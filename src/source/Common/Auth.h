@@ -17,16 +17,6 @@ extern "C" {
 // Function definitions
 ////////////////////////////////////////////////////
 
-/**
- * Deserialize an AWS credentials object, adapt the accessKey/secretKey/sessionToken pointer
- * to offset following the AwsCredential structure
- *
- * @param - PBYTE - IN - Token to be deserialized.
- *
- * @return - STATUS code of the execution
- */
-STATUS deserializeAwsCredentials(PBYTE);
-
 #pragma pack(pop, include_i)
 
 #ifdef  __cplusplus

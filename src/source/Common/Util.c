@@ -5,9 +5,6 @@
 
 #include "Include_i.h"
 
-#define EARLY_EXPIRATION_FACTOR                         1.0
-#define IOT_EXPIRATION_PARSE_CONVERSION_BASE                     10
-
 STATUS convertTimestampToEpoch(PCHAR expirationTimestampStr, UINT64 nowTime, PUINT64 pExpiration)
 {
     STATUS retStatus = STATUS_SUCCESS;
@@ -74,11 +71,46 @@ STATUS convertTimestampToEpoch(PCHAR expirationTimestampStr, UINT64 nowTime, PUI
 
     diff = iotExpirationInEpoch - currentTimeInEpoch;
 
-    DLOGD("Difference between current time and iot expiration is %llu ", diff);
+    DLOGD("Difference between current time and iot expiration is %" PRIu64, diff);
 
     *pExpiration = (UINT64) (nowTime + ((DOUBLE) diff * EARLY_EXPIRATION_FACTOR)) * HUNDREDS_OF_NANOS_IN_A_SECOND;
 
 CleanUp:
 
     return retStatus;
+}
+
+BOOL compareJsonString(PCHAR pJsonStr, jsmntok_t* pToken, jsmntype_t jsmnType, PCHAR pStr)
+{
+    if (pToken->type == jsmnType &&
+        STRLEN(pStr) == pToken->end - pToken->start &&
+        0 == STRNCMP(pJsonStr + pToken->start, pStr, (UINT32) pToken->end - pToken->start)) {
+        return TRUE;
+    } else {
+        return FALSE;
+    }
+}
+
+PCHAR getSslCertNameFromType(SSL_CERTIFICATE_TYPE sslCertificateType)
+{
+    PCHAR retStr;
+
+    switch (sslCertificateType) {
+        case SSL_CERTIFICATE_TYPE_PEM:
+            retStr = SSL_CERTIFICATE_TYPE_PEM_STR;
+            break;
+
+        case SSL_CERTIFICATE_TYPE_DER:
+            retStr = SSL_CERTIFICATE_TYPE_DER_STR;
+            break;
+
+        case SSL_CERTIFICATE_TYPE_ENG:
+            retStr = SSL_CERTIFICATE_TYPE_ENG_STR;
+            break;
+
+        default:
+            retStr = SSL_CERTIFICATE_TYPE_UNKNOWN_STR;
+    }
+
+    return retStr;
 }
