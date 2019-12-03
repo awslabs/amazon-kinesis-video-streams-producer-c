@@ -48,7 +48,7 @@ STATUS getUserAgentString(PCHAR userAgentName, PCHAR customUserAgent, UINT32 len
                                customUserAgent);
     }
 
-    CHK(requiredLen > 0 && requiredLen <= len, STATUS_BUFFER_TOO_SMALL);
+    CHK(requiredLen > 0 && (UINT32) requiredLen <= len, STATUS_BUFFER_TOO_SMALL);
 
 CleanUp:
 
