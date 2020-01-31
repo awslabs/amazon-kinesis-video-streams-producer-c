@@ -344,6 +344,8 @@ protected:
     BufferPressureState mCurrentPressureState;
     UINT32 mPressureHandlerRetryCount;
 
+    UINT32 loggerLogLevel = LOG_LEVEL_WARN;
+
 private:
 
     // Stored function pointers to reset on exit

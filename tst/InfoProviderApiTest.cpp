@@ -15,7 +15,7 @@ namespace com { namespace amazonaws { namespace kinesis { namespace video {
 
         EXPECT_EQ(STATUS_INVALID_STORAGE_SIZE, setDeviceInfoStorageSize(pDeviceInfo, MAX_STORAGE_ALLOCATION_SIZE + 1));
 
-        EXPECT_TRUE(pDeviceInfo->clientInfo.loggerLogLevel == 4);
+        EXPECT_TRUE(pDeviceInfo->clientInfo.loggerLogLevel == this->loggerLogLevel);
 
         // 500 Kbps with 2 sec duration
         EXPECT_EQ(STATUS_SUCCESS,

@@ -5,7 +5,13 @@
 
 namespace com { namespace amazonaws { namespace kinesis { namespace video {
 
-    class FileLoggerFunctionalityTest : public ProducerClientTestBase {
+    class FileLoggerFunctionalityTest : public ProducerClientTestBase
+    {
+        public:
+            FileLoggerFunctionalityTest() :  ProducerClientTestBase() {
+                // Tests will fail if log level is not warn
+                SET_LOGGER_LOG_LEVEL(LOG_LEVEL_WARN);
+            }
     };
 
     TEST_F(FileLoggerFunctionalityTest, basicFileLoggerUsage)
