@@ -7,9 +7,6 @@
 extern "C" {
 #endif
 
-// For tight packing
-#pragma pack(push, include_i, 1) // for byte alignment
-
 #define GRACE_PERIOD_STREAM_LATENCY_STATE_MACHINE                   (30 * HUNDREDS_OF_NANOS_IN_A_SECOND)
 #define VERIFICATION_PERIOD_STREAM_LATENCY_STATE_MACHINE            (60 * HUNDREDS_OF_NANOS_IN_A_SECOND)
 
@@ -46,7 +43,7 @@ VOID streamLatencyStateMachineSetThrottlePipelineState(PStreamLatencyStateMachin
 VOID streamLatencyStateMachineSetInfiniteRetryState(PStreamLatencyStateMachine);
 STATUS streamLatencyStateMachineDoInfiniteRetry(STREAM_HANDLE, PStreamLatencyStateMachine);
 
-#pragma pack(pop, include_i)
+
 
 #ifdef  __cplusplus
 }

@@ -10,9 +10,6 @@ Auth internal include file
 extern "C" {
 #endif
 
-// For tight packing
-#pragma pack(push, include_i, 1) // for byte alignment
-
 /**
  * IMPORTANT!!! This is the current version of the SDK which needs to be maintained
  */
@@ -26,8 +23,6 @@ extern "C" {
 ////////////////////////////////////////////////////
 // Function definitions
 ////////////////////////////////////////////////////
-
-#pragma pack(pop, include_i)
 
 #ifdef  __cplusplus
 }

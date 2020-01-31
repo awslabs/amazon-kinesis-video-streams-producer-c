@@ -7,9 +7,6 @@
 extern "C" {
 #endif
 
-// For tight packing
-#pragma pack(push, include_i, 1) // for byte alignment
-
 struct __CallbackStateMachine;
 struct __CallbacksProvider;
 
@@ -60,8 +57,6 @@ STATUS continuousRetryStreamReadyHandler(UINT64, STREAM_HANDLE);
 STATUS continuousRetryStreamFreeHandler(PUINT64);
 STATUS continuousRetryStreamShutdownHandler(UINT64, STREAM_HANDLE, BOOL);
 STATUS continuousRetryStreamClosedHandler(UINT64, STREAM_HANDLE, UPLOAD_HANDLE);
-
-#pragma pack(pop, include_i)
 
 #ifdef  __cplusplus
 }

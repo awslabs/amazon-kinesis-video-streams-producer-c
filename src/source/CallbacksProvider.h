@@ -10,9 +10,6 @@ CallbacksProvider internal include file
 extern "C" {
 #endif
 
-// For tight packing
-#pragma pack(push, include_i, 1) // for byte alignment
-
 /**
  * The KVS callbacks provider structure
  */
@@ -131,7 +128,7 @@ STATUS broadcastConditionVariableAggregate(UINT64, CVAR);
 STATUS waitConditionVariableAggregate(UINT64, CVAR, MUTEX, UINT64);
 VOID freeConditionVariableAggregate(UINT64, CVAR);
 
-#pragma pack(pop, include_i)
+
 
 #ifdef  __cplusplus
 }

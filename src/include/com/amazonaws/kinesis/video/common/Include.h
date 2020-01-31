@@ -16,9 +16,6 @@ extern "C" {
 #include <jsmn.h>
 #include <com/amazonaws/kinesis/video/client/Include.h>
 
-// For tight packing
-#pragma pack(push, include, 1) // for byte alignment
-
 ////////////////////////////////////////////////////
 // Status return codes
 ////////////////////////////////////////////////////
@@ -791,7 +788,7 @@ PUBLIC_API SERVICE_CALL_RESULT getServiceCallResultFromHttpStatus(UINT32);
  */
 PUBLIC_API STATUS releaseCallInfo(PCallInfo);
 
-#pragma pack(pop, include)
+
 
 #ifdef  __cplusplus
 }
