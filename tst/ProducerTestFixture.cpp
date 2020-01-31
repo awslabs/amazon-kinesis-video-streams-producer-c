@@ -207,6 +207,12 @@ ProducerClientTestBase::ProducerClientTestBase() :
         mProducerCallbacks(NULL),
         mResetStreamCounter(0)
 {
+    auto logLevelStr = GETENV("AWS_KVS_LOG_LEVEL");
+    if (logLevelStr != NULL) {
+        assert(STRTOUI32(logLevelStr, NULL, 10, &this->loggerLogLevel) == STATUS_SUCCESS);
+        SET_LOGGER_LOG_LEVEL(this->loggerLogLevel);
+    }
+
     // Store the function pointers
     gTotalProducerClientMemoryUsage = 0;
     mStoredMemAlloc = globalMemAlloc;
@@ -243,7 +249,7 @@ ProducerClientTestBase::ProducerClientTestBase() :
     mDeviceInfo.clientInfo.createStreamTimeout = 0;
     mDeviceInfo.clientInfo.createClientTimeout = 0;
     mDeviceInfo.clientInfo.offlineBufferAvailabilityTimeout = 0;
-    mDeviceInfo.clientInfo.loggerLogLevel = LOG_LEVEL_DEBUG;
+    mDeviceInfo.clientInfo.loggerLogLevel = this->loggerLogLevel;
     mDeviceInfo.clientInfo.logMetric = TRUE;
 
     mDefaultRegion[0] = '\0';
@@ -417,6 +423,7 @@ VOID ProducerClientTestBase::createDefaultProducerClient(BOOL cachingEndpoint, U
     // Set quick timeouts
     mDeviceInfo.clientInfo.createClientTimeout = TEST_CREATE_PRODUCER_TIMEOUT;
     mDeviceInfo.clientInfo.createStreamTimeout = createStreamTimeout;
+    mDeviceInfo.clientInfo.loggerLogLevel = this->loggerLogLevel;
 
     // Create the producer client
     EXPECT_EQ(STATUS_SUCCESS, createKinesisVideoClientSync(&mDeviceInfo, mCallbacksProvider, &mClientHandle));
