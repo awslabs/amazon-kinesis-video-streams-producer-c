@@ -31,9 +31,6 @@ typedef StreamLatencyStateMachine* PStreamLatencyStateMachine;
 #include <signal.h>
 #endif
 
-// For tight packing
-#pragma pack(push, include_i, 1) // for byte alignment
-
 /**
  * Continuous retry state machinery states
  */
@@ -76,8 +73,6 @@ typedef enum {
 ////////////////////////////////////////////////////
 // Project internal functions
 ////////////////////////////////////////////////////
-
-#pragma pack(pop, include_i)
 
 #ifdef  __cplusplus
 }

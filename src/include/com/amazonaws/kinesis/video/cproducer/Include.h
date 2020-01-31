@@ -16,9 +16,6 @@ extern "C" {
 #include <com/amazonaws/kinesis/video/client/Include.h>
 #include <com/amazonaws/kinesis/video/common/Include.h>
 
-// For tight packing
-#pragma pack(push, include, 1) // for byte alignment
-
 ////////////////////////////////////////////////////
 // Status return codes
 ////////////////////////////////////////////////////
@@ -663,7 +660,7 @@ PUBLIC_API STATUS createAbstractDefaultCallbacksProvider(UINT32, BOOL, UINT64, P
  */
 PUBLIC_API STATUS addFileLoggerPlatformCallbacksProvider(PClientCallbacks, UINT64, UINT64, PCHAR, BOOL);
 
-#pragma pack(pop, include)
+
 
 #ifdef  __cplusplus
 }

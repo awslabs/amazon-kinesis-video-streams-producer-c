@@ -8,9 +8,6 @@
 extern "C" {
 #endif
 
-// For tight packing
-#pragma pack(push, include_i, 1) // for byte alignment
-
 /**
  * Forward declarations
  */
@@ -46,8 +43,6 @@ STATUS freeRotatingStaticAuthCallbacks(PAuthCallbacks*);
 STATUS getStreamingTokenEnvVarFunc(UINT64, PCHAR, STREAM_ACCESS_MODE, PServiceCallContext);
 STATUS getSecurityTokenEnvVarFunc(UINT64, PBYTE *, PUINT32, PUINT64);
 STATUS freeRotatingStaticAuthCallbacksFunc(PUINT64);
-
-#pragma pack(pop, include_i)
 
 #ifdef  __cplusplus
 }
