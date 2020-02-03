@@ -7,8 +7,8 @@
 <h4 align="center"> Amazon Kinesis Video Streams | Secure Video Ingestion for Analysis &amp; Storage </h4>
 
 <p align="center">
-  <a href="https://travis-ci.org/awslabs/amazon-kinesis-video-streams-pic"> <img src="https://travis-ci.org/awslabs/amazon-kinesis-video-streams-pic.svg?branch=master" alt="Build Status"> </a>
-  <a href="https://codecov.io/gh/awslabs/amazon-kinesis-video-streams-pic"> <img src="https://codecov.io/gh/awslabs/amazon-kinesis-video-streams-pic/branch/master/graph/badge.svg" alt="Coverage Status"> </a>
+  <a href="https://travis-ci.org/awslabs/amazon-kinesis-video-streams-producer-c"> <img src="https://travis-ci.org/awslabs/amazon-kinesis-video-streams-producer-c.svg?branch=master" alt="Build Status"> </a>
+  <a href="https://codecov.io/gh/awslabs/amazon-kinesis-video-streams-producer-c"> <img src="https://codecov.io/gh/awslabs/amazon-kinesis-video-streams-producer-c/branch/master/graph/badge.svg" alt="Coverage Status"> </a>
 </p>
 
 <p align="center">
