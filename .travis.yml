@@ -34,7 +34,7 @@ matrix:
       os: osx
       compiler: gcc
       before_script:
-        - mkdir build && cd build && cmake .. -DBUILD_TEST=TRUE -DBUILD_COMMON_LWS=TRUE
+        - mkdir build && cd build && cmake .. -DBUILD_TEST=TRUE -DBUILD_COMMON_LWS=TRUE -DBUILD_COMMON_CURL=TRUE
       script:
         - make
         - ./tst/producer_test
@@ -55,7 +55,7 @@ matrix:
       os: linux
       compiler: gcc
       before_script:
-        - mkdir build && cd build && cmake .. -DCODE_COVERAGE=TRUE -DBUILD_TEST=TRUE -DBUILD_COMMON_LWS=TRUE
+        - mkdir build && cd build && cmake .. -DCODE_COVERAGE=TRUE -DBUILD_TEST=TRUE -DBUILD_COMMON_LWS=TRUE -DBUILD_COMMON_CURL=TRUE
       after_success:
         - for test_file in $(find cproducer.dir kvsCommonCurl.dir kvsCommonLws.dir -name '*.gcno'); do gcov $test_file; done
         - bash <(curl -s https://codecov.io/bash)
@@ -66,7 +66,7 @@ matrix:
       compiler: clang
       # env: ASAN_OPTIONS=detect_odr_violation=0:detect_leaks=1
       env: allowTestFail=true
-      before_script: mkdir build && cd build && cmake .. -DBUILD_TEST=TRUE -DADDRESS_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
+      before_script: mkdir build && cd build && cmake .. -DBUILD_TEST=TRUE -DADDRESS_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE -DBUILD_COMMON_CURL=TRUE
 
     # UndefinedBehaviorSanitizer
     - name: "Linux Clang UndefinedBehaviorSanitizer"
@@ -74,21 +74,21 @@ matrix:
       compiler: clang
       env: allowTestFail=true
       # env: UBSAN_OPTIONS=halt_on_error=1
-      before_script: mkdir build && cd build && cmake .. -DBUILD_TEST=TRUE -DUNDEFINED_BEHAVIOR_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
+      before_script: mkdir build && cd build && cmake .. -DBUILD_TEST=TRUE -DUNDEFINED_BEHAVIOR_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE -DBUILD_COMMON_CURL=TRUE
 
     # MemorySanitizer
     - name: "Linux Clang MemorySanitizer"
       os: linux
       compiler: clang
       env: allowTestFail=true
-      before_script: mkdir build && cd build && cmake .. -DBUILD_TEST=TRUE -DMEMORY_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
+      before_script: mkdir build && cd build && cmake .. -DBUILD_TEST=TRUE -DMEMORY_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE -DBUILD_COMMON_CURL=TRUE
 
     # ThreadSanitizer
     - name: "Linux Clang ThreadSanitizer"
       os: linux
       compiler: clang
       env: allowTestFail=true
-      before_script: mkdir build && cd build && cmake .. -DBUILD_TEST=TRUE -DTHREAD_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
+      before_script: mkdir build && cd build && cmake .. -DBUILD_TEST=TRUE -DTHREAD_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE -DBUILD_COMMON_CURL=TRUE
 
     # Old Version GCC 4.4
     - name: "Linux GCC 4.4 Build"
@@ -102,7 +102,7 @@ matrix:
             - gcc-4.4
             - gdb
       compiler: gcc
-      before_script: export CC=gcc-4.4 && mkdir build && cd build && cmake .. -DBUILD_TEST=TRUE -DBUILD_COMMON_LWS=TRUE
+      before_script: export CC=gcc-4.4 && mkdir build && cd build && cmake .. -DBUILD_TEST=TRUE -DBUILD_COMMON_LWS=TRUE -DBUILD_COMMON_CURL=TRUE
 
     # Cross-compilation to ARM, no tests are run
     - name: "ARM Cross-compilation"

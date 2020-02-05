@@ -6,6 +6,7 @@ option(ADD_MUCLIBC "Add -muclibc c flag" OFF)
 option(BUILD_DEPENDENCIES "Whether or not to build depending libraries from source" ON)
 option(BUILD_OPENSSL "If building dependencies, whether or not building openssl from source" OFF)
 OPTION(BUILD_COMMON_LWS "Whether or not to build ProducerC libwebsockets common library" OFF)
+OPTION(BUILD_COMMON_CURL "Whether or not to build ProducerC curl common library" OFF)
 
 # Developer Flags
 option(BUILD_TEST "Build the testing tree." OFF)
@@ -126,7 +127,7 @@ if(BUILD_DEPENDENCIES)
     endif()
   endif()
 
-  if(NOT EXISTS ${OPEN_SOURCE_DIR}/libcurl)
+  if(NOT EXISTS ${OPEN_SOURCE_DIR}/libcurl AND BUILD_COMMON_CURL)
     configure_file(
       ${CMAKE_SOURCE_DIR}/cmake-scripts/libcurl-CMakeLists.txt
       ${OPEN_SOURCE_DIR}/libcurl/CMakeLists.txt COPYONLY)
@@ -222,10 +223,14 @@ if("${CMAKE_C_COMPILER_ID}" MATCHES "GNU|Clang")
         enableSanitizer("undefined")
     endif()
 
-    pkg_check_modules(LIBCURL REQUIRED libcurl)
-    link_directories(${LIBCURL_LIBRARY_DIRS})
+    set(OPEN_SRC_INCLUDE_DIRS ${OPENSSL_INCLUDE_DIR} )
 
-    set(OPEN_SRC_INCLUDE_DIRS ${OPENSSL_INCLUDE_DIR} ${LIBCURL_INCLUDE_DIRS})
+    if(BUILD_COMMON_CURL)
+        pkg_check_modules(LIBCURL REQUIRED libcurl)
+
+        set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${LIBCURL_INCLUDE_DIRS})
+        link_directories(${LIBCURL_LIBRARY_DIRS})
+    endif()
 
     if (BUILD_COMMON_LWS)
         pkg_check_modules(LIBWEBSOCKET REQUIRED libwebsockets)
