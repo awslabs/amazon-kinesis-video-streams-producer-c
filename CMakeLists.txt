@@ -6,7 +6,7 @@ option(ADD_MUCLIBC "Add -muclibc c flag" OFF)
 option(BUILD_DEPENDENCIES "Whether or not to build depending libraries from source" ON)
 option(BUILD_OPENSSL "If building dependencies, whether or not building openssl from source" OFF)
 OPTION(BUILD_COMMON_LWS "Whether or not to build ProducerC libwebsockets common library" OFF)
-OPTION(BUILD_COMMON_CURL "Whether or not to build ProducerC curl common library" OFF)
+OPTION(BUILD_COMMON_CURL "Whether or not to build ProducerC curl common library" ON)
 
 # Developer Flags
 option(BUILD_TEST "Build the testing tree." OFF)
