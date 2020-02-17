@@ -124,4 +124,5 @@ matrix:
         - cmake .. -DBUILD_TEST=TRUE -DBUILD_OPENSSL=TRUE -DBUILD_OPENSSL_PLATFORM=linux-generic32 -DBUILD_LIBCURL_HOST_PLATFORM=x86_64-unknown-linux-gnu -DBUILD_LIBCURL_DESTINATION_PLATFORM=arm-unknown-linux-uclibcgnueabi
       script: make
       after_failure:
+        - echo "got a failure"
         - cat $TRAVIS_BUILD_DIR/open-source/libcurl/build/src/project_libcurl/config.log
