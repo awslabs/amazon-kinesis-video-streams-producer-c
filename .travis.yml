@@ -113,6 +113,7 @@ matrix:
           s3_region: "us-west-2"
           paths:
             - $TRAVIS_BUILD_DIR/open-source/libcurl/build/src/project_libcurl/config.log
+          debug: true
         apt:
           packages:
             - gcc-arm-linux-gnueabi
