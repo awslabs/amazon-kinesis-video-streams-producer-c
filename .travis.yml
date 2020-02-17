@@ -11,6 +11,7 @@ cache:
   - $HOME/.cache
 
 addons:
+  artifacts: true
   apt:
     packages:
       - gdb
@@ -110,11 +111,6 @@ matrix:
       env: allowTestFail=true
       os: linux
       addons:
-        artifacts:
-          s3_region: "us-west-2"
-          paths:
-            - $TRAVIS_BUILD_DIR/open-source/libcurl/build/src/project_libcurl/config.log
-          debug: true
         apt:
           packages:
             - gcc-arm-linux-gnueabi
