@@ -118,7 +118,7 @@ matrix:
             - binutils-arm-linux-gnueabi
       compiler: gcc
       before_script:
-        - export CC=arm-linux-gnueabi-gcc CXX=arm-linux-gnueabi-g++ AR=arm-linux-gnueabi-ar
+        - export CC=arm-linux-gnueabi-gcc CXX=arm-linux-gnueabi-g++ AR=arm-linux-gnueabi-ar LD=arm-linux-gnueabi-ld
         - mkdir build && cd build
         - cmake .. -DBUILD_TEST=TRUE -DBUILD_OPENSSL=TRUE -DBUILD_OPENSSL_PLATFORM=linux-generic32 -DBUILD_LIBCURL_HOST_PLATFORM=x86_64-unknown-linux-gnu -DBUILD_LIBCURL_DESTINATION_PLATFORM=arm-unknown-linux-uclibcgnueabi
       script: make
