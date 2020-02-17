@@ -11,7 +11,8 @@ cache:
   - $HOME/.cache
 
 addons:
-  artifacts: true
+  artifacts:
+    debug: true
   apt:
     packages:
       - gdb
