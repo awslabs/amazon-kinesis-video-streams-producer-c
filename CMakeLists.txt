@@ -56,6 +56,7 @@ message(STATUS "Kinesis Video Producer path is ${KINESIS_VIDEO_PRODUCER_C_SRC}")
 message(STATUS "Kinesis Video Open Source path is ${KINESIS_VIDEO_OPEN_SOURCE_SRC}")
 
 if(BUILD_DEPENDENCIES)
+
   set(OPEN_SOURCE_DIR ${CMAKE_SOURCE_DIR}/open-source)
 
   if(NOT EXISTS ${OPEN_SOURCE_DIR})
@@ -274,7 +275,8 @@ if(BUILD_COMMON_LWS)
             ${OPENSSL_CRYPTO_LIBRARY}
             ${OPENSSL_SSL_LIBRARY}
             ${LIBWEBSOCKET_LIBRARIES}
-            ${LIBCURL_LIBRARIES})
+            ${LIBCURL_LIBRARIES}
+            kvspicUtils)
 endif()
 
 # producer only uses curl right now
