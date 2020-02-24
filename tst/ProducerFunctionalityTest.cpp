@@ -1015,7 +1015,7 @@ TEST_F(ProducerFunctionalityTest, stream_latency_handling_with_continuous_retry)
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
 
-TEST_F(ProducerFunctionalityTest, offline_mode_multiple_stream_streaming)
+TEST_F(ProducerFunctionalityTest, DISABLED_offline_mode_multiple_stream_streaming)
 {
     UINT32 j, k;
     UINT32 totalFragments = 10;
