@@ -55,7 +55,10 @@ message(STATUS "Kinesis Video Producer path is ${KINESIS_VIDEO_PRODUCER_C_SRC}")
 message(STATUS "Kinesis Video Open Source path is ${KINESIS_VIDEO_OPEN_SOURCE_SRC}")
 
 if(BUILD_DEPENDENCIES)
-  set(OPEN_SOURCE_DIR ${CMAKE_SOURCE_DIR}/open-source)
+
+  if(NOT OPEN_SOURCE_DIR) # set in parent cmake script
+    set(OPEN_SOURCE_DIR ${CMAKE_SOURCE_DIR}/open-source)
+  endif()
 
   if(NOT EXISTS ${OPEN_SOURCE_DIR})
     file(MAKE_DIRECTORY ${OPEN_SOURCE_DIR}/local)
@@ -73,7 +76,7 @@ if(BUILD_DEPENDENCIES)
               ${CMAKE_SOURCE_DIR}/cmake-scripts/libopenssl-CMakeLists.txt
               ${OPEN_SOURCE_DIR}/libopenssl/CMakeLists.txt COPYONLY)
       execute_process(
-              COMMAND ${CMAKE_COMMAND} -DBUILD_OPENSSL_PLATFORM=${BUILD_OPENSSL_PLATFORM} -DOPEN_SRC_INSTALL_PREFIX=${OPEN_SRC_INSTALL_PREFIX} -G ${CMAKE_GENERATOR} .
+              COMMAND ${CMAKE_COMMAND} -DBUILD_STATIC=${BUILD_STATIC} -DBUILD_OPENSSL_PLATFORM=${BUILD_OPENSSL_PLATFORM} -DOPEN_SRC_INSTALL_PREFIX=${OPEN_SRC_INSTALL_PREFIX} -G ${CMAKE_GENERATOR} .
               RESULT_VARIABLE result
               WORKING_DIRECTORY ${OPEN_SOURCE_DIR}/libopenssl)
       if(result)
