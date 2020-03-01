@@ -107,7 +107,21 @@ if(BUILD_DEPENDENCIES)
 
   find_package(OpenSSL REQUIRED)
   # get openssl dir and pass it to libwebsocket
-  get_filename_component(OPENSSL_DIR ${OPENSSL_INCLUDE_DIR} DIRECTORY)
+  set(OPENSSL_DIR ${OPEN_SOURCE_DIR}/libopenssl/build/src/project_libopenssl/ )
+  
+  # prepare for cURL
+  if(NOT EXISTS ${OPENSSL_DIR}/lib)
+    file(MAKE_DIRECTORY ${OPENSSL_DIR}/lib)
+
+    execute_process(
+    COMMAND ln -s ../libssl.a
+    COMMAND ln -s ../libcrypto.a
+    RESULT_VARIABLE result
+    WORKING_DIRECTORY ${OPENSSL_DIR}/lib)
+    if(result)
+      message(FATAL_ERROR "CMake step for libopenssl failed: ${result}")
+    endif()
+  endif()
 
   if(NOT EXISTS ${OPEN_SOURCE_DIR}/libwebsockets AND BUILD_COMMON_LWS)
     # build libwebsockets
