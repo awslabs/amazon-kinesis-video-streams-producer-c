@@ -61,7 +61,7 @@ TEST_F(ProducerFunctionalityTest, reset_stream_on_stream_error_before_putFrame)
 {
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     UINT32 i;
-    UINT32 totalFragments = 60;
+    UINT32 totalFragments = 10;
     UINT32 totalFrames = totalFragments * TEST_FPS;
 
     createDefaultProducerClient(FALSE, 60 * HUNDREDS_OF_NANOS_IN_A_SECOND);
@@ -77,7 +77,6 @@ TEST_F(ProducerFunctionalityTest, reset_stream_on_stream_error_before_putFrame)
     for(i = 0; i < totalFrames; ++i) {
         EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
         updateFrame();
-        THREAD_SLEEP(mFrame.duration);
     }
 
     DLOGD("Stopping the stream with stream handle %" PRIu64, (UINT64) streamHandle);
@@ -95,7 +94,7 @@ TEST_F(ProducerFunctionalityTest, reset_stream_on_stream_error_with_frame_in_buf
 {
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     UINT32 i;
-    UINT32 totalFragments = 60;
+    UINT32 totalFragments = 10;
     UINT32 totalFrames = totalFragments * TEST_FPS;
 
     createDefaultProducerClient(FALSE, 60 * HUNDREDS_OF_NANOS_IN_A_SECOND);
@@ -116,8 +115,11 @@ TEST_F(ProducerFunctionalityTest, reset_stream_on_stream_error_with_frame_in_buf
     mCurlEasyPerformInjectionCount = 6;
     mResetStreamCounter = 1;
 
-    // gonna cause getEndpoint error
+    // trigger getEndpoint error and wait until it happens.
     EXPECT_EQ(STATUS_SUCCESS, kinesisVideoStreamResetConnection(streamHandle));
+    while(mStreamErrorFnCount == 0) {
+        THREAD_SLEEP(HUNDREDS_OF_NANOS_IN_A_MILLISECOND);
+    }
 
     for(; i < totalFrames; ++i) {
         EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
@@ -198,14 +200,13 @@ TEST_F(ProducerFunctionalityTest, repeated_create_client_create_stream_put_frame
     for(i = 0; i < FUNCTIONALITY_TEST_STRESS_TEST_ITERATION; i++) {
         createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
 
-        EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION));
+        EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION, FALSE));
         streamHandle = mStreams[0];
         EXPECT_TRUE(streamHandle != INVALID_STREAM_HANDLE_VALUE);
 
         for(j = 0; j < totalFrames; ++j) {
             EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
             updateFrame();
-            THREAD_SLEEP(mFrame.duration);
         }
 
         mFrame.flags = FRAME_FLAG_NONE;
@@ -233,7 +234,7 @@ TEST_F(ProducerFunctionalityTest, repeated_create_client_create_stream_put_frame
         createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
 
         for(j = 0; j < streamCount; j++) {
-            EXPECT_EQ(STATUS_SUCCESS, createTestStream(j, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION));
+            EXPECT_EQ(STATUS_SUCCESS, createTestStream(j, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION, FALSE));
             EXPECT_TRUE(mStreams[j] != INVALID_STREAM_HANDLE_VALUE);
         }
 
@@ -242,7 +243,6 @@ TEST_F(ProducerFunctionalityTest, repeated_create_client_create_stream_put_frame
                 EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(mStreams[j], &mFrame));
             }
             updateFrame();
-            THREAD_SLEEP(mFrame.duration);
         }
 
         for(j = 0; j < streamCount; j++) {
@@ -272,14 +272,13 @@ TEST_F(ProducerFunctionalityTest, create_client_repeated_create_stream_put_frame
 
     for(i = 0; i < FUNCTIONALITY_TEST_STRESS_TEST_ITERATION; i++) {
 
-        EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION));
+        EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION, FALSE));
         streamHandle = mStreams[0];
         EXPECT_TRUE(streamHandle != INVALID_STREAM_HANDLE_VALUE);
 
         for(j = 0; j < totalFrames; ++j) {
             EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
             updateFrame();
-            THREAD_SLEEP(mFrame.duration);
         }
 
         mFrame.flags = FRAME_FLAG_NONE;
@@ -304,7 +303,7 @@ TEST_F(ProducerFunctionalityTest, create_client_repeated_create_stream_put_frame
     for(i = 0; i < FUNCTIONALITY_TEST_STRESS_TEST_ITERATION; i++) {
 
         for(j = 0; j < streamCount; j++) {
-            EXPECT_EQ(STATUS_SUCCESS, createTestStream(j, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION));
+            EXPECT_EQ(STATUS_SUCCESS, createTestStream(j, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION, FALSE));
             EXPECT_TRUE(mStreams[j] != INVALID_STREAM_HANDLE_VALUE);
         }
 
@@ -313,7 +312,6 @@ TEST_F(ProducerFunctionalityTest, create_client_repeated_create_stream_put_frame
                 EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(mStreams[j], &mFrame));
             }
             updateFrame();
-            THREAD_SLEEP(mFrame.duration);
         }
 
         for(j = 0; j < streamCount; j++) {
@@ -335,14 +333,13 @@ TEST_F(ProducerFunctionalityTest, create_client_repeated_create_stream_put_frame
 
     for(i = 0; i < FUNCTIONALITY_TEST_STRESS_TEST_ITERATION; i++) {
 
-        EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION));
+        EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION, FALSE));
         streamHandle = mStreams[0];
         EXPECT_TRUE(streamHandle != INVALID_STREAM_HANDLE_VALUE);
 
         for(j = 0; j < totalFrames; ++j) {
             EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
             updateFrame();
-            THREAD_SLEEP(mFrame.duration);
         }
 
         mFrame.flags = FRAME_FLAG_NONE;
@@ -367,7 +364,7 @@ TEST_F(ProducerFunctionalityTest, create_client_repeated_create_stream_put_frame
     for(i = 0; i < FUNCTIONALITY_TEST_STRESS_TEST_ITERATION; i++) {
 
         for(j = 0; j < streamCount; j++) {
-            EXPECT_EQ(STATUS_SUCCESS, createTestStream(j, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION));
+            EXPECT_EQ(STATUS_SUCCESS, createTestStream(j, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION, FALSE));
             EXPECT_TRUE(mStreams[j] != INVALID_STREAM_HANDLE_VALUE);
         }
 
@@ -376,7 +373,6 @@ TEST_F(ProducerFunctionalityTest, create_client_repeated_create_stream_put_frame
                 EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(mStreams[j], &mFrame));
             }
             updateFrame();
-            THREAD_SLEEP(mFrame.duration);
         }
 
         for(j = 0; j < streamCount; j++) {
@@ -391,7 +387,7 @@ TEST_F(ProducerFunctionalityTest, fail_new_connection_at_token_rotation)
 {
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     UINT32 i;
-    UINT32 totalFrames = 60 * TEST_FPS; // need to stream until token rotation
+    UINT32 totalFrames = 50 * TEST_FPS; // need to stream until token rotation
     mCurlEasyPerformInjectionCount = 1;
 
     createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
@@ -415,7 +411,7 @@ TEST_F(ProducerFunctionalityTest, fail_new_connection_at_token_rotation)
     EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStreamSync(streamHandle));
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
     EXPECT_EQ(1, mStreamErrorFnCount);
-    EXPECT_EQ(60, mPersistedFragmentCount);
+    EXPECT_EQ(50, mPersistedFragmentCount);
 
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
@@ -424,7 +420,7 @@ TEST_F(ProducerFunctionalityTest, fail_old_connection_at_token_rotation)
 {
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     UINT32 i, errCount;
-    UINT32 totalFrames = 60 * TEST_FPS; // need to stream until token rotation
+    UINT32 totalFrames = 50 * TEST_FPS; // need to stream until token rotation
 
     createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
 
@@ -450,7 +446,7 @@ TEST_F(ProducerFunctionalityTest, fail_old_connection_at_token_rotation)
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
     // no new error during shutdown
     EXPECT_EQ(errCount, mStreamErrorFnCount);
-    EXPECT_EQ(60, mPersistedFragmentCount);
+    EXPECT_EQ(50, mPersistedFragmentCount);
 
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
@@ -459,7 +455,7 @@ TEST_F(ProducerFunctionalityTest, intermittent_producer_fail_new_connection_at_t
 {
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     UINT32 i;
-    UINT32 totalFrames = 60 * TEST_FPS; // need to stream until token rotation
+    UINT32 totalFrames = 50 * TEST_FPS; // need to stream until token rotation
     UINT32 pausePutFrameInterval = 40; // pause putFrame for 5 sec every 40 frames.
     mCurlEasyPerformInjectionCount = 1;
 
@@ -479,8 +475,6 @@ TEST_F(ProducerFunctionalityTest, intermittent_producer_fail_new_connection_at_t
         updateFrame();
         if (mFrame.index % pausePutFrameInterval == 0) {
             THREAD_SLEEP(5 * HUNDREDS_OF_NANOS_IN_A_SECOND);
-        } else {
-            THREAD_SLEEP(mFrame.duration);
         }
     }
 
@@ -488,7 +482,7 @@ TEST_F(ProducerFunctionalityTest, intermittent_producer_fail_new_connection_at_t
     EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStreamSync(streamHandle));
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
     EXPECT_EQ(1, mStreamErrorFnCount);
-    EXPECT_EQ(60, mPersistedFragmentCount);
+    EXPECT_EQ(50, mPersistedFragmentCount);
 
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
@@ -497,7 +491,7 @@ TEST_F(ProducerFunctionalityTest, intermittent_producer_fail_old_connection_at_t
 {
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     UINT32 i, errCount;
-    UINT32 totalFrames = 60 * TEST_FPS; // need to stream until token rotation
+    UINT32 totalFrames = 50 * TEST_FPS; // need to stream until token rotation
     UINT32 pausePutFrameInterval = 40; // pause putFrame for 5 sec every 40 frames.
 
     createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
@@ -514,8 +508,6 @@ TEST_F(ProducerFunctionalityTest, intermittent_producer_fail_old_connection_at_t
         updateFrame();
         if (mFrame.index % pausePutFrameInterval == 0) {
             THREAD_SLEEP(5 * HUNDREDS_OF_NANOS_IN_A_SECOND);
-        } else {
-            THREAD_SLEEP(mFrame.duration);
         }
     }
 
@@ -528,7 +520,7 @@ TEST_F(ProducerFunctionalityTest, intermittent_producer_fail_old_connection_at_t
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
     // no new error during shutdown
     EXPECT_EQ(errCount, mStreamErrorFnCount);
-    EXPECT_EQ(60, mPersistedFragmentCount);
+    EXPECT_EQ(50, mPersistedFragmentCount);
 
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
@@ -757,7 +749,7 @@ TEST_F(ProducerFunctionalityTest, offline_upload_limited_storage)
 TEST_F(ProducerFunctionalityTest, intermittent_file_upload)
 {
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
-    UINT32 j, k, clipCount = 10;
+    UINT32 j, k, clipCount = 5;
     UINT32 fragmentsPerClip = 30;
     UINT32 framesPerClip = fragmentsPerClip * TEST_FPS;
     UINT32 pauseBetweenClipSeconds = 10;
@@ -789,7 +781,7 @@ TEST_F(ProducerFunctionalityTest, intermittent_file_upload)
 TEST_F(ProducerFunctionalityTest, intermittent_file_upload_with_eofr)
 {
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
-    UINT32 j, k, clipCount = 10;
+    UINT32 j, k, clipCount = 5;
     UINT32 fragmentsPerClip = 30;
     UINT32 framesPerClip = fragmentsPerClip * TEST_FPS;
     UINT32 pauseBetweenClipSeconds = 10;
@@ -824,7 +816,7 @@ TEST_F(ProducerFunctionalityTest, high_fragment_rate_file_upload)
 {
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     UINT32 i;
-    UINT32 totalDuration = 100;
+    UINT32 totalDuration = 50;
     UINT32 totalFrames = totalDuration * TEST_FPS;
     mKeyFrameInterval = 4;
 
@@ -875,7 +867,6 @@ TEST_F(ProducerFunctionalityTest, stream_callbacks_going_off_properly)
     for(i = 0; i < totalFrames; ++i) {
         EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
         updateFrame();
-        THREAD_SLEEP(mFrame.duration / 2); // speed up test
     }
 
     DLOGD("Stopping the stream with stream handle %" PRIu64, (UINT64) streamHandle);
@@ -892,7 +883,7 @@ TEST_F(ProducerFunctionalityTest, connection_stale_callbacks_going_off_properly)
 {
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     UINT32 i;
-    UINT32 totalFragments = 60;
+    UINT32 totalFragments = 10;
     UINT32 totalFrames = totalFragments * TEST_FPS;
 
     // block off any acks
@@ -903,6 +894,7 @@ TEST_F(ProducerFunctionalityTest, connection_stale_callbacks_going_off_properly)
 
     createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
 
+    mStreamInfo.streamCaps.connectionStalenessDuration = 5 * HUNDREDS_OF_NANOS_IN_A_SECOND;
     EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION));
     streamHandle = mStreams[0];
     EXPECT_TRUE(streamHandle != INVALID_STREAM_HANDLE_VALUE);
@@ -910,7 +902,7 @@ TEST_F(ProducerFunctionalityTest, connection_stale_callbacks_going_off_properly)
     for(i = 0; i < totalFrames; ++i) {
         EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
         updateFrame();
-        THREAD_SLEEP(mFrame.duration / 2); // speed up test
+        THREAD_SLEEP(mFrame.duration);
     }
 
     DLOGD("Stopping the stream with stream handle %" PRIu64, (UINT64) streamHandle);
@@ -1437,7 +1429,6 @@ TEST_F(ProducerFunctionalityTest, putFrame_stopSync_timeout_reset_then_putFrame_
     for(j = 0; j < totalFrames; ++j) {
         EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
         updateFrame();
-        THREAD_SLEEP(mFrame.duration);
     }
 
     EXPECT_EQ(0, mStreamErrorFnCount);
@@ -1478,7 +1469,6 @@ TEST_F(ProducerFunctionalityTest, putFrame_stopSync_reset_then_putFrame_again_mu
             EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(mStreams[i], &mFrame));
         }
         updateFrame();
-        THREAD_SLEEP(mFrame.duration);
     }
 
     for(i = 0; i < totalStreams; i++) {
@@ -1491,7 +1481,6 @@ TEST_F(ProducerFunctionalityTest, putFrame_stopSync_reset_then_putFrame_again_mu
             EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(mStreams[i], &mFrame));
         }
         updateFrame();
-        THREAD_SLEEP(mFrame.duration);
     }
 
     for(i = 0; i < totalStreams; i++) {
@@ -1521,7 +1510,6 @@ TEST_F(ProducerFunctionalityTest, putFrame_stop_reset_then_putFrame_again)
         for(j = 0; j < totalFrames; ++j) {
             EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
             updateFrame();
-            THREAD_SLEEP(mFrame.duration);
         }
 
         EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStream(streamHandle));
@@ -1532,18 +1520,18 @@ TEST_F(ProducerFunctionalityTest, putFrame_stop_reset_then_putFrame_again)
         for(j = 0; j < totalFrames; ++j) {
             EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
             updateFrame();
-            THREAD_SLEEP(mFrame.duration);
         }
-
-        EXPECT_EQ(0, mStreamErrorFnCount);
-        // may not get all persisted acks for fragments in the first batch because of asycn stop
-        EXPECT_LT(totalFragments, mPersistedFragmentCount);
 
         EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStreamSync(streamHandle));
         EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
         EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoClient(&mClientHandle));
         EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&mCallbacksProvider));
         EXPECT_EQ(STATUS_SUCCESS, freeStreamCallbacks(&mStreamCallbacks));
+
+        // may not get all persisted acks for fragments in the first batch because of asycn stop
+        EXPECT_GE(mPersistedFragmentCount, totalFragments);
+        EXPECT_EQ(0, mStreamErrorFnCount);
+
         MEMFREE(mProducerCallbacks);
         mProducerCallbacks = NULL;
         mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
@@ -1571,7 +1559,6 @@ TEST_F(ProducerFunctionalityTest, putFrame_stop_reset_then_putFrame_again_multis
             EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(mStreams[i], &mFrame));
         }
         updateFrame();
-        THREAD_SLEEP(mFrame.duration);
     }
 
     for(i = 0; i < totalStreams; i++) {
@@ -1586,7 +1573,6 @@ TEST_F(ProducerFunctionalityTest, putFrame_stop_reset_then_putFrame_again_multis
             EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(mStreams[i], &mFrame));
         }
         updateFrame();
-        THREAD_SLEEP(mFrame.duration);
     }
 
     // Shouldn't have any errors
@@ -1606,7 +1592,7 @@ TEST_F(ProducerFunctionalityTest, putFrame_stop_reset_then_putFrame_again_multis
     EXPECT_EQ(errorCount, mStreamErrorFnCount);
 
     // may not get all persisted acks for fragments in the first batch because of asycn stop
-    EXPECT_LT(totalFragments * totalStreams, mPersistedFragmentCount);
+    EXPECT_GE(mPersistedFragmentCount, totalFragments * totalStreams);
 }
 
 }
