@@ -15,10 +15,10 @@ addons:
       - gdb
 
 script:
-  - export AWS_KVS_LOG_LEVEL=7
+  - export AWS_KVS_LOG_LEVEL=3
   - make
   - ulimit -c unlimited -S
-  - timeout --signal=SIGABRT 120m ./tst/producer_test
+  - timeout --signal=SIGABRT 120m ./tst/producer_test --gtest_break_on_failure
 
 after_failure:
   - for i in $(find ./ -maxdepth 1 -name 'core*' -print); do gdb $(pwd)/tst/producer_test core* -ex "thread apply all bt" -ex "set pagination 0" -batch; done;
@@ -37,7 +37,7 @@ matrix:
         - mkdir build && cd build && cmake .. -DBUILD_TEST=TRUE -DBUILD_COMMON_LWS=TRUE
       script:
         - make
-        - ./tst/producer_test
+        - ./tst/producer_test --gtest_break_on_failure
       after_failure: skip # timeout not available on MacOS
 
     - name: "OSX Clang"
@@ -47,7 +47,7 @@ matrix:
         - mkdir build && cd build && cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE
       script:
         - make
-        - ./tst/producer_test
+        - ./tst/producer_test --gtest_break_on_failure
       after_failure: skip # timeout not available on MacOS
 
     # Code Coverage

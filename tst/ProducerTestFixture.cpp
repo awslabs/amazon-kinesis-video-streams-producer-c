@@ -445,7 +445,7 @@ VOID ProducerClientTestBase::updateFrame()
     mFrame.decodingTs = mFrame.presentationTs;
 }
 
-STATUS ProducerClientTestBase::createTestStream(UINT32 index, STREAMING_TYPE streamingType, UINT32 maxLatency, UINT32 bufferDuration)
+STATUS ProducerClientTestBase::createTestStream(UINT32 index, STREAMING_TYPE streamingType, UINT32 maxLatency, UINT32 bufferDuration, BOOL sync)
 {
     if (index >= TEST_MAX_STREAM_COUNT) {
         return STATUS_INVALID_ARG;
@@ -453,6 +453,7 @@ STATUS ProducerClientTestBase::createTestStream(UINT32 index, STREAMING_TYPE str
 
     Tag tags[TEST_TAG_COUNT];
     UINT32 tagCount = TEST_TAG_COUNT;
+    STATUS retStatus;
 
     for (UINT32 i = 0; i < tagCount; i++) {
         tags[i].name = (PCHAR) MEMALLOC(SIZEOF(CHAR) * (MAX_TAG_NAME_LEN + 1));
@@ -469,7 +470,11 @@ STATUS ProducerClientTestBase::createTestStream(UINT32 index, STREAMING_TYPE str
     mStreamInfo.streamCaps.bufferDuration = bufferDuration;
     mStreamInfo.streamCaps.maxLatency = maxLatency;
 
-    STATUS retStatus = createKinesisVideoStreamSync(mClientHandle, &mStreamInfo, &mStreams[index]);
+    if (sync) {
+        retStatus = createKinesisVideoStreamSync(mClientHandle, &mStreamInfo, &mStreams[index]);
+    } else {
+        retStatus = createKinesisVideoStream(mClientHandle, &mStreamInfo, &mStreams[index]);
+    }
 
     for (UINT32 i = 0; i < tagCount; i++) {
         MEMFREE(tags[i].name);

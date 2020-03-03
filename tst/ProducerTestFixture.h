@@ -19,7 +19,7 @@
 #define TEST_SESSION_TOKEN                                      (PCHAR) "Test session token"
 
 #define TEST_FRAME_DURATION                                     (50 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND)
-#define TEST_EXECUTION_DURATION                                 (10 * HUNDREDS_OF_NANOS_IN_A_SECOND)
+#define TEST_EXECUTION_DURATION                                 (3 * HUNDREDS_OF_NANOS_IN_A_SECOND)
 #define TEST_KEY_FRAME_INTERVAL                                 50
 #define TEST_STREAM_COUNT                                       2
 #define TEST_FRAME_SIZE                                         1000
@@ -28,7 +28,7 @@
 #define TEST_STORAGE_SIZE_IN_BYTES                              (128 * 1024 * 1024ull)
 #define TEST_MAX_STREAM_LATENCY                                 (30 * HUNDREDS_OF_NANOS_IN_A_SECOND)
 #define TEST_STREAM_BUFFER_DURATION                             (120 * HUNDREDS_OF_NANOS_IN_A_SECOND)
-#define TEST_START_STOP_ITERATION_COUNT                         200
+#define TEST_START_STOP_ITERATION_COUNT                         100
 #define TEST_CACHING_ENDPOINT_PERIOD                            (5 * HUNDREDS_OF_NANOS_IN_A_MINUTE)
 #define TEST_TAG_COUNT                                          5
 #define TEST_DEFAULT_PRESSURE_HANDLER_RETRY_COUNT               10
@@ -198,7 +198,8 @@ protected:
     STATUS createTestStream(UINT32 index,
                             STREAMING_TYPE streamingType = STREAMING_TYPE_REALTIME,
                             UINT32 maxLatency = TEST_MAX_STREAM_LATENCY,
-                            UINT32 bufferDuration = TEST_STREAM_BUFFER_DURATION);
+                            UINT32 bufferDuration = TEST_STREAM_BUFFER_DURATION,
+                            BOOL sync = TRUE);
     VOID freeStreams(BOOL sync = FALSE);
     VOID printFrameInfo(PFrame pFrame);
 
