@@ -289,6 +289,10 @@ add_executable(kvsVideoOnlyStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/sampl
 target_link_libraries(kvsVideoOnlyStreamingSample
     cproducer)
 
+add_executable(kvsAacAudioVideoStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsAacAudioVideoStreamingSample.c)
+target_link_libraries(kvsAacAudioVideoStreamingSample
+        cproducer)
+
 if (BUILD_TEST)
     add_subdirectory(tst)
 endif()
