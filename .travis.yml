@@ -106,7 +106,6 @@ matrix:
 
     # Cross-compilation to ARM, no tests are run
     - name: "ARM Cross-compilation"
-      env: allowTestFail=true
       os: linux
       addons:
         apt:
@@ -118,5 +117,5 @@ matrix:
       before_script:
         - export CC=arm-linux-gnueabi-gcc CXX=arm-linux-gnueabi-g++ AR=arm-linux-gnueabi-ar
         - mkdir build && cd build
-        - cmake .. -DBUILD_TEST=TRUE -DBUILD_OPENSSL=TRUE -DBUILD_OPENSSL_PLATFORM=linux-generic32 -DBUILD_LIBCURL_HOST_PLATFORM=x86_64-unknown-linux-gnu -DBUILD_LIBCURL_DESTINATION_PLATFORM=arm-linux-gnueabi
+        - cmake .. -DBUILD_TEST=TRUE -DBUILD_OPENSSL=TRUE -DBUILD_OPENSSL_PLATFORM=linux-generic32
       script: make
