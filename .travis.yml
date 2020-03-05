@@ -34,7 +34,7 @@ matrix:
       os: osx
       compiler: gcc
       before_script:
-        - mkdir build && cd build && cmake .. -DBUILD_TEST=TRUE -DBUILD_COMMON_LWS=TRUE
+        - mkdir build && cd build && cmake .. -DBUILD_TEST=TRUE -DBUILD_OPENSSL=TRUE
       script:
         - make
         - ./tst/producer_test --gtest_break_on_failure
@@ -44,7 +44,7 @@ matrix:
       os: osx
       compiler: clang
       before_script:
-        - mkdir build && cd build && cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE
+        - mkdir build && cd build && cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DBUILD_OPENSSL=TRUE
       script:
         - make
         - ./tst/producer_test --gtest_break_on_failure
