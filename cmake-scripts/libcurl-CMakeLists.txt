@@ -8,13 +8,10 @@ if (DEFINED CMAKE_OSX_SYSROOT AND NOT CMAKE_OSX_SYSROOT STREQUAL "")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -isysroot${CMAKE_OSX_SYSROOT}")
 endif()
 
-set(CONFIG_COMMAND cd ${CMAKE_CURRENT_BINARY_DIR}/build/src/project_libcurl/ && ./buildconf && CPPFLAGS="-I${OPENSSL_DIR}/include" LDFLAGS="-L${OPENSSL_DIR}lib" ./configure --prefix=${OPEN_SRC_INSTALL_PREFIX}  --with-ssl)
+set(CONFIG_COMMAND cd ${CMAKE_CURRENT_BINARY_DIR}/build/src/project_libcurl/ && ./buildconf && ./configure CPPFLAGS=-I${OPENSSL_DIR}/include LDFLAGS=-L${OPENSSL_DIR}/lib --prefix=${OPEN_SRC_INSTALL_PREFIX}  --with-ssl)
 if (DEFINED BUILD_LIBCURL_DESTINATION_PLATFORM AND NOT BUILD_LIBCURL_DESTINATION_PLATFORM STREQUAL OFF)
   set(CONFIG_COMMAND ${CONFIG_COMMAND} --build=${BUILD_LIBCURL_HOST_PLATFORM} --host=${BUILD_LIBCURL_DESTINATION_PLATFORM})
 endif()
-
-message("curl config command ${CONFIG_COMMAND}")
-message("pkgconfig $ENV{PKG_CONFIG_PATH}")
 
 include(ExternalProject)
 ExternalProject_Add(project_libcurl
