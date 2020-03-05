@@ -7,6 +7,9 @@ option(BUILD_DEPENDENCIES "Whether or not to build depending libraries from sour
 option(BUILD_OPENSSL "If building dependencies, whether or not building openssl from source" OFF)
 OPTION(BUILD_COMMON_LWS "Whether or not to build ProducerC libwebsockets common library" OFF)
 OPTION(BUILD_COMMON_CURL "Whether or not to build ProducerC curl common library" ON)
+option(BUILD_OPENSSL_PLATFORM "If buildng OpenSSL what is the target platform" OFF)
+option(BUILD_LIBCURL_HOST_PLATFORM "If cross compiling LibCURL what is the current platform" OFF)
+option(BUILD_LIBCURL_DESTINATION_PLATFORM "If cross compiling LibCURL what is the destination platform" OFF)
 
 # Developer Flags
 option(BUILD_TEST "Build the testing tree." OFF)
@@ -73,7 +76,10 @@ if(BUILD_DEPENDENCIES)
               ${CMAKE_SOURCE_DIR}/cmake-scripts/libopenssl-CMakeLists.txt
               ${OPEN_SOURCE_DIR}/libopenssl/CMakeLists.txt COPYONLY)
       execute_process(
-              COMMAND ${CMAKE_COMMAND} -DBUILD_OPENSSL_PLATFORM=${BUILD_OPENSSL_PLATFORM} -DOPEN_SRC_INSTALL_PREFIX=${OPEN_SRC_INSTALL_PREFIX} -G ${CMAKE_GENERATOR} .
+              COMMAND ${CMAKE_COMMAND}
+                -DBUILD_OPENSSL_PLATFORM=${BUILD_OPENSSL_PLATFORM}
+                -DOPEN_SRC_INSTALL_PREFIX=${OPEN_SRC_INSTALL_PREFIX}
+                -G ${CMAKE_GENERATOR} .
               RESULT_VARIABLE result
               WORKING_DIRECTORY ${OPEN_SOURCE_DIR}/libopenssl)
       if(result)
@@ -132,7 +138,12 @@ if(BUILD_DEPENDENCIES)
       ${CMAKE_SOURCE_DIR}/cmake-scripts/libcurl-CMakeLists.txt
       ${OPEN_SOURCE_DIR}/libcurl/CMakeLists.txt COPYONLY)
     execute_process(
-      COMMAND ${CMAKE_COMMAND} -DOPEN_SRC_INSTALL_PREFIX=${OPEN_SRC_INSTALL_PREFIX} -DOPENSSL_DIR=${OPENSSL_DIR} -G ${CMAKE_GENERATOR} .
+      COMMAND ${CMAKE_COMMAND}
+            -DOPEN_SRC_INSTALL_PREFIX=${OPEN_SRC_INSTALL_PREFIX}
+            -DOPENSSL_DIR=${OPENSSL_DIR}
+            -DBUILD_LIBCURL_HOST_PLATFORM=${BUILD_LIBCURL_HOST_PLATFORM}
+            -DBUILD_LIBCURL_DESTINATION_PLATFORM=${BUILD_LIBCURL_DESTINATION_PLATFORM}
+            -G ${CMAKE_GENERATOR} .
       RESULT_VARIABLE result
       WORKING_DIRECTORY ${OPEN_SOURCE_DIR}/libcurl)
     if(result)
