@@ -8,19 +8,16 @@ if (DEFINED CMAKE_OSX_SYSROOT AND NOT CMAKE_OSX_SYSROOT STREQUAL "")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -isysroot${CMAKE_OSX_SYSROOT}")
 endif()
 
-set(CONFIG_COMMAND cd ${CMAKE_CURRENT_BINARY_DIR}/build/src/project_libcurl/ && ./buildconf && ./configure CPPFLAGS=-I${OPENSSL_DIR}/include LDFLAGS=-L${OPENSSL_DIR}/lib --prefix=${OPEN_SRC_INSTALL_PREFIX}  --with-ssl)
-if (DEFINED BUILD_LIBCURL_DESTINATION_PLATFORM AND NOT BUILD_LIBCURL_DESTINATION_PLATFORM STREQUAL OFF)
-  set(CONFIG_COMMAND ${CONFIG_COMMAND} --build=${BUILD_LIBCURL_HOST_PLATFORM} --host=${BUILD_LIBCURL_DESTINATION_PLATFORM})
-endif()
-
 include(ExternalProject)
+
 ExternalProject_Add(project_libcurl
     GIT_REPOSITORY    https://github.com/curl/curl.git
     GIT_TAG           curl-7_68_0
     PREFIX            ${CMAKE_CURRENT_BINARY_DIR}/build
-    CONFIGURE_COMMAND ${CONFIG_COMMAND}
-    BUILD_COMMAND     ${MAKE_EXE}
-    BUILD_IN_SOURCE   TRUE
-    INSTALL_COMMAND   ${MAKE_EXE} install
+    CMAKE_ARGS
+        -DCMAKE_INSTALL_PREFIX=${CMAKE_SOURCE_DIR}/../local/
+        -DBUILD_CURL_EXE=0
+        -DHTTP_ONLY=1
+        BUILD_ALWAYS      TRUE
     TEST_COMMAND      ""
 )
