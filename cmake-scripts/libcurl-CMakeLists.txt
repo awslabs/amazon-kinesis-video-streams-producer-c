@@ -13,6 +13,8 @@ if (DEFINED BUILD_LIBCURL_DESTINATION_PLATFORM AND NOT BUILD_LIBCURL_DESTINATION
   set(CONFIG_COMMAND ${CONFIG_COMMAND} --build=${BUILD_LIBCURL_HOST_PLATFORM} --host=${BUILD_LIBCURL_DESTINATION_PLATFORM})
 endif()
 
+message("curl config command ${CONFIG_COMMAND}")
+
 include(ExternalProject)
 ExternalProject_Add(project_libcurl
     GIT_REPOSITORY    https://github.com/curl/curl.git
