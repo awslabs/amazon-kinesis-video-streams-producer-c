@@ -91,7 +91,7 @@ if(BUILD_DEPENDENCIES)
         message(FATAL_ERROR "CMake step for libopenssl failed: ${result}")
       endif()
     endif()
-    set(OPENSSL_ROOT_DIR ${OPEN_SRC_INSTALL_PREFIX}/ssl)
+    set(OPENSSL_ROOT_DIR ${OPEN_SRC_INSTALL_PREFIX})
     set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${OPENSSL_ROOT_DIR}/lib/pkgconfig")
 
   else()
@@ -230,7 +230,7 @@ if("${CMAKE_C_COMPILER_ID}" MATCHES "GNU|Clang")
         enableSanitizer("undefined")
     endif()
 
-    set(OPEN_SRC_INCLUDE_DIRS ${OPENSSL_INCLUDE_DIR} )
+    set(OPEN_SRC_INCLUDE_DIRS ${OPENSSL_INCLUDE_DIR})
 
     if(BUILD_COMMON_CURL)
         pkg_check_modules(LIBCURL REQUIRED libcurl)
@@ -288,9 +288,17 @@ target_link_libraries(kvsCommonCurl
 
 add_library(cproducer SHARED ${PRODUCER_C_SOURCE_FILES})
 
-target_link_libraries(cproducer
+if (MINGW)
+# Use PRIVATE otherwise anything linking against cproducer will also link with pic again,
+# causing duplicate symbols
+target_link_libraries(cproducer PRIVATE
     kvspic
     kvsCommonCurl)
+else()
+target_link_libraries(cproducer
+        kvspic
+        kvsCommonCurl)
+endif()
 
 add_executable(kvsVideoOnlyStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsVideoOnlyStreamingSample.c)
 target_link_libraries(kvsVideoOnlyStreamingSample
