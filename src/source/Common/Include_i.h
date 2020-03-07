@@ -13,9 +13,30 @@ extern "C" {
 ////////////////////////////////////////////////////
 // Project include files
 ////////////////////////////////////////////////////
+#if defined(KVS_USE_OPENSSL)
+
 #include <openssl/sha.h>
 #include <openssl/hmac.h>
 #include <openssl/evp.h>
+
+#define KVS_HMAC(k,klen,m,mlen,ob,plen)             \
+    CHK(NULL != HMAC(EVP_sha256(), (k), (INT32) (klen), (m), (mlen), (ob), (plen)), STATUS_HMAC_GENERATION_ERROR);
+#define KVS_SHA256(m, mlen, ob) SHA256((m), (mlen), (ob));
+
+#elif defined(KVS_USE_MBEDTLS)
+
+#include <mbedtls/sha256.h>
+#include <mbedtls/md.h>
+#define KVS_HMAC(k,klen,m,mlen,ob,plen)           \
+    CHK(0 == mbedtls_md_hmac(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), (k), (klen), (m), (mlen), (ob)),   \
+        STATUS_HMAC_GENERATION_ERROR);                                                              \
+    *(plen) = mbedtls_md_get_size(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256));
+#define KVS_SHA256(m, mlen, ob) mbedtls_sha256((m), (mlen), (ob), 0);
+
+#else
+#error Need to specify the ssl library at build time
+#endif
+
 #if defined(KVS_BUILD_WITH_LWS)
 #include <libwebsockets.h>
 #endif

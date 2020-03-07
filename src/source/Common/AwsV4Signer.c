@@ -20,8 +20,8 @@ STATUS generateAwsSigV4Signature(PRequestInfo pRequestInfo, PCHAR dateTimeStr, B
     PCHAR pScratchBuf = NULL, pCredentialScope = NULL, pUrlEncodedCredentials = NULL,
             pSignedStr = NULL, pSignedHeaders = NULL;
     CHAR requestHexSha256[2 * SHA256_DIGEST_LENGTH + 1];
-    BYTE hmac[EVP_MAX_MD_SIZE];
-    CHAR hexHmac[EVP_MAX_MD_SIZE * 2 + 1];
+    BYTE hmac[KVS_MAX_HMAC_SIZE];
+    CHAR hexHmac[KVS_MAX_HMAC_SIZE * 2 + 1];
 
     CHK(pRequestInfo != NULL && pRequestInfo->pAwsCredentials != NULL &&
         ppSigningInfo != NULL && pSigningInfoLen != NULL, STATUS_NULL_ARG);
@@ -678,27 +678,6 @@ CleanUp:
     return retStatus;
 }
 
-STATUS hexEncodedSha256(PBYTE pMessage, UINT32 size, PCHAR pEncodedHash)
-{
-    ENTERS();
-    STATUS retStatus = STATUS_SUCCESS;
-    BYTE hash[SHA256_DIGEST_LENGTH];
-    UINT32 encodedSize = SHA256_DIGEST_LENGTH * 2 + 1;
-
-    CHK(pMessage != NULL && pEncodedHash != NULL, STATUS_NULL_ARG);
-
-    // Generate the SHA256 of the message first
-    SHA256(pMessage, size, hash);
-
-    // Hex encode lower case
-    CHK_STATUS(hexEncodeCase(hash, SHA256_DIGEST_LENGTH, pEncodedHash, &encodedSize, FALSE));
-
-CleanUp:
-
-    LEAVES();
-    return retStatus;
-}
-
 STATUS generateSignatureDateTime(UINT64 currentTime, PCHAR pDateTimeStr)
 {
     ENTERS();
@@ -713,31 +692,6 @@ STATUS generateSignatureDateTime(UINT64 currentTime, PCHAR pDateTimeStr)
     retSize = STRFTIME(pDateTimeStr, SIGNATURE_DATE_TIME_STRING_LEN, DATE_TIME_STRING_FORMAT, GMTIME(&timeT));
     CHK(retSize > 0, STATUS_BUFFER_TOO_SMALL);
     pDateTimeStr[retSize] = '\0';
-
-CleanUp:
-
-    LEAVES();
-    return retStatus;
-}
-
-STATUS generateRequestHmac(PBYTE key, UINT32 keyLen, PBYTE message, UINT32 messageLen,
-                           PBYTE outBuffer, PUINT32 pHmacLen)
-{
-    ENTERS();
-    STATUS retStatus = STATUS_SUCCESS;
-    UINT32 hmacLen;
-    EVP_MD* pEvp;
-
-    CHK(pHmacLen != NULL && pHmacLen != NULL, STATUS_NULL_ARG);
-
-    *pHmacLen = 0;
-
-    pEvp = (EVP_MD*) EVP_sha256();
-
-    // Potentially in-place HMAC
-    CHK(NULL != HMAC(pEvp, key, (INT32) keyLen, message, messageLen, outBuffer, &hmacLen), STATUS_HMAC_GENERATION_ERROR);
-
-    *pHmacLen = hmacLen;
 
 CleanUp:
 
@@ -1069,4 +1023,47 @@ PCHAR getRequestVerbString(HTTP_REQUEST_VERB verb)
     }
 
     return NULL;
+}
+
+STATUS generateRequestHmac(PBYTE key, UINT32 keyLen, PBYTE message, UINT32 messageLen,
+                           PBYTE outBuffer, PUINT32 pHmacLen)
+{
+    ENTERS();
+    STATUS retStatus = STATUS_SUCCESS;
+    UINT32 hmacLen;
+
+    CHK(pHmacLen != NULL, STATUS_NULL_ARG);
+
+    *pHmacLen = 0;
+
+    KVS_HMAC(key, keyLen, message, messageLen, outBuffer, &hmacLen);
+    *pHmacLen = hmacLen;
+
+CleanUp:
+
+    CHK_LOG_ERR(retStatus);
+
+    LEAVES();
+    return retStatus;
+}
+
+STATUS hexEncodedSha256(PBYTE pMessage, UINT32 size, PCHAR pEncodedHash)
+{
+    ENTERS();
+    STATUS retStatus = STATUS_SUCCESS;
+    BYTE hashBuf[SHA256_DIGEST_LENGTH];
+    UINT32 encodedSize = SHA256_DIGEST_LENGTH * 2 + 1;
+
+    CHK(pMessage != NULL && pEncodedHash != NULL, STATUS_NULL_ARG);
+
+    // Generate the SHA256 of the message first
+    KVS_SHA256(pMessage, size, hashBuf);
+
+    // Hex encode lower case
+    CHK_STATUS(hexEncodeCase(hashBuf, SHA256_DIGEST_LENGTH, pEncodedHash, &encodedSize, FALSE));
+
+CleanUp:
+
+    LEAVES();
+    return retStatus;
 }
