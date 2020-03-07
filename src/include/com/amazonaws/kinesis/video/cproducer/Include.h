@@ -458,6 +458,18 @@ PUBLIC_API STATUS createRealtimeAudioVideoStreamInfoProvider(PCHAR, UINT64, UINT
 */
 PUBLIC_API STATUS createOfflineAudioVideoStreamInfoProvider(PCHAR, UINT64, UINT64, PStreamInfo*);
 
+/**
+ * Configure streaminfo based on given storage size and average bitrate
+ * Will change buffer duration, stream latency duration.
+ *
+ * @param - UINT32 - Storage size in bytes
+ * @param - UINT64 - Total average bitrate for all tracks. Unit: bits per second
+ * @param - UINT32 - Total number of streams per kinesisVideoStreamClient
+ * @param - PStreamInfo
+ * @return - STATUS code of the execution
+*/
+PUBLIC_API STATUS setStreamInfoBasedOnStorageSize(UINT32, UINT64, UINT32, PStreamInfo);
+
 /*
  * Frees the StreamInfo provider object.
  *
