@@ -7,6 +7,7 @@ project(KinesisVideoProducerC LANGUAGES C)
 option(ADD_MUCLIBC "Add -muclibc c flag" OFF)
 option(BUILD_DEPENDENCIES "Whether or not to build depending libraries from source" ON)
 option(USE_OPENSSL "Use openssl as crypto library" ON)
+option(USE_MBEDTLS "Use openssl as crypto library" OFF)
 option(BUILD_COMMON_LWS "Whether or not to build ProducerC libwebsockets common library" OFF)
 option(BUILD_COMMON_CURL "Whether or not to build ProducerC curl common library" ON)
 option(BUILD_OPENSSL_PLATFORM "If buildng OpenSSL what is the target platform" OFF)
@@ -63,10 +64,21 @@ if(BUILD_DEPENDENCIES)
 
   message(STATUS "Begin building dependencies.")
 
+  set(SSL_OPTIONS USE_OPENSSL USE_MBEDTLS)
+  count_true(ENABLED_SSL_OPTION_COUNT
+    ${SSL_OPTIONS})
+
+  if(ENABLED_SSL_OPTION_COUNT GREATER "1")
+    message(FATAL_ERROR "Only one of ${SSL_OPTIONS} can be enabled")
+  endif()
+
   if(USE_OPENSSL)
     set(BUILD_ARGS -DBUILD_STATIC=${BUILD_STATIC}
                    -DBUILD_OPENSSL_PLATFORM=${BUILD_OPENSSL_PLATFORM})
     build_dependency(openssl ${BUILD_ARGS})
+  elseif(USE_MBEDTLS)
+    set(BUILD_ARGS -DBUILD_STATIC=${BUILD_STATIC})
+    build_dependency(mbedtls ${BUILD_ARGS})
   else()
     message(FATAL_ERROR "No crypto library selected.")
   endif()
@@ -79,7 +91,8 @@ if(BUILD_DEPENDENCIES)
 
   if (BUILD_COMMON_CURL)
     set(BUILD_ARGS  -DBUILD_STATIC=${BUILD_STATIC}
-                    -DUSE_OPENSSL=${USE_OPENSSL})
+                    -DUSE_OPENSSL=${USE_OPENSSL}
+                    -DUSE_MBEDTLS=${USE_MBEDTLS})
     build_dependency(curl ${BUILD_ARGS})
   endif()
 
@@ -96,7 +109,18 @@ endif()
 
 find_package(Threads)
 find_package(PkgConfig REQUIRED)
-find_package(OpenSSL REQUIRED)
+
+set(OPEN_SRC_INCLUDE_DIRS )
+
+if(USE_OPENSSL)
+  find_package(OpenSSL REQUIRED)
+  set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR})
+elseif(USE_MBEDTLS)
+  find_package(MbedTLS REQUIRED)
+  set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${MBEDTLS_INCLUDE_DIRS})
+else()
+  message(FATAL_ERROR "No crypto library selected.")
+endif()
 
 if(BUILD_COMMON_CURL)
     pkg_check_modules(LIBCURL REQUIRED libcurl)
@@ -112,12 +136,7 @@ if (BUILD_COMMON_LWS)
     link_directories(${LIBWEBSOCKET_LIBRARY_DIRS})
 endif()
 
-find_library(Jsmn
-    NAMES jsmn
-    REQUIRED
-    PATHS   ${OPEN_SRC_INSTALL_PREFIX}/lib)
-
-set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR})
+find_package(Jsmn REQUIRED)
 
 ############# find dependent libraries end ############
 
@@ -178,11 +197,24 @@ if(ALIGNED_MEMORY_MODEL)
     add_definitions(-DALIGNED_MEMORY_MODEL)
 endif()
 
+# use openssl by default
+set(CPRODUCER_COMMON_TLS_OPTION KVS_USE_OPENSSL)
+set(PRODUCER_CRYPTO_LIBRARY
+        OpenSSL::Crypto
+        OpenSSL::SSL)
+if (USE_MBEDTLS)
+    set(CPRODUCER_COMMON_TLS_OPTION KVS_USE_MBEDTLS)
+    set(PRODUCER_CRYPTO_LIBRARY
+            MbedTLS
+            MbedCrypto)
+endif()
+
 if(BUILD_COMMON_LWS)
     add_library(kvsCommonLws STATIC ${KVS_COMMON_SOURCE_FILES_BASE} ${KVS_COMMON_SOURCE_FILES_LWS})
-    target_compile_definitions(kvsCommonLws PRIVATE KVS_BUILD_WITH_LWS=1)
+    # dont support websocket with mbedtls yet
+    target_compile_definitions(kvsCommonLws PRIVATE KVS_BUILD_WITH_LWS KVS_USE_OPENSSL)
     target_link_libraries(kvsCommonLws
-            ${Jsmn}
+            ${JSMN_LIBRARY}
             ${OPENSSL_CRYPTO_LIBRARY}
             ${OPENSSL_SSL_LIBRARY}
             ${LIBWEBSOCKET_LIBRARIES}
@@ -192,11 +224,10 @@ endif()
 
 # producer only uses curl right now
 add_library(kvsCommonCurl STATIC ${KVS_COMMON_SOURCE_FILES_BASE} ${KVS_COMMON_SOURCE_FILES_CURL})
-target_compile_definitions(kvsCommonCurl PRIVATE KVS_BUILD_WITH_CURL=1)
+target_compile_definitions(kvsCommonCurl PRIVATE KVS_BUILD_WITH_CURL ${CPRODUCER_COMMON_TLS_OPTION})
 target_link_libraries(kvsCommonCurl
-        ${Jsmn}
-        ${OPENSSL_CRYPTO_LIBRARY}
-        ${OPENSSL_SSL_LIBRARY}
+        ${JSMN_LIBRARY}
+        ${PRODUCER_CRYPTO_LIBRARY}
         ${LIBCURL_LIBRARIES})
 
 add_library(cproducer SHARED ${PRODUCER_C_SOURCE_FILES})

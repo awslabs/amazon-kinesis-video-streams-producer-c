@@ -78,6 +78,10 @@ extern "C" {
 // URI-encoded backslash value
 #define URI_ENCODED_FORWARD_SLASH               "%2F"
 
+#define SHA256_DIGEST_LENGTH                	32
+
+#define KVS_MAX_HMAC_SIZE                     	64
+
 ////////////////////////////////////////////////////
 // Function definitions
 ////////////////////////////////////////////////////
