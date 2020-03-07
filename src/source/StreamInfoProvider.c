@@ -216,3 +216,18 @@ CleanUp:
     return retStatus;
 }
 
+STATUS setStreamInfoBasedOnStorageSize(UINT32 storageSize, UINT64 avgBitrate, UINT32 totalStreamCount, PStreamInfo pStreamInfo)
+{
+    STATUS retStatus = STATUS_SUCCESS;
+    CHK(pStreamInfo != NULL, STATUS_NULL_ARG);
+    CHK(storageSize > 0 && avgBitrate > 0 && totalStreamCount > 0, STATUS_INVALID_ARG);
+
+    pStreamInfo->streamCaps.bufferDuration = (UINT64) ((DOUBLE) storageSize * 8 / avgBitrate / totalStreamCount * PRODUCER_DEFRAGMENTATION_FACTOR) * HUNDREDS_OF_NANOS_IN_A_SECOND;
+    pStreamInfo->streamCaps.replayDuration = (UINT64) (REPLAY_DURATION_FACTOR * ((DOUBLE) pStreamInfo->streamCaps.bufferDuration));
+    pStreamInfo->streamCaps.maxLatency = (UINT64) (LATENCY_PRESSURE_FACTOR * ((DOUBLE) pStreamInfo->streamCaps.bufferDuration));
+
+CleanUp:
+    CHK_LOG_ERR(retStatus);
+    return retStatus;
+}
+

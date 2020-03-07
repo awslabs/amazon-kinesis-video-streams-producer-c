@@ -6,6 +6,8 @@
 #define DEFAULT_KEY_FRAME_INTERVAL          45
 #define DEFAULT_FPS_VALUE                   25
 #define DEFAULT_STREAM_DURATION             20 * HUNDREDS_OF_NANOS_IN_A_SECOND
+#define DEFAULT_STORAGE_SIZE                20 * 1024 * 1024
+#define RECORDED_FRAME_AVG_BITRATE_BIT_PS   3800000
 
 #define NUMBER_OF_FRAME_FILES               403
 
@@ -91,8 +93,10 @@ INT32 main(INT32 argc, CHAR *argv[])
     CHK_STATUS(createDefaultDeviceInfo(&pDeviceInfo));
     // adjust members of pDeviceInfo here if needed
     pDeviceInfo->clientInfo.loggerLogLevel = LOG_LEVEL_DEBUG;
+    pDeviceInfo->storageInfo.storageSize = DEFAULT_STORAGE_SIZE;
 
     CHK_STATUS(createRealtimeVideoStreamInfoProvider(streamName, DEFAULT_RETENTION_PERIOD, DEFAULT_BUFFER_DURATION, &pStreamInfo));
+    CHK_STATUS(setStreamInfoBasedOnStorageSize(DEFAULT_STORAGE_SIZE, RECORDED_FRAME_AVG_BITRATE_BIT_PS, 1, pStreamInfo));
     // adjust members of pStreamInfo here if needed
 
     CHK_STATUS(createDefaultCallbacksProviderWithAwsCredentials(accessKey,
