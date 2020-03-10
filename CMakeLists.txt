@@ -17,6 +17,7 @@ option(ADDRESS_SANITIZER "Build with AddressSanitizer." OFF)
 option(MEMORY_SANITIZER "Build with MemorySanitizer." OFF)
 option(THREAD_SANITIZER "Build with ThreadSanitizer." OFF)
 option(UNDEFINED_BEHAVIOR_SANITIZER "Build with UndefinedBehaviorSanitizer." OFF)
+option(ALIGNED_MEMORY_MODEL "Aligned memory model ONLY." OFF)
 
 set(CMAKE_MACOSX_RPATH TRUE)
 
@@ -233,6 +234,9 @@ if("${CMAKE_C_COMPILER_ID}" MATCHES "GNU|Clang")
     endif()
     if(UNDEFINED_BEHAVIOR_SANITIZER)
         enableSanitizer("undefined")
+    endif()
+    if(ALIGNED_MEMORY_MODEL)
+        add_definitions(-DALIGNED_MEMORY_MODEL)
     endif()
 
     set(OPEN_SRC_INCLUDE_DIRS ${OPENSSL_INCLUDE_DIR})
