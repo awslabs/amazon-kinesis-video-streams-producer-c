@@ -4,7 +4,6 @@ project(KinesisVideoProducerC LANGUAGES C)
 # User Flags
 option(ADD_MUCLIBC "Add -muclibc c flag" OFF)
 option(BUILD_DEPENDENCIES "Whether or not to build depending libraries from source" ON)
-option(BUILD_OPENSSL "If building dependencies, whether or not building openssl from source" OFF)
 OPTION(BUILD_COMMON_LWS "Whether or not to build ProducerC libwebsockets common library" OFF)
 OPTION(BUILD_COMMON_CURL "Whether or not to build ProducerC curl common library" ON)
 option(BUILD_OPENSSL_PLATFORM "If buildng OpenSSL what is the target platform" OFF)
@@ -66,48 +65,31 @@ if(BUILD_DEPENDENCIES)
 
   set(OPEN_SRC_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/open-source/local)
 
-  if(BUILD_OPENSSL)
-    if(NOT EXISTS ${OPEN_SOURCE_DIR}/libopenssl)
-      message(STATUS "Rebuilding libraries that depend on openssl")
-      file(REMOVE_RECURSE ${OPEN_SOURCE_DIR}/libwebsockets)
-
-      # build libwebsockets
-      configure_file(
-              ${CMAKE_SOURCE_DIR}/cmake-scripts/libopenssl-CMakeLists.txt
-              ${OPEN_SOURCE_DIR}/libopenssl/CMakeLists.txt COPYONLY)
-      execute_process(
-              COMMAND ${CMAKE_COMMAND}
-                -DBUILD_OPENSSL_PLATFORM=${BUILD_OPENSSL_PLATFORM}
-                -DOPEN_SRC_INSTALL_PREFIX=${OPEN_SRC_INSTALL_PREFIX}
-                -G ${CMAKE_GENERATOR} .
-              RESULT_VARIABLE result
-              WORKING_DIRECTORY ${OPEN_SOURCE_DIR}/libopenssl)
-      if(result)
-        message(FATAL_ERROR "CMake step for libopenssl failed: ${result}")
-      endif()
-      execute_process(
-              COMMAND ${CMAKE_COMMAND} --build .
-              RESULT_VARIABLE result
-              WORKING_DIRECTORY ${OPEN_SOURCE_DIR}/libopenssl)
-      if(result)
-        message(FATAL_ERROR "CMake step for libopenssl failed: ${result}")
-      endif()
+  if(NOT EXISTS ${OPEN_SOURCE_DIR}/libopenssl)
+    # build openssl
+    configure_file(
+            ${CMAKE_SOURCE_DIR}/cmake-scripts/libopenssl-CMakeLists.txt
+            ${OPEN_SOURCE_DIR}/libopenssl/CMakeLists.txt COPYONLY)
+    execute_process(
+            COMMAND ${CMAKE_COMMAND}
+              -DBUILD_OPENSSL_PLATFORM=${BUILD_OPENSSL_PLATFORM}
+              -DOPEN_SRC_INSTALL_PREFIX=${OPEN_SRC_INSTALL_PREFIX}
+              -G ${CMAKE_GENERATOR} .
+            RESULT_VARIABLE result
+            WORKING_DIRECTORY ${OPEN_SOURCE_DIR}/libopenssl)
+    if(result)
+      message(FATAL_ERROR "CMake step for libopenssl failed: ${result}")
     endif()
-    set(OPENSSL_ROOT_DIR ${OPEN_SRC_INSTALL_PREFIX})
-    set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${OPENSSL_ROOT_DIR}/lib/pkgconfig")
-
-  else()
-    if(EXISTS ${OPEN_SOURCE_DIR}/libopenssl)
-      # delete openssl built from source otherwise build wont work
-      file(REMOVE_RECURSE ${OPEN_SOURCE_DIR}/libopenssl)
-      message(STATUS "Rebuilding libraries that depend on openssl")
-      file(REMOVE_RECURSE ${OPEN_SOURCE_DIR}/libwebsockets)
-    endif()
-
-    if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-      set(OPENSSL_ROOT_DIR "/usr/local/opt/openssl")
+    execute_process(
+            COMMAND ${CMAKE_COMMAND} --build .
+            RESULT_VARIABLE result
+            WORKING_DIRECTORY ${OPEN_SOURCE_DIR}/libopenssl)
+    if(result)
+      message(FATAL_ERROR "CMake step for libopenssl failed: ${result}")
     endif()
   endif()
+  set(OPENSSL_ROOT_DIR ${OPEN_SRC_INSTALL_PREFIX})
+  set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${OPENSSL_ROOT_DIR}/lib/pkgconfig")
 
   find_package(OpenSSL REQUIRED)
   # get openssl dir and pass it to libwebsocket
