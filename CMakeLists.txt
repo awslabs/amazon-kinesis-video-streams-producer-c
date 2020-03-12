@@ -1,12 +1,14 @@
 cmake_minimum_required(VERSION 2.8)
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake;${CMAKE_MODULE_PATH}")
+include(Utilities)
 project(KinesisVideoProducerC LANGUAGES C)
 
 # User Flags
 option(ADD_MUCLIBC "Add -muclibc c flag" OFF)
 option(BUILD_DEPENDENCIES "Whether or not to build depending libraries from source" ON)
-option(BUILD_OPENSSL "If building dependencies, whether or not building openssl from source" OFF)
-OPTION(BUILD_COMMON_LWS "Whether or not to build ProducerC libwebsockets common library" OFF)
-OPTION(BUILD_COMMON_CURL "Whether or not to build ProducerC curl common library" ON)
+option(USE_OPENSSL "Use openssl as crypto library" ON)
+option(BUILD_COMMON_LWS "Whether or not to build ProducerC libwebsockets common library" OFF)
+option(BUILD_COMMON_CURL "Whether or not to build ProducerC curl common library" ON)
 option(BUILD_OPENSSL_PLATFORM "If buildng OpenSSL what is the target platform" OFF)
 
 # Developer Flags
@@ -40,162 +42,85 @@ if(NOT KINESIS_VIDEO_PRODUCER_C_SRC)
 endif()
 
 if(NOT KINESIS_VIDEO_OPEN_SOURCE_SRC)
-  if(DEFINED ENV{KINESIS_VIDEO_OPEN_SOURCE_SRC})
-    set(KINESIS_VIDEO_OPEN_SOURCE_SRC $ENV{KINESIS_VIDEO_OPEN_SOURCE_SRC})
-  elseif(BUILD_DEPENDENCIES)
-    set(KINESIS_VIDEO_OPEN_SOURCE_SRC ${CMAKE_SOURCE_DIR}/open-source/local)
-  else()
-    set(KINESIS_VIDEO_OPEN_SOURCE_SRC "${CMAKE_CURRENT_SOURCE_DIR}/open-source/downloads/local" )
-  endif()
+  set(KINESIS_VIDEO_OPEN_SOURCE_SRC ${CMAKE_SOURCE_DIR}/open-source)
 endif()
-
-find_package(PkgConfig REQUIRED)
-set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${KINESIS_VIDEO_OPEN_SOURCE_SRC}/lib/pkgconfig")
 
 message(STATUS "Kinesis Video PIC path is ${KINESIS_VIDEO_PIC_SRC}")
 message(STATUS "Kinesis Video Producer path is ${KINESIS_VIDEO_PRODUCER_C_SRC}")
 message(STATUS "Kinesis Video Open Source path is ${KINESIS_VIDEO_OPEN_SOURCE_SRC}")
 
 if(BUILD_DEPENDENCIES)
-
-  set(OPEN_SOURCE_DIR ${CMAKE_SOURCE_DIR}/open-source)
-
-  if(NOT EXISTS ${OPEN_SOURCE_DIR})
-    file(MAKE_DIRECTORY ${OPEN_SOURCE_DIR}/local)
+  if(NOT EXISTS ${KINESIS_VIDEO_OPEN_SOURCE_SRC})
+    file(MAKE_DIRECTORY ${KINESIS_VIDEO_OPEN_SOURCE_SRC}/local)
   endif()
 
-  set(OPEN_SRC_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/open-source/local)
+  if (NOT OPEN_SRC_INSTALL_PREFIX)
+    set(OPEN_SRC_INSTALL_PREFIX ${KINESIS_VIDEO_OPEN_SOURCE_SRC}/local)
+    set(ENV{PKG_CONFIG_PATH}
+          "$ENV{PKG_CONFIG_PATH}:${OPEN_SRC_INSTALL_PREFIX}/lib/pkgconfig")
+    set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${OPEN_SRC_INSTALL_PREFIX})
+  endif()
 
-  if(BUILD_OPENSSL)
-    if(NOT EXISTS ${OPEN_SOURCE_DIR}/libopenssl)
-      message(STATUS "Rebuilding libraries that depend on openssl")
-      file(REMOVE_RECURSE ${OPEN_SOURCE_DIR}/libwebsockets)
+  message(STATUS "Begin building dependencies.")
 
-      # build libwebsockets
-      configure_file(
-              ${CMAKE_SOURCE_DIR}/cmake-scripts/libopenssl-CMakeLists.txt
-              ${OPEN_SOURCE_DIR}/libopenssl/CMakeLists.txt COPYONLY)
-      execute_process(
-              COMMAND ${CMAKE_COMMAND}
-                -DBUILD_OPENSSL_PLATFORM=${BUILD_OPENSSL_PLATFORM}
-                -DOPEN_SRC_INSTALL_PREFIX=${OPEN_SRC_INSTALL_PREFIX}
-                -G ${CMAKE_GENERATOR} .
-              RESULT_VARIABLE result
-              WORKING_DIRECTORY ${OPEN_SOURCE_DIR}/libopenssl)
-      if(result)
-        message(FATAL_ERROR "CMake step for libopenssl failed: ${result}")
-      endif()
-      execute_process(
-              COMMAND ${CMAKE_COMMAND} --build .
-              RESULT_VARIABLE result
-              WORKING_DIRECTORY ${OPEN_SOURCE_DIR}/libopenssl)
-      if(result)
-        message(FATAL_ERROR "CMake step for libopenssl failed: ${result}")
-      endif()
-    endif()
-    set(OPENSSL_ROOT_DIR ${OPEN_SRC_INSTALL_PREFIX})
-    set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${OPENSSL_ROOT_DIR}/lib/pkgconfig")
-
+  if(USE_OPENSSL)
+    set(BUILD_ARGS -DBUILD_STATIC=${BUILD_STATIC}
+                   -DBUILD_OPENSSL_PLATFORM=${BUILD_OPENSSL_PLATFORM})
+    build_dependency(openssl ${BUILD_ARGS})
   else()
-    if(EXISTS ${OPEN_SOURCE_DIR}/libopenssl)
-      # delete openssl built from source otherwise build wont work
-      file(REMOVE_RECURSE ${OPEN_SOURCE_DIR}/libopenssl)
-      message(STATUS "Rebuilding libraries that depend on openssl")
-      file(REMOVE_RECURSE ${OPEN_SOURCE_DIR}/libwebsockets)
-    endif()
-
-    if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-      set(OPENSSL_ROOT_DIR "/usr/local/opt/openssl")
-    endif()
+    message(FATAL_ERROR "No crypto library selected.")
   endif()
 
-  find_package(OpenSSL REQUIRED)
-  # get openssl dir and pass it to libwebsocket
-  get_filename_component(OPENSSL_DIR ${OPENSSL_INCLUDE_DIR} DIRECTORY)
-
-  if(NOT EXISTS ${OPEN_SOURCE_DIR}/libwebsockets AND BUILD_COMMON_LWS)
-    # build libwebsockets
-    configure_file(
-      ${CMAKE_SOURCE_DIR}/cmake-scripts/libwebsockets-CMakeLists.txt
-      ${OPEN_SOURCE_DIR}/libwebsockets/CMakeLists.txt COPYONLY)
-    execute_process(
-      COMMAND ${CMAKE_COMMAND} -DOPENSSL_DIR=${OPENSSL_DIR} -G ${CMAKE_GENERATOR} .
-      RESULT_VARIABLE result
-      WORKING_DIRECTORY ${OPEN_SOURCE_DIR}/libwebsockets)
-    if(result)
-      message(FATAL_ERROR "CMake step for libwebsockets failed: ${result}")
-    endif()
-    execute_process(
-      COMMAND ${CMAKE_COMMAND} --build .
-      RESULT_VARIABLE result
-      WORKING_DIRECTORY ${OPEN_SOURCE_DIR}/libwebsockets)
-    if(result)
-      message(FATAL_ERROR "CMake step for libwebsockets failed: ${result}")
-    endif()
+  if (BUILD_COMMON_LWS)
+    set(BUILD_ARGS  -DBUILD_STATIC=${BUILD_STATIC}
+                    -DOPENSSL_DIR=${OPEN_SRC_INSTALL_PREFIX})
+    build_dependency(websockets ${BUILD_ARGS})
   endif()
 
-  if(NOT EXISTS ${OPEN_SOURCE_DIR}/libcurl AND BUILD_COMMON_CURL)
-    configure_file(
-      ${CMAKE_SOURCE_DIR}/cmake-scripts/libcurl-CMakeLists.txt
-      ${OPEN_SOURCE_DIR}/libcurl/CMakeLists.txt COPYONLY)
-    execute_process(
-      COMMAND ${CMAKE_COMMAND}
-            -DOPEN_SRC_INSTALL_PREFIX=${OPEN_SRC_INSTALL_PREFIX}
-            -G ${CMAKE_GENERATOR} .
-      RESULT_VARIABLE result
-      WORKING_DIRECTORY ${OPEN_SOURCE_DIR}/libcurl)
-    if(result)
-      message(FATAL_ERROR "CMake step for libcurl failed: ${result}")
-    endif()
-    execute_process(
-      COMMAND ${CMAKE_COMMAND} --build .
-      RESULT_VARIABLE result
-      WORKING_DIRECTORY ${OPEN_SOURCE_DIR}/libcurl)
-    if(result)
-      message(FATAL_ERROR "CMake step for libcurl failed: ${result}")
-    endif()
+  if (BUILD_COMMON_CURL)
+    set(BUILD_ARGS  -DBUILD_STATIC=${BUILD_STATIC}
+                    -DUSE_OPENSSL=${USE_OPENSSL})
+    build_dependency(curl ${BUILD_ARGS})
   endif()
 
-  if(NOT EXISTS ${OPEN_SOURCE_DIR}/libjsmn)
-    # build libjsmn
-    configure_file(${CMAKE_SOURCE_DIR}/cmake-scripts/libjsmn-CMakeLists.txt
-                   ${OPEN_SOURCE_DIR}/libjsmn/CMakeLists.txt COPYONLY)
-    execute_process(
-      COMMAND ${CMAKE_COMMAND} -G ${CMAKE_GENERATOR} .
-      RESULT_VARIABLE result
-      WORKING_DIRECTORY ${OPEN_SOURCE_DIR}/libjsmn)
-    if(result)
-      message(FATAL_ERROR "CMake step for libjsmn failed: ${result}")
-    endif()
-    execute_process(
-      COMMAND ${CMAKE_COMMAND} --build .
-      RESULT_VARIABLE result
-      WORKING_DIRECTORY ${OPEN_SOURCE_DIR}/libjsmn)
-    if(result)
-      message(FATAL_ERROR "CMake step for libjsmn failed: ${result}")
-    endif()
+  build_dependency(jsmn)
+
+  if(BUILD_TEST)
+    build_dependency(gtest)
   endif()
 
-  if(NOT EXISTS ${OPEN_SOURCE_DIR}/libgtest)
-    # build gtest
-    configure_file(${CMAKE_SOURCE_DIR}/cmake-scripts/libgtest-CMakeLists.txt
-                   ${OPEN_SOURCE_DIR}/libgtest/CMakeLists.txt COPYONLY)
-    execute_process(
-      COMMAND ${CMAKE_COMMAND} -G ${CMAKE_GENERATOR} .
-      RESULT_VARIABLE result
-      WORKING_DIRECTORY ${OPEN_SOURCE_DIR}/libgtest)
-    if(result)
-      message(FATAL_ERROR "CMake step for libgtest failed: ${result}")
-    endif()
-    execute_process(
-      COMMAND ${CMAKE_COMMAND} --build .
-      RESULT_VARIABLE result
-      WORKING_DIRECTORY ${OPEN_SOURCE_DIR}/libgtest)
-    if(result)
-      message(FATAL_ERROR "CMake step for libgtest failed: ${result}")
-    endif()
-  endif()
+  message(STATUS "Finished building dependencies.")
 endif()
+
+############# find dependent libraries ############
+
+find_package(Threads)
+find_package(PkgConfig REQUIRED)
+find_package(OpenSSL REQUIRED)
+
+if(BUILD_COMMON_CURL)
+    pkg_check_modules(LIBCURL REQUIRED libcurl)
+
+    set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${LIBCURL_INCLUDE_DIRS})
+    link_directories(${LIBCURL_LIBRARY_DIRS})
+endif()
+
+if (BUILD_COMMON_LWS)
+    pkg_check_modules(LIBWEBSOCKET REQUIRED libwebsockets)
+
+    set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${LIBWEBSOCKET_INCLUDE_DIRS})
+    link_directories(${LIBWEBSOCKET_LIBRARY_DIRS})
+endif()
+
+find_library(Jsmn
+    NAMES jsmn
+    REQUIRED
+    PATHS   ${OPEN_SRC_INSTALL_PREFIX}/lib
+    NO_DEFAULT_PATH)
+
+set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR})
+
+############# find dependent libraries end ############
 
 if(CMAKE_SIZEOF_VOID_P STREQUAL 4)
     message(STATUS "Bitness 32 bits")
@@ -235,32 +160,7 @@ if("${CMAKE_C_COMPILER_ID}" MATCHES "GNU|Clang")
     if(UNDEFINED_BEHAVIOR_SANITIZER)
         enableSanitizer("undefined")
     endif()
-    if(ALIGNED_MEMORY_MODEL)
-        add_definitions(-DALIGNED_MEMORY_MODEL)
-    endif()
-
-    set(OPEN_SRC_INCLUDE_DIRS ${OPENSSL_INCLUDE_DIR})
-
-    if(BUILD_COMMON_CURL)
-        pkg_check_modules(LIBCURL REQUIRED libcurl)
-
-        set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${LIBCURL_INCLUDE_DIRS})
-        link_directories(${LIBCURL_LIBRARY_DIRS})
-    endif()
-
-    if (BUILD_COMMON_LWS)
-        pkg_check_modules(LIBWEBSOCKET REQUIRED libwebsockets)
-
-        set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${LIBWEBSOCKET_INCLUDE_DIRS})
-        link_directories(${LIBWEBSOCKET_LIBRARY_DIRS})
-    endif()
 endif()
-
-find_library(Jsmn
-    NAMES jsmn
-    REQUIRED
-    PATHS   ${KINESIS_VIDEO_OPEN_SOURCE_SRC}/lib
-    NO_DEFAULT_PATH)
 
 file(GLOB KVS_COMMON_SOURCE_FILES_BASE "src/source/Common/*.c")
 file(GLOB KVS_COMMON_SOURCE_FILES_LWS "src/source/Common/Lws/*.c")
@@ -274,6 +174,10 @@ include_directories(${OPEN_SRC_INCLUDE_DIRS})
 include_directories(${KINESIS_VIDEO_OPEN_SOURCE_SRC}/include)
 
 add_subdirectory(${KINESIS_VIDEO_PIC_SRC} ./kvspic EXCLUDE_FROM_ALL)
+
+if(ALIGNED_MEMORY_MODEL)
+    add_definitions(-DALIGNED_MEMORY_MODEL)
+endif()
 
 if(BUILD_COMMON_LWS)
     add_library(kvsCommonLws STATIC ${KVS_COMMON_SOURCE_FILES_BASE} ${KVS_COMMON_SOURCE_FILES_LWS})

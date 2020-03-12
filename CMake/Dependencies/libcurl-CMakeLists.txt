@@ -15,9 +15,8 @@ ExternalProject_Add(project_libcurl
     GIT_TAG           curl-7_68_0
     PREFIX            ${CMAKE_CURRENT_BINARY_DIR}/build
     CMAKE_ARGS
-        -DCMAKE_INSTALL_PREFIX=${CMAKE_SOURCE_DIR}/../local/
+        -DCMAKE_INSTALL_PREFIX=${OPEN_SRC_INSTALL_PREFIX}
         -DBUILD_CURL_EXE=0
         -DHTTP_ONLY=1
         BUILD_ALWAYS      TRUE
-    TEST_COMMAND      ""
-)
+    TEST_COMMAND      "")
