@@ -246,7 +246,7 @@ INT32 main(INT32 argc, CHAR *argv[])
                                                                 cacertPath,
                                                                 NULL,
                                                                 NULL,
-                                                                FALSE,
+                                                                TRUE,
                                                                 &pClientCallbacks));
 
     CHK_STATUS(createKinesisVideoClient(pDeviceInfo, pClientCallbacks, &clientHandle));
