@@ -8,6 +8,8 @@
 #define DEFAULT_STREAM_DURATION             20 * HUNDREDS_OF_NANOS_IN_A_SECOND
 #define SAMPLE_AUDIO_FRAME_DURATION         (20 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND)
 #define SAMPLE_VIDEO_FRAME_DURATION         (HUNDREDS_OF_NANOS_IN_A_SECOND / DEFAULT_FPS_VALUE)
+#define AUDIO_TRACK_SAMPLING_RATE           48000
+#define AUDIO_TRACK_CHANNEL_CONFIG          2
 
 #define NUMBER_OF_H264_FRAME_FILES          403
 #define NUMBER_OF_AAC_FRAME_FILES           582
@@ -154,14 +156,9 @@ INT32 main(INT32 argc, CHAR *argv[])
     UINT32 i;
     CHAR filePath[MAX_PATH_LEN + 1];
     PTrackInfo pAudioTrack = NULL;
+    BYTE audioCpd[KVS_AAC_CPD_SIZE_BYTE];
 
     MEMSET(&data, 0x00, SIZEOF(SampleCustomData));
-
-    /*
-     * user is expected to set audio cpd for their stream.
-     * 5 bits (Audio Object Type) | 4 bits (frequency index) | 4 bits (channel configuration) | 3 bits (not used)
-     */
-    BYTE audioCpd[] = {0x11, 0x90, 0x56, 0xe5, 0x00};
 
     if (argc < 2) {
         printf("Usage: AWS_ACCESS_KEY_ID=SAMPLEKEY AWS_SECRET_ACCESS_KEY=SAMPLESECRET %s <stream_name> <duration_in_seconds> <frame_files_path>\n", argv[0]);
@@ -232,8 +229,10 @@ INT32 main(INT32 argc, CHAR *argv[])
     pAudioTrack = pStreamInfo->streamCaps.trackInfoList[0].trackId == DEFAULT_AUDIO_TRACK_ID ?
                   &pStreamInfo->streamCaps.trackInfoList[0] :
                   &pStreamInfo->streamCaps.trackInfoList[1];
+    // generate audio cpd
     pAudioTrack->codecPrivateData = audioCpd;
-    pAudioTrack->codecPrivateDataSize = ARRAY_SIZE(audioCpd);
+    pAudioTrack->codecPrivateDataSize = KVS_AAC_CPD_SIZE_BYTE;
+    CHK_STATUS(mkvgenGenerateAacCpd(AAC_LC, AUDIO_TRACK_SAMPLING_RATE, AUDIO_TRACK_CHANNEL_CONFIG, pAudioTrack->codecPrivateData, &pAudioTrack->codecPrivateDataSize));
 
     // use relative time mode. Buffer timestamps start from 0
     pStreamInfo->streamCaps.absoluteFragmentTimes = FALSE;
