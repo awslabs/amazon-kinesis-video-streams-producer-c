@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake;${CMAKE_MODULE_PATH}")
 include(Utilities)
-project(KinesisVideoProducerC LANGUAGES C)
+project(KinesisVideoProducerC LANGUAGES C CXX)
 
 # User Flags
 option(ADD_MUCLIBC "Add -muclibc c flag" OFF)
@@ -117,6 +117,8 @@ elseif(USE_MBEDTLS)
 else()
   message(FATAL_ERROR "No crypto library selected.")
 endif()
+
+find_package(AWSSDK REQUIRED COMPONENTS monitoring events logs)
 
 if(BUILD_COMMON_CURL)
   if (OPEN_SRC_INSTALL_PREFIX)
@@ -291,6 +293,13 @@ if(BUILD_COMMON_CURL)
 
     add_executable(kvsVideoOnlyStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsVideoOnlyStreamingSample.c)
     target_link_libraries(kvsVideoOnlyStreamingSample cproducer)
+
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    add_executable(kinesis_video_cproducer_video_only_sample_cw
+                ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsVideoOnlyStreamingSampleCloudwatch.cpp
+                ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/CanaryStreamCallbacks.cpp)
+
+    target_link_libraries(kinesis_video_cproducer_video_only_sample_cw cproducer ${AWSSDK_LINK_LIBRARIES})
 
     add_executable(kvsAacAudioVideoStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsAacAudioVideoStreamingSample.c)
     target_link_libraries(kvsAacAudioVideoStreamingSample cproducer)
