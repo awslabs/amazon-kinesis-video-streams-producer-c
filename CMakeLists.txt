@@ -219,7 +219,8 @@ if(BUILD_COMMON_LWS)
             ${OPENSSL_SSL_LIBRARY}
             ${LIBWEBSOCKET_LIBRARIES}
             ${LIBCURL_LIBRARIES}
-            kvspicUtils)
+            kvspicUtils
+	    -pthread)
 endif()
 
 # producer only uses curl right now
