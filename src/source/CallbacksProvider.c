@@ -374,10 +374,6 @@ STATUS createAbstractDefaultCallbacksProvider(UINT32 callbackChainCount, BOOL ca
                                       customUserAgent,
                                       &pCurlApiCallbacks));
 
-    CHK_STATUS(createStreamCallbacks(&pStreamCallbacks));
-
-    CHK_STATUS(addStreamCallbacks((PClientCallbacks) pCallbacksProvider, pStreamCallbacks));
-
 CleanUp:
 
     if (STATUS_FAILED(retStatus)) {
