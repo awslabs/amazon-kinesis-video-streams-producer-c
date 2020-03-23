@@ -1595,6 +1595,87 @@ TEST_F(ProducerFunctionalityTest, putFrame_stop_reset_then_putFrame_again_multis
     EXPECT_GE(mPersistedFragmentCount, totalFragments * totalStreams);
 }
 
+TEST_F(ProducerFunctionalityTest, dropTailFragPolicyStorageOverflowNoInvalidMkv)
+{
+    UINT32 i;
+    UINT32 totalFrames = (UINT32) ((DOUBLE) 1 * 1024 * 1024 / TEST_FRAME_SIZE * 1.5);
+
+    mDeviceInfo.storageInfo.storageSize = 1 * 1024 * 1024;
+    mStreamInfo.streamCaps.storePressurePolicy = CONTENT_STORE_PRESSURE_POLICY_DROP_TAIL_ITEM;
+    mStreamInfo.streamCaps.viewOverflowPolicy = CONTENT_VIEW_OVERFLOW_POLICY_DROP_UNTIL_FRAGMENT_START;
+
+    createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
+
+    EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION));
+
+    EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(mStreams[0], &mFrame));
+    updateFrame();
+
+    // short sleep before curl comes to life, otherwise we may push stream start frame out of buffer.
+    THREAD_SLEEP(500 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND);
+
+    for(i = 0; i < totalFrames; i++) {
+        EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(mStreams[0], &mFrame));
+        updateFrame();
+    }
+
+    EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStreamSync(mStreams[0]));
+    EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&mStreams[0]));
+    mStreams[i] = INVALID_STREAM_HANDLE_VALUE;
+
+    // Shouldn't have any errors
+    EXPECT_EQ(0, mStreamErrorFnCount);
+
+    // storage callback should go off
+    EXPECT_GT(mStorageOverflowCount, 0);
+    // should have frame drop
+    EXPECT_GT(mDroppedFrameFnCount, 0);
+    // should only use one putMedia. Frame drop will not corrupt current putMedia
+    EXPECT_EQ(mPutStreamFnCount, 1);
+
+    // should have some persisted ack
+    EXPECT_GT(mPersistedFragmentCount, 0);
+}
+
+TEST_F(ProducerFunctionalityTest, dropTailFragPolicyBufferOverflowNoInvalidMkv)
+{
+    UINT32 i;
+    UINT32 totalFrames = (UINT32) ((DOUBLE) 5 * HUNDREDS_OF_NANOS_IN_A_SECOND / mFrame.duration * 1.5);
+
+    mStreamInfo.streamCaps.storePressurePolicy = CONTENT_STORE_PRESSURE_POLICY_DROP_TAIL_ITEM;
+    mStreamInfo.streamCaps.viewOverflowPolicy = CONTENT_VIEW_OVERFLOW_POLICY_DROP_UNTIL_FRAGMENT_START;
+
+    createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
+
+    EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, 5 * HUNDREDS_OF_NANOS_IN_A_SECOND));
+
+    EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(mStreams[0], &mFrame));
+    updateFrame();
+
+    // short sleep before curl comes to life, otherwise we may push stream start frame out of buffer.
+    THREAD_SLEEP(500 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND);
+
+    for(i = 0; i < totalFrames; i++) {
+        EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(mStreams[0], &mFrame));
+        updateFrame();
+    }
+
+    EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStreamSync(mStreams[0]));
+    EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&mStreams[0]));
+    mStreams[i] = INVALID_STREAM_HANDLE_VALUE;
+
+    // Shouldn't have any errors
+    EXPECT_EQ(0, mStreamErrorFnCount);
+
+    // should have frame drop
+    EXPECT_GT(mDroppedFrameFnCount, 0);
+    // should only use one putMedia. Frame drop will not corrupt current putMedia
+    EXPECT_EQ(mPutStreamFnCount, 1);
+
+    // should have some persisted ack
+    EXPECT_GT(mPersistedFragmentCount, 0);
+}
+
 }
 }
 }
