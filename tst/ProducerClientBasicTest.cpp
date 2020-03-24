@@ -477,6 +477,7 @@ TEST_F(ProducerClientBasicTest, create_produce_stream)
 
         // Spin off the producer
         EXPECT_EQ(STATUS_SUCCESS, THREAD_CREATE(&mProducerThread, staticProducerRoutine, (PVOID) mStreams[i]));
+        THREAD_DETACH(mProducerThread);
     }
 
 #if 0
@@ -509,6 +510,7 @@ TEST_F(ProducerClientBasicTest, create_produce_stream)
 
             // Spin off the producer
             EXPECT_EQ(STATUS_SUCCESS, THREAD_CREATE(&mProducerThread, staticProducerRoutine, (PVOID) mStreams[i]));
+            THREAD_DETACH(mProducerThread);
         }
     }
 #endif
@@ -554,6 +556,7 @@ TEST_F(ProducerClientBasicTest, create_produce_stream_parallel)
         // Create the streams
         THREAD_SLEEP(300 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND);
         THREAD_CREATE(&mProducerThread, staticCreateProducerRoutine, (PVOID) i);
+        THREAD_DETACH(mProducerThread);
     }
 
     // Await for all the streams to finish creating
@@ -564,6 +567,7 @@ TEST_F(ProducerClientBasicTest, create_produce_stream_parallel)
     for (UINT32 i = 0; i < TEST_STREAM_COUNT; i++) {
         // Spin off the producer
         EXPECT_EQ(STATUS_SUCCESS, THREAD_CREATE(&mProducerThread, staticProducerRoutine, (PVOID) mStreams[i]));
+        THREAD_DETACH(mProducerThread);
     }
 
     // Wait for some time to produce
@@ -599,6 +603,7 @@ TEST_F(ProducerClientBasicTest, create_produce_client_parallel)
         // Create the streams
         THREAD_SLEEP(300 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND);
         THREAD_CREATE(&mProducerThread, staticCreateProducerClientRoutine, (PVOID) i);
+        THREAD_DETACH(mProducerThread);
     }
 
     // Await for all the streams to finish creating
@@ -608,6 +613,7 @@ TEST_F(ProducerClientBasicTest, create_produce_client_parallel)
 
     for (UINT64 i = 0; i < TEST_STREAM_COUNT; i++) {
         EXPECT_EQ(STATUS_SUCCESS, THREAD_CREATE(&mProducerThread, staticProducerClientStartRoutine, (PVOID) i));
+        THREAD_DETACH(mProducerThread);
     }
 
     // Wait for some time to produce
@@ -647,6 +653,7 @@ TEST_F(ProducerClientBasicTest, cachingEndpointProvider_Returns_EndpointFromCach
 
         // Spin off the producer
         EXPECT_EQ(STATUS_SUCCESS, THREAD_CREATE(&mProducerThread, staticProducerRoutine, (PVOID) mStreams[i]));
+        THREAD_DETACH(mProducerThread);
     }
 
     // Wait for a couple of rotations and ensure we didn't call the endpoint
