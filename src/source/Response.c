@@ -429,7 +429,6 @@ STATUS curlCompleteSync(PCurlResponse pCurlResponse)
         // The transmission has been force terminated.
         pCurlResponse->callInfo.httpStatus = HTTP_STATUS_CODE_REQUEST_TIMEOUT;
         pCurlResponse->callInfo.callResult = SERVICE_CALL_REQUEST_TIMEOUT;
-
     } else if (result != CURLE_OK) {
         curl_easy_getinfo(pCurlResponse->pCurl, CURLINFO_EFFECTIVE_URL, &url);
         DLOGW("curl perform failed for url %s with result %s: %s",

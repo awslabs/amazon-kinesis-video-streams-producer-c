@@ -299,6 +299,10 @@ SERVICE_CALL_RESULT getServiceCallResultFromHttpStatus(UINT32 httpStatus)
         case SERVICE_CALL_NOT_AUTHORIZED:
         case SERVICE_CALL_NOT_IMPLEMENTED:
         case SERVICE_CALL_INTERNAL_ERROR:
+        case SERVICE_CALL_REQUEST_TIMEOUT:
+        case SERVICE_CALL_GATEWAY_TIMEOUT:
+        case SERVICE_CALL_NETWORK_READ_TIMEOUT:
+        case SERVICE_CALL_NETWORK_CONNECTION_TIMEOUT:
             return (SERVICE_CALL_RESULT) httpStatus;
         default:
             return SERVICE_CALL_UNKNOWN;

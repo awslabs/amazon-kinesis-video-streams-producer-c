@@ -195,6 +195,9 @@ protected:
     VOID createDefaultProducerClient(BOOL cachingEndpoint = FALSE,
                                      UINT64 createStreamTimeout = TEST_CREATE_STREAM_TIMEOUT,
                                      BOOL continuousRetry = FALSE);
+    VOID createDefaultProducerClient(API_CALL_CACHE_TYPE cacheType = API_CALL_CACHE_TYPE_NONE,
+                                     UINT64 createStreamTimeout = TEST_CREATE_STREAM_TIMEOUT,
+                                     BOOL continuousRetry = FALSE);
     STATUS createTestStream(UINT32 index,
                             STREAMING_TYPE streamingType = STREAMING_TYPE_REALTIME,
                             UINT32 maxLatency = TEST_MAX_STREAM_LATENCY,

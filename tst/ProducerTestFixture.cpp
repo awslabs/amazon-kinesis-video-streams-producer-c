@@ -362,10 +362,17 @@ VOID ProducerClientTestBase::handlePressure(volatile BOOL* pressureFlag, UINT32 
 
 VOID ProducerClientTestBase::createDefaultProducerClient(BOOL cachingEndpoint, UINT64 createStreamTimeout, BOOL continuousRetry)
 {
+    createDefaultProducerClient(cachingEndpoint ? API_CALL_CACHE_TYPE_ENDPOINT_ONLY : API_CALL_CACHE_TYPE_NONE,
+            createStreamTimeout,
+            continuousRetry);
+}
+
+VOID ProducerClientTestBase::createDefaultProducerClient(API_CALL_CACHE_TYPE cacheType, UINT64 createStreamTimeout, BOOL continuousRetry)
+{
     PAuthCallbacks pAuthCallbacks;
     PStreamCallbacks pStreamCallbacks;
     EXPECT_EQ(STATUS_SUCCESS, createAbstractDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT,
-                                                                     cachingEndpoint,
+                                                                     cacheType,
                                                                      TEST_CACHING_ENDPOINT_PERIOD,
                                                                      mRegion,
                                                                      TEST_CONTROL_PLANE_URI,
@@ -512,6 +519,8 @@ STATUS ProducerClientTestBase::curlEasyPerformHookFunc(PCurlResponse pCurlRespon
 
     // Get the test object
     ProducerClientTestBase* pTest = (ProducerClientTestBase*) pCurlResponse->pCurlRequest->pCurlApiCallbacks->hookCustomData;
+
+    DLOGV("Curl perform hook for %s", pCurlResponse->pCurlRequest->requestInfo.url);
 
     pTest->mEasyPerformFnCount++;
 

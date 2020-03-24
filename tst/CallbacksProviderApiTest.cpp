@@ -18,7 +18,7 @@ TEST_F(CallbacksProviderApiTest, createDefaultCallbacksProvider_variations)
                                                              mCaCertPath,
                                                              NULL,
                                                              TEST_USER_AGENT,
-                                                             FALSE,
+                                                             API_CALL_CACHE_TYPE_NONE,
                                                              TEST_CACHING_ENDPOINT_PERIOD,
                                                              TRUE,
                                                              NULL));
@@ -35,7 +35,7 @@ TEST_F(CallbacksProviderApiTest, createDefaultCallbacksProvider_variations)
                                                              mCaCertPath,
                                                              NULL,
                                                              TEST_USER_AGENT,
-                                                             FALSE,
+                                                             API_CALL_CACHE_TYPE_NONE,
                                                              TEST_CACHING_ENDPOINT_PERIOD,
                                                              TRUE,
                                                              &pClientCallbacks));
@@ -52,7 +52,7 @@ TEST_F(CallbacksProviderApiTest, createDefaultCallbacksProvider_variations)
                                                              mCaCertPath,
                                                              NULL,
                                                              TEST_USER_AGENT,
-                                                             FALSE,
+                                                             API_CALL_CACHE_TYPE_NONE,
                                                              MAX_ENDPOINT_CACHE_UPDATE_PERIOD + 1,
                                                              TRUE,
                                                              &pClientCallbacks));
@@ -69,7 +69,7 @@ TEST_F(CallbacksProviderApiTest, createDefaultCallbacksProvider_variations)
                                                              mCaCertPath,
                                                              NULL,
                                                              TEST_USER_AGENT,
-                                                             TRUE,
+                                                             API_CALL_CACHE_TYPE_ENDPOINT_ONLY,
                                                              MAX_ENDPOINT_CACHE_UPDATE_PERIOD + 1,
                                                              TRUE,
                                                              &pClientCallbacks));
@@ -86,7 +86,7 @@ TEST_F(CallbacksProviderApiTest, createDefaultCallbacksProvider_variations)
                                                              mCaCertPath,
                                                              NULL,
                                                              TEST_USER_AGENT,
-                                                             FALSE,
+                                                             API_CALL_CACHE_TYPE_NONE,
                                                              TEST_CACHING_ENDPOINT_PERIOD,
                                                              TRUE,
                                                              &pClientCallbacks));
@@ -104,7 +104,7 @@ TEST_F(CallbacksProviderApiTest, createDefaultCallbacksProvider_variations)
                                                              mCaCertPath,
                                                              NULL,
                                                              TEST_USER_AGENT,
-                                                             TRUE,
+                                                             API_CALL_CACHE_TYPE_ENDPOINT_ONLY,
                                                              TEST_CACHING_ENDPOINT_PERIOD,
                                                              TRUE,
                                                              &pClientCallbacks));
@@ -122,7 +122,7 @@ TEST_F(CallbacksProviderApiTest, createDefaultCallbacksProvider_variations)
                                                              mCaCertPath,
                                                              NULL,
                                                              TEST_USER_AGENT,
-                                                             FALSE,
+                                                             API_CALL_CACHE_TYPE_NONE,
                                                              TEST_CACHING_ENDPOINT_PERIOD,
                                                              FALSE,
                                                              &pClientCallbacks));
@@ -140,7 +140,7 @@ TEST_F(CallbacksProviderApiTest, createDefaultCallbacksProvider_variations)
                                                              mCaCertPath,
                                                              NULL,
                                                              TEST_USER_AGENT,
-                                                             FALSE,
+                                                             API_CALL_CACHE_TYPE_NONE,
                                                              TEST_CACHING_ENDPOINT_PERIOD,
                                                              TRUE,
                                                              &pClientCallbacks));
@@ -158,7 +158,7 @@ TEST_F(CallbacksProviderApiTest, createDefaultCallbacksProvider_variations)
                                                              mCaCertPath,
                                                              NULL,
                                                              TEST_USER_AGENT,
-                                                             FALSE,
+                                                             API_CALL_CACHE_TYPE_NONE,
                                                              TEST_CACHING_ENDPOINT_PERIOD,
                                                              TRUE,
                                                              &pClientCallbacks));
@@ -176,7 +176,7 @@ TEST_F(CallbacksProviderApiTest, createDefaultCallbacksProvider_variations)
                                                              mCaCertPath,
                                                              NULL,
                                                              TEST_USER_AGENT,
-                                                             FALSE,
+                                                             API_CALL_CACHE_TYPE_NONE,
                                                              TEST_CACHING_ENDPOINT_PERIOD,
                                                              TRUE,
                                                              &pClientCallbacks));
@@ -194,7 +194,7 @@ TEST_F(CallbacksProviderApiTest, createDefaultCallbacksProvider_variations)
                                                              mCaCertPath,
                                                              NULL,
                                                              NULL,
-                                                             FALSE,
+                                                             API_CALL_CACHE_TYPE_NONE,
                                                              TEST_CACHING_ENDPOINT_PERIOD,
                                                              TRUE,
                                                              &pClientCallbacks));
@@ -212,7 +212,7 @@ TEST_F(CallbacksProviderApiTest, createDefaultCallbacksProvider_variations)
                                                              NULL,
                                                              NULL,
                                                              NULL,
-                                                             FALSE,
+                                                             API_CALL_CACHE_TYPE_NONE,
                                                              TEST_CACHING_ENDPOINT_PERIOD,
                                                              TRUE,
                                                              &pClientCallbacks));
@@ -230,7 +230,7 @@ TEST_F(CallbacksProviderApiTest, createDefaultCallbacksProvider_variations)
                                                              EMPTY_STRING,
                                                              EMPTY_STRING,
                                                              EMPTY_STRING,
-                                                             FALSE,
+                                                             API_CALL_CACHE_TYPE_NONE,
                                                              TEST_CACHING_ENDPOINT_PERIOD,
                                                              TRUE,
                                                              &pClientCallbacks));
@@ -248,7 +248,7 @@ TEST_F(CallbacksProviderApiTest, createDefaultCallbacksProvider_variations)
                                                              EMPTY_STRING,
                                                              EMPTY_STRING,
                                                              EMPTY_STRING,
-                                                             TRUE,
+                                                             API_CALL_CACHE_TYPE_ENDPOINT_ONLY,
                                                              TEST_CACHING_ENDPOINT_PERIOD,
                                                              TRUE,
                                                              &pClientCallbacks));
@@ -275,7 +275,7 @@ TEST_F(CallbacksProviderApiTest, createStreamVerifyCallbackChainInteration)
     pStreamInfo->streamCaps.nalAdaptationFlags = NAL_ADAPTATION_FLAG_NONE;
 
     EXPECT_EQ(STATUS_INVALID_ARG, createAbstractDefaultCallbacksProvider(MAX_CALLBACK_CHAIN_COUNT + 1,
-                                                                         FALSE,
+                                                                         API_CALL_CACHE_TYPE_NONE,
                                                                          TEST_CACHING_ENDPOINT_PERIOD,
                                                                          mRegion,
                                                                          TEST_CONTROL_PLANE_URI,
@@ -285,7 +285,7 @@ TEST_F(CallbacksProviderApiTest, createStreamVerifyCallbackChainInteration)
                                                                          &pClientCallbacks));
 
     EXPECT_EQ(STATUS_SUCCESS, createAbstractDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT,
-                                                                     FALSE,
+                                                                     API_CALL_CACHE_TYPE_NONE,
                                                                      TEST_CACHING_ENDPOINT_PERIOD,
                                                                      mRegion,
                                                                      TEST_CONTROL_PLANE_URI,
@@ -358,7 +358,7 @@ TEST_F(CallbacksProviderApiTest, createStreamVerifyCallbackChainStopsOnStopStatu
     pStreamInfo->streamCaps.nalAdaptationFlags = NAL_ADAPTATION_FLAG_NONE;
 
     EXPECT_EQ(STATUS_INVALID_ARG, createAbstractDefaultCallbacksProvider(MAX_CALLBACK_CHAIN_COUNT + 1,
-                                                                         FALSE,
+                                                                         API_CALL_CACHE_TYPE_NONE,
                                                                          TEST_CACHING_ENDPOINT_PERIOD,
                                                                          mRegion,
                                                                          TEST_CONTROL_PLANE_URI,
@@ -368,7 +368,7 @@ TEST_F(CallbacksProviderApiTest, createStreamVerifyCallbackChainStopsOnStopStatu
                                                                          &pClientCallbacks));
 
     EXPECT_EQ(STATUS_SUCCESS, createAbstractDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT,
-                                                                     FALSE,
+                                                                     API_CALL_CACHE_TYPE_NONE,
                                                                      TEST_CACHING_ENDPOINT_PERIOD,
                                                                      mRegion,
                                                                      TEST_CONTROL_PLANE_URI,

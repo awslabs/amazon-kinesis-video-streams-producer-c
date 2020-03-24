@@ -73,14 +73,14 @@ STATUS setDefaultPlatformCallbacks(PCallbacksProvider);
  * @param - PCHAR - IN - Certificate path
  * @param - PCHAR - IN - User agent postfix to be used in the API calls
  * @param - PCHAR - IN - Custom user agent to be used in the API calls
- * @param - BOOL - IN - Whether to create caching endpoint callback provider
+ * @param - API_CALL_CACHE_TYPE - IN - Backend API call caching mode
  * @param - UINT64 - IN - The cache update period in case of caching endpoint only provider
  * @param - BOOL - IN - Whether to create continuous retry callback provider
  * @param - PClientCallbacks* - OUT - Returned pointer to callbacks provider
  *
  * @return - STATUS code of the execution
  */
-STATUS createDefaultCallbacksProvider(UINT32, PCHAR, PCHAR, PCHAR, UINT64, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, BOOL, UINT64, BOOL, PClientCallbacks*);
+STATUS createDefaultCallbacksProvider(UINT32, PCHAR, PCHAR, PCHAR, UINT64, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, API_CALL_CACHE_TYPE, UINT64, BOOL, PClientCallbacks*);
 
 ////////////////////////////////////////////////////
 // Aggregate callbacks definitions

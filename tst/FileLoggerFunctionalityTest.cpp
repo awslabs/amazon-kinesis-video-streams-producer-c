@@ -28,7 +28,7 @@ namespace com { namespace amazonaws { namespace kinesis { namespace video {
         MEMSET(logMessage, 'a', logMessageSize);
         logMessage[logMessageSize] = '\0';
         EXPECT_EQ(STATUS_SUCCESS, createAbstractDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT,
-                                                                         FALSE,
+                                                                         API_CALL_CACHE_TYPE_NONE,
                                                                          TEST_CACHING_ENDPOINT_PERIOD,
                                                                          TEST_DEFAULT_REGION,
                                                                          TEST_CONTROL_PLANE_URI,
@@ -99,7 +99,7 @@ namespace com { namespace amazonaws { namespace kinesis { namespace video {
         MEMSET(logMessage, 'a', logMessageSize);
         logMessage[logMessageSize] = '\0';
         EXPECT_EQ(STATUS_SUCCESS, createAbstractDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT,
-                                                                         FALSE,
+                                                                         API_CALL_CACHE_TYPE_NONE,
                                                                          TEST_CACHING_ENDPOINT_PERIOD,
                                                                          TEST_DEFAULT_REGION,
                                                                          TEST_CONTROL_PLANE_URI,
@@ -156,7 +156,7 @@ namespace com { namespace amazonaws { namespace kinesis { namespace video {
         MEMSET(logMessage, 'a', logMessageSize);
         logMessage[logMessageSize] = '\0';
         EXPECT_EQ(STATUS_SUCCESS, createAbstractDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT,
-                                                                         FALSE,
+                                                                         API_CALL_CACHE_TYPE_NONE,
                                                                          TEST_CACHING_ENDPOINT_PERIOD,
                                                                          TEST_DEFAULT_REGION,
                                                                          TEST_CONTROL_PLANE_URI,
@@ -210,7 +210,7 @@ namespace com { namespace amazonaws { namespace kinesis { namespace video {
         LogPrintFunc logFunc;
 
         EXPECT_EQ(STATUS_SUCCESS, createAbstractDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT,
-                                                                         FALSE,
+                                                                         API_CALL_CACHE_TYPE_NONE,
                                                                          TEST_CACHING_ENDPOINT_PERIOD,
                                                                          TEST_DEFAULT_REGION,
                                                                          TEST_CONTROL_PLANE_URI,
@@ -265,7 +265,7 @@ namespace com { namespace amazonaws { namespace kinesis { namespace video {
         MEMSET(logMessage, 'a', logMessageSize);
         logMessage[logMessageSize] = '\0';
         EXPECT_EQ(STATUS_SUCCESS, createAbstractDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT,
-                                                                         FALSE,
+                                                                         API_CALL_CACHE_TYPE_NONE,
                                                                          TEST_CACHING_ENDPOINT_PERIOD,
                                                                          TEST_DEFAULT_REGION,
                                                                          TEST_CONTROL_PLANE_URI,
@@ -336,7 +336,7 @@ namespace com { namespace amazonaws { namespace kinesis { namespace video {
         MEMSET(logMessage, 'a', logMessageSize);
         logMessage[logMessageSize] = '\0';
         EXPECT_EQ(STATUS_SUCCESS, createAbstractDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT,
-                                                                         FALSE,
+                                                                         API_CALL_CACHE_TYPE_NONE,
                                                                          TEST_CACHING_ENDPOINT_PERIOD,
                                                                          TEST_DEFAULT_REGION,
                                                                          TEST_CONTROL_PLANE_URI,
