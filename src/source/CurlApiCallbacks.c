@@ -1610,6 +1610,7 @@ STATUS getStreamingEndpointCachingCurl(UINT64 customData, PCHAR streamName,
         case API_CALL_CACHE_TYPE_ALL:
             pCallbacksProvider->clientCallbacks.lockMutexFn(pCallbacksProvider->clientCallbacks.customData,
                                                             pCurlApiCallbacks->cachedEndpointsLock);
+            endpointsLocked = TRUE;
 
             // Attempt to retrieve the cached value
             retStatus = hashTableGet(pCurlApiCallbacks->pCachedEndpoints, (UINT64) streamHandle, &value);
