@@ -1034,58 +1034,15 @@ STATUS createStreamCachingCurl(UINT64 customData, PCHAR deviceName, PCHAR stream
     STREAM_HANDLE streamHandle;
     PCurlApiCallbacks pCurlApiCallbacks = (PCurlApiCallbacks) customData;
     PCallbacksProvider pCallbacksProvider = NULL;
-    BOOL endpointsLocked = FALSE, emulateApiCall = TRUE;
-    UINT64 curTime, value;
-    PEndpointTracker pEndpointTracker = NULL;
+    BOOL emulateApiCall = TRUE;
 
     CHK(pCurlApiCallbacks != NULL && pCurlApiCallbacks->pCallbacksProvider != NULL && pServiceCallContext != NULL, STATUS_INVALID_ARG);
     pCallbacksProvider = pCurlApiCallbacks->pCallbacksProvider;
 
     streamHandle = (STREAM_HANDLE) pServiceCallContext->customData;
 
-    // We check whether we have already made the call by checking
-    // for the presence of the endpoint in the cache.
-    switch(pCurlApiCallbacks->cacheType) {
-        case API_CALL_CACHE_TYPE_NONE:
-            emulateApiCall = FALSE;
-            break;
-
-        case API_CALL_CACHE_TYPE_ENDPOINT_ONLY:
-            emulateApiCall = TRUE;
-            break;
-
-        case API_CALL_CACHE_TYPE_ALL:
-            pCallbacksProvider->clientCallbacks.lockMutexFn(pCallbacksProvider->clientCallbacks.customData,
-                                                            pCurlApiCallbacks->cachedEndpointsLock);
-            endpointsLocked = TRUE;
-
-            // Attempt to retrieve the cached value
-            retStatus = hashTableGet(pCurlApiCallbacks->pCachedEndpoints, (UINT64) streamHandle, &value);
-
-            CHK(retStatus == STATUS_HASH_KEY_NOT_PRESENT || retStatus == STATUS_SUCCESS, retStatus);
-
-            if (retStatus == STATUS_HASH_KEY_NOT_PRESENT) {
-                emulateApiCall = FALSE;
-
-                // Reset the status if not found
-                retStatus = STATUS_SUCCESS;
-            } else {
-                pEndpointTracker = (PEndpointTracker) value;
-                curTime = pCallbacksProvider->clientCallbacks.getCurrentTimeFn(pCallbacksProvider->clientCallbacks.customData);
-
-                if (pEndpointTracker == NULL ||
-                    pEndpointTracker->streamingEndpoint[0] == '\0' ||
-                    pEndpointTracker->endpointLastUpdateTime + pCurlApiCallbacks->cacheUpdatePeriod <= curTime) {
-                    emulateApiCall = FALSE;
-                }
-            }
-
-            // No longer need to hold the endpoint lock
-            pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData,
-                                                              pCurlApiCallbacks->cachedEndpointsLock);
-            endpointsLocked = FALSE;
-            break;
-    }
+    // Check whether we need to emulate the call
+    CHK_STATUS(checkApiCallEmulation(pCurlApiCallbacks, streamHandle, &emulateApiCall));
 
     // Force the create call if we have no up-to-date info
     if (!emulateApiCall) {
@@ -1104,11 +1061,6 @@ STATUS createStreamCachingCurl(UINT64 customData, PCHAR deviceName, PCHAR stream
     notifyCallResult(pCallbacksProvider, retStatus, streamHandle);
 
 CleanUp:
-
-    if (endpointsLocked) {
-        pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData,
-                                                          pCurlApiCallbacks->cachedEndpointsLock);
-    }
 
     LEAVES();
     return retStatus;
@@ -1322,59 +1274,15 @@ STATUS describeStreamCachingCurl(UINT64 customData, PCHAR streamName, PServiceCa
     STREAM_HANDLE streamHandle;
     StreamDescription streamDescription;
     PStreamInfo pStreamInfo;
-    BOOL endpointsLocked = FALSE, emulateApiCall = TRUE;
-    UINT64 curTime, value;
-    PEndpointTracker pEndpointTracker = NULL;
+    BOOL emulateApiCall = TRUE;
 
     CHK(pCurlApiCallbacks != NULL && pCurlApiCallbacks->pCallbacksProvider != NULL && pServiceCallContext != NULL, STATUS_INVALID_ARG);
     pCallbacksProvider = pCurlApiCallbacks->pCallbacksProvider;
 
     streamHandle = (STREAM_HANDLE) pServiceCallContext->customData;
 
-    // We check whether we have already made the call by checking
-    // for the presence of the endpoint in the cache.
-    switch(pCurlApiCallbacks->cacheType) {
-        case API_CALL_CACHE_TYPE_NONE:
-            emulateApiCall = FALSE;
-            break;
-
-        case API_CALL_CACHE_TYPE_ENDPOINT_ONLY:
-            emulateApiCall = TRUE;
-            break;
-
-        case API_CALL_CACHE_TYPE_ALL:
-            pCallbacksProvider->clientCallbacks.lockMutexFn(pCallbacksProvider->clientCallbacks.customData,
-                                                            pCurlApiCallbacks->cachedEndpointsLock);
-            endpointsLocked = TRUE;
-
-            // Attempt to retrieve the cached value
-            retStatus = hashTableGet(pCurlApiCallbacks->pCachedEndpoints, (UINT64) streamHandle, &value);
-
-            CHK(retStatus == STATUS_HASH_KEY_NOT_PRESENT || retStatus == STATUS_SUCCESS, retStatus);
-
-            if (retStatus == STATUS_HASH_KEY_NOT_PRESENT) {
-                emulateApiCall = FALSE;
-
-                // Reset the status if not found
-                retStatus = STATUS_SUCCESS;
-            } else {
-                pEndpointTracker = (PEndpointTracker) value;
-                curTime = pCallbacksProvider->clientCallbacks.getCurrentTimeFn(pCallbacksProvider->clientCallbacks.customData);
-
-                if (pEndpointTracker == NULL ||
-                    pEndpointTracker->streamingEndpoint[0] == '\0' ||
-                    pEndpointTracker->endpointLastUpdateTime + pCurlApiCallbacks->cacheUpdatePeriod <= curTime) {
-                    emulateApiCall = FALSE;
-                }
-            }
-
-            // No longer need to hold the endpoint lock
-            pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData,
-                                                              pCurlApiCallbacks->cachedEndpointsLock);
-            endpointsLocked = FALSE;
-            break;
-    }
-
+    // Check whether we need to emulate the call
+    CHK_STATUS(checkApiCallEmulation(pCurlApiCallbacks, streamHandle, &emulateApiCall));
 
     // Force the describe call if we have no up-to-date info
     if (!emulateApiCall) {
@@ -1406,11 +1314,6 @@ STATUS describeStreamCachingCurl(UINT64 customData, PCHAR streamName, PServiceCa
     notifyCallResult(pCallbacksProvider, retStatus, streamHandle);
 
 CleanUp:
-
-    if (endpointsLocked) {
-        pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData,
-                                                          pCurlApiCallbacks->cachedEndpointsLock);
-    }
 
     LEAVES();
     return retStatus;
@@ -1707,7 +1610,6 @@ STATUS getStreamingEndpointCachingCurl(UINT64 customData, PCHAR streamName,
         case API_CALL_CACHE_TYPE_ALL:
             pCallbacksProvider->clientCallbacks.lockMutexFn(pCallbacksProvider->clientCallbacks.customData,
                                                             pCurlApiCallbacks->cachedEndpointsLock);
-            endpointsLocked = TRUE;
 
             // Attempt to retrieve the cached value
             retStatus = hashTableGet(pCurlApiCallbacks->pCachedEndpoints, (UINT64) streamHandle, &value);
@@ -1730,15 +1632,16 @@ STATUS getStreamingEndpointCachingCurl(UINT64 customData, PCHAR streamName,
                 }
             }
 
-            // No longer need to hold the endpoint lock
-            pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData,
-                                                              pCurlApiCallbacks->cachedEndpointsLock);
-            endpointsLocked = FALSE;
             break;
     }
 
     // Force the get endpoint call if we have no up-to-date info
     if (!emulateApiCall) {
+        // No longer need to hold the endpoint lock
+        pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData,
+                                                          pCurlApiCallbacks->cachedEndpointsLock);
+        endpointsLocked = FALSE;
+
         CHK_STATUS(getStreamingEndpointCurl(customData, streamName, apiName, pServiceCallContext));
 
         // Early return
@@ -1746,6 +1649,9 @@ STATUS getStreamingEndpointCachingCurl(UINT64 customData, PCHAR streamName,
     }
 
     DLOGV("Caching GetStreamingEndpoint API call");
+
+    // At this stage we should be holding the lock
+    CHECK(endpointsLocked);
     retStatus = getStreamingEndpointResultEvent(streamHandle, SERVICE_CALL_RESULT_OK,
             pEndpointTracker->streamingEndpoint);
 
@@ -2029,59 +1935,15 @@ STATUS tagResourceCachingCurl(UINT64 customData, PCHAR streamArn, UINT32 tagCoun
     PCurlApiCallbacks pCurlApiCallbacks = (PCurlApiCallbacks) customData;
     PCallbacksProvider pCallbacksProvider = NULL;
     STREAM_HANDLE streamHandle;
-    BOOL endpointsLocked = FALSE, emulateApiCall = TRUE;
-    UINT64 curTime, value;
-    PEndpointTracker pEndpointTracker = NULL;
+    BOOL emulateApiCall = TRUE;
 
     CHK(pCurlApiCallbacks != NULL && pCurlApiCallbacks->pCallbacksProvider != NULL && pServiceCallContext != NULL, STATUS_INVALID_ARG);
     pCallbacksProvider = pCurlApiCallbacks->pCallbacksProvider;
 
     streamHandle = (STREAM_HANDLE) pServiceCallContext->customData;
 
-    // We check whether we have already made the call by checking
-    // for the presence of the endpoint in the cache.
-    switch(pCurlApiCallbacks->cacheType) {
-        case API_CALL_CACHE_TYPE_NONE:
-            emulateApiCall = FALSE;
-            break;
-
-        case API_CALL_CACHE_TYPE_ENDPOINT_ONLY:
-            emulateApiCall = TRUE;
-            break;
-
-        case API_CALL_CACHE_TYPE_ALL:
-            pCallbacksProvider->clientCallbacks.lockMutexFn(pCallbacksProvider->clientCallbacks.customData,
-                                                            pCurlApiCallbacks->cachedEndpointsLock);
-            endpointsLocked = TRUE;
-
-            // Attempt to retrieve the cached value
-            retStatus = hashTableGet(pCurlApiCallbacks->pCachedEndpoints, (UINT64) streamHandle, &value);
-
-            CHK(retStatus == STATUS_HASH_KEY_NOT_PRESENT || retStatus == STATUS_SUCCESS, retStatus);
-
-            if (retStatus == STATUS_HASH_KEY_NOT_PRESENT) {
-                emulateApiCall = FALSE;
-
-                // Reset the status if not found
-                retStatus = STATUS_SUCCESS;
-            } else {
-                pEndpointTracker = (PEndpointTracker) value;
-                curTime = pCallbacksProvider->clientCallbacks.getCurrentTimeFn(pCallbacksProvider->clientCallbacks.customData);
-
-                if (pEndpointTracker == NULL ||
-                    pEndpointTracker->streamingEndpoint[0] == '\0' ||
-                    pEndpointTracker->endpointLastUpdateTime + pCurlApiCallbacks->cacheUpdatePeriod <= curTime) {
-                    emulateApiCall = FALSE;
-                }
-            }
-
-            // No longer need to hold the endpoint lock
-            pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData,
-                                                              pCurlApiCallbacks->cachedEndpointsLock);
-            endpointsLocked = FALSE;
-            break;
-    }
-
+    // Check whether we need to emulate the call
+    CHK_STATUS(checkApiCallEmulation(pCurlApiCallbacks, streamHandle, &emulateApiCall));
 
     // Force the tag resource call if we have no up-to-date info
     if (!emulateApiCall) {
@@ -2096,11 +1958,6 @@ STATUS tagResourceCachingCurl(UINT64 customData, PCHAR streamArn, UINT32 tagCoun
     notifyCallResult(pCallbacksProvider, retStatus, streamHandle);
 
 CleanUp:
-
-    if (endpointsLocked) {
-        pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData,
-                                                          pCurlApiCallbacks->cachedEndpointsLock);
-    }
 
     LEAVES();
     return retStatus;
@@ -2410,6 +2267,79 @@ CleanUp:
     }
 
     *ppCurlRequest = pCurlRequest;
+
+    LEAVES();
+    return retStatus;
+}
+
+STATUS checkApiCallEmulation(PCurlApiCallbacks pCurlApiCallbacks, STREAM_HANDLE streamHandle, PBOOL pEmulateApiCall)
+{
+    ENTERS();
+    STATUS retStatus = STATUS_SUCCESS;
+    BOOL endpointsLocked = FALSE, emulateApiCall = TRUE;
+    PCallbacksProvider pCallbacksProvider = NULL;
+    UINT64 curTime, value;
+    PEndpointTracker pEndpointTracker = NULL;
+
+    CHK(pCurlApiCallbacks != NULL && pCurlApiCallbacks->pCallbacksProvider != NULL && pEmulateApiCall != NULL,
+        STATUS_NULL_ARG);
+    pCallbacksProvider = pCurlApiCallbacks->pCallbacksProvider;
+
+    // We check whether we have already made the call by checking
+    // for the presence of the endpoint in the cache.
+    switch (pCurlApiCallbacks->cacheType) {
+        case API_CALL_CACHE_TYPE_NONE:
+            emulateApiCall = FALSE;
+            break;
+
+        case API_CALL_CACHE_TYPE_ENDPOINT_ONLY:
+            emulateApiCall = TRUE;
+            break;
+
+        case API_CALL_CACHE_TYPE_ALL:
+            pCallbacksProvider->clientCallbacks.lockMutexFn(pCallbacksProvider->clientCallbacks.customData,
+                                                            pCurlApiCallbacks->cachedEndpointsLock);
+            endpointsLocked = TRUE;
+
+            // Attempt to retrieve the cached value
+            retStatus = hashTableGet(pCurlApiCallbacks->pCachedEndpoints, (UINT64) streamHandle, &value);
+
+            CHK(retStatus == STATUS_HASH_KEY_NOT_PRESENT || retStatus == STATUS_SUCCESS, retStatus);
+
+            if (retStatus == STATUS_HASH_KEY_NOT_PRESENT) {
+                emulateApiCall = FALSE;
+
+                // Reset the status if not found
+                retStatus = STATUS_SUCCESS;
+            } else {
+                pEndpointTracker = (PEndpointTracker) value;
+                curTime = pCallbacksProvider->clientCallbacks.getCurrentTimeFn(
+                        pCallbacksProvider->clientCallbacks.customData);
+
+                if (pEndpointTracker == NULL ||
+                    pEndpointTracker->streamingEndpoint[0] == '\0' ||
+                    pEndpointTracker->endpointLastUpdateTime + pCurlApiCallbacks->cacheUpdatePeriod <= curTime) {
+                    emulateApiCall = FALSE;
+                }
+            }
+
+            // No longer need to hold the endpoint lock
+            pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData,
+                                                              pCurlApiCallbacks->cachedEndpointsLock);
+            endpointsLocked = FALSE;
+            break;
+    }
+
+CleanUp:
+
+    if (pEmulateApiCall != NULL) {
+        *pEmulateApiCall = emulateApiCall;
+    }
+
+    if (endpointsLocked) {
+        pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData,
+                                                          pCurlApiCallbacks->cachedEndpointsLock);
+    }
 
     LEAVES();
     return retStatus;

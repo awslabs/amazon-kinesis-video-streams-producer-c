@@ -197,6 +197,7 @@ STREAM_STATUS getStreamStatusFromString(PCHAR, UINT32);
 STATUS curlApiCallbacksMarkStreamShuttingdownCallback(UINT64, PHashEntry);
 STATUS curlApiCallbacksCachedEndpointsTableShutdownCallback(UINT64, PHashEntry);
 STATUS curlApiCallbacksFreeRequest(PCurlRequest);
+STATUS checkApiCallEmulation(PCurlApiCallbacks, STREAM_HANDLE, PBOOL);
 
 ////////////////////////////////////////////////////////////////////////
 // API Callback function implementations
