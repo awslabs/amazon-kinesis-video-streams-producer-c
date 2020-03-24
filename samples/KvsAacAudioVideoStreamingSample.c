@@ -173,7 +173,7 @@ INT32 main(INT32 argc, CHAR *argv[])
 
     MEMSET(data.sampleDir, 0x00, MAX_PATH_LEN + 1);
     if (argc < 4) {
-        STRCPY(data.sampleDir, (PCHAR) "../kinesis-video-c-producer/samples");
+        STRCPY(data.sampleDir, (PCHAR) "../samples");
     } else {
         STRNCPY(data.sampleDir, argv[3], MAX_PATH_LEN);
         if (data.sampleDir[STRLEN(data.sampleDir) - 1] == '/') {
