@@ -70,7 +70,7 @@ INT32 main(INT32 argc, CHAR *argv[])
 
     MEMSET(frameFilePath, 0x00, MAX_PATH_LEN + 1);
     if (argc < 4) {
-        STRCPY(frameFilePath, (PCHAR) "../kinesis-video-c-producer/samples/h264SampleFrames");
+        STRCPY(frameFilePath, (PCHAR) "../samples/h264SampleFrames");
     } else {
         STRNCPY(frameFilePath, argv[3], MAX_PATH_LEN);
     }
