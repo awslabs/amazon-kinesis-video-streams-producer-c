@@ -242,16 +242,40 @@ struct __ApiCallbacks {
 typedef struct __ApiCallbacks* PApiCallbacks;
 
 /**
- * Type of caching implementation
+ * Type of caching implementation to use with the callbacks provider
  */
 typedef enum {
-    // No caching is specified, will make API calls
+    /**
+     *  No caching. The callbacks provider will make backend API calls every time PIC requests.
+     */
     API_CALL_CACHE_TYPE_NONE,
 
-    // The stream should be pre-existing as DescribeStream API call will be emulated
+    /**
+     * The backend API calls are emulated for all of the API calls with the exception of GetStreamingEndpoint
+     * and PutMedia (for actual streaming). The result of the GetStreamingEndpoint is cached and the cached
+     * value is returned next time PIC makes a request to call GetStreamingEndpoint call.
+     *
+     * NOTE: The stream should be pre-existing as DescribeStream API call will be emulated and will
+     * return a success with stream being Active.
+     */
     API_CALL_CACHE_TYPE_ENDPOINT_ONLY,
 
-    // Call the APIs and cache the result
+    /**
+     * Cache all of the backend API calls with the exception of PutMedia (for actual data streaming).
+     * In this mode, the actual backend APIs will be called once and the information will be cached.
+     * The cached result will be returned afterwards when the PIC requests the provider to make the
+     * backend API call.
+     *
+     * This mode is the recommended mode for most of the streaming scenarios and is the default in the samples.
+     *
+     * NOTE: This mode is most suitable for streaming scenarios when the stream is not dynamically deleted
+     * or modified by another entity so the cached value of the API calls are static.
+     *
+     * NOTE: This mode will work for non-pre-created streams as the first call will not be cached for
+     * DescribeStream API call and if the stream is not created then the state machine will attempt
+     * to create it by calling CreateStream API call which would evaluate to the actual backend call
+     * to create the stream as it's not cached.
+     */
     API_CALL_CACHE_TYPE_ALL,
 } API_CALL_CACHE_TYPE;
 
