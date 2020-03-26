@@ -108,7 +108,6 @@ INT32 main(INT32 argc, CHAR *argv[])
                                                                 cacertPath,
                                                                 NULL,
                                                                 NULL,
-                                                                API_CALL_CACHE_TYPE_ALL,
                                                                 &pClientCallbacks));
     CHK_STATUS(createStreamCallbacks(&pStreamCallbacks));
     CHK_STATUS(addStreamCallbacks(pClientCallbacks, pStreamCallbacks));

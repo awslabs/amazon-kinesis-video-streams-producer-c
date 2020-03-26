@@ -297,12 +297,11 @@ typedef enum {
  * @param - PCHAR - IN/OPT - CA Cert Path
  * @param - PCHAR - IN/OPT - User agent name (Use NULL)
  * @param - PCHAR - IN/OUT - Custom user agent to be used in the API calls
- * @param - API_CALL_CACHE_TYPE - IN - Backend API call caching mode
  * @param - PClientCallbacks* - OUT - Returned pointer to callbacks provider
  *
  * @return - STATUS code of the execution
  */
-PUBLIC_API STATUS createDefaultCallbacksProviderWithAwsCredentials(PCHAR, PCHAR, PCHAR, UINT64, PCHAR, PCHAR, PCHAR, PCHAR, API_CALL_CACHE_TYPE, PClientCallbacks*);
+PUBLIC_API STATUS createDefaultCallbacksProviderWithAwsCredentials(PCHAR, PCHAR, PCHAR, UINT64, PCHAR, PCHAR, PCHAR, PCHAR, PClientCallbacks*);
 
 /**
  * Creates a default callbacks provider that uses iot certificate as auth method.
@@ -319,12 +318,11 @@ PUBLIC_API STATUS createDefaultCallbacksProviderWithAwsCredentials(PCHAR, PCHAR,
  * @param - PCHAR - IN/OPT - AWS region
  * @param - PCHAR - IN/OPT - User agent name (Use NULL)
  * @param - PCHAR - IN/OPT - Custom user agent to be used in the API calls
- * @param - API_CALL_CACHE_TYPE - IN - Backend API call caching mode
  * @param - PClientCallbacks* - OUT - Returned pointer to callbacks provider
  *
  * @return - STATUS code of the execution
  */
-PUBLIC_API STATUS createDefaultCallbacksProviderWithIotCertificate(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, API_CALL_CACHE_TYPE, PClientCallbacks*);
+PUBLIC_API STATUS createDefaultCallbacksProviderWithIotCertificate(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PClientCallbacks*);
 
 /**
  * Creates a default callbacks provider that uses file-based certificate as auth method.
@@ -337,12 +335,11 @@ PUBLIC_API STATUS createDefaultCallbacksProviderWithIotCertificate(PCHAR, PCHAR,
  * @param - PCHAR - IN/OPT - CA Cert path
  * @param - PCHAR - IN/OPT - User agent name (Use NULL)
  * @param - PCHAR - IN/OPT - Custom user agent to be used in the API calls
- * @param - API_CALL_CACHE_TYPE - IN - Backend API call caching mode
  * @param - PClientCallbacks* - OUT - Returned pointer to callbacks provider
  *
  * @return - STATUS code of the execution
  */
-PUBLIC_API STATUS createDefaultCallbacksProviderWithFileAuth(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, API_CALL_CACHE_TYPE, PClientCallbacks*);
+PUBLIC_API STATUS createDefaultCallbacksProviderWithFileAuth(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PClientCallbacks*);
 
 /**
  * Creates a default callbacks provider that uses auth callbacks as auth method.
@@ -355,14 +352,12 @@ PUBLIC_API STATUS createDefaultCallbacksProviderWithFileAuth(PCHAR, PCHAR, PCHAR
  * @param - PCHAR - IN/OPT - CA Cert path
  * @param - PCHAR - IN/OPT - User agent name (Use NULL)
  * @param - PCHAR - IN/OPT - Custom user agent to be used in the API calls
- * @param - API_CALL_CACHE_TYPE - IN - Backend API call caching mode
  * @param - BOOL - IN - Whether to create continuous retry callback provider
- * @param - UINT64 - IN - Cached endpoint update period
  * @param - PClientCallbacks* - OUT - Returned pointer to callbacks provider
  *
  * @return - STATUS code of the execution
  */
-PUBLIC_API STATUS createDefaultCallbacksProviderWithAuthCallbacks(PAuthCallbacks, PCHAR, PCHAR, PCHAR, PCHAR, API_CALL_CACHE_TYPE, BOOL, UINT64, PClientCallbacks*);
+PUBLIC_API STATUS createDefaultCallbacksProviderWithAuthCallbacks(PAuthCallbacks, PCHAR, PCHAR, PCHAR, PCHAR, BOOL, PClientCallbacks*);
 
 /**
  * Releases and frees the callbacks provider structure.

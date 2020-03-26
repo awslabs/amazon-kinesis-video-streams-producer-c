@@ -82,7 +82,6 @@ STATUS createDefaultCallbacksProviderWithAwsCredentials(PCHAR accessKeyId,
                                                         PCHAR caCertPath,
                                                         PCHAR userAgentPostfix,
                                                         PCHAR customUserAgent,
-                                                        API_CALL_CACHE_TYPE cacheType,
                                                         PClientCallbacks* ppClientCallbacks)
 {
     ENTERS();
@@ -92,8 +91,8 @@ STATUS createDefaultCallbacksProviderWithAwsCredentials(PCHAR accessKeyId,
     PStreamCallbacks pStreamCallbacks = NULL;
 
     CHK_STATUS(createAbstractDefaultCallbacksProvider(DEFAULT_CALLBACK_CHAIN_COUNT,
-                                                    cacheType,
-                                                    0,
+                                                    API_CALL_CACHE_TYPE_ALL,
+                                                    ENDPOINT_UPDATE_PERIOD_SENTINEL_VALUE,
                                                     region,
                                                     EMPTY_STRING,
                                                     caCertPath,
@@ -148,7 +147,6 @@ STATUS createDefaultCallbacksProviderWithIotCertificate(PCHAR endpoint,
                                                         PCHAR region,
                                                         PCHAR userAgentPostfix,
                                                         PCHAR customUserAgent,
-                                                        API_CALL_CACHE_TYPE cacheType,
                                                         PClientCallbacks* ppClientCallbacks)
 {
     ENTERS();
@@ -158,14 +156,14 @@ STATUS createDefaultCallbacksProviderWithIotCertificate(PCHAR endpoint,
     PStreamCallbacks pStreamCallbacks = NULL;
 
     CHK_STATUS(createAbstractDefaultCallbacksProvider(DEFAULT_CALLBACK_CHAIN_COUNT,
-                                                    cacheType,
-                                                    0,
-                                                    region,
-                                                    EMPTY_STRING,
-                                                    caCertPath,
-                                                    userAgentPostfix,
-                                                    customUserAgent,
-                                                    ppClientCallbacks));
+            API_CALL_CACHE_TYPE_ALL,
+            ENDPOINT_UPDATE_PERIOD_SENTINEL_VALUE,
+            region,
+            EMPTY_STRING,
+            caCertPath,
+            userAgentPostfix,
+            customUserAgent,
+            ppClientCallbacks));
 
     pCallbacksProvider = (PCallbacksProvider) *ppClientCallbacks;
 
@@ -212,7 +210,6 @@ STATUS createDefaultCallbacksProviderWithFileAuth(PCHAR credentialsFilePath,
                                                   PCHAR caCertPath,
                                                   PCHAR userAgentPostfix,
                                                   PCHAR customUserAgent,
-                                                  API_CALL_CACHE_TYPE cacheType,
                                                   PClientCallbacks* ppClientCallbacks)
 {
     ENTERS();
@@ -222,14 +219,14 @@ STATUS createDefaultCallbacksProviderWithFileAuth(PCHAR credentialsFilePath,
     PStreamCallbacks pStreamCallbacks = NULL;
 
     CHK_STATUS(createAbstractDefaultCallbacksProvider(DEFAULT_CALLBACK_CHAIN_COUNT,
-                                                    cacheType,
-                                                    0,
-                                                    region,
-                                                    EMPTY_STRING,
-                                                    caCertPath,
-                                                    userAgentPostfix,
-                                                    customUserAgent,
-                                                    ppClientCallbacks));
+            API_CALL_CACHE_TYPE_ALL,
+            ENDPOINT_UPDATE_PERIOD_SENTINEL_VALUE,
+            region,
+            EMPTY_STRING,
+            caCertPath,
+            userAgentPostfix,
+            customUserAgent,
+            ppClientCallbacks));
 
     pCallbacksProvider = (PCallbacksProvider) *ppClientCallbacks;
 
@@ -271,9 +268,7 @@ STATUS createDefaultCallbacksProviderWithAuthCallbacks(PAuthCallbacks pAuthCallb
                                                   PCHAR caCertPath,
                                                   PCHAR userAgentPostfix,
                                                   PCHAR customUserAgent,
-                                                  API_CALL_CACHE_TYPE cacheType,
                                                   BOOL continuousRetry,
-                                                  UINT64 endpointCachingPeriod,
                                                   PClientCallbacks* ppClientCallbacks)
 {
     ENTERS();
@@ -282,14 +277,14 @@ STATUS createDefaultCallbacksProviderWithAuthCallbacks(PAuthCallbacks pAuthCallb
     PStreamCallbacks pStreamCallbacks = NULL;
 
     CHK_STATUS(createAbstractDefaultCallbacksProvider(DEFAULT_CALLBACK_CHAIN_COUNT,
-                                                    cacheType,
-                                                    endpointCachingPeriod,
-                                                    region,
-                                                    EMPTY_STRING,
-                                                    caCertPath,
-                                                    userAgentPostfix,
-                                                    customUserAgent,
-                                                    ppClientCallbacks));
+            API_CALL_CACHE_TYPE_ALL,
+            ENDPOINT_UPDATE_PERIOD_SENTINEL_VALUE,
+            region,
+            EMPTY_STRING,
+            caCertPath,
+            userAgentPostfix,
+            customUserAgent,
+            ppClientCallbacks));
     pCallbacksProvider = (PCallbacksProvider) *ppClientCallbacks;
     CHK_STATUS(addAuthCallbacks(*ppClientCallbacks, pAuthCallbacks));
 

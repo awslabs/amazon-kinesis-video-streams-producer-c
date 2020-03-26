@@ -18,7 +18,6 @@ TEST_F(CallbacksProviderApiFunctionalityTest, checkIotCallbackProviderOptionalCa
                                                               (PCHAR) DEFAULT_AWS_REGION,
                                                               NULL,
                                                               NULL,
-                                                              API_CALL_CACHE_TYPE_ALL,
                                                               &pClientCallbacks);
 
     EXPECT_NE(STATUS_SUCCESS, status);
@@ -33,7 +32,6 @@ TEST_F(CallbacksProviderApiFunctionalityTest, checkIotCallbackProviderOptionalCa
                                                               (PCHAR) DEFAULT_AWS_REGION,
                                                               NULL,
                                                               NULL,
-                                                              API_CALL_CACHE_TYPE_NONE,
                                                               &pClientCallbacks);
 
     EXPECT_NE(STATUS_SUCCESS, status);
@@ -48,7 +46,6 @@ TEST_F(CallbacksProviderApiFunctionalityTest, checkIotCallbackProviderOptionalCa
                                                               (PCHAR) DEFAULT_AWS_REGION,
                                                               NULL,
                                                               NULL,
-                                                              API_CALL_CACHE_TYPE_ENDPOINT_ONLY,
                                                               &pClientCallbacks);
 
     EXPECT_NE(STATUS_SUCCESS, status);
