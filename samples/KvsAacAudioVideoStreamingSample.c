@@ -146,6 +146,7 @@ INT32 main(INT32 argc, CHAR *argv[])
     PDeviceInfo pDeviceInfo = NULL;
     PStreamInfo pStreamInfo = NULL;
     PClientCallbacks pClientCallbacks = NULL;
+    PStreamCallbacks pStreamCallbacks = NULL;
     CLIENT_HANDLE clientHandle = INVALID_CLIENT_HANDLE_VALUE;
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     STATUS retStatus = STATUS_SUCCESS;
@@ -172,7 +173,7 @@ INT32 main(INT32 argc, CHAR *argv[])
 
     MEMSET(data.sampleDir, 0x00, MAX_PATH_LEN + 1);
     if (argc < 4) {
-        STRCPY(data.sampleDir, (PCHAR) "../kinesis-video-c-producer/samples");
+        STRCPY(data.sampleDir, (PCHAR) "../samples");
     } else {
         STRNCPY(data.sampleDir, argv[3], MAX_PATH_LEN);
         if (data.sampleDir[STRLEN(data.sampleDir) - 1] == '/') {
@@ -247,6 +248,8 @@ INT32 main(INT32 argc, CHAR *argv[])
                                                                 NULL,
                                                                 TRUE,
                                                                 &pClientCallbacks));
+    CHK_STATUS(createStreamCallbacks(&pStreamCallbacks));
+    CHK_STATUS(addStreamCallbacks(pClientCallbacks, pStreamCallbacks));
 
     CHK_STATUS(createKinesisVideoClient(pDeviceInfo, pClientCallbacks, &clientHandle));
     CHK_STATUS(createKinesisVideoStreamSync(clientHandle, pStreamInfo, &streamHandle));

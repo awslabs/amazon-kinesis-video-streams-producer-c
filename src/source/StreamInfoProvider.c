@@ -122,6 +122,10 @@ STATUS setStreamInfoDefaults(STREAMING_TYPE streamingType, UINT64 retention, UIN
     pStreamInfo->streamCaps.timecodeScale = STREAM_INFO_DEFAULT_TIMESCALE;
     pStreamInfo->streamCaps.trackInfoCount = trackCount;
     pStreamInfo->streamCaps.trackInfoList = pTrackInfo;
+    // when putFrame could cause OOM error from buffer, drop tail fragment
+    pStreamInfo->streamCaps.storePressurePolicy = CONTENT_STORE_PRESSURE_POLICY_DROP_TAIL_ITEM;
+    // when content view is full, drop tail fragment
+    pStreamInfo->streamCaps.viewOverflowPolicy = CONTENT_VIEW_OVERFLOW_POLICY_DROP_UNTIL_FRAGMENT_START;
 
     pStreamInfo->kmsKeyId[0] = '\0';
     pStreamInfo->retention = retention;

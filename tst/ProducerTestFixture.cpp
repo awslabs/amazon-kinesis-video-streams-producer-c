@@ -267,7 +267,7 @@ ProducerClientTestBase::ProducerClientTestBase() :
     mTrackInfo.trackCustomData.trackVideoConfig.videoHeight = 1080;
     mTrackInfo.trackCustomData.trackVideoConfig.videoWidth = 1920;
 
-    mStreamInfo.version = STORAGE_INFO_CURRENT_VERSION;
+    mStreamInfo.version = STREAM_INFO_CURRENT_VERSION;
     mStreamInfo.kmsKeyId[0] = '\0';
     mStreamInfo.retention = 2 * HUNDREDS_OF_NANOS_IN_AN_HOUR;
     mStreamInfo.streamCaps.streamingType = STREAMING_TYPE_REALTIME;
@@ -294,6 +294,8 @@ ProducerClientTestBase::ProducerClientTestBase() :
     mStreamInfo.streamCaps.trackInfoCount = 1;
     mStreamInfo.streamCaps.trackInfoList = &mTrackInfo;
     mStreamInfo.streamCaps.frameOrderingMode = FRAME_ORDER_MODE_PASS_THROUGH;
+    mStreamInfo.streamCaps.storePressurePolicy = CONTENT_STORE_PRESSURE_POLICY_OOM;
+    mStreamInfo.streamCaps.viewOverflowPolicy = CONTENT_VIEW_OVERFLOW_POLICY_DROP_TAIL_VIEW_ITEM;
 
     mFps = TEST_FPS;
     mKeyFrameInterval = TEST_FPS;
