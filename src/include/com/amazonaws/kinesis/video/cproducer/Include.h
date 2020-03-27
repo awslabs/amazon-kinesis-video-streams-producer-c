@@ -352,12 +352,11 @@ PUBLIC_API STATUS createDefaultCallbacksProviderWithFileAuth(PCHAR, PCHAR, PCHAR
  * @param - PCHAR - IN/OPT - CA Cert path
  * @param - PCHAR - IN/OPT - User agent name (Use NULL)
  * @param - PCHAR - IN/OPT - Custom user agent to be used in the API calls
- * @param - BOOL - IN - Whether to create continuous retry callback provider
  * @param - PClientCallbacks* - OUT - Returned pointer to callbacks provider
  *
  * @return - STATUS code of the execution
  */
-PUBLIC_API STATUS createDefaultCallbacksProviderWithAuthCallbacks(PAuthCallbacks, PCHAR, PCHAR, PCHAR, PCHAR, BOOL, PClientCallbacks*);
+PUBLIC_API STATUS createDefaultCallbacksProviderWithAuthCallbacks(PAuthCallbacks, PCHAR, PCHAR, PCHAR, PCHAR, PClientCallbacks*);
 
 /**
  * Releases and frees the callbacks provider structure.

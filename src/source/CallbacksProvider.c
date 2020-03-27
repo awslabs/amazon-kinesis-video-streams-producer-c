@@ -268,7 +268,6 @@ STATUS createDefaultCallbacksProviderWithAuthCallbacks(PAuthCallbacks pAuthCallb
                                                   PCHAR caCertPath,
                                                   PCHAR userAgentPostfix,
                                                   PCHAR customUserAgent,
-                                                  BOOL continuousRetry,
                                                   PClientCallbacks* ppClientCallbacks)
 {
     ENTERS();
@@ -287,10 +286,7 @@ STATUS createDefaultCallbacksProviderWithAuthCallbacks(PAuthCallbacks pAuthCallb
             ppClientCallbacks));
     pCallbacksProvider = (PCallbacksProvider) *ppClientCallbacks;
     CHK_STATUS(addAuthCallbacks(*ppClientCallbacks, pAuthCallbacks));
-
-    if (continuousRetry) {
-        CHK_STATUS(createContinuousRetryStreamCallbacks((PClientCallbacks) pCallbacksProvider, &pStreamCallbacks));
-    }
+    CHK_STATUS(createContinuousRetryStreamCallbacks((PClientCallbacks) pCallbacksProvider, &pStreamCallbacks));
 
 CleanUp:
 

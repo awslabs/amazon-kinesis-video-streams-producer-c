@@ -46,6 +46,14 @@
 #define TEST_CREATE_PRODUCER_TIMEOUT                            (300 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND)
 #define TEST_CREATE_STREAM_TIMEOUT                              (10 * HUNDREDS_OF_NANOS_IN_A_SECOND)
 
+#define TEST_IOT_ENDPOINT                                       (PCHAR) "Test.iot.endpoint"
+#define TEST_IOT_CERT_PATH                                      (PCHAR) "/Test/credentials/cert/path"
+#define TEST_IOT_CERT_PRIVATE_KEY_PATH                          (PCHAR) "/Test/private/key/path"
+#define TEST_CA_CERT_PATH                                       (PCHAR) "/Test/private/ca_cert/path"
+#define TEST_IOT_ROLE_ALIAS                                     (PCHAR) "TestRoleAlias"
+#define TEST_IOT_THING_NAME                                     (PCHAR) "TestThingName"
+#define TEST_USER_AGENT_POSTFIX                                 (PCHAR) "Postfix"
+
 #ifdef _WIN32
 #define TEST_TEMP_DIR_PATH                                      (PCHAR) "C:\\Windows\\Temp\\"
 #define TEST_TEMP_DIR_PATH_NO_ENDING_SEPARTOR                   (PCHAR) "C:\\Windows\\Temp"

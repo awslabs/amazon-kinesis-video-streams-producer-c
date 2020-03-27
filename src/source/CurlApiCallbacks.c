@@ -402,7 +402,12 @@ STATUS curlApiCallbacksShutdownActiveRequests(PCurlApiCallbacks pCurlApiCallback
     requestsLocked = TRUE;
 
     CHK_STATUS(hashTableIsEmpty(pCurlApiCallbacks->pActiveRequests, &hashTableEmpty));
-    CHK_WARN(!hashTableEmpty, retStatus, "pActiveRequests hashtable is empty");
+    if (hashTableEmpty) {
+        DLOGD("pActiveRequests hashtable is empty");
+
+        // Early bailout
+        CHK(FALSE, retStatus);
+    }
 
     if (IS_VALID_STREAM_HANDLE(streamHandle)) {
         hashEntry[0].key = streamHandle;
