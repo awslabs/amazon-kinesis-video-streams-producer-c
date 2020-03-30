@@ -83,7 +83,7 @@ TEST_F(AuthCallbackTest, verify_fileAuthCallback_provider_works)
     pDeviceInfo->clientInfo.loggerLogLevel = this->loggerLogLevel;
     EXPECT_EQ(STATUS_SUCCESS, createRealtimeVideoStreamInfoProvider(streamName, TEST_RETENTION_PERIOD, TEST_STREAM_BUFFER_DURATION, &pStreamInfo));
     EXPECT_EQ(STATUS_SUCCESS, createAbstractDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT,
-                                                                     FALSE,
+                                                                     API_CALL_CACHE_TYPE_NONE,
                                                                      TEST_CACHING_ENDPOINT_PERIOD,
                                                                      mRegion,
                                                                      TEST_CONTROL_PLANE_URI,

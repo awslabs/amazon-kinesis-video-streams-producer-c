@@ -9,12 +9,12 @@ TEST_F(ProducerApiTest, fileLoggerApiTest)
 {
     PClientCallbacks pClientCallbacks = NULL;
     PCHAR testLogDir = ((PCHAR) "/tmp");
-    PCHAR longPath = (PCHAR) MEMALLOC(MAX_PATH_LEN + 2);
+    CHAR longPath[MAX_PATH_LEN + 2];
 
     MEMSET(longPath, 0x01, MAX_PATH_LEN + 2);
     longPath[MAX_PATH_LEN + 1] = '\0';
     EXPECT_EQ(STATUS_SUCCESS, createAbstractDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT,
-                                                                     FALSE,
+                                                                     API_CALL_CACHE_TYPE_NONE,
                                                                      TEST_CACHING_ENDPOINT_PERIOD,
                                                                      TEST_DEFAULT_REGION,
                                                                      TEST_CONTROL_PLANE_URI,
@@ -32,7 +32,6 @@ TEST_F(ProducerApiTest, fileLoggerApiTest)
 
     EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks));
     EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks)); // idempotent
-    MEMFREE(longPath);
 }
 
 }

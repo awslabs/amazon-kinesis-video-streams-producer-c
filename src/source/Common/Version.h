@@ -13,7 +13,7 @@ extern "C" {
 /**
  * IMPORTANT!!! This is the current version of the SDK which needs to be maintained
  */
-#define AWS_SDK_KVS_PRODUCER_VERSION_STRING             (PCHAR) "2.1.0"
+#define AWS_SDK_KVS_PRODUCER_VERSION_STRING             (PCHAR) "3.0.0"
 
 /**
  * Default user agent string

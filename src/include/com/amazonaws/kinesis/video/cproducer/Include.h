@@ -241,6 +241,44 @@ struct __ApiCallbacks {
 };
 typedef struct __ApiCallbacks* PApiCallbacks;
 
+/**
+ * Type of caching implementation to use with the callbacks provider
+ */
+typedef enum {
+    /**
+     *  No caching. The callbacks provider will make backend API calls every time PIC requests.
+     */
+    API_CALL_CACHE_TYPE_NONE,
+
+    /**
+     * The backend API calls are emulated for all of the API calls with the exception of GetStreamingEndpoint
+     * and PutMedia (for actual streaming). The result of the GetStreamingEndpoint is cached and the cached
+     * value is returned next time PIC makes a request to call GetStreamingEndpoint call.
+     *
+     * NOTE: The stream should be pre-existing as DescribeStream API call will be emulated and will
+     * return a success with stream being Active.
+     */
+    API_CALL_CACHE_TYPE_ENDPOINT_ONLY,
+
+    /**
+     * Cache all of the backend API calls with the exception of PutMedia (for actual data streaming).
+     * In this mode, the actual backend APIs will be called once and the information will be cached.
+     * The cached result will be returned afterwards when the PIC requests the provider to make the
+     * backend API call.
+     *
+     * This mode is the recommended mode for most of the streaming scenarios and is the default in the samples.
+     *
+     * NOTE: This mode is most suitable for streaming scenarios when the stream is not dynamically deleted
+     * or modified by another entity so the cached value of the API calls are static.
+     *
+     * NOTE: This mode will work for non-pre-created streams as the first call will not be cached for
+     * DescribeStream API call and if the stream is not created then the state machine will attempt
+     * to create it by calling CreateStream API call which would evaluate to the actual backend call
+     * to create the stream as it's not cached.
+     */
+    API_CALL_CACHE_TYPE_ALL,
+} API_CALL_CACHE_TYPE;
+
 ////////////////////////////////////////////////////
 // Public functions
 ////////////////////////////////////////////////////
@@ -259,12 +297,11 @@ typedef struct __ApiCallbacks* PApiCallbacks;
  * @param - PCHAR - IN/OPT - CA Cert Path
  * @param - PCHAR - IN/OPT - User agent name (Use NULL)
  * @param - PCHAR - IN/OUT - Custom user agent to be used in the API calls
- * @param - BOOL - IN - Whether to create caching endpoint only callback provider
  * @param - PClientCallbacks* - OUT - Returned pointer to callbacks provider
  *
  * @return - STATUS code of the execution
  */
-PUBLIC_API STATUS createDefaultCallbacksProviderWithAwsCredentials(PCHAR, PCHAR, PCHAR, UINT64, PCHAR, PCHAR, PCHAR, PCHAR, BOOL, PClientCallbacks*);
+PUBLIC_API STATUS createDefaultCallbacksProviderWithAwsCredentials(PCHAR, PCHAR, PCHAR, UINT64, PCHAR, PCHAR, PCHAR, PCHAR, PClientCallbacks*);
 
 /**
  * Creates a default callbacks provider that uses iot certificate as auth method.
@@ -281,12 +318,11 @@ PUBLIC_API STATUS createDefaultCallbacksProviderWithAwsCredentials(PCHAR, PCHAR,
  * @param - PCHAR - IN/OPT - AWS region
  * @param - PCHAR - IN/OPT - User agent name (Use NULL)
  * @param - PCHAR - IN/OPT - Custom user agent to be used in the API calls
- * @param - BOOL - IN - Whether to create caching endpoint only callback provider
  * @param - PClientCallbacks* - OUT - Returned pointer to callbacks provider
  *
  * @return - STATUS code of the execution
  */
-PUBLIC_API STATUS createDefaultCallbacksProviderWithIotCertificate(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, BOOL, PClientCallbacks*);
+PUBLIC_API STATUS createDefaultCallbacksProviderWithIotCertificate(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PClientCallbacks*);
 
 /**
  * Creates a default callbacks provider that uses file-based certificate as auth method.
@@ -299,12 +335,11 @@ PUBLIC_API STATUS createDefaultCallbacksProviderWithIotCertificate(PCHAR, PCHAR,
  * @param - PCHAR - IN/OPT - CA Cert path
  * @param - PCHAR - IN/OPT - User agent name (Use NULL)
  * @param - PCHAR - IN/OPT - Custom user agent to be used in the API calls
- * @param - BOOL - IN - Whether to create caching endpoint only callback provider
  * @param - PClientCallbacks* - OUT - Returned pointer to callbacks provider
  *
  * @return - STATUS code of the execution
  */
-PUBLIC_API STATUS createDefaultCallbacksProviderWithFileAuth(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, BOOL, PClientCallbacks*);
+PUBLIC_API STATUS createDefaultCallbacksProviderWithFileAuth(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PClientCallbacks*);
 
 /**
  * Creates a default callbacks provider that uses auth callbacks as auth method.
@@ -317,14 +352,11 @@ PUBLIC_API STATUS createDefaultCallbacksProviderWithFileAuth(PCHAR, PCHAR, PCHAR
  * @param - PCHAR - IN/OPT - CA Cert path
  * @param - PCHAR - IN/OPT - User agent name (Use NULL)
  * @param - PCHAR - IN/OPT - Custom user agent to be used in the API calls
- * @param - BOOL - IN - Whether to create caching endpoint only callback provider
- * @param - BOOL - IN - Whether to create continuous retry callback provider
- * @param - UINT64 - IN - Cached endpoint update period
  * @param - PClientCallbacks* - OUT - Returned pointer to callbacks provider
  *
  * @return - STATUS code of the execution
  */
-PUBLIC_API STATUS createDefaultCallbacksProviderWithAuthCallbacks(PAuthCallbacks, PCHAR, PCHAR, PCHAR, PCHAR, BOOL, BOOL, UINT64, PClientCallbacks*);
+PUBLIC_API STATUS createDefaultCallbacksProviderWithAuthCallbacks(PAuthCallbacks, PCHAR, PCHAR, PCHAR, PCHAR, PClientCallbacks*);
 
 /**
  * Releases and frees the callbacks provider structure.
@@ -645,7 +677,7 @@ PUBLIC_API STATUS freeContinuousRetryStreamCallbacks(PStreamCallbacks*);
  * Create abstract callback provider that can hook with other callbacks
  *
  * @param - UINT32 - IN - Length of callback provider calling chain
- * @param - BOOL - IN - Whether to create caching endpoint only callback provider
+ * @param - API_CALL_CACHE_TYPE - IN - Backend API call caching mode
  * @param - UINT64 - IN - Cached endpoint update period
  * @param - PCHAR - IN/OPT - AWS region
  * @param - PCHAR - IN - Specific Control Plane Uri as endpoint to be called
@@ -656,7 +688,7 @@ PUBLIC_API STATUS freeContinuousRetryStreamCallbacks(PStreamCallbacks*);
  *
  * @return - STATUS code of the execution
  */
-PUBLIC_API STATUS createAbstractDefaultCallbacksProvider(UINT32, BOOL, UINT64, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PClientCallbacks*);
+PUBLIC_API STATUS createAbstractDefaultCallbacksProvider(UINT32, API_CALL_CACHE_TYPE, UINT64, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PClientCallbacks*);
 
 /**
  * Use file logger instead of default logger which log to stdout. The underlying objects are automatically freed

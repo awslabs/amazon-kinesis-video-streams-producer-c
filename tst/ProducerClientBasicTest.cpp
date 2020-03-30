@@ -75,7 +75,7 @@ PVOID ProducerClientBasicTest::staticCreateProducerClientRoutine(PVOID arg)
     deviceInfo.clientInfo.logMetric = TRUE;
 
     EXPECT_EQ(STATUS_SUCCESS, createAbstractDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT,
-            FALSE,
+            API_CALL_CACHE_TYPE_NONE,
             TEST_CACHING_ENDPOINT_PERIOD,
             pTest->mRegion,
             TEST_CONTROL_PLANE_URI,
@@ -477,6 +477,7 @@ TEST_F(ProducerClientBasicTest, create_produce_stream)
 
         // Spin off the producer
         EXPECT_EQ(STATUS_SUCCESS, THREAD_CREATE(&mProducerThread, staticProducerRoutine, (PVOID) mStreams[i]));
+        THREAD_DETACH(mProducerThread);
     }
 
 #if 0
@@ -509,6 +510,7 @@ TEST_F(ProducerClientBasicTest, create_produce_stream)
 
             // Spin off the producer
             EXPECT_EQ(STATUS_SUCCESS, THREAD_CREATE(&mProducerThread, staticProducerRoutine, (PVOID) mStreams[i]));
+            THREAD_DETACH(mProducerThread);
         }
     }
 #endif
@@ -554,6 +556,7 @@ TEST_F(ProducerClientBasicTest, create_produce_stream_parallel)
         // Create the streams
         THREAD_SLEEP(300 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND);
         THREAD_CREATE(&mProducerThread, staticCreateProducerRoutine, (PVOID) i);
+        THREAD_DETACH(mProducerThread);
     }
 
     // Await for all the streams to finish creating
@@ -564,6 +567,7 @@ TEST_F(ProducerClientBasicTest, create_produce_stream_parallel)
     for (UINT32 i = 0; i < TEST_STREAM_COUNT; i++) {
         // Spin off the producer
         EXPECT_EQ(STATUS_SUCCESS, THREAD_CREATE(&mProducerThread, staticProducerRoutine, (PVOID) mStreams[i]));
+        THREAD_DETACH(mProducerThread);
     }
 
     // Wait for some time to produce
@@ -599,6 +603,7 @@ TEST_F(ProducerClientBasicTest, create_produce_client_parallel)
         // Create the streams
         THREAD_SLEEP(300 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND);
         THREAD_CREATE(&mProducerThread, staticCreateProducerClientRoutine, (PVOID) i);
+        THREAD_DETACH(mProducerThread);
     }
 
     // Await for all the streams to finish creating
@@ -608,6 +613,7 @@ TEST_F(ProducerClientBasicTest, create_produce_client_parallel)
 
     for (UINT64 i = 0; i < TEST_STREAM_COUNT; i++) {
         EXPECT_EQ(STATUS_SUCCESS, THREAD_CREATE(&mProducerThread, staticProducerClientStartRoutine, (PVOID) i));
+        THREAD_DETACH(mProducerThread);
     }
 
     // Wait for some time to produce
@@ -647,6 +653,7 @@ TEST_F(ProducerClientBasicTest, cachingEndpointProvider_Returns_EndpointFromCach
 
         // Spin off the producer
         EXPECT_EQ(STATUS_SUCCESS, THREAD_CREATE(&mProducerThread, staticProducerRoutine, (PVOID) mStreams[i]));
+        THREAD_DETACH(mProducerThread);
     }
 
     // Wait for a couple of rotations and ensure we didn't call the endpoint
@@ -703,7 +710,8 @@ TEST_F(ProducerClientBasicTest, createStreamStopSyncFree)
     EXPECT_EQ(STATUS_SUCCESS, createDefaultCallbacksProvider(5, mAccessKey, mSecretKey,
                                                              mSessionToken, GETTIME() + TEST_STREAMING_TOKEN_DURATION,
                                                              mRegion, TEST_CONTROL_PLANE_URI,
-                                                             mCaCertPath, NULL, NULL, FALSE, TEST_CACHING_ENDPOINT_PERIOD,
+                                                             mCaCertPath, NULL, NULL,
+                                                             API_CALL_CACHE_TYPE_NONE, TEST_CACHING_ENDPOINT_PERIOD,
                                                              FALSE, &pClientCallbacks));
     EXPECT_EQ(STATUS_SUCCESS, createKinesisVideoClientSync(pDeviceInfo, pClientCallbacks, &clientHandle));
     EXPECT_EQ(STATUS_SUCCESS, createKinesisVideoStreamSync(clientHandle, pStreamInfo, &streamHandle));
@@ -744,7 +752,8 @@ TEST_F(ProducerClientBasicTest, createStreamPutOneFrameStopSyncFree)
     EXPECT_EQ(STATUS_SUCCESS, createDefaultCallbacksProvider(5, mAccessKey, mSecretKey,
                                                              mSessionToken, GETTIME() + TEST_STREAMING_TOKEN_DURATION,
                                                              mRegion, TEST_CONTROL_PLANE_URI,
-                                                             mCaCertPath, NULL, NULL, FALSE, TEST_CACHING_ENDPOINT_PERIOD,
+                                                             mCaCertPath, NULL, NULL,
+                                                             API_CALL_CACHE_TYPE_NONE, TEST_CACHING_ENDPOINT_PERIOD,
                                                              FALSE, &pClientCallbacks));
     EXPECT_EQ(STATUS_SUCCESS, createKinesisVideoClientSync(pDeviceInfo, pClientCallbacks, &clientHandle));
     EXPECT_EQ(STATUS_SUCCESS, createKinesisVideoStreamSync(clientHandle, pStreamInfo, &streamHandle));
@@ -788,7 +797,8 @@ TEST_F(ProducerClientBasicTest, createStreamPutMultipleFrameStopSyncFree)
     EXPECT_EQ(STATUS_SUCCESS, createDefaultCallbacksProvider(5, mAccessKey, mSecretKey,
                                                              mSessionToken, MAX_UINT64,
                                                              mRegion, TEST_CONTROL_PLANE_URI,
-                                                             mCaCertPath, NULL, NULL, FALSE, TEST_CACHING_ENDPOINT_PERIOD,
+                                                             mCaCertPath, NULL, NULL,
+                                                             API_CALL_CACHE_TYPE_NONE, TEST_CACHING_ENDPOINT_PERIOD,
                                                              FALSE, &pClientCallbacks));
     EXPECT_EQ(STATUS_SUCCESS, createKinesisVideoClientSync(pDeviceInfo, pClientCallbacks, &clientHandle));
     EXPECT_EQ(STATUS_SUCCESS, createKinesisVideoStreamSync(clientHandle, pStreamInfo, &streamHandle));
@@ -842,14 +852,14 @@ TEST_F(ProducerClientBasicTest, createStreamStreamUntilTokenRotationStopSyncFree
     EXPECT_EQ(STATUS_SUCCESS, createRealtimeVideoStreamInfoProvider(streamName, TEST_RETENTION_PERIOD, TEST_STREAM_BUFFER_DURATION, &pStreamInfo));
     pStreamInfo->streamCaps.nalAdaptationFlags = NAL_ADAPTATION_FLAG_NONE;
     EXPECT_EQ(STATUS_SUCCESS, createAbstractDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT,
-                                                                   FALSE,
-                                                                   TEST_CACHING_ENDPOINT_PERIOD,
-                                                                   mRegion,
-                                                                   TEST_CONTROL_PLANE_URI,
-                                                                   mCaCertPath,
-                                                                   NULL,
-                                                                   NULL,
-                                                                   &pClientCallbacks));
+            API_CALL_CACHE_TYPE_NONE,
+            TEST_CACHING_ENDPOINT_PERIOD,
+            mRegion,
+            TEST_CONTROL_PLANE_URI,
+            mCaCertPath,
+            NULL,
+            NULL,
+            &pClientCallbacks));
 
     UINT64 expiration = currentTime + TEST_STREAMING_TOKEN_DURATION;
 
@@ -914,7 +924,7 @@ TEST_F(ProducerClientBasicTest, createStreamStreamUntilTokenRotationStopSyncFree
     EXPECT_EQ(STATUS_SUCCESS, createRealtimeVideoStreamInfoProvider(streamName, TEST_RETENTION_PERIOD, TEST_STREAM_BUFFER_DURATION, &pStreamInfo));
     pStreamInfo->streamCaps.nalAdaptationFlags = NAL_ADAPTATION_FLAG_NONE;
     EXPECT_EQ(STATUS_SUCCESS, createAbstractDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT,
-                                                                     FALSE,
+                                                                     API_CALL_CACHE_TYPE_NONE,
                                                                      TEST_CACHING_ENDPOINT_PERIOD,
                                                                      mRegion,
                                                                      TEST_CONTROL_PLANE_URI,

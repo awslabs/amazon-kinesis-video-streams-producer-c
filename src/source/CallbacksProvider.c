@@ -14,7 +14,7 @@
 STATUS createDefaultCallbacksProvider(UINT32 callbackChainCount, PCHAR accessKeyId, PCHAR secretKey,
                                       PCHAR sessionToken, UINT64 expiration, PCHAR region, PCHAR controlPlaneUrl,
                                       PCHAR certPath, PCHAR userAgentPostfix, PCHAR customUserAgent,
-                                      BOOL cachingEndpoint, UINT64 endpointCachingPeriod,
+                                      API_CALL_CACHE_TYPE cacheType, UINT64 endpointCachingPeriod,
                                       BOOL continuousRetry,
                                       PClientCallbacks* ppClientCallbacks)
 {
@@ -25,7 +25,7 @@ STATUS createDefaultCallbacksProvider(UINT32 callbackChainCount, PCHAR accessKey
     PStreamCallbacks pStreamCallbacks = NULL;
 
     CHK_STATUS(createAbstractDefaultCallbacksProvider(callbackChainCount,
-                                                    cachingEndpoint,
+                                                    cacheType,
                                                     endpointCachingPeriod,
                                                     region,
                                                     controlPlaneUrl,
@@ -82,7 +82,6 @@ STATUS createDefaultCallbacksProviderWithAwsCredentials(PCHAR accessKeyId,
                                                         PCHAR caCertPath,
                                                         PCHAR userAgentPostfix,
                                                         PCHAR customUserAgent,
-                                                        BOOL cachingEndpoint,
                                                         PClientCallbacks* ppClientCallbacks)
 {
     ENTERS();
@@ -92,8 +91,8 @@ STATUS createDefaultCallbacksProviderWithAwsCredentials(PCHAR accessKeyId,
     PStreamCallbacks pStreamCallbacks = NULL;
 
     CHK_STATUS(createAbstractDefaultCallbacksProvider(DEFAULT_CALLBACK_CHAIN_COUNT,
-                                                    cachingEndpoint,
-                                                    0,
+                                                    API_CALL_CACHE_TYPE_ALL,
+                                                    ENDPOINT_UPDATE_PERIOD_SENTINEL_VALUE,
                                                     region,
                                                     EMPTY_STRING,
                                                     caCertPath,
@@ -148,7 +147,6 @@ STATUS createDefaultCallbacksProviderWithIotCertificate(PCHAR endpoint,
                                                         PCHAR region,
                                                         PCHAR userAgentPostfix,
                                                         PCHAR customUserAgent,
-                                                        BOOL cachingEndpoint,
                                                         PClientCallbacks* ppClientCallbacks)
 {
     ENTERS();
@@ -158,14 +156,14 @@ STATUS createDefaultCallbacksProviderWithIotCertificate(PCHAR endpoint,
     PStreamCallbacks pStreamCallbacks = NULL;
 
     CHK_STATUS(createAbstractDefaultCallbacksProvider(DEFAULT_CALLBACK_CHAIN_COUNT,
-                                                    cachingEndpoint,
-                                                    0,
-                                                    region,
-                                                    EMPTY_STRING,
-                                                    caCertPath,
-                                                    userAgentPostfix,
-                                                    customUserAgent,
-                                                    ppClientCallbacks));
+            API_CALL_CACHE_TYPE_ALL,
+            ENDPOINT_UPDATE_PERIOD_SENTINEL_VALUE,
+            region,
+            EMPTY_STRING,
+            caCertPath,
+            userAgentPostfix,
+            customUserAgent,
+            ppClientCallbacks));
 
     pCallbacksProvider = (PCallbacksProvider) *ppClientCallbacks;
 
@@ -212,7 +210,6 @@ STATUS createDefaultCallbacksProviderWithFileAuth(PCHAR credentialsFilePath,
                                                   PCHAR caCertPath,
                                                   PCHAR userAgentPostfix,
                                                   PCHAR customUserAgent,
-                                                  BOOL cachingEndpoint,
                                                   PClientCallbacks* ppClientCallbacks)
 {
     ENTERS();
@@ -222,14 +219,14 @@ STATUS createDefaultCallbacksProviderWithFileAuth(PCHAR credentialsFilePath,
     PStreamCallbacks pStreamCallbacks = NULL;
 
     CHK_STATUS(createAbstractDefaultCallbacksProvider(DEFAULT_CALLBACK_CHAIN_COUNT,
-                                                    cachingEndpoint,
-                                                    0,
-                                                    region,
-                                                    EMPTY_STRING,
-                                                    caCertPath,
-                                                    userAgentPostfix,
-                                                    customUserAgent,
-                                                    ppClientCallbacks));
+            API_CALL_CACHE_TYPE_ALL,
+            ENDPOINT_UPDATE_PERIOD_SENTINEL_VALUE,
+            region,
+            EMPTY_STRING,
+            caCertPath,
+            userAgentPostfix,
+            customUserAgent,
+            ppClientCallbacks));
 
     pCallbacksProvider = (PCallbacksProvider) *ppClientCallbacks;
 
@@ -271,9 +268,6 @@ STATUS createDefaultCallbacksProviderWithAuthCallbacks(PAuthCallbacks pAuthCallb
                                                   PCHAR caCertPath,
                                                   PCHAR userAgentPostfix,
                                                   PCHAR customUserAgent,
-                                                  BOOL cachingEndpoint,
-                                                  BOOL continuousRetry,
-                                                  UINT64 endpointCachingPeriod,
                                                   PClientCallbacks* ppClientCallbacks)
 {
     ENTERS();
@@ -282,20 +276,17 @@ STATUS createDefaultCallbacksProviderWithAuthCallbacks(PAuthCallbacks pAuthCallb
     PStreamCallbacks pStreamCallbacks = NULL;
 
     CHK_STATUS(createAbstractDefaultCallbacksProvider(DEFAULT_CALLBACK_CHAIN_COUNT,
-                                                    cachingEndpoint,
-                                                    endpointCachingPeriod,
-                                                    region,
-                                                    EMPTY_STRING,
-                                                    caCertPath,
-                                                    userAgentPostfix,
-                                                    customUserAgent,
-                                                    ppClientCallbacks));
+            API_CALL_CACHE_TYPE_ALL,
+            ENDPOINT_UPDATE_PERIOD_SENTINEL_VALUE,
+            region,
+            EMPTY_STRING,
+            caCertPath,
+            userAgentPostfix,
+            customUserAgent,
+            ppClientCallbacks));
     pCallbacksProvider = (PCallbacksProvider) *ppClientCallbacks;
     CHK_STATUS(addAuthCallbacks(*ppClientCallbacks, pAuthCallbacks));
-
-    if (continuousRetry) {
-        CHK_STATUS(createContinuousRetryStreamCallbacks((PClientCallbacks) pCallbacksProvider, &pStreamCallbacks));
-    }
+    CHK_STATUS(createContinuousRetryStreamCallbacks((PClientCallbacks) pCallbacksProvider, &pStreamCallbacks));
 
 CleanUp:
 
@@ -320,7 +311,7 @@ CleanUp:
     return retStatus;
 }
 
-STATUS createAbstractDefaultCallbacksProvider(UINT32 callbackChainCount, BOOL cachingEndpoint,
+STATUS createAbstractDefaultCallbacksProvider(UINT32 callbackChainCount, API_CALL_CACHE_TYPE cacheType,
                                             UINT64 endpointCachingPeriod, PCHAR region,
                                             PCHAR controlPlaneUrl, PCHAR certPath,
                                             PCHAR userAgentName, PCHAR customUserAgent,
@@ -366,7 +357,7 @@ STATUS createAbstractDefaultCallbacksProvider(UINT32 callbackChainCount, BOOL ca
     // Create the default Curl API callbacks
     CHK_STATUS(createCurlApiCallbacks(pCallbacksProvider,
                                       region,
-                                      cachingEndpoint,
+                                      cacheType,
                                       endpointCachingPeriod,
                                       controlPlaneUrl,
                                       certPath,

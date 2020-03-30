@@ -1052,7 +1052,7 @@ TEST_F(ProducerFunctionalityTest, create_abstract_provider_add_stream_callback_f
 {
     PStreamCallbacks pStreamCallbacks;
     EXPECT_EQ(STATUS_SUCCESS, createAbstractDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT,
-                                                                     FALSE,
+                                                                     API_CALL_CACHE_TYPE_NONE,
                                                                      TEST_CACHING_ENDPOINT_PERIOD,
                                                                      mRegion,
                                                                      TEST_CONTROL_PLANE_URI,
