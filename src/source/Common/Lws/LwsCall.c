@@ -76,7 +76,11 @@ CleanUp:
         // Trigger termination
         ATOMIC_STORE_BOOL(&pCallInfo->pRequestInfo->terminating, TRUE);
 
+        // Cancel the ongoing service if any
         lws_cancel_service(lwsContext);
+
+        // Destroy the context
+        lws_context_destroy(lwsContext);
     }
 
     LEAVES();
