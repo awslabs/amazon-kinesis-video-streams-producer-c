@@ -82,7 +82,7 @@ TEST_F(ProducerContinuousRetryTest, test_stream_callbacks_stream_latency_trigger
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
 
-TEST_F(ProducerContinuousRetryTest, DISABLED_test_stream_recover_after_reset_connnection) {
+TEST_F(ProducerContinuousRetryTest, test_stream_recover_after_reset_connnection) {
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     UINT32 i;
     UINT32 totalFragments = 10; // 10s in total duration
@@ -118,7 +118,7 @@ TEST_F(ProducerContinuousRetryTest, DISABLED_test_stream_recover_after_reset_con
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
 
-TEST_F(ProducerContinuousRetryTest, DISABLED_test_stream_recover_after_reset_connnection_stream_session_timeout) {
+TEST_F(ProducerContinuousRetryTest, test_stream_recover_after_reset_connnection_stream_session_timeout) {
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     UINT32 i;
     UINT32 totalFragments = 10; // 10s in total duration
