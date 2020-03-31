@@ -41,7 +41,7 @@ TEST_F(ProducerApiCallCacheTest, basicValidateNoCaching)
     frame.flags = FRAME_FLAG_KEY_FRAME;
     EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(mStreams[0], &frame));
 
-    THREAD_SLEEP(3 * HUNDREDS_OF_NANOS_IN_A_SECOND);
+    THREAD_SLEEP(10 * HUNDREDS_OF_NANOS_IN_A_SECOND);
 
     EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStream(streamHandle));
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
@@ -77,7 +77,7 @@ TEST_F(ProducerApiCallCacheTest, basicValidateEndpointOnlyCaching)
     // The number of times the Curl hook was called - only once should be called
     EXPECT_EQ(1, mEasyPerformFnCount);
 
-    THREAD_SLEEP(1 * HUNDREDS_OF_NANOS_IN_A_SECOND);
+    THREAD_SLEEP(10 * HUNDREDS_OF_NANOS_IN_A_SECOND);
 
     EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStream(streamHandle));
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
@@ -123,7 +123,7 @@ TEST_F(ProducerApiCallCacheTest, basicValidateCachingAllApis)
     frame.flags = FRAME_FLAG_KEY_FRAME;
     EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(mStreams[0], &frame));
 
-    THREAD_SLEEP(3 * HUNDREDS_OF_NANOS_IN_A_SECOND);
+    THREAD_SLEEP(10 * HUNDREDS_OF_NANOS_IN_A_SECOND);
 
     EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStream(streamHandle));
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
