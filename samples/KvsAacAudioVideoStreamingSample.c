@@ -233,7 +233,7 @@ INT32 main(INT32 argc, CHAR *argv[])
     // generate audio cpd
     pAudioTrack->codecPrivateData = audioCpd;
     pAudioTrack->codecPrivateDataSize = KVS_AAC_CPD_SIZE_BYTE;
-    CHK_STATUS(mkvgenGenerateAacCpd(AAC_LC, AUDIO_TRACK_SAMPLING_RATE, AUDIO_TRACK_CHANNEL_CONFIG, pAudioTrack->codecPrivateData, &pAudioTrack->codecPrivateDataSize));
+    CHK_STATUS(mkvgenGenerateAacCpd(AAC_LC, AUDIO_TRACK_SAMPLING_RATE, AUDIO_TRACK_CHANNEL_CONFIG, pAudioTrack->codecPrivateData, pAudioTrack->codecPrivateDataSize));
 
     // use relative time mode. Buffer timestamps start from 0
     pStreamInfo->streamCaps.absoluteFragmentTimes = FALSE;
