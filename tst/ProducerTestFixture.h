@@ -349,6 +349,10 @@ protected:
     volatile UINT32 mStreamClosedFnCount;
     volatile UINT32 mPersistedFragmentCount;
     volatile UINT32 mStorageOverflowCount;
+    volatile UINT64 mLastErrorAckTimestamp;
+    volatile UINT64 mLastBufferingAckTimestamp;
+    volatile UINT64 mLastReceivedAckTimestamp;
+    volatile UINT64 mLastPersistedAckTimestamp;
 
     // Buffer pressure state machine variables
     volatile BOOL mBufferDurationInPressure;

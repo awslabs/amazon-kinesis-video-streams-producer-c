@@ -1319,6 +1319,77 @@ TEST_F(ProducerFunctionalityTest, token_rotation_collide_with_curl_timeout_idlin
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
 
+TEST_F(ProducerFunctionalityTest, curl_timeout_idling_force_ack)
+{
+    UINT32 j;
+    STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
+    UINT32 totalFragments = 5, ackCount, persistedAckCount;
+    UINT32 totalFrames = totalFragments * TEST_FPS;
+    Frame eofr = EOFR_FRAME_INITIALIZER;
+
+    createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
+
+    EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION));
+    streamHandle = mStreams[0];
+    EXPECT_TRUE(streamHandle != INVALID_STREAM_HANDLE_VALUE);
+
+    // put some frames initially
+    for(j = 0; j < TEST_FPS * 5; ++j) {
+        EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
+        updateFrame();
+    }
+
+    // Wait for a while to ensure the frames are uploaded
+    THREAD_SLEEP(2 * HUNDREDS_OF_NANOS_IN_A_SECOND);
+
+    // Get the number of ACKs
+    ackCount = mFragmentAckReceivedFnCount;
+    persistedAckCount = mPersistedFragmentCount;
+
+    // Check the ACK timestamps
+    // NOTE: The Buffering ACK should have already been received but Received and Persisted
+    // should not yet arrive.
+    // The Timestamp of the ACK is the Key frame timestamp in milliseconds
+    // hence, we use the total frames and account for the entire fragment (TEST_FPS) to
+    // get to the key frame timestamp.
+    EXPECT_EQ((totalFrames - TEST_FPS) * mFrame.duration / HUNDREDS_OF_NANOS_IN_A_MILLISECOND, mLastBufferingAckTimestamp);
+    EXPECT_EQ((totalFrames - 2 * TEST_FPS) * mFrame.duration / HUNDREDS_OF_NANOS_IN_A_MILLISECOND, mLastReceivedAckTimestamp);
+    EXPECT_EQ((totalFrames - 2 * TEST_FPS) * mFrame.duration / HUNDREDS_OF_NANOS_IN_A_MILLISECOND, mLastPersistedAckTimestamp);
+    EXPECT_EQ(0, mLastErrorAckTimestamp);
+
+    // Submit an EoFR to force the ack
+    EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &eofr));
+
+    // Wait until the ack comes back
+    THREAD_SLEEP(5 * HUNDREDS_OF_NANOS_IN_A_SECOND);
+
+    // Should be one more as we should have received the persistent ack for the incomplete fragment
+    // There should be a received ack and a persisted ack.
+    EXPECT_EQ(ackCount + 2, mFragmentAckReceivedFnCount);
+    EXPECT_EQ(persistedAckCount + 1, mPersistedFragmentCount);
+
+    // Check the ACK timestamps
+    EXPECT_EQ((totalFrames - TEST_FPS) * mFrame.duration / HUNDREDS_OF_NANOS_IN_A_MILLISECOND, mLastBufferingAckTimestamp);
+    EXPECT_EQ((totalFrames - TEST_FPS) * mFrame.duration / HUNDREDS_OF_NANOS_IN_A_MILLISECOND, mLastReceivedAckTimestamp);
+    EXPECT_EQ((totalFrames - TEST_FPS) * mFrame.duration / HUNDREDS_OF_NANOS_IN_A_MILLISECOND, mLastPersistedAckTimestamp);
+    EXPECT_EQ(0, mLastErrorAckTimestamp);
+
+    // trigger curl timeout.
+    THREAD_SLEEP(40 * HUNDREDS_OF_NANOS_IN_A_SECOND);
+
+    for(j = 0; j < totalFrames; ++j) {
+        EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
+        updateFrame();
+        THREAD_SLEEP(mFrame.duration);
+    }
+
+    EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStreamSync(streamHandle));
+    EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
+    EXPECT_EQ(0, mStreamErrorFnCount);
+
+    mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
+}
+
 TEST_F(ProducerFunctionalityTest, token_rotation_collide_with_curl_timeout_idling_with_non_key_frame)
 {
     UINT32 j;
