@@ -106,9 +106,28 @@ STATUS ProducerClientTestBase::testFragmentAckReceivedFunc(UINT64 customData,
     ProducerClientTestBase* pTest = (ProducerClientTestBase*) customData;
 
     MUTEX_LOCK(pTest->mTestCallbackLock);
-    if (pFragmentAck->ackType == FRAGMENT_ACK_TYPE_PERSISTED) {
-        pTest->mPersistedFragmentCount++;
+    switch (pFragmentAck->ackType) {
+        case FRAGMENT_ACK_TYPE_PERSISTED:
+            pTest->mLastPersistedAckTimestamp = pFragmentAck->timestamp;
+            pTest->mPersistedFragmentCount++;
+            break;
+
+        case FRAGMENT_ACK_TYPE_BUFFERING:
+            pTest->mLastBufferingAckTimestamp = pFragmentAck->timestamp;
+            break;
+
+        case FRAGMENT_ACK_TYPE_RECEIVED:
+            pTest->mLastReceivedAckTimestamp = pFragmentAck->timestamp;
+            break;
+
+        case FRAGMENT_ACK_TYPE_ERROR:
+            pTest->mLastErrorAckTimestamp = pFragmentAck->timestamp;
+            break;
+
+        default:
+            break;
     }
+
     pTest->mFragmentAckReceivedFnCount++;
     MUTEX_UNLOCK(pTest->mTestCallbackLock);
 
@@ -321,6 +340,10 @@ ProducerClientTestBase::ProducerClientTestBase() :
     mStreamReadyFnCount = 0;
     mStreamClosedFnCount = 0;
     mPersistedFragmentCount = 0;
+    mLastBufferingAckTimestamp = 0;
+    mLastErrorAckTimestamp = 0;
+    mLastReceivedAckTimestamp = 0;
+    mLastPersistedAckTimestamp = 0;
     mStorageOverflowCount = 0;
 
     mAbortUploadhandle = INVALID_UPLOAD_HANDLE_VALUE;

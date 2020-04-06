@@ -297,25 +297,48 @@ TEST_F(ProducerFunctionalityTest, create_client_repeated_create_stream_put_frame
     UINT32 i, j, k;
     UINT32 totalFragments = 2;
     UINT32 totalFrames = totalFragments * TEST_FPS, streamCount = 10;
+    TID threadIds[streamCount];
 
     createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
 
     for(i = 0; i < FUNCTIONALITY_TEST_STRESS_TEST_ITERATION; i++) {
 
         for(j = 0; j < streamCount; j++) {
-            EXPECT_EQ(STATUS_SUCCESS, createTestStream(j, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION, FALSE));
+            EXPECT_EQ(STATUS_SUCCESS,
+                      createTestStream(j, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION,
+                                       FALSE));
             EXPECT_TRUE(mStreams[j] != INVALID_STREAM_HANDLE_VALUE);
         }
 
         for(k = 0; k < totalFrames; k++) {
-            for(j = 0; j < streamCount; j++) {
+            for (j = 0; j < streamCount; j++) {
                 EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(mStreams[j], &mFrame));
             }
             updateFrame();
         }
 
-        for(j = 0; j < streamCount; j++) {
-            EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStreamSync(mStreams[j]));
+        // As we are processing multiple streams, we can't sequentially stop the streams
+        // as the latter streams will timeout their PutMedia calls
+        auto stopRoutine = [](PVOID arg) -> PVOID {
+            STREAM_HANDLE streamHandle = (STREAM_HANDLE) arg;
+            EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStreamSync(streamHandle));
+            return nullptr;
+        };
+
+        // Spin off threads to stop sync
+        for (j = 0; j < streamCount; j++) {
+            EXPECT_EQ(STATUS_SUCCESS, THREAD_CREATE(
+                    &threadIds[j],
+                    stopRoutine,
+                    (PVOID) mStreams[j]));
+        }
+
+        // Await for every one of the threads
+        for (j = 0; j < streamCount; j++) {
+            THREAD_JOIN(threadIds[j], NULL);
+        }
+
+        for (j = 0; j < streamCount; j++) {
             EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&mStreams[j]));
             mStreams[j] = INVALID_STREAM_HANDLE_VALUE;
         }
@@ -1079,7 +1102,7 @@ TEST_F(ProducerFunctionalityTest, stop_sending_frame_in_the_middle_of_streaming_
     streamHandle = mStreams[0];
     EXPECT_TRUE(streamHandle != INVALID_STREAM_HANDLE_VALUE);
 
-    for(j = 0; j < totalFrames; ++j) {
+    for (j = 0; j < totalFrames; ++j) {
         EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
         updateFrame();
         THREAD_SLEEP(mFrame.duration);
@@ -1090,6 +1113,14 @@ TEST_F(ProducerFunctionalityTest, stop_sending_frame_in_the_middle_of_streaming_
     // expecting no error so far
     EXPECT_EQ(0, mStreamErrorFnCount);
     errCount = mStreamErrorFnCount;
+
+    // We need to continue putting frames as the last fragment is not complete and has not received the
+    // the final persisted ACK in order to gracefully stop.
+    for (j = 0; j < totalFrames; ++j) {
+        EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
+        updateFrame();
+        THREAD_SLEEP(mFrame.duration);
+    }
 
     EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStreamSync(streamHandle));
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
@@ -1243,7 +1274,7 @@ TEST_F(ProducerFunctionalityTest, pause_sending_frame_until_timeout_then_put_key
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
 
-TEST_F(ProducerFunctionalityTest, token_rotation_collide_with_curl_timeout)
+TEST_F(ProducerFunctionalityTest, token_rotation_collide_with_curl_timeout_idling)
 {
     UINT32 j;
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
@@ -1268,14 +1299,12 @@ TEST_F(ProducerFunctionalityTest, token_rotation_collide_with_curl_timeout)
     THREAD_SLEEP(40 * HUNDREDS_OF_NANOS_IN_A_SECOND);
 
     for(j = 0; j < totalFrames; ++j) {
-        // First putKinesisVideoFrame is gonna trigger token rotation. However, the streamTerminatedEvent call triggered
-        // by the token rotation will have no effect since the stream is already repeatedly trying to get ready due to the
-        // putMedia failure induced, but mkv generator is still gonna be reset 3 seconds after token rotation is triggered.
-        // After first putKinesisVideoFrame we restore the mPutMediaStatus to allow new uploadHandle to be created. But the
-        // new uploadHandle is gonna run into the new stream start triggered by token rotation very shortly and reach end of
-        // stream.
+        // NOTE: as we have streamed the last bit there will be no more calls to curl
+        // The next frame here is a Key-frame which makes the state machine to step out
+        // and not yet call put stream state so the fault is not really injected
+        // as we are overwriting the fault inject value right after the frame is put.
         EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
-        if (STATUS_FAILED(mPutMediaStatus)) {
+        if (mStreamErrorFnCount != 0) {
             mPutMediaStatus = STATUS_SUCCESS;
             mPutMediaCallResult = SERVICE_CALL_RESULT_OK;
         }
@@ -1290,6 +1319,125 @@ TEST_F(ProducerFunctionalityTest, token_rotation_collide_with_curl_timeout)
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
 
+TEST_F(ProducerFunctionalityTest, curl_timeout_idling_force_ack)
+{
+    UINT32 j;
+    STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
+    UINT32 totalFragments = 5, ackCount, persistedAckCount;
+    UINT32 totalFrames = totalFragments * TEST_FPS;
+    Frame eofr = EOFR_FRAME_INITIALIZER;
+
+    createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
+
+    EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION));
+    streamHandle = mStreams[0];
+    EXPECT_TRUE(streamHandle != INVALID_STREAM_HANDLE_VALUE);
+
+    // put some frames initially
+    for(j = 0; j < TEST_FPS * 5; ++j) {
+        EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
+        updateFrame();
+    }
+
+    // Wait for a while to ensure the frames are uploaded
+    THREAD_SLEEP(2 * HUNDREDS_OF_NANOS_IN_A_SECOND);
+
+    // Get the number of ACKs
+    ackCount = mFragmentAckReceivedFnCount;
+    persistedAckCount = mPersistedFragmentCount;
+
+    // Check the ACK timestamps
+    // NOTE: The Buffering ACK should have already been received but Received and Persisted
+    // should not yet arrive.
+    // The Timestamp of the ACK is the Key frame timestamp in milliseconds
+    // hence, we use the total frames and account for the entire fragment (TEST_FPS) to
+    // get to the key frame timestamp.
+    EXPECT_EQ((totalFrames - TEST_FPS) * mFrame.duration / HUNDREDS_OF_NANOS_IN_A_MILLISECOND, mLastBufferingAckTimestamp);
+    EXPECT_EQ((totalFrames - 2 * TEST_FPS) * mFrame.duration / HUNDREDS_OF_NANOS_IN_A_MILLISECOND, mLastReceivedAckTimestamp);
+    EXPECT_EQ((totalFrames - 2 * TEST_FPS) * mFrame.duration / HUNDREDS_OF_NANOS_IN_A_MILLISECOND, mLastPersistedAckTimestamp);
+    EXPECT_EQ(0, mLastErrorAckTimestamp);
+
+    // Submit an EoFR to force the ack
+    EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &eofr));
+
+    // Wait until the ack comes back
+    THREAD_SLEEP(5 * HUNDREDS_OF_NANOS_IN_A_SECOND);
+
+    // Should be one more as we should have received the persistent ack for the incomplete fragment
+    // There should be a received ack and a persisted ack.
+    EXPECT_EQ(ackCount + 2, mFragmentAckReceivedFnCount);
+    EXPECT_EQ(persistedAckCount + 1, mPersistedFragmentCount);
+
+    // Check the ACK timestamps
+    EXPECT_EQ((totalFrames - TEST_FPS) * mFrame.duration / HUNDREDS_OF_NANOS_IN_A_MILLISECOND, mLastBufferingAckTimestamp);
+    EXPECT_EQ((totalFrames - TEST_FPS) * mFrame.duration / HUNDREDS_OF_NANOS_IN_A_MILLISECOND, mLastReceivedAckTimestamp);
+    EXPECT_EQ((totalFrames - TEST_FPS) * mFrame.duration / HUNDREDS_OF_NANOS_IN_A_MILLISECOND, mLastPersistedAckTimestamp);
+    EXPECT_EQ(0, mLastErrorAckTimestamp);
+
+    // trigger curl timeout.
+    THREAD_SLEEP(40 * HUNDREDS_OF_NANOS_IN_A_SECOND);
+
+    for(j = 0; j < totalFrames; ++j) {
+        EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
+        updateFrame();
+        THREAD_SLEEP(mFrame.duration);
+    }
+
+    EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStreamSync(streamHandle));
+    EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
+    EXPECT_EQ(0, mStreamErrorFnCount);
+
+    mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
+}
+
+TEST_F(ProducerFunctionalityTest, token_rotation_collide_with_curl_timeout_idling_with_non_key_frame)
+{
+    UINT32 j;
+    STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
+    UINT32 totalFragments = 5;
+    UINT32 totalFrames = totalFragments * TEST_FPS;
+
+    createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
+
+    EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION));
+    streamHandle = mStreams[0];
+    EXPECT_TRUE(streamHandle != INVALID_STREAM_HANDLE_VALUE);
+
+    // put some frames initially
+    for(j = 0; j < TEST_FPS * 5; ++j) {
+        EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
+        updateFrame();
+    }
+
+    // Call once more to ensure we won't be starting on a key-frame after the timeout
+    EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
+    updateFrame();
+
+    mPutMediaStatus = STATUS_NOT_IMPLEMENTED; // Non success status
+    mPutMediaCallResult = SERVICE_CALL_RESOURCE_NOT_FOUND;
+    // trigger curl timeout.
+    THREAD_SLEEP(40 * HUNDREDS_OF_NANOS_IN_A_SECOND);
+
+    for(j = 0; j < totalFrames; ++j) {
+        // NOTE: as we have streamed the last bit there will be no more calls to curl
+        // The next frame here is a Key-frame which makes the state machine to step out
+        // and not yet call put stream state so the fault is not really injected
+        // as we are overwriting the fault inject value right after the frame is put.
+        EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
+        if (mStreamErrorFnCount != 0) {
+            mPutMediaStatus = STATUS_SUCCESS;
+            mPutMediaCallResult = SERVICE_CALL_RESULT_OK;
+        }
+
+        updateFrame();
+        THREAD_SLEEP(mFrame.duration);
+    }
+
+    EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStreamSync(streamHandle));
+    EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
+    EXPECT_LT(0, mStreamErrorFnCount); // putMedia error purposely induced
+    mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
+}
 
 TEST_F(ProducerFunctionalityTest, offline_streaming_single_frame_fragment_large_gop_zero_duration_zero_dts)
 {

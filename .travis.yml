@@ -65,14 +65,12 @@ matrix:
       os: linux
       compiler: clang
       # env: ASAN_OPTIONS=detect_odr_violation=0:detect_leaks=1
-      env: allowTestFail=true
       before_script: mkdir build && cd build && cmake .. -DBUILD_TEST=TRUE -DADDRESS_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
 
     # UndefinedBehaviorSanitizer
     - name: "Linux Clang UndefinedBehaviorSanitizer"
       os: linux
       compiler: clang
-      env: allowTestFail=true
       # env: UBSAN_OPTIONS=halt_on_error=1
       before_script: mkdir build && cd build && cmake .. -DBUILD_TEST=TRUE -DUNDEFINED_BEHAVIOR_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
 
@@ -92,15 +90,12 @@ matrix:
 
     # Old Version GCC 4.4
     - name: "Linux GCC 4.4 Build"
-      env: allowTestFail=true
       os: linux
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - gcc-4.4
-            - gdb
+      before_install:
+        - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+        - sudo apt-get -q update
+        - sudo apt-get -y install gcc-4.4
+        - sudo apt-get -y install gdb
       compiler: gcc
       before_script: export CC=gcc-4.4 && mkdir build && cd build && cmake .. -DBUILD_TEST=TRUE -DBUILD_COMMON_LWS=TRUE
 
