@@ -156,6 +156,9 @@ endif()
 
 if("${CMAKE_C_COMPILER_ID}" MATCHES "GNU|Clang")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
+    if(ADD_MUCLIBC)
+      set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -muclibc")
+    endif()
 
     if(CODE_COVERAGE)
       set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -g -fprofile-arcs -ftest-coverage")
