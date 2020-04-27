@@ -19,7 +19,7 @@ extern "C" {
 #define SSL_CERTIFICATE_TYPE_PEM_STR                                ((PCHAR) "PEM")
 
 PCHAR getSslCertNameFromType(SSL_CERTIFICATE_TYPE);
-
+STATUS getParsedValue(PBYTE, jsmntok_t, PCHAR);
 #ifdef  __cplusplus
 }
 #endif

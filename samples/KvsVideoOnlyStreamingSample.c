@@ -57,9 +57,10 @@ INT32 main(INT32 argc, CHAR *argv[])
     BYTE frameBuffer[200000]; // Assuming this is enough
     UINT32 frameSize = SIZEOF(frameBuffer), frameIndex = 0, fileIndex = 0;
     UINT64 streamStopTime, streamingDuration = DEFAULT_STREAM_DURATION;
+    BOOL parseArgsFromFile = FALSE;
 
     if (argc < 2) {
-        defaultLogPrint(LOG_LEVEL_ERROR, "", "Usage: AWS_ACCESS_KEY_ID=SAMPLEKEY AWS_SECRET_ACCESS_KEY=SAMPLESECRET %s <stream_name> <duration_in_seconds> <frame_files_path>\n", argv[0]);
+        defaultLogPrint(LOG_LEVEL_ERROR, "", "Usage: AWS_ACCESS_KEY_ID=SAMPLEKEY AWS_SECRET_ACCESS_KEY=SAMPLESECRET %s <stream_name> <parse/no-parse> <duration_in_seconds> <frame_files_path>\n", argv[0]);
         CHK(FALSE, STATUS_INVALID_ARG);
     }
 
@@ -68,11 +69,19 @@ INT32 main(INT32 argc, CHAR *argv[])
         CHK(FALSE, STATUS_INVALID_ARG);
     }
 
+    if (argc > 2) {
+        if(STRCMP(argv[2], "parse") == 0) {
+            parseArgsFromFile = TRUE;
+        }
+        else {
+            parseArgsFromFile = FALSE;
+        }
+    }
     MEMSET(frameFilePath, 0x00, MAX_PATH_LEN + 1);
-    if (argc < 4) {
+    if (argc < 5) {
         STRCPY(frameFilePath, (PCHAR) "../samples/h264SampleFrames");
     } else {
-        STRNCPY(frameFilePath, argv[3], MAX_PATH_LEN);
+        STRNCPY(frameFilePath, argv[4], MAX_PATH_LEN);
     }
 
     cacertPath = getenv(CACERT_PATH_ENV_VAR);
@@ -82,9 +91,9 @@ INT32 main(INT32 argc, CHAR *argv[])
         region = (PCHAR) DEFAULT_AWS_REGION;
     }
 
-    if (argc >= 3) {
+    if (argc > 3) {
         // Get the duration and convert to an integer
-        CHK_STATUS(STRTOUI64(argv[2], NULL, 10, &streamingDuration));
+        CHK_STATUS(STRTOUI64(argv[3], NULL, 10, &streamingDuration));
         streamingDuration *= HUNDREDS_OF_NANOS_IN_A_SECOND;
     }
 
@@ -92,13 +101,30 @@ INT32 main(INT32 argc, CHAR *argv[])
 
     // default storage size is 128MB. Use setDeviceInfoStorageSize after create to change storage size.
     CHK_STATUS(createDefaultDeviceInfo(&pDeviceInfo));
+
     // adjust members of pDeviceInfo here if needed
     pDeviceInfo->clientInfo.loggerLogLevel = LOG_LEVEL_DEBUG;
-    pDeviceInfo->storageInfo.storageSize = DEFAULT_STORAGE_SIZE;
+
+    if(parseArgsFromFile == TRUE) {
+        if((retStatus = setDeviceInfoFromConfigFile(pDeviceInfo, "../param.json")) != STATUS_SUCCESS) {
+            printf("Encountered error while parsing file. Using the defaults (code %08x)\n", retStatus);
+        }
+    }
+    else {
+        pDeviceInfo->storageInfo.storageSize = DEFAULT_STORAGE_SIZE;
+    }
 
     CHK_STATUS(createRealtimeVideoStreamInfoProvider(streamName, DEFAULT_RETENTION_PERIOD, DEFAULT_BUFFER_DURATION, &pStreamInfo));
-    CHK_STATUS(setStreamInfoBasedOnStorageSize(DEFAULT_STORAGE_SIZE, RECORDED_FRAME_AVG_BITRATE_BIT_PS, 1, pStreamInfo));
+    if(parseArgsFromFile == TRUE) {
+        if((retStatus = createStreamInfoFromConfigFile(pStreamInfo, "../param.json")) != STATUS_SUCCESS) {
+            printf("Encountered error while parsing file. Using the defaults (code %08x)\n", retStatus);
+        }
+    }
+
     // adjust members of pStreamInfo here if needed
+    else {
+    CHK_STATUS(setStreamInfoBasedOnStorageSize(DEFAULT_STORAGE_SIZE, RECORDED_FRAME_AVG_BITRATE_BIT_PS, 1, pStreamInfo));
+    }
 
     CHK_STATUS(createDefaultCallbacksProviderWithAwsCredentials(accessKey,
                                                                 secretKey,

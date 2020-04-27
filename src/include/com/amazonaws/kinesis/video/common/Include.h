@@ -445,6 +445,8 @@ struct __AwsCredentialProvider {
     GetCredentialsFunc getCredentialsFn;
 };
 
+PUBLIC_API STATUS createStreamInfoFromConfigFile(PStreamInfo, PCHAR);
+
 ////////////////////////////////////////////////////
 // Public functions
 ////////////////////////////////////////////////////

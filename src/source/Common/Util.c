@@ -114,3 +114,18 @@ PCHAR getSslCertNameFromType(SSL_CERTIFICATE_TYPE sslCertificateType)
 
     return retStr;
 }
+
+STATUS getParsedValue(PBYTE params, jsmntok_t tokens, PCHAR paramStr) {
+    STATUS retStatus = STATUS_SUCCESS;
+    PCHAR jsonKey = NULL;
+    UINT32 tokenValLength = 0;
+    CHK(params != NULL || paramStr != NULL, STATUS_NULL_ARG);
+    tokenValLength = (UINT32) (tokens.end - tokens.start);
+    jsonKey = (PCHAR)params + tokens.start;
+    CHK(tokenValLength < 256, STATUS_INVALID_ARG_LEN);
+    STRNCPY(paramStr, jsonKey, tokenValLength);
+    paramStr[tokenValLength] = '\0';
+
+CleanUp:
+    return retStatus;
+}

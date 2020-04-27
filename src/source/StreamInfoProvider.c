@@ -178,6 +178,100 @@ CleanUp:
     return retStatus;
 }
 
+STATUS createStreamInfoFromConfigFile(PStreamInfo pCreateStreamInfoFromConfigFile, PCHAR filePath) {
+    ENTERS();
+    STATUS retStatus = STATUS_SUCCESS;
+    CHK(pCreateStreamInfoFromConfigFile != NULL && filePath != NULL, STATUS_NULL_ARG);
+    UINT64 fileSize = 0;
+    BYTE params[1024];
+    CHAR frameFilePath[MAX_PATH_LEN + 1];
+    jsmn_parser parser;
+    jsmn_init(&parser);
+    jsmntok_t tokens[256];
+    INT64 tokenCount;
+    CHAR finalAttr[256];
+
+    MEMSET(frameFilePath, 0x00, MAX_PATH_LEN + 1);
+    STRCPY(frameFilePath, filePath);
+
+    CHK_STATUS(readFile(frameFilePath, TRUE, NULL, &fileSize));
+    CHK_STATUS(readFile(frameFilePath, TRUE, params, &fileSize));
+
+    tokenCount = jsmn_parse(&parser, (PCHAR)params, fileSize, tokens, SIZEOF(tokens) / SIZEOF(jsmntok_t));
+    if(tokenCount < 0) {
+        DLOGE("JSMN Parse failed with error %d", tokenCount);
+        retStatus = STATUS_INTERNAL_ERROR;
+    }
+    else {
+        for (UINT32 i = 1; i < (UINT32) tokenCount; i++) {
+            if (compareJsonString((PCHAR)params, &tokens[i], JSMN_STRING, (PCHAR) "DEFAULT_RETENTION_PERIOD_HOURS")) {
+                CHK_STATUS(getParsedValue(params, tokens[i+1], finalAttr);
+                STRTOUI64(finalAttr, NULL, 10, &pCreateStreamInfoFromConfigFile->retention));
+                pCreateStreamInfoFromConfigFile->retention = pCreateStreamInfoFromConfigFile->retention * HUNDREDS_OF_NANOS_IN_AN_HOUR;
+                DLOGD("Retention Period (hours) parsed: %lu hours",pCreateStreamInfoFromConfigFile->retention);
+                i++;
+            }
+            if (compareJsonString((PCHAR)params, &tokens[i], JSMN_STRING, (PCHAR) "DEFAULT_TIMECODE_SCALE_MILLISECONDS")) {
+                CHK_STATUS(getParsedValue(params, tokens[i+1], finalAttr));
+                STRTOUI64(finalAttr, NULL, 10, &pCreateStreamInfoFromConfigFile->streamCaps.timecodeScale);
+                pCreateStreamInfoFromConfigFile->streamCaps.timecodeScale = pCreateStreamInfoFromConfigFile->streamCaps.timecodeScale * HUNDREDS_OF_NANOS_IN_A_MILLISECOND;
+                DLOGD("Timecode scale (milliseconds) parsed: %lu milliseconds", pCreateStreamInfoFromConfigFile->streamCaps.timecodeScale);
+                i++;
+            }
+            if (compareJsonString((PCHAR)params, &tokens[i], JSMN_STRING, (PCHAR) "DEFAULT_AVG_BANDWIDTH_BPS")) {
+                CHK_STATUS(getParsedValue(params, tokens[i+1], finalAttr));
+                STRTOUI32(finalAttr, NULL, 10, &pCreateStreamInfoFromConfigFile->streamCaps.avgBandwidthBps);
+                DLOGD("Average bandwidth parsed: %lu bps", pCreateStreamInfoFromConfigFile->streamCaps.avgBandwidthBps);
+                i++;
+            }
+            if (compareJsonString((PCHAR)params, &tokens[i], JSMN_STRING, (PCHAR) "DEFAULT_FRAGMENT_DURATION_MILLISECONDS")) {
+                CHK_STATUS(getParsedValue(params, tokens[i+1], finalAttr));
+                STRTOUI64(finalAttr, NULL, 10, &pCreateStreamInfoFromConfigFile->streamCaps.fragmentDuration);
+                pCreateStreamInfoFromConfigFile->streamCaps.fragmentDuration = pCreateStreamInfoFromConfigFile->streamCaps.fragmentDuration * HUNDREDS_OF_NANOS_IN_A_MILLISECOND;
+                DLOGD("Fragment duration (milliseconds) parsed: %lu milliseconds", pCreateStreamInfoFromConfigFile->streamCaps.fragmentDuration);
+                i++;
+            }
+            if (compareJsonString((PCHAR)params, &tokens[i], JSMN_STRING, (PCHAR) "DEFAULT_STREAM_FRAMERATE")) {
+                CHK_STATUS(getParsedValue(params, tokens[i+1], finalAttr));
+                STRTOUI32(finalAttr, NULL, 10, &pCreateStreamInfoFromConfigFile->streamCaps.frameRate);
+                DLOGD("Stream frame rate parsed: %lu fps", pCreateStreamInfoFromConfigFile->streamCaps.frameRate);
+                i++;
+            }
+            if (compareJsonString((PCHAR)params, &tokens[i], JSMN_STRING, (PCHAR) "DEFAULT_MAX_LATENCY_SECONDS")) {
+                CHK_STATUS(getParsedValue(params, tokens[i+1], finalAttr));
+                STRTOUI64(finalAttr, NULL, 10, &pCreateStreamInfoFromConfigFile->streamCaps.maxLatency);
+                pCreateStreamInfoFromConfigFile->streamCaps.maxLatency = pCreateStreamInfoFromConfigFile->streamCaps.maxLatency * HUNDREDS_OF_NANOS_IN_A_SECOND;
+                DLOGD("Max latency (seconds) parsed: %lu seconds", pCreateStreamInfoFromConfigFile->streamCaps.maxLatency);
+                i++;
+            }
+            if (compareJsonString((PCHAR)params, &tokens[i], JSMN_STRING, (PCHAR) "DEFAULT_BUFFER_DURATION_SECONDS")) {
+                CHK_STATUS(getParsedValue(params, tokens[i+1], finalAttr));
+                STRTOUI64(finalAttr, NULL, 10, &pCreateStreamInfoFromConfigFile->streamCaps.bufferDuration);
+                pCreateStreamInfoFromConfigFile->streamCaps.bufferDuration = pCreateStreamInfoFromConfigFile->streamCaps.bufferDuration * HUNDREDS_OF_NANOS_IN_A_SECOND;
+                DLOGD("Buffer Duration (seconds) parsed: %lu seconds", pCreateStreamInfoFromConfigFile->streamCaps.bufferDuration);
+                i++;
+            }
+            if (compareJsonString((PCHAR)params, &tokens[i], JSMN_STRING, (PCHAR) "DEFAULT_REPLAY_DURATION_SECONDS")) {
+                CHK_STATUS(getParsedValue(params, tokens[i+1], finalAttr));
+                STRTOUI64(finalAttr, NULL, 10, &pCreateStreamInfoFromConfigFile->streamCaps.replayDuration);
+                pCreateStreamInfoFromConfigFile->streamCaps.replayDuration = pCreateStreamInfoFromConfigFile->streamCaps.replayDuration * HUNDREDS_OF_NANOS_IN_A_SECOND;
+                DLOGD("Replay Duration (seconds) parsed: %lu seconds", pCreateStreamInfoFromConfigFile->streamCaps.replayDuration);
+                i++;
+            }
+            if (compareJsonString((PCHAR)params, &tokens[i], JSMN_STRING, (PCHAR) "DEFAULT_CONNECTION_STALENESS_SECONDS")) {
+                CHK_STATUS(getParsedValue(params, tokens[i+1], finalAttr));
+                STRTOUI64(finalAttr, NULL, 10, &pCreateStreamInfoFromConfigFile->streamCaps.connectionStalenessDuration);
+                pCreateStreamInfoFromConfigFile->streamCaps.connectionStalenessDuration = pCreateStreamInfoFromConfigFile->streamCaps.connectionStalenessDuration * HUNDREDS_OF_NANOS_IN_A_SECOND;
+                DLOGD("Connection stale (seconds) parsed: %lu seconds", pCreateStreamInfoFromConfigFile->streamCaps.connectionStalenessDuration);
+                i++;
+            }
+        }
+    }
+CleanUp:
+    LEAVES();
+    return retStatus;
+}
+
 STATUS createAudioVideoStreamInfo(STREAMING_TYPE streamingType, PCHAR streamName,
                                   UINT64 retention, UINT64 bufferDuration, PStreamInfo* ppStreamInfo)
 {

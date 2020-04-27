@@ -521,6 +521,7 @@ PUBLIC_API STATUS freeStreamInfoProvider(PStreamInfo*);
  */
 PUBLIC_API STATUS createDefaultDeviceInfo(PDeviceInfo*);
 
+PUBLIC_API STATUS setDeviceInfoFromConfigFile(PDeviceInfo, PCHAR);
 /**
  * Frees the DeviceInfo provider object.
  *

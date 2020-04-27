@@ -101,6 +101,61 @@ CleanUp:
     return retStatus;
 }
 
+STATUS setDeviceInfoFromConfigFile(PDeviceInfo pDeviceConfigFromFile, PCHAR filePath) {
+    ENTERS();
+    STATUS retStatus = STATUS_SUCCESS;
+    CHK(pDeviceConfigFromFile != NULL && filePath != NULL, STATUS_NULL_ARG);
+    UINT64 fileSize = 0;
+    BYTE params[1024];
+    CHAR frameFilePath[MAX_PATH_LEN + 1];
+
+    jsmn_parser parser;
+    jsmn_init(&parser);
+    jsmntok_t tokens[256];
+    INT64 tokenCount;
+    CHAR finalAttr[256];
+
+    MEMSET(frameFilePath, 0x00, MAX_PATH_LEN + 1);
+    STRCPY(frameFilePath, filePath);
+
+    CHK_STATUS(readFile(frameFilePath, TRUE, NULL, &fileSize));
+    CHK_STATUS(readFile(frameFilePath, TRUE, params, &fileSize));
+
+    tokenCount = jsmn_parse(&parser, (PCHAR)params, fileSize, tokens, SIZEOF(tokens) / SIZEOF(jsmntok_t));
+    if(tokenCount < 0) {
+        DLOGE("JSMN Parse failed with error %d", tokenCount);
+        retStatus = STATUS_INTERNAL_ERROR;
+    }
+    else {
+        for (UINT32 i = 1; i < (UINT32) tokenCount; i++) {
+            if(compareJsonString((PCHAR)params, &tokens[i], JSMN_STRING, (PCHAR) "DEFAULT_DEVICE_STORAGE_TYPE")) {
+                CHK_STATUS(getParsedValue(params, tokens[i+1], finalAttr));
+                if (STRCMP(finalAttr, "HYBRID_FILE") == 0) {
+                    pDeviceConfigFromFile->storageInfo.storageType = DEVICE_STORAGE_TYPE_HYBRID_FILE;
+                }
+                else if(STRCMP(finalAttr, "CONTENT_STORE") == 0) {
+                    pDeviceConfigFromFile->storageInfo.storageType = DEVICE_STORAGE_TYPE_IN_MEM_CONTENT_STORE_ALLOC;
+                }
+                else {
+                    pDeviceConfigFromFile->storageInfo.storageType = DEVICE_STORAGE_TYPE_IN_MEM;
+                }
+                DLOGD("Storage type parsed: %s (type %d)", finalAttr, pDeviceConfigFromFile->storageInfo.storageType);
+                i++;
+            }
+            if(compareJsonString((PCHAR)params, &tokens[i], JSMN_STRING, (PCHAR) "DEFAULT_DEVICE_STORAGE_SIZE")) {
+                CHK_STATUS(getParsedValue(params, tokens[i+1], finalAttr));
+                STRTOUI64(finalAttr, NULL, 10, &pDeviceConfigFromFile->storageInfo.storageSize);
+                DLOGD("Storage type parsed: %lu bytes", pDeviceConfigFromFile->storageInfo.storageSize);
+                i++;
+            }
+        }
+    }
+
+CleanUp:
+    LEAVES();
+    return retStatus;
+}
+
 STATUS freeDeviceInfo(PDeviceInfo* ppDeviceInfo)
 {
     ENTERS();

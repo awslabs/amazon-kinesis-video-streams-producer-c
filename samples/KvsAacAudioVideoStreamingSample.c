@@ -158,11 +158,12 @@ INT32 main(INT32 argc, CHAR *argv[])
     CHAR filePath[MAX_PATH_LEN + 1];
     PTrackInfo pAudioTrack = NULL;
     BYTE audioCpd[KVS_AAC_CPD_SIZE_BYTE];
+    BOOL parseArgsFromFile = FALSE;
 
     MEMSET(&data, 0x00, SIZEOF(SampleCustomData));
 
     if (argc < 2) {
-        printf("Usage: AWS_ACCESS_KEY_ID=SAMPLEKEY AWS_SECRET_ACCESS_KEY=SAMPLESECRET %s <stream_name> <duration_in_seconds> <frame_files_path>\n", argv[0]);
+        printf("Usage: AWS_ACCESS_KEY_ID=SAMPLEKEY AWS_SECRET_ACCESS_KEY=SAMPLESECRET %s <stream_name> <parse/no-parse> <duration_in_seconds> <frame_files_path>\n", argv[0]);
         CHK(FALSE, STATUS_INVALID_ARG);
     }
 
@@ -171,11 +172,20 @@ INT32 main(INT32 argc, CHAR *argv[])
         CHK(FALSE, STATUS_INVALID_ARG);
     }
 
+    if (argc > 2) {
+        if(STRCMP(argv[2], "parse") == 0) {
+            parseArgsFromFile = TRUE;
+        }
+        else {
+            parseArgsFromFile = FALSE;
+        }
+    }
+
     MEMSET(data.sampleDir, 0x00, MAX_PATH_LEN + 1);
-    if (argc < 4) {
+    if (argc < 5) {
         STRCPY(data.sampleDir, (PCHAR) "../samples");
     } else {
-        STRNCPY(data.sampleDir, argv[3], MAX_PATH_LEN);
+        STRNCPY(data.sampleDir, argv[4], MAX_PATH_LEN);
         if (data.sampleDir[STRLEN(data.sampleDir) - 1] == '/') {
             data.sampleDir[STRLEN(data.sampleDir) - 1] = '\0';
         }
@@ -208,9 +218,8 @@ INT32 main(INT32 argc, CHAR *argv[])
         region = (PCHAR) DEFAULT_AWS_REGION;
     }
 
-    if (argc >= 3) {
-        // Get the duration and convert to an integer
-        CHK_STATUS(STRTOUI64(argv[2], NULL, 10, &streamingDuration));
+    if(argc > 3) {
+        CHK_STATUS(STRTOUI64(argv[3], NULL, 10, &streamingDuration));
         printf("streaming for %" PRIu64 " seconds\n", streamingDuration);
         streamingDuration *= HUNDREDS_OF_NANOS_IN_A_SECOND;
     }
@@ -219,11 +228,23 @@ INT32 main(INT32 argc, CHAR *argv[])
 
     // default storage size is 128MB. Use setDeviceInfoStorageSize after create to change storage size.
     CHK_STATUS(createDefaultDeviceInfo(&pDeviceInfo));
+
+    // Change the set parameters to the ones from file
+    if(parseArgsFromFile == TRUE) {
+        if((retStatus = setDeviceInfoFromConfigFile(pDeviceInfo, "../param.json")) != STATUS_SUCCESS) {
+             printf("Encountered error while parsing file. Using the defaults (code %08x)\n", retStatus);
+         }
+    }
     // adjust members of pDeviceInfo here if needed
     pDeviceInfo->clientInfo.loggerLogLevel = LOG_LEVEL_DEBUG;
 
     CHK_STATUS(createRealtimeAudioVideoStreamInfoProvider(streamName, DEFAULT_RETENTION_PERIOD, DEFAULT_BUFFER_DURATION, &pStreamInfo));
 
+    if(parseArgsFromFile == TRUE) {
+        if((retStatus = createStreamInfoFromConfigFile(pStreamInfo, "../param.json")) != STATUS_SUCCESS) {
+            printf("Encountered error while parsing file. Using the defaults (code %08x)\n", retStatus);
+        }
+    }
     // adjust members of pStreamInfo here if needed
 
     // set up audio cpd.
