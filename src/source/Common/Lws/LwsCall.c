@@ -153,7 +153,7 @@ INT32 lwsIotCallbackRoutine(struct lws *wsi, enum lws_callback_reasons reason,
 
         case LWS_CALLBACK_RECEIVE_CLIENT_HTTP_READ:
             DLOGD("Received client http read: %d bytes", (INT32) dataSize);
-            lwsl_hexdump_notice(pDataIn, dataSize);
+            lwsl_hexdump_debug(pDataIn, dataSize);
 
             if (dataSize != 0) {
                 CHK(NULL != (pCallInfo->responseData = (PCHAR) MEMALLOC(dataSize)),
