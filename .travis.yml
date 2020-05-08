@@ -114,3 +114,12 @@ matrix:
         - mkdir build && cd build
         - cmake .. -DBUILD_TEST=TRUE -DBUILD_OPENSSL_PLATFORM=linux-generic32
       script: make
+
+    - name: "Windows MSVC"
+      os: windows
+      script:
+        - choco install nasm strawberryperl
+        - unset CC CC_FOR_BUILD CXX CXX_FOR_BUILD # We want to use MSVC
+        - export "PATH=/c/Strawberry/perl/site/bin:/c/Strawberry/perl/bin:/c/Strawberry/c/bin:/c/Program Files/NASM:`pwd`/open-source/local/lib:`pwd`/open-source/local/bin:$PATH"
+        - .github/build_windows.bat
+        - cd build/tst && ./producer_test.exe --gtest_filter="-ProducerFunctionalityTest.stop_sending_frame_in_the_middle_of_streaming_offline_mode*"

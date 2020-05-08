@@ -296,7 +296,8 @@ TEST_F(ProducerFunctionalityTest, create_client_repeated_create_stream_put_frame
 {
     UINT32 i, j, k;
     UINT32 totalFragments = 2;
-    UINT32 totalFrames = totalFragments * TEST_FPS, streamCount = 10;
+    UINT32 totalFrames = totalFragments * TEST_FPS;
+    static const UINT32 streamCount = 10;
     TID threadIds[streamCount];
 
     createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);

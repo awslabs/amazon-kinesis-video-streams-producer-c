@@ -17,7 +17,11 @@ set(CMAKE_ARGS
 
 # By default use openssl
 if (USE_MBEDTLS)
-    set(CMAKE_ARGS ${CMAKE_ARGS} -DCMAKE_USE_MBEDTLS=1)
+    set(CMAKE_ARGS ${CMAKE_ARGS} -DCMAKE_USE_MBEDTLS=1 -DCURL_STATIC_CRT=1)
+endif()
+
+if (WIN32)
+    set(CMAKE_ARGS ${CMAKE_ARGS} -DCMAKE_USE_WINSSL=1 -DCURL_STATIC_CRT=1)
 endif()
 
 ExternalProject_Add(project_libcurl

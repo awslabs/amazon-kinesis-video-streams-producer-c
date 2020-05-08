@@ -5,25 +5,20 @@ project (producerTest)
 set(CMAKE_CXX_STANDARD 11)
 set(KINESIS_VIDEO_PRODUCER_C_SRC "${CMAKE_CURRENT_SOURCE_DIR}/..")
 
-set(THREADS_PREFER_PTHREAD_FLAG ON)
-find_package(Threads)
-set(EXE_LIBRARIES Threads::Threads ${CMAKE_DL_LIBS})
-
-if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" AND NOT ${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-    set(EXE_LIBRARIES ${EXE_LIBRARIES} rt)
+if (OPEN_SRC_INSTALL_PREFIX)
+  find_package(GTest REQUIRED PATHS ${OPEN_SRC_INSTALL_PREFIX})
+else()
+  find_package(GTest REQUIRED)
 endif()
 
-set(GTEST_ROOT $ENV{KVS_GTEST_ROOT})
-find_package(GTest REQUIRED)
+SET(GTEST_LIBNAME GTest::gtest)
+if (TARGET GTest::GTest)
+  SET(GTEST_LIBNAME GTest::GTest)
+endif()
 
 include_directories(${KINESIS_VIDEO_PRODUCER_C_SRC})
 
 file(GLOB PRODUCER_TEST_SOURCE_FILES "*.cpp")
 
 add_executable(producer_test ${PRODUCER_TEST_SOURCE_FILES})
-target_link_libraries(producer_test
-        cproducer
-        GTest::GTest
-        GTest::Main
-        ${EXE_LIBRARIES}
-        ${Jsmn})
+target_link_libraries(producer_test cproducer ${GTEST_LIBNAME})
