@@ -123,17 +123,25 @@ else()
 endif()
 
 if(BUILD_COMMON_CURL)
-    pkg_check_modules(LIBCURL REQUIRED libcurl)
+  if (OPEN_SRC_INSTALL_PREFIX)
+    find_package(CURL REQUIRED PATHS ${OPEN_SRC_INSTALL_PREFIX})
+  else()
+    find_package(CURL REQUIRED)
+  endif()
 
-    set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${LIBCURL_INCLUDE_DIRS})
-    link_directories(${LIBCURL_LIBRARY_DIRS})
+  set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${CURL_INCLUDE_DIRS})
+  link_directories(${CURL_LIBRARY_DIRS})
 endif()
 
 if (BUILD_COMMON_LWS)
+  if (WIN32)
+    find_package(LIBWEBSOCKETS REQUIRED PATHS ${OPEN_SRC_INSTALL_PREFIX})
+  else()
     pkg_check_modules(LIBWEBSOCKET REQUIRED libwebsockets)
+  endif()
 
-    set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${LIBWEBSOCKET_INCLUDE_DIRS})
-    link_directories(${LIBWEBSOCKET_LIBRARY_DIRS})
+    set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${LIBWEBSOCKETS_INCLUDE_DIRS})
+    link_directories(${LIBWEBSOCKETS_LIBRARY_DIRS})
 endif()
 
 find_package(Jsmn REQUIRED)
@@ -180,6 +188,10 @@ if("${CMAKE_C_COMPILER_ID}" MATCHES "GNU|Clang")
     endif()
 endif()
 
+if(MSVC)
+  add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_WARNINGS -D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
+endif()
+
 file(GLOB KVS_COMMON_SOURCE_FILES_BASE "src/source/Common/*.c")
 file(GLOB KVS_COMMON_SOURCE_FILES_LWS "src/source/Common/Lws/*.c")
 file(GLOB KVS_COMMON_SOURCE_FILES_CURL "src/source/Common/Curl/*.c")
@@ -190,6 +202,7 @@ include_directories(${PIC_HEADERS})
 include_directories(${KINESIS_VIDEO_PRODUCER_C_SRC}/src/include)
 include_directories(${OPEN_SRC_INCLUDE_DIRS})
 include_directories(${KINESIS_VIDEO_OPEN_SOURCE_SRC}/include)
+include_directories(${KINESIS_VIDEO_OPEN_SOURCE_SRC}/local/include)
 
 add_subdirectory(${KINESIS_VIDEO_PIC_SRC} ./kvspic EXCLUDE_FROM_ALL)
 
@@ -217,8 +230,8 @@ if(BUILD_COMMON_LWS)
             ${JSMN_LIBRARY}
             ${OPENSSL_CRYPTO_LIBRARY}
             ${OPENSSL_SSL_LIBRARY}
-            ${LIBWEBSOCKET_LIBRARIES}
-            ${LIBCURL_LIBRARIES}
+            ${LIBWEBSOCKETS_LIBRARIES}
+            CURL::libcurl
             kvspicUtils)
 endif()
 
@@ -228,29 +241,20 @@ target_compile_definitions(kvsCommonCurl PRIVATE KVS_BUILD_WITH_CURL ${CPRODUCER
 target_link_libraries(kvsCommonCurl
         ${JSMN_LIBRARY}
         ${PRODUCER_CRYPTO_LIBRARY}
-        ${LIBCURL_LIBRARIES})
+        CURL::libcurl)
 
-add_library(cproducer SHARED ${PRODUCER_C_SOURCE_FILES})
-
-if (MINGW)
-# Use PRIVATE otherwise anything linking against cproducer will also link with pic again,
-# causing duplicate symbols
-target_link_libraries(cproducer PRIVATE
-    kvspic
-    kvsCommonCurl)
+if (WIN32)
+  add_library(cproducer STATIC ${PRODUCER_C_SOURCE_FILES})
 else()
-target_link_libraries(cproducer
-        kvspic
-        kvsCommonCurl)
+  add_library(cproducer SHARED ${PRODUCER_C_SOURCE_FILES})
 endif()
+target_link_libraries(cproducer PUBLIC kvspic kvsCommonCurl)
 
 add_executable(kvsVideoOnlyStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsVideoOnlyStreamingSample.c)
-target_link_libraries(kvsVideoOnlyStreamingSample
-    cproducer)
+target_link_libraries(kvsVideoOnlyStreamingSample cproducer)
 
 add_executable(kvsAacAudioVideoStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsAacAudioVideoStreamingSample.c)
-target_link_libraries(kvsAacAudioVideoStreamingSample
-        cproducer)
+target_link_libraries(kvsAacAudioVideoStreamingSample cproducer)
 
 if (BUILD_TEST)
     add_subdirectory(tst)
