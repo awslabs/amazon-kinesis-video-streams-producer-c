@@ -1,0 +1,44 @@
+Release 1.0.0 of the Amazon Kinesis Video C Producer SDK
+
+Platforms tested on:
+- Linux
+- MacOS
+- Windows
+- x64
+- ARMv5
+
+
+Release tagged at:
+- xxxxx
+
+Whats’s new:
+- This is the first official release of the C Producer SDK as a standalone repository.
+- Outsourcing common functionality into a separate target library to be used directly by other projects.
+- Implementation of the backend API call caching policies.
+- No tight packing required.
+- Modular CMake build support for the project and it's dependencies and tests.
+- Full TravisCI integration.
+- Multiple TSAN and ASAN hardenings.
+- Improved test coverage.
+
+
+What's new in PIC:
+- Unaligned memory model support.
+- Basic ATOMICs support
+- Enhanced client and stream metrics.
+- Instrumented allocators support.
+- Intermittent producer support.
+- Buffer pressure policies.
+- Intelligent dropping of the frames on buffer pressures to hold the fragments semantic correctness.
+- AAC and PCM CPD generation.
+- Modular CMake build support for the project and it's dependencies and tests.
+- Full TravisCI integration.
+- Multiple TSAN and ASAN hardenings.
+- Various bug fixes for edge cases and stability.
+- Improved test coverage.
+
+
+Known Issues:
+- No Doxygen support
+- Need to add mbed TLS run for TravisCI
+
