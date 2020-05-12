@@ -26,14 +26,6 @@ set(CMAKE_MACOSX_RPATH TRUE)
 
 get_filename_component(ROOT "${CMAKE_CURRENT_SOURCE_DIR}" ABSOLUTE)
 
-if(NOT KINESIS_VIDEO_PIC_SRC)
-  if(DEFINED ENV{KINESIS_VIDEO_PIC_SRC})
-    set(KINESIS_VIDEO_PIC_SRC $ENV{KINESIS_VIDEO_PIC_SRC})
-  else()
-    set(KINESIS_VIDEO_PIC_SRC "${CMAKE_CURRENT_SOURCE_DIR}/open-source/amazon-kinesis-video-streams-pic/")
-  endif()
-endif()
-
 if(NOT KINESIS_VIDEO_PRODUCER_C_SRC)
     if(DEFINED ENV{KINESIS_VIDEO_PRODUCER_C_SRC})
         set(KINESIS_VIDEO_PRODUCER_C_SRC $ENV{KINESIS_VIDEO_PRODUCER_C_SRC})
@@ -42,24 +34,18 @@ if(NOT KINESIS_VIDEO_PRODUCER_C_SRC)
     endif()
 endif()
 
-if(NOT KINESIS_VIDEO_OPEN_SOURCE_SRC)
-  set(KINESIS_VIDEO_OPEN_SOURCE_SRC ${CMAKE_SOURCE_DIR}/open-source)
-endif()
-
-message(STATUS "Kinesis Video PIC path is ${KINESIS_VIDEO_PIC_SRC}")
 message(STATUS "Kinesis Video Producer path is ${KINESIS_VIDEO_PRODUCER_C_SRC}")
-message(STATUS "Kinesis Video Open Source path is ${KINESIS_VIDEO_OPEN_SOURCE_SRC}")
 
 if(BUILD_DEPENDENCIES)
-  if(NOT EXISTS ${KINESIS_VIDEO_OPEN_SOURCE_SRC})
-    file(MAKE_DIRECTORY ${KINESIS_VIDEO_OPEN_SOURCE_SRC}/local)
-  endif()
-
   if (NOT OPEN_SRC_INSTALL_PREFIX)
-    set(OPEN_SRC_INSTALL_PREFIX ${KINESIS_VIDEO_OPEN_SOURCE_SRC}/local)
+    set(OPEN_SRC_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/open-source)
     set(ENV{PKG_CONFIG_PATH}
           "$ENV{PKG_CONFIG_PATH}:${OPEN_SRC_INSTALL_PREFIX}/lib/pkgconfig")
     set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${OPEN_SRC_INSTALL_PREFIX})
+  endif()
+
+  if(NOT EXISTS ${OPEN_SRC_INSTALL_PREFIX})
+    file(MAKE_DIRECTORY ${OPEN_SRC_INSTALL_PREFIX})
   endif()
 
   message(STATUS "Begin building dependencies.")
@@ -97,6 +83,7 @@ if(BUILD_DEPENDENCIES)
   endif()
 
   build_dependency(jsmn)
+  build_dependency(kvspic)
 
   if(BUILD_TEST)
     build_dependency(gtest)
@@ -110,7 +97,16 @@ endif()
 find_package(Threads)
 find_package(PkgConfig REQUIRED)
 
-set(OPEN_SRC_INCLUDE_DIRS )
+if (WIN32)
+  find_package(LIBKVSPIC REQUIRED PATHS ${OPEN_SRC_INSTALL_PREFIX})
+  find_package(LIBKVSPIC_UTILS REQUIRED PATHS ${OPEN_SRC_INSTALL_PREFIX})
+else()
+  pkg_check_modules(LIBKVSPIC REQUIRED libkvspic)
+  pkg_check_modules(LIBKVSPIC_UTILS REQUIRED libkvspicUtils)
+endif()
+
+set(OPEN_SRC_INCLUDE_DIRS ${LIBKVSPIC_INCLUDE_DIRS})
+link_directories(${LIBKVSPIC_LIBRARY_DIRS})
 
 if(USE_OPENSSL)
   find_package(OpenSSL REQUIRED)
@@ -196,15 +192,9 @@ file(GLOB KVS_COMMON_SOURCE_FILES_BASE "src/source/Common/*.c")
 file(GLOB KVS_COMMON_SOURCE_FILES_LWS "src/source/Common/Lws/*.c")
 file(GLOB KVS_COMMON_SOURCE_FILES_CURL "src/source/Common/Curl/*.c")
 file(GLOB PRODUCER_C_SOURCE_FILES "src/source/*.c")
-file(GLOB PIC_HEADERS "${KINESIS_VIDEO_PIC_SRC}/src/*/include")
 
-include_directories(${PIC_HEADERS})
 include_directories(${KINESIS_VIDEO_PRODUCER_C_SRC}/src/include)
 include_directories(${OPEN_SRC_INCLUDE_DIRS})
-include_directories(${KINESIS_VIDEO_OPEN_SOURCE_SRC}/include)
-include_directories(${KINESIS_VIDEO_OPEN_SOURCE_SRC}/local/include)
-
-add_subdirectory(${KINESIS_VIDEO_PIC_SRC} ./kvspic EXCLUDE_FROM_ALL)
 
 if(ALIGNED_MEMORY_MODEL)
     add_definitions(-DALIGNED_MEMORY_MODEL)
@@ -223,6 +213,10 @@ if (USE_MBEDTLS)
 endif()
 
 if(BUILD_COMMON_LWS)
+    configure_file(
+      "${CMAKE_CURRENT_SOURCE_DIR}/libkvsCommonLws.pc.cmake"
+      "${CMAKE_CURRENT_BINARY_DIR}/libkvsCommonLws.pc" @ONLY)
+
     add_library(kvsCommonLws STATIC ${KVS_COMMON_SOURCE_FILES_BASE} ${KVS_COMMON_SOURCE_FILES_LWS})
     # dont support websocket with mbedtls yet
     target_compile_definitions(kvsCommonLws PRIVATE KVS_BUILD_WITH_LWS KVS_USE_OPENSSL)
@@ -231,11 +225,24 @@ if(BUILD_COMMON_LWS)
             ${OPENSSL_CRYPTO_LIBRARY}
             ${OPENSSL_SSL_LIBRARY}
             ${LIBWEBSOCKETS_LIBRARIES}
-            CURL::libcurl
-            kvspicUtils)
+            ${LIBKVSPIC_UTILS_LIBRARIES}
+            CURL::libcurl)
+
+    install(
+      TARGETS kvsCommonLws
+      ARCHIVE DESTINATION lib
+      LIBRARY DESTINATION lib
+      RUNTIME DESTINATION bin)
+    install(
+      FILES ${CMAKE_CURRENT_BINARY_DIR}/libkvsCommonLws.pc
+      DESTINATION lib/pkgconfig)
 endif()
 
 # producer only uses curl right now
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/libkvsCommonCurl.pc.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/libkvsCommonCurl.pc" @ONLY)
+
 add_library(kvsCommonCurl STATIC ${KVS_COMMON_SOURCE_FILES_BASE} ${KVS_COMMON_SOURCE_FILES_CURL})
 target_compile_definitions(kvsCommonCurl PRIVATE KVS_BUILD_WITH_CURL ${CPRODUCER_COMMON_TLS_OPTION})
 target_link_libraries(kvsCommonCurl
@@ -243,12 +250,38 @@ target_link_libraries(kvsCommonCurl
         ${PRODUCER_CRYPTO_LIBRARY}
         CURL::libcurl)
 
+install(
+  TARGETS kvsCommonCurl
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin)
+install(
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/libkvsCommonCurl.pc
+  DESTINATION lib/pkgconfig)
+
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/libcproducer.pc.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/libcproducer.pc" @ONLY)
+
 if (WIN32)
   add_library(cproducer STATIC ${PRODUCER_C_SOURCE_FILES})
 else()
   add_library(cproducer SHARED ${PRODUCER_C_SOURCE_FILES})
 endif()
-target_link_libraries(cproducer PUBLIC kvspic kvsCommonCurl)
+target_link_libraries(cproducer PUBLIC ${LIBKVSPIC_LIBRARIES} kvsCommonCurl)
+
+install(
+  TARGETS cproducer
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin)
+install(
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/libcproducer.pc
+  DESTINATION lib/pkgconfig)
+
+install(
+  DIRECTORY ${KINESIS_VIDEO_PRODUCER_C_SRC}/src/include
+  DESTINATION .)
 
 add_executable(kvsVideoOnlyStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsVideoOnlyStreamingSample.c)
 target_link_libraries(kvsVideoOnlyStreamingSample cproducer)
