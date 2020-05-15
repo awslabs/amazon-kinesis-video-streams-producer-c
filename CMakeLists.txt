@@ -98,8 +98,8 @@ find_package(Threads)
 find_package(PkgConfig REQUIRED)
 
 if (WIN32)
-  find_package(LIBKVSPIC REQUIRED PATHS ${OPEN_SRC_INSTALL_PREFIX})
-  find_package(LIBKVSPIC_UTILS REQUIRED PATHS ${OPEN_SRC_INSTALL_PREFIX})
+  find_library(LIBKVSPIC_LIBRARIES kvspic REQUIRED)
+  find_library(LIBKVSPIC_UTILS_LIBRARIES kvspicUtils REQUIRED)
 else()
   pkg_check_modules(LIBKVSPIC REQUIRED libkvspic)
   pkg_check_modules(LIBKVSPIC_UTILS REQUIRED libkvspicUtils)
@@ -248,6 +248,8 @@ target_compile_definitions(kvsCommonCurl PRIVATE KVS_BUILD_WITH_CURL ${CPRODUCER
 target_link_libraries(kvsCommonCurl
         ${JSMN_LIBRARY}
         ${PRODUCER_CRYPTO_LIBRARY}
+        ${LIBKVSPIC_LIBRARIES}
+        ${LIBKVSPIC_UTILS_LIBRARIES}
         CURL::libcurl)
 
 install(
@@ -268,7 +270,7 @@ if (WIN32)
 else()
   add_library(cproducer SHARED ${PRODUCER_C_SOURCE_FILES})
 endif()
-target_link_libraries(cproducer PUBLIC ${LIBKVSPIC_LIBRARIES} kvsCommonCurl)
+target_link_libraries(cproducer PUBLIC kvsCommonCurl)
 
 install(
   TARGETS cproducer
