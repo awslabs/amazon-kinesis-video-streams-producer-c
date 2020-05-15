@@ -4,10 +4,5 @@
 build
 cmake-build-debug/
 cmake-build-release/
-open-source/libcurl
-open-source/libgtest
-open-source/libjsmn
-open-source/libopenssl
-open-source/libwebsockets
-open-source/local
+open-source
 outputs
