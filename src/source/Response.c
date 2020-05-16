@@ -461,8 +461,6 @@ STATUS curlCompleteSync(PCurlResponse pCurlResponse)
 
 CleanUp:
 
-    CHK_LOG_ERR(retStatus);
-
     return STATUS_FAILED(retStatus) ? retStatus : status;
 }
 
