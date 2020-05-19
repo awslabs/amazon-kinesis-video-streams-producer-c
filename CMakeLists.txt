@@ -225,8 +225,7 @@ if(BUILD_COMMON_LWS)
             ${OPENSSL_CRYPTO_LIBRARY}
             ${OPENSSL_SSL_LIBRARY}
             ${LIBWEBSOCKETS_LIBRARIES}
-            ${LIBKVSPIC_UTILS_LIBRARIES}
-            CURL::libcurl)
+            ${LIBKVSPIC_UTILS_LIBRARIES})
 
     install(
       TARGETS kvsCommonLws
