@@ -215,6 +215,10 @@ endif()
 install(
   DIRECTORY ${KINESIS_VIDEO_PRODUCER_C_SRC}/src/include
   DESTINATION .)
+# TODO: Find a better way to reexpose third party libraries
+install(
+  FILES ${JSMN_INCLUDE_DIRS}/jsmn.h
+  DESTINATION include)
 
 if(BUILD_COMMON_LWS)
     configure_file(
