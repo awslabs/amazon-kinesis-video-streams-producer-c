@@ -212,6 +212,10 @@ if (USE_MBEDTLS)
             MbedCrypto)
 endif()
 
+install(
+  DIRECTORY ${KINESIS_VIDEO_PRODUCER_C_SRC}/src/include
+  DESTINATION .)
+
 if(BUILD_COMMON_LWS)
     configure_file(
       "${CMAKE_CURRENT_SOURCE_DIR}/libkvsCommonLws.pc.cmake"
@@ -237,59 +241,57 @@ if(BUILD_COMMON_LWS)
       DESTINATION lib/pkgconfig)
 endif()
 
-# producer only uses curl right now
-configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/libkvsCommonCurl.pc.cmake"
-  "${CMAKE_CURRENT_BINARY_DIR}/libkvsCommonCurl.pc" @ONLY)
+if(BUILD_COMMON_CURL)
+    # producer only uses curl right now
+    configure_file(
+      "${CMAKE_CURRENT_SOURCE_DIR}/libkvsCommonCurl.pc.cmake"
+      "${CMAKE_CURRENT_BINARY_DIR}/libkvsCommonCurl.pc" @ONLY)
 
-add_library(kvsCommonCurl STATIC ${KVS_COMMON_SOURCE_FILES_BASE} ${KVS_COMMON_SOURCE_FILES_CURL})
-target_compile_definitions(kvsCommonCurl PRIVATE KVS_BUILD_WITH_CURL ${CPRODUCER_COMMON_TLS_OPTION})
-target_link_libraries(kvsCommonCurl
-        ${JSMN_LIBRARY}
-        ${PRODUCER_CRYPTO_LIBRARY}
-        ${LIBKVSPIC_LIBRARIES}
-        ${LIBKVSPIC_UTILS_LIBRARIES}
-        CURL::libcurl)
+    add_library(kvsCommonCurl STATIC ${KVS_COMMON_SOURCE_FILES_BASE} ${KVS_COMMON_SOURCE_FILES_CURL})
+    target_compile_definitions(kvsCommonCurl PRIVATE KVS_BUILD_WITH_CURL ${CPRODUCER_COMMON_TLS_OPTION})
+    target_link_libraries(kvsCommonCurl
+            ${JSMN_LIBRARY}
+            ${PRODUCER_CRYPTO_LIBRARY}
+            ${LIBKVSPIC_LIBRARIES}
+            ${LIBKVSPIC_UTILS_LIBRARIES}
+            CURL::libcurl)
 
-install(
-  TARGETS kvsCommonCurl
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin)
-install(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/libkvsCommonCurl.pc
-  DESTINATION lib/pkgconfig)
+    install(
+      TARGETS kvsCommonCurl
+      ARCHIVE DESTINATION lib
+      LIBRARY DESTINATION lib
+      RUNTIME DESTINATION bin)
+    install(
+      FILES ${CMAKE_CURRENT_BINARY_DIR}/libkvsCommonCurl.pc
+      DESTINATION lib/pkgconfig)
 
-configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/libcproducer.pc.cmake"
-  "${CMAKE_CURRENT_BINARY_DIR}/libcproducer.pc" @ONLY)
+    configure_file(
+      "${CMAKE_CURRENT_SOURCE_DIR}/libcproducer.pc.cmake"
+      "${CMAKE_CURRENT_BINARY_DIR}/libcproducer.pc" @ONLY)
 
-if (WIN32)
-  add_library(cproducer STATIC ${PRODUCER_C_SOURCE_FILES})
-else()
-  add_library(cproducer SHARED ${PRODUCER_C_SOURCE_FILES})
-endif()
-target_link_libraries(cproducer PUBLIC kvsCommonCurl)
+    if (WIN32)
+      add_library(cproducer STATIC ${PRODUCER_C_SOURCE_FILES})
+    else()
+      add_library(cproducer SHARED ${PRODUCER_C_SOURCE_FILES})
+    endif()
+    target_link_libraries(cproducer PUBLIC kvsCommonCurl)
 
-install(
-  TARGETS cproducer
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin)
-install(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/libcproducer.pc
-  DESTINATION lib/pkgconfig)
+    install(
+      TARGETS cproducer
+      ARCHIVE DESTINATION lib
+      LIBRARY DESTINATION lib
+      RUNTIME DESTINATION bin)
+    install(
+      FILES ${CMAKE_CURRENT_BINARY_DIR}/libcproducer.pc
+      DESTINATION lib/pkgconfig)
 
-install(
-  DIRECTORY ${KINESIS_VIDEO_PRODUCER_C_SRC}/src/include
-  DESTINATION .)
+    add_executable(kvsVideoOnlyStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsVideoOnlyStreamingSample.c)
+    target_link_libraries(kvsVideoOnlyStreamingSample cproducer)
 
-add_executable(kvsVideoOnlyStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsVideoOnlyStreamingSample.c)
-target_link_libraries(kvsVideoOnlyStreamingSample cproducer)
+    add_executable(kvsAacAudioVideoStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsAacAudioVideoStreamingSample.c)
+    target_link_libraries(kvsAacAudioVideoStreamingSample cproducer)
 
-add_executable(kvsAacAudioVideoStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsAacAudioVideoStreamingSample.c)
-target_link_libraries(kvsAacAudioVideoStreamingSample cproducer)
-
-if (BUILD_TEST)
-    add_subdirectory(tst)
+    if (BUILD_TEST)
+        add_subdirectory(tst)
+    endif()
 endif()
