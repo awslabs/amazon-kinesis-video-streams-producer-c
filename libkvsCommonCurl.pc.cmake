@@ -7,4 +7,4 @@ Name: KVS-libkvsCommonCurl
 Description: KVS C Producer common curl library
 Version: 0.0.0
 Cflags: -I${includedir}
-Libs: -L${libdir} -libkvsCommonCurl
+Libs: -L${libdir} -lkvsCommonCurl
