@@ -5,7 +5,7 @@ namespace com { namespace amazonaws { namespace kinesis { namespace video {
 class ProducerApiTest : public ProducerClientTestBase {
 };
 
-TEST_F(ProducerApiTest, fileLoggerApiTest)
+TEST_F(ProducerApiTest, fileLoggerCallbackApiTest)
 {
     PClientCallbacks pClientCallbacks = NULL;
     PCHAR testLogDir = ((PCHAR) "/tmp");
@@ -32,6 +32,21 @@ TEST_F(ProducerApiTest, fileLoggerApiTest)
 
     EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks));
     EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks)); // idempotent
+}
+
+TEST_F(ProducerApiTest, fileLoggerApiTest)
+{
+    PCHAR testLogDir = ((PCHAR) "/tmp");
+    CHAR longPath[MAX_PATH_LEN + 2];
+
+    MEMSET(longPath, 0x01, MAX_PATH_LEN + 2);
+    longPath[MAX_PATH_LEN + 1] = '\0';
+
+    EXPECT_EQ(STATUS_INVALID_ARG, createFileLogger(MIN_FILE_LOGGER_STRING_BUFFER_SIZE - 1, 10, testLogDir, FALSE, FALSE, NULL));
+    EXPECT_EQ(STATUS_INVALID_ARG, createFileLogger(MAX_FILE_LOGGER_STRING_BUFFER_SIZE + 1, 10, testLogDir, FALSE, FALSE, NULL));
+    EXPECT_EQ(STATUS_INVALID_ARG, createFileLogger(MIN_FILE_LOGGER_STRING_BUFFER_SIZE, MAX_FILE_LOGGER_LOG_FILE_COUNT + 1, testLogDir, FALSE, FALSE, NULL));
+    EXPECT_EQ(STATUS_INVALID_ARG, createFileLogger(MIN_FILE_LOGGER_STRING_BUFFER_SIZE, 0, testLogDir, FALSE, FALSE, NULL));
+    EXPECT_EQ(STATUS_PATH_TOO_LONG, createFileLogger(MIN_FILE_LOGGER_STRING_BUFFER_SIZE, 10, longPath, FALSE, FALSE, NULL));
 }
 
 }

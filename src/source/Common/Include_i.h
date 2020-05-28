@@ -54,6 +54,7 @@ extern "C" {
 #include "Auth.h"
 #include "StaticCredentialProvider.h"
 #include "FileCredentialProvider.h"
+#include "FileLogger.h"
 
 #if !(defined(KVS_BUILD_WITH_CURL) || defined(KVS_BUILD_WITH_LWS))
 #error Need to specify the networking client at build time
