@@ -828,6 +828,20 @@ PUBLIC_API STATUS createFileLogger(UINT64, UINT64, PCHAR, BOOL, BOOL, logPrintFu
 PUBLIC_API STATUS freeFileLogger();
 
 /**
+ * Parses command line options. The command line options must be prefixed with `--`
+ * For example: ./my_test_sample --arg1 <val> --arg2 --arg3 <val>
+ * The parser can take options with no value for it
+ * If an option does not get a value, the return value is 0
+ * If an option has a value set, the return value is the index of the <val>
+ *
+ * NOTE: THe 3rd argument passed to this function will have to be allocated/deallocated by the user
+ *
+ *
+ * @return -1 if we reach the end of options, else index of the <val> or 0 for no <val>
+ */
+PUBLIC_API INT32 parseCommandLineOptions(INT32, const PCHAR*, PCHAR);
+
+/**
  * Helper macros to be used in pairs at the application start and end
  */
 #define SET_FILE_LOGGER()               createFileLogger(FILE_LOGGER_STRING_BUFFER_SIZE, FILE_LOGGER_LOG_FILE_COUNT, (PCHAR) FILE_LOGGER_LOG_FILE_DIRECTORY_PATH, TRUE, TRUE, NULL)

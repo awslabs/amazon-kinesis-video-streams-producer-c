@@ -141,6 +141,16 @@ CleanUp:
     return (PVOID) (ULONG_PTR) retStatus;
 }
 
+void helper() {
+    printf("List of available options:\n" \
+           "1. --stream_name      : Set name of stream. If not selected, default stream name is set\n" \
+           "2. --file_log         : No args needed. If set, file logging is enabled\n" \
+           "3. --file_log_path    : Ensure --file_log option is provided. Set file path\n" \
+           "4. --duration         : Streaming duration in seconds\n" \
+           "5. --frame_file_path  : Frame file path\n " \
+           "6. --help             : Look at the list of available args\n");
+}
+
 INT32 main(INT32 argc, CHAR *argv[])
 {
     PDeviceInfo pDeviceInfo = NULL;
@@ -158,26 +168,76 @@ INT32 main(INT32 argc, CHAR *argv[])
     CHAR filePath[MAX_PATH_LEN + 1];
     PTrackInfo pAudioTrack = NULL;
     BYTE audioCpd[KVS_AAC_CPD_SIZE_BYTE];
+    INT32 opt_result;
+    CHAR opt[256];
+    PCHAR fileLogPath = (PCHAR) FILE_LOGGER_LOG_FILE_DIRECTORY_PATH;
+    BOOL fileLogEnable = FALSE;
+    STRCPY(filePath, (PCHAR) "../samples/h264SampleFrames");
 
     MEMSET(&data, 0x00, SIZEOF(SampleCustomData));
 
     if (argc < 2) {
-        printf("Usage: AWS_ACCESS_KEY_ID=SAMPLEKEY AWS_SECRET_ACCESS_KEY=SAMPLESECRET %s <stream_name> <duration_in_seconds> <frame_files_path>\n", argv[0]);
-        CHK(FALSE, STATUS_INVALID_ARG);
+        helper();
+        goto CleanUp;
     }
+    while((opt_result = parseCommandLineOptions(argc, argv, opt)) != -1) {
+        if(STRCMP(opt, "help") == 0) {
+            helper();
+            goto CleanUp;
+        }
 
+        else if(STRCMP(opt, "stream_name") == 0) {
+            if(opt_result != 0) {
+                streamName = argv[opt_result];
+            }
+            else {
+                printf("Please set the stream name\n");
+                CHK(FALSE, STATUS_INVALID_ARG);
+            }
+        }
+
+        else if(STRCMP(opt, "file_log") == 0) {
+            fileLogEnable = TRUE;
+        }
+
+        else if(STRCMP(opt, "file_log_path") == 0) {
+            if(opt_result != 0) {
+            	fileLogPath = (PCHAR) argv[opt_result];
+            }
+            else {
+                printf("Please set the file log path\n");
+                CHK(FALSE, STATUS_INVALID_ARG);
+            }
+        }
+        else if(STRCMP(opt, "duration") == 0) {
+            if(opt_result != 0) {
+                CHK_STATUS(STRTOUI64(argv[opt_result], NULL, 10, &streamingDuration));
+                streamingDuration *= HUNDREDS_OF_NANOS_IN_A_SECOND;
+            }
+            else {
+                printf("Please set the required streaming duration in seconds\n");
+                CHK(FALSE, STATUS_INVALID_ARG);
+            }
+        }
+        else if(STRCMP(opt, "frame_file_path") == 0) {
+            if(opt_result != 0) {
+                STRNCPY(filePath, argv[opt_result], STRLEN(argv[opt_result]) + 1);
+            }
+            else {
+                printf("Please set a valid file path\n");
+                CHK(FALSE, STATUS_INVALID_ARG);
+            }
+        }
+        MEMSET(opt, '\0', SIZEOF(opt));
+    }
     if ((accessKey = getenv(ACCESS_KEY_ENV_VAR)) == NULL || (secretKey = getenv(SECRET_KEY_ENV_VAR)) == NULL) {
         printf("Error missing credentials\n");
         CHK(FALSE, STATUS_INVALID_ARG);
     }
 
-    MEMSET(data.sampleDir, 0x00, MAX_PATH_LEN + 1);
-    if (argc < 4) {
-        STRCPY(data.sampleDir, (PCHAR) "../samples");
-    } else {
-        STRNCPY(data.sampleDir, argv[3], MAX_PATH_LEN);
-        if (data.sampleDir[STRLEN(data.sampleDir) - 1] == '/') {
-            data.sampleDir[STRLEN(data.sampleDir) - 1] = '\0';
+    if(fileLogEnable) {
+        if(createFileLogger(FILE_LOGGER_STRING_BUFFER_SIZE, FILE_LOGGER_LOG_FILE_COUNT, fileLogPath, TRUE, TRUE, NULL) != STATUS_SUCCESS) {
+            printf("Unable to set file logger....no logging will be available\n");
         }
     }
 
@@ -203,16 +263,9 @@ INT32 main(INT32 argc, CHAR *argv[])
 
     cacertPath = getenv(CACERT_PATH_ENV_VAR);
     sessionToken = getenv(SESSION_TOKEN_ENV_VAR);
-    streamName = argv[1];
+
     if ((region = getenv(DEFAULT_REGION_ENV_VAR)) == NULL) {
         region = (PCHAR) DEFAULT_AWS_REGION;
-    }
-
-    if (argc >= 3) {
-        // Get the duration and convert to an integer
-        CHK_STATUS(STRTOUI64(argv[2], NULL, 10, &streamingDuration));
-        printf("streaming for %" PRIu64 " seconds\n", streamingDuration);
-        streamingDuration *= HUNDREDS_OF_NANOS_IN_A_SECOND;
     }
 
     streamStopTime = defaultGetTime() + streamingDuration;

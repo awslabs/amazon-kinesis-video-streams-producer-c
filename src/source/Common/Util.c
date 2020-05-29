@@ -114,3 +114,28 @@ PCHAR getSslCertNameFromType(SSL_CERTIFICATE_TYPE sslCertificateType)
 
     return retStr;
 }
+
+INT32 parseCommandLineOptions(INT32 argc, const PCHAR* argv, PCHAR chosenOption) {
+    if(argc < 1 || argv == NULL || *argv == NULL || chosenOption == NULL) {
+        return -1;
+    }
+    static INT32 optind = 1;
+    INT32 index = 0;
+    if(optind == argc) {
+        index = -1;
+    }
+    else {
+        // Check if the argv parameter is a command line option
+        if(argv[optind][0] == '-' && argv[optind][1] == '-') {
+            STRNCPY(chosenOption, &argv[optind][2], (STRLEN(argv[optind]) -1));
+            // If argv is a command line option, check if next arg is a value for the option.
+            // If yes, we set the index to the value, else, we do not do anything. The application must
+            // check if index value is 0 accordingly
+            if(((optind + 1) < argc) && argv[optind + 1][0] != '-' && argv[optind + 1][1] != '-') {
+                index = optind + 1;
+            }
+        }
+        optind++;
+    }
+    return index;
+}
