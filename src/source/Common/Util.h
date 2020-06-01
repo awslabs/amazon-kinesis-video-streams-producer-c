@@ -19,6 +19,7 @@ extern "C" {
 #define SSL_CERTIFICATE_TYPE_PEM_STR                                ((PCHAR) "PEM")
 
 PCHAR getSslCertNameFromType(SSL_CERTIFICATE_TYPE);
+UINT64 commonDefaultGetCurrentTimeFunc(UINT64);
 
 #ifdef  __cplusplus
 }

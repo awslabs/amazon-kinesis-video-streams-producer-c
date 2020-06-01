@@ -14,7 +14,7 @@ STATUS createCurlIotCredentialProvider(PCHAR iotGetCredentialEndpoint,
 {
     return createCurlIotCredentialProviderWithTime(iotGetCredentialEndpoint, certPath, privateKeyPath,
             caCertPath, roleAlias, thingName,
-            kinesisVideoStreamDefaultGetCurrentTime, 0,
+            commonDefaultGetCurrentTimeFunc, 0,
             ppCredentialProvider);
 
 }
