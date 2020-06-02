@@ -220,7 +220,7 @@ STATUS signAwsRequestInfoQueryParam(PRequestInfo pRequestInfo)
     expirationInSeconds = MAX(MIN_AWS_SIGV4_CREDENTIALS_EXPIRATION_IN_SECONDS, expirationInSeconds);
 
     // Add the params
-    if (pRequestInfo->pAwsCredentials->sessionToken == NULL) {
+    if (pRequestInfo->pAwsCredentials->sessionToken == NULL || pRequestInfo->pAwsCredentials->sessionTokenLen == 0) {
         len = (UINT32) SNPRINTF(pEndUrl, remaining, AUTH_QUERY_TEMPLATE,
                                 AWS_SIG_V4_ALGORITHM, pEncodedCreds, dateTimeStr, expirationInSeconds,
                                 signedHeadersLen, pSignedHeaders);
