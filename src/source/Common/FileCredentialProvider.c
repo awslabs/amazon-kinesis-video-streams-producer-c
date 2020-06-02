@@ -8,7 +8,7 @@ STATUS createFileCredentialProvider(PCHAR pCredentialsFilepath,
                                     PAwsCredentialProvider* ppCredentialProvider)
 {
     return createFileCredentialProviderWithTime(pCredentialsFilepath,
-                                                kinesisVideoStreamDefaultGetCurrentTime,
+                                                commonDefaultGetCurrentTimeFunc,
                                                 0,
                                                 ppCredentialProvider);
 }
@@ -35,7 +35,7 @@ STATUS createFileCredentialProviderWithTime(PCHAR pCredentialsFilepath,
     STRCPY((PCHAR) pFileCredentialProvider->credentialsFilepath, pCredentialsFilepath);
 
     // Store the time functionality and specify default if NULL
-    pFileCredentialProvider->getCurrentTimeFn = (getCurrentTimeFn == NULL) ? kinesisVideoStreamDefaultGetCurrentTime : getCurrentTimeFn;
+    pFileCredentialProvider->getCurrentTimeFn = (getCurrentTimeFn == NULL) ? commonDefaultGetCurrentTimeFunc : getCurrentTimeFn;
     pFileCredentialProvider->customData = customData;
 
     // Create the credentials object

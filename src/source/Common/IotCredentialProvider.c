@@ -29,7 +29,7 @@ STATUS createIotCredentialProviderWithTime(PCHAR iotGetCredentialEndpoint,
     pIotCredentialProvider->credentialProvider.getCredentialsFn = getIotCredentials;
 
     // Store the time functionality and specify default if NULL
-    pIotCredentialProvider->getCurrentTimeFn = (getCurrentTimeFn == NULL) ? kinesisVideoStreamDefaultGetCurrentTime : getCurrentTimeFn;
+    pIotCredentialProvider->getCurrentTimeFn = (getCurrentTimeFn == NULL) ? commonDefaultGetCurrentTimeFunc : getCurrentTimeFn;
     pIotCredentialProvider->customData = customData;
 
     CHK(STRNLEN(iotGetCredentialEndpoint, MAX_URI_CHAR_LEN + 1) <= MAX_URI_CHAR_LEN, MAX_URI_CHAR_LEN);

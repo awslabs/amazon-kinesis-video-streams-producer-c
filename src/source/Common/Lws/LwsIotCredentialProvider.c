@@ -14,7 +14,7 @@ STATUS createLwsIotCredentialProvider(PCHAR iotGetCredentialEndpoint,
 {
     return createLwsIotCredentialProviderWithTime(iotGetCredentialEndpoint, certPath, privateKeyPath,
             caCertPath, roleAlias, thingName,
-            kinesisVideoStreamDefaultGetCurrentTime, 0,
+            commonDefaultGetCurrentTimeFunc, 0,
             ppCredentialProvider);
 
 }
