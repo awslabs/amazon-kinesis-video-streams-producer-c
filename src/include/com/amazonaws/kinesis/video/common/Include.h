@@ -39,6 +39,9 @@ extern "C" {
 #define STATUS_IOT_CREATE_LWS_CONTEXT_FAILED                                        STATUS_COMMON_PRODUCER_BASE + 0x0000001f
 #define STATUS_INVALID_CA_CERT_PATH                                                 STATUS_COMMON_PRODUCER_BASE + 0x00000020
 #define STATUS_FILE_LOGGER_INDEX_FILE_INVALID_SIZE                                  STATUS_COMMON_PRODUCER_BASE + 0x00000021
+#define STATUS_FILE_CREDENTIAL_PROVIDER_OPEN_FILE_FAILED                            STATUS_COMMON_PRODUCER_BASE + 0x00000022
+#define STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_LENGTH                         STATUS_COMMON_PRODUCER_BASE + 0x00000023
+#define STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_FORMAT                         STATUS_COMMON_PRODUCER_BASE + 0x00000024
 
 // Continue errors from the new common base
 #define STATUS_COMMON_BASE                                                          0x16000000
