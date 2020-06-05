@@ -393,11 +393,12 @@ TEST_F(CallbacksProviderPublicApiTest, createDefaultCallbacksProviderWithFileAut
 {
     PClientCallbacks pClientCallbacks = NULL;
     CHAR filePath[MAX_PATH_LEN + 2];
+    CHAR fileContent[MAX_CREDENTIAL_FILE_LEN];
 
     MEMSET(filePath, 'a', ARRAY_SIZE(filePath));
     filePath[MAX_PATH_LEN + 1] = '\0';
 
-    EXPECT_EQ(STATUS_OPEN_FILE_FAILED, createDefaultCallbacksProviderWithFileAuth(
+    EXPECT_EQ(STATUS_FILE_CREDENTIAL_PROVIDER_OPEN_FILE_FAILED, createDefaultCallbacksProviderWithFileAuth(
             TEST_AUTH_FILE_PATH,
             (PCHAR) DEFAULT_AWS_REGION,
             TEST_CA_CERT_PATH,
@@ -416,6 +417,34 @@ TEST_F(CallbacksProviderPublicApiTest, createDefaultCallbacksProviderWithFileAut
     EXPECT_EQ(NULL, pClientCallbacks);
 
     EXPECT_EQ(STATUS_INVALID_ARG, createDefaultCallbacksProviderWithFileAuth(
+            filePath,
+            (PCHAR) DEFAULT_AWS_REGION,
+            TEST_CA_CERT_PATH,
+            TEST_USER_AGENT_POSTFIX,
+            TEST_USER_AGENT,
+            &pClientCallbacks));
+    EXPECT_EQ(NULL, pClientCallbacks);
+
+    // Try max file length
+    STRCPY(filePath, "credsFile");
+    MEMSET(fileContent, 'a', ARRAY_SIZE(fileContent));
+    ASSERT_EQ(STATUS_SUCCESS, writeFile(filePath, FALSE, FALSE, (PBYTE) fileContent, ARRAY_SIZE(fileContent)));
+
+    EXPECT_EQ(STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_LENGTH, createDefaultCallbacksProviderWithFileAuth(
+            filePath,
+            (PCHAR) DEFAULT_AWS_REGION,
+            TEST_CA_CERT_PATH,
+            TEST_USER_AGENT_POSTFIX,
+            TEST_USER_AGENT,
+            &pClientCallbacks));
+    EXPECT_EQ(NULL, pClientCallbacks);
+
+    // Try bad content creds file
+    STRCPY(filePath, "credsFile");
+    STRCPY(fileContent, "Bad creds file");
+    ASSERT_EQ(STATUS_SUCCESS, writeFile(filePath, FALSE, FALSE, (PBYTE) fileContent, STRLEN(fileContent)));
+
+    EXPECT_EQ(STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_FORMAT, createDefaultCallbacksProviderWithFileAuth(
             filePath,
             (PCHAR) DEFAULT_AWS_REGION,
             TEST_CA_CERT_PATH,
