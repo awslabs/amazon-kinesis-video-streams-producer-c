@@ -13,8 +13,11 @@ extern "C" {
 ////////////////////////////////////////////////////
 // Public headers
 ////////////////////////////////////////////////////
-#include <jsmn.h>
 #include <com/amazonaws/kinesis/video/client/Include.h>
+#ifndef JSMN_HEADER
+#define JSMN_HEADER
+#endif
+#include <com/amazonaws/kinesis/video/common/jsmn.h>
 
 ////////////////////////////////////////////////////
 // Status return codes
@@ -38,7 +41,6 @@ extern "C" {
 #define STATUS_MAX_IOT_THING_NAME_LENGTH                                            STATUS_COMMON_PRODUCER_BASE + 0x0000001e
 #define STATUS_IOT_CREATE_LWS_CONTEXT_FAILED                                        STATUS_COMMON_PRODUCER_BASE + 0x0000001f
 #define STATUS_INVALID_CA_CERT_PATH                                                 STATUS_COMMON_PRODUCER_BASE + 0x00000020
-#define STATUS_FILE_LOGGER_INDEX_FILE_INVALID_SIZE                                  STATUS_COMMON_PRODUCER_BASE + 0x00000021
 #define STATUS_FILE_CREDENTIAL_PROVIDER_OPEN_FILE_FAILED                            STATUS_COMMON_PRODUCER_BASE + 0x00000022
 #define STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_LENGTH                         STATUS_COMMON_PRODUCER_BASE + 0x00000023
 #define STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_FORMAT                         STATUS_COMMON_PRODUCER_BASE + 0x00000024
@@ -260,22 +262,6 @@ extern "C" {
  * AWS service Request id header name
  */
 #define KVS_REQUEST_ID_HEADER_NAME                  "x-amzn-RequestId"
-
-/**
- * File based logger limit constants
- */
-#define MAX_FILE_LOGGER_STRING_BUFFER_SIZE          (3 * 1024 * 1024)
-#define MIN_FILE_LOGGER_STRING_BUFFER_SIZE          (10 * 1024)
-#define MAX_FILE_LOGGER_LOG_FILE_COUNT              (10 * 1024)
-
-/**
- * Default values used in the file logger
- */
-#define FILE_LOGGER_LOG_FILE_NAME                   "kvsFileLog"
-#define FILE_LOGGER_LAST_INDEX_FILE_NAME            "kvsFileLogIndex"
-#define FILE_LOGGER_STRING_BUFFER_SIZE              (100 * 1024)
-#define FILE_LOGGER_LOG_FILE_COUNT                  3
-#define FILE_LOGGER_LOG_FILE_DIRECTORY_PATH         "./"
 
 ////////////////////////////////////////////////////
 // Main structure declarations

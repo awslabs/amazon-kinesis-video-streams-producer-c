@@ -36,6 +36,10 @@ endif()
 
 message(STATUS "Kinesis Video Producer path is ${KINESIS_VIDEO_PRODUCER_C_SRC}")
 
+if(BUILD_COMMON_LWS AND NOT BUILD_DEPENDENCIES)
+  message(FATAL_ERROR "BUILD_DEPENDENCIES has to be ON if BUILD_COMMON_LWS is ON")
+endif()
+
 if(BUILD_DEPENDENCIES)
   if (NOT OPEN_SRC_INSTALL_PREFIX)
     set(OPEN_SRC_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/open-source)
@@ -82,9 +86,6 @@ if(BUILD_DEPENDENCIES)
     build_dependency(curl ${BUILD_ARGS})
   endif()
 
-  build_dependency(jsmn)
-  build_dependency(kvspic)
-
   if(BUILD_TEST)
     build_dependency(gtest)
   endif()
@@ -92,24 +93,29 @@ if(BUILD_DEPENDENCIES)
   message(STATUS "Finished building dependencies.")
 endif()
 
+############# fetch repos that we need do add_subdirectory ############
+
+# repos that we will build using add_subdirectory will be stored in this path
+set(DEPENDENCY_DOWNLOAD_PATH ${CMAKE_CURRENT_SOURCE_DIR}/dependency)
+fetch_repo(kvspic)
+add_subdirectory("${DEPENDENCY_DOWNLOAD_PATH}/libkvspic/kvspic-src")
+file(GLOB PIC_HEADERS "${pic_project_SOURCE_DIR}/src/*/include")
+include_directories("${PIC_HEADERS}")
+
+############# fetch repos that we need do add_subdirectory done ############
+
 ############# find dependent libraries ############
 
 find_package(Threads)
 find_package(PkgConfig REQUIRED)
 
-if (WIN32)
-  find_library(LIBKVSPIC_LIBRARIES kvspic REQUIRED)
-  find_library(LIBKVSPIC_UTILS_LIBRARIES kvspicUtils REQUIRED)
-else()
-  pkg_check_modules(LIBKVSPIC REQUIRED libkvspic)
-  pkg_check_modules(LIBKVSPIC_UTILS REQUIRED libkvspicUtils)
-endif()
-
 set(OPEN_SRC_INCLUDE_DIRS ${LIBKVSPIC_INCLUDE_DIRS})
-link_directories(${LIBKVSPIC_LIBRARY_DIRS})
 
 if(USE_OPENSSL)
-  find_package(OpenSSL REQUIRED)
+  find_package(OpenSSL)
+  if(NOT OPENSSL_FOUND AND NOT BUILD_DEPENDENCIES)
+    message(FATAL_ERROR "OpenSSL is not found. Make sure to export PKG_CONFIG_PATH to where OpenSSL's pc file is")
+  endif()
   set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR})
 elseif(USE_MBEDTLS)
   find_package(MbedTLS REQUIRED)
@@ -139,8 +145,6 @@ if (BUILD_COMMON_LWS)
     set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${LIBWEBSOCKETS_INCLUDE_DIRS})
     link_directories(${LIBWEBSOCKETS_LIBRARY_DIRS})
 endif()
-
-find_package(Jsmn REQUIRED)
 
 ############# find dependent libraries end ############
 
@@ -215,10 +219,6 @@ endif()
 install(
   DIRECTORY ${KINESIS_VIDEO_PRODUCER_C_SRC}/src/include
   DESTINATION .)
-# TODO: Find a better way to reexpose third party libraries
-install(
-  FILES ${JSMN_INCLUDE_DIRS}/jsmn.h
-  DESTINATION include)
 
 if(BUILD_COMMON_LWS)
     configure_file(
@@ -229,11 +229,10 @@ if(BUILD_COMMON_LWS)
     # dont support websocket with mbedtls yet
     target_compile_definitions(kvsCommonLws PRIVATE KVS_BUILD_WITH_LWS KVS_USE_OPENSSL)
     target_link_libraries(kvsCommonLws
-            ${JSMN_LIBRARY}
             ${OPENSSL_CRYPTO_LIBRARY}
             ${OPENSSL_SSL_LIBRARY}
             ${LIBWEBSOCKETS_LIBRARIES}
-            ${LIBKVSPIC_UTILS_LIBRARIES})
+            kvspicUtils)
 
     install(
       TARGETS kvsCommonLws
@@ -254,10 +253,8 @@ if(BUILD_COMMON_CURL)
     add_library(kvsCommonCurl STATIC ${KVS_COMMON_SOURCE_FILES_BASE} ${KVS_COMMON_SOURCE_FILES_CURL})
     target_compile_definitions(kvsCommonCurl PRIVATE KVS_BUILD_WITH_CURL ${CPRODUCER_COMMON_TLS_OPTION})
     target_link_libraries(kvsCommonCurl
-            ${JSMN_LIBRARY}
             ${PRODUCER_CRYPTO_LIBRARY}
-            ${LIBKVSPIC_LIBRARIES}
-            ${LIBKVSPIC_UTILS_LIBRARIES}
+            kvspicUtils
             CURL::libcurl)
 
     install(
@@ -278,7 +275,7 @@ if(BUILD_COMMON_CURL)
     else()
       add_library(cproducer SHARED ${PRODUCER_C_SOURCE_FILES})
     endif()
-    target_link_libraries(cproducer PUBLIC kvsCommonCurl)
+    target_link_libraries(cproducer PUBLIC kvsCommonCurl kvspic)
 
     install(
       TARGETS cproducer
