@@ -1,3 +1,0 @@
-[submodule "open-source/amazon-kinesis-video-streams-pic"]
-	path = open-source/amazon-kinesis-video-streams-pic
-	url = https://github.com/awslabs/amazon-kinesis-video-streams-pic.git
