@@ -53,6 +53,12 @@ extern "C" {
 ////////////////////////////////////////////////////
 
 /**
+ * Environment variable to enable file logging. Run export AWS_ENABLE_FILE_LOGGING=TRUE to enable file
+ * logging
+ */
+#define ENABLE_FILE_LOGGING                                                     ((PCHAR) "AWS_ENABLE_FILE_LOGGING")
+
+/**
  * Max region name
  */
 #define MAX_REGION_NAME_LEN                                                     128

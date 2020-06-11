@@ -14,6 +14,9 @@
 #define NUMBER_OF_H264_FRAME_FILES          403
 #define NUMBER_OF_AAC_FRAME_FILES           582
 
+#define FILE_LOGGING_BUFFER_SIZE            (100 * 1024)
+#define MAX_NUMBER_OF_LOG_FILES             5
+
 typedef struct {
     PBYTE buffer;
     UINT32 size;
@@ -247,6 +250,17 @@ INT32 main(INT32 argc, CHAR *argv[])
                                                                 NULL,
                                                                 NULL,
                                                                 &pClientCallbacks));
+
+    if(NULL != getenv(ENABLE_FILE_LOGGING)) {
+        if((retStatus = addFileLoggerPlatformCallbacksProvider(pClientCallbacks,
+                                                               FILE_LOGGING_BUFFER_SIZE,
+                                                               MAX_NUMBER_OF_LOG_FILES,
+                                                               (PCHAR) FILE_LOGGER_LOG_FILE_DIRECTORY_PATH,
+                                                               TRUE) != STATUS_SUCCESS)) {
+            printf("File logging enable option failed with 0x%08x error code\n", retStatus);
+        }
+    }
+
     CHK_STATUS(createStreamCallbacks(&pStreamCallbacks));
     CHK_STATUS(addStreamCallbacks(pClientCallbacks, pStreamCallbacks));
 
@@ -283,7 +297,6 @@ CleanUp:
     for(i = 0; i < NUMBER_OF_H264_FRAME_FILES; ++i) {
         SAFE_MEMFREE(data.videoFrames[i].buffer);
     }
-
     freeDeviceInfo(&pDeviceInfo);
     freeStreamInfoProvider(&pStreamInfo);
     freeKinesisVideoStream(&streamHandle);
