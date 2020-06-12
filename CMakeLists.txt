@@ -135,7 +135,7 @@ if (BUILD_COMMON_LWS)
   if (WIN32)
     find_package(LIBWEBSOCKETS REQUIRED PATHS ${OPEN_SRC_INSTALL_PREFIX})
   else()
-    pkg_check_modules(LIBWEBSOCKET REQUIRED libwebsockets)
+    pkg_check_modules(LIBWEBSOCKETS REQUIRED libwebsockets)
   endif()
 
     set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${LIBWEBSOCKETS_INCLUDE_DIRS})
