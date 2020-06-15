@@ -83,7 +83,9 @@ if(BUILD_DEPENDENCIES)
   endif()
 
   if(BUILD_TEST)
+    message("build gtest producer ${OPEN_SRC_INSTALL_PREFIX}")
     build_dependency(gtest)
+    message("build gtest producer done ${OPEN_SRC_INSTALL_PREFIX}")
   endif()
 
   message(STATUS "Finished building dependencies.")
