@@ -71,7 +71,9 @@ if(BUILD_DEPENDENCIES)
 
   if (BUILD_COMMON_LWS)
     set(BUILD_ARGS  -DBUILD_STATIC=${BUILD_STATIC}
-                    -DOPENSSL_DIR=${OPEN_SRC_INSTALL_PREFIX})
+                    -DOPENSSL_DIR=${OPEN_SRC_INSTALL_PREFIX}
+                    -DUSE_OPENSSL=${USE_OPENSSL}
+                    -DUSE_MBEDTLS=${USE_MBEDTLS})
     build_dependency(websockets ${BUILD_ARGS})
   endif()
 
@@ -222,8 +224,7 @@ if(BUILD_COMMON_LWS)
       "${CMAKE_CURRENT_BINARY_DIR}/libkvsCommonLws.pc" @ONLY)
 
     add_library(kvsCommonLws STATIC ${KVS_COMMON_SOURCE_FILES_BASE} ${KVS_COMMON_SOURCE_FILES_LWS})
-    # dont support websocket with mbedtls yet
-    target_compile_definitions(kvsCommonLws PRIVATE KVS_BUILD_WITH_LWS KVS_USE_OPENSSL)
+    target_compile_definitions(kvsCommonLws PRIVATE KVS_BUILD_WITH_LWS ${CPRODUCER_COMMON_TLS_OPTION})
     target_link_libraries(kvsCommonLws
             ${OPENSSL_CRYPTO_LIBRARY}
             ${OPENSSL_SSL_LIBRARY}
