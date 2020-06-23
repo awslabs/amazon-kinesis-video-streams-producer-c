@@ -8,12 +8,16 @@ function(fetch_repo lib_name)
     return()
   endif()
 
+  # anything after lib_name(${ARGN}) are assumed to be arguments passed over to
+  # library building cmake.
+  set(build_args ${ARGN})
+
   # build library
   configure_file(
     ./CMake/Dependencies/lib${lib_name}-CMakeLists.txt
     ${DEPENDENCY_DOWNLOAD_PATH}/lib${lib_name}/CMakeLists.txt COPYONLY)
   execute_process(
-    COMMAND ${CMAKE_COMMAND}
+    COMMAND ${CMAKE_COMMAND} ${build_args}
             ${CMAKE_GENERATOR} .
     RESULT_VARIABLE result
     WORKING_DIRECTORY ${DEPENDENCY_DOWNLOAD_PATH}/lib${lib_name})

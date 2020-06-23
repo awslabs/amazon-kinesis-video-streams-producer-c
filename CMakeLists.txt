@@ -95,7 +95,8 @@ endif()
 
 # repos that we will build using add_subdirectory will be stored in this path
 set(DEPENDENCY_DOWNLOAD_PATH ${CMAKE_CURRENT_SOURCE_DIR}/dependency)
-fetch_repo(kvspic)
+set(BUILD_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
+fetch_repo(kvspic ${BUILD_ARGS})
 add_subdirectory("${DEPENDENCY_DOWNLOAD_PATH}/libkvspic/kvspic-src")
 file(GLOB PIC_HEADERS "${pic_project_SOURCE_DIR}/src/*/include")
 include_directories("${PIC_HEADERS}")

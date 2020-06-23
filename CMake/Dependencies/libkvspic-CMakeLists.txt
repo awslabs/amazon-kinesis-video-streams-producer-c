@@ -10,6 +10,8 @@ ExternalProject_Add(libkvspic-download
     	GIT_TAG           af2168f7c0334630cbc4a7d02c3171df737a30f8
     	SOURCE_DIR        "${CMAKE_CURRENT_BINARY_DIR}/kvspic-src"
 	BINARY_DIR        "${CMAKE_CURRENT_BINARY_DIR}/kvspic-build"
+	CMAKE_ARGS
+	  -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
 	CONFIGURE_COMMAND ""
 	BUILD_COMMAND     ""
 	INSTALL_COMMAND   ""
