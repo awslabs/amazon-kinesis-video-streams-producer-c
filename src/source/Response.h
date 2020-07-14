@@ -31,12 +31,26 @@ extern "C" {
 typedef SIZE_T (*CurlCallbackFunc)(PCHAR, SIZE_T, SIZE_T, PVOID);
 
 /**
+ * CURL callback function for progress monitoring
+ */
+typedef INT32 (*CurlProgressCallbackFunc)(PVOID, curl_off_t, curl_off_t, curl_off_t, curl_off_t);
+
+/**
  * Curl Response structure
  */
 typedef struct __CurlResponse CurlResponse;
 struct __CurlResponse {
     // Related request object
     PCurlRequest pCurlRequest;
+
+    // Whether curl is paused
+    volatile ATOMIC_BOOL paused;
+
+    // For flagging the callback to re-enable the curl transfer
+    volatile ATOMIC_BOOL unpause;
+
+    // Whether the call was force-terminated
+    volatile BOOL terminated;
 
     // Curl object to use for the calls
     CURL* pCurl;
@@ -47,17 +61,11 @@ struct __CurlResponse {
     // Curl call data
     CallInfo callInfo;
 
-    // Whether the call was force-terminated
-    volatile BOOL terminated;
-
     ///////////////////////////////////////////////
     // Variables needed for putMedia session
 
     // track whether end-of-stream has been received from getKinesisVideoStreamData
     BOOL endOfStream;
-
-    // Whether curl is paused
-    volatile BOOL paused;
 
     // Whether to dump streaming session into mkv file
     BOOL debugDumpFile;
@@ -67,6 +75,8 @@ struct __CurlResponse {
 
     // Lock for exclusive access
     MUTEX lock;
+
+    UINT64 time;
 
     ///////////////////////////////////////////////
 };
@@ -162,10 +172,11 @@ SERVICE_CALL_RESULT getServiceCallResultFromCurlStatus(CURLcode);
  * @param - CurlCallbackFunc - IN - Curl read callback
  * @param - CurlCallbackFunc - IN - Curl write callback
  * @param - CurlCallbackFunc - IN - Curl post write callback
+ * @param - CurlProgressCallbackFunc - IN - Curl progress monitoring callback
  *
  * @return - STATUS code of the execution
  */
-STATUS initializeCurlSession(PRequestInfo, PCallInfo, CURL**, PVOID, CurlCallbackFunc, CurlCallbackFunc, CurlCallbackFunc, CurlCallbackFunc);
+STATUS initializeCurlSession(PRequestInfo, PCallInfo, CURL**, PVOID, CurlCallbackFunc, CurlCallbackFunc, CurlCallbackFunc, CurlCallbackFunc, CurlProgressCallbackFunc);
 
 ////////////////////////////////////////////////////
 // Curl callbacks
@@ -174,6 +185,7 @@ SIZE_T writeHeaderCallback(PCHAR, SIZE_T, SIZE_T, PVOID);
 SIZE_T postWriteCallback(PCHAR, SIZE_T, SIZE_T, PVOID);
 SIZE_T postReadCallback(PCHAR, SIZE_T, SIZE_T, PVOID);
 SIZE_T postResponseWriteCallback(PCHAR, SIZE_T, SIZE_T, PVOID);
+INT32 progressCallback(PVOID, curl_off_t, curl_off_t, curl_off_t, curl_off_t);
 
 #ifdef  __cplusplus
 }

@@ -32,7 +32,8 @@ STATUS createCurlResponse(PCurlRequest pCurlRequest, PCurlResponse* ppCurlRespon
 
     // init putMedia related members
     pCurlResponse->endOfStream = FALSE;
-    pCurlResponse->paused = TRUE;
+    ATOMIC_STORE_BOOL(&pCurlResponse->paused, TRUE);
+    ATOMIC_STORE_BOOL(&pCurlResponse->unpause, FALSE);
     pCurlResponse->debugDumpFile = FALSE;
     pCurlResponse->debugDumpFilePath[0] = '\0';
 
@@ -62,7 +63,8 @@ STATUS createCurlResponse(PCurlRequest pCurlRequest, PCurlResponse* ppCurlRespon
                                      writeHeaderCallback,
                                      postReadCallback,
                                      postWriteCallback,
-                                     postResponseWriteCallback));
+                                     postResponseWriteCallback,
+                                     progressCallback));
 
 CleanUp:
 
@@ -137,7 +139,8 @@ STATUS initializeCurlSession(PRequestInfo pRequestInfo,
                              CurlCallbackFunc writeHeaderFn,
                              CurlCallbackFunc readFn,
                              CurlCallbackFunc writeFn,
-                             CurlCallbackFunc responseWriteFn)
+                             CurlCallbackFunc responseWriteFn,
+                             CurlProgressCallbackFunc progressFn)
 {
     ENTERS();
     STATUS retStatus = STATUS_SUCCESS;
@@ -226,6 +229,11 @@ STATUS initializeCurlSession(PRequestInfo pRequestInfo,
                 // Set the write callback from the request
                 curl_easy_setopt(pCurl, CURLOPT_WRITEFUNCTION, writeFn);
                 curl_easy_setopt(pCurl, CURLOPT_WRITEDATA, data);
+
+                // Setup the progress callback which will help with pause/unpause
+                curl_easy_setopt(pCurl, CURLOPT_XFERINFOFUNCTION, progressFn);
+                curl_easy_setopt(pCurl, CURLOPT_XFERINFODATA, data);
+                curl_easy_setopt(pCurl, CURLOPT_NOPROGRESS, 0L);
             } else {
                 // Set the read data and it's size
                 curl_easy_setopt(pCurl, CURLOPT_POSTFIELDSIZE, pRequestInfo->bodySize);
@@ -469,7 +477,6 @@ CleanUp:
 STATUS notifyDataAvailable(PCurlResponse pCurlResponse, UINT64 durationAvailable, UINT64 sizeAvailable)
 {
     STATUS retStatus = STATUS_SUCCESS;
-    CURLcode result;
 
     CHK(pCurlResponse != NULL, STATUS_NULL_ARG);
 
@@ -478,16 +485,8 @@ STATUS notifyDataAvailable(PCurlResponse pCurlResponse, UINT64 durationAvailable
         DLOGV("Note data received: duration(100ns): %" PRIu64 " bytes %" PRIu64 " for stream handle %" PRIu64,
               durationAvailable, sizeAvailable, pCurlResponse->pCurlRequest->uploadHandle);
 
-        if (pCurlResponse->paused && pCurlResponse->pCurl != NULL) {
-            pCurlResponse->paused = FALSE;
-            // frequent pause unpause causes curl segfault in offline scenario
-            THREAD_SLEEP(10 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND);
-            // un-pause curl
-            result = curl_easy_pause(pCurlResponse->pCurl, CURLPAUSE_SEND_CONT);
-            if (result != CURLE_OK) {
-                DLOGW("Failed to un-pause curl with error: %u", result);
-            }
-        }
+        // Set unpause flag to be picked up by the progress curl callback function
+        ATOMIC_STORE_BOOL(&pCurlResponse->unpause, TRUE);
     }
 
 CleanUp:
@@ -655,7 +654,11 @@ SIZE_T postReadCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID custo
     pCurlApiCallbacks = pCurlRequest->pCurlApiCallbacks;
     uploadHandle = pCurlResponse->pCurlRequest->uploadHandle;
 
-    if (pCurlResponse->paused) {
+    UINT64 curTime = GETTIME();
+    DLOGE("MMMMMMM postReadTime diff %llu", curTime - pCurlResponse->time);
+    pCurlResponse->time = curTime;
+
+    if (ATOMIC_LOAD_BOOL(&pCurlResponse->paused)) {
         bytesWritten = CURL_READFUNC_PAUSE;
         CHK(FALSE, retStatus);
     }
@@ -742,7 +745,7 @@ CleanUp:
             }
         }
     } else if (bytesWritten == CURL_READFUNC_PAUSE) {
-        pCurlResponse->paused = TRUE;
+        ATOMIC_STORE_BOOL(&pCurlResponse->paused, TRUE);
     }
 
     // Since curl is about to terminate gracefully, set flag to prevent shutdown thread from timing it out.
@@ -751,4 +754,49 @@ CleanUp:
     }
 
     return bytesWritten;
+}
+
+INT32 progressCallback(PVOID customData, curl_off_t dltotal, curl_off_t dlnow,
+        curl_off_t ultotal, curl_off_t ulnow)
+{
+    UNUSED_PARAM(dltotal);
+    UNUSED_PARAM(dlnow);
+    UNUSED_PARAM(ultotal);
+    UNUSED_PARAM(ulnow);
+    DLOGV("progressCallback (curl callback) invoked");
+    PCurlResponse pCurlResponse;
+    STATUS retStatus = STATUS_SUCCESS;
+    PCurlRequest  pCurlRequest = (PCurlRequest) customData;
+    INT32 retVal = 0; // Continue
+    SIZE_T expected;
+    CURLcode result;
+
+    if (pCurlRequest == NULL || pCurlRequest->pCurlResponse == NULL || pCurlRequest->pCurlApiCallbacks == NULL ||
+        ATOMIC_LOAD_BOOL(&pCurlRequest->requestInfo.terminating)) {
+        retVal = CURL_READFUNC_ABORT;
+        CHK(FALSE, retStatus);
+    }
+
+    pCurlResponse = pCurlRequest->pCurlResponse;
+
+    // Early return if we don't have the curl context
+    CHK(pCurlResponse->pCurl != NULL, retStatus);
+
+    // Check if we need to unpause the curl
+    expected = TRUE;
+    if (ATOMIC_COMPARE_EXCHANGE_BOOL(&pCurlResponse->unpause, &expected, (SIZE_T) FALSE)) {
+        // un-pause curl if paused
+        expected = TRUE;
+        if (ATOMIC_COMPARE_EXCHANGE_BOOL(&pCurlResponse->paused, &expected, (SIZE_T) FALSE)) {
+            result = curl_easy_pause(pCurlResponse->pCurl, CURLPAUSE_SEND_CONT);
+            if (result != CURLE_OK) {
+                DLOGW("Failed to un-pause curl with error: %u", result);
+            }
+        }
+    }
+
+CleanUp:
+
+    CHK_LOG_ERR(retStatus);
+    return retVal;
 }
