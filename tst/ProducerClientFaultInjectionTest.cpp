@@ -137,6 +137,32 @@ TEST_F(ProducerClientFaultInjectionTest, invalidArgDescribeCallWithContinuousCal
     freeStreams();
 }
 
+TEST_F(ProducerClientFaultInjectionTest, streamLimitCreateCall)
+{
+    createDefaultProducerClient(FALSE);
+
+    // Induce create call
+    mDescribeStreamStatus = STATUS_NOT_IMPLEMENTED; // Non success status
+    mDescribeStreamCallResult = SERVICE_CALL_RESOURCE_NOT_FOUND;
+
+    mCreateStreamStatus = STATUS_NOT_IMPLEMENTED; // Non success status
+    mCreateStreamCallResult = SERVICE_CALL_STREAM_LIMIT;
+
+    // Attempt to create a stream
+    EXPECT_NE(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, 20 * HUNDREDS_OF_NANOS_IN_A_SECOND, 60 * HUNDREDS_OF_NANOS_IN_A_SECOND));
+
+    THREAD_SLEEP(2 * HUNDREDS_OF_NANOS_IN_A_SECOND);
+
+    // Stream limit is not a retriable call
+    EXPECT_EQ(1, mCurlCreateStreamCount);
+    EXPECT_EQ(1, mCurlDescribeStreamCount);
+    EXPECT_EQ(0, mCurlTagResourceCount);
+    EXPECT_EQ(0, mCurlGetDataEndpointCount);
+    EXPECT_EQ(0, mCurlPutMediaCount);
+
+    freeStreams();
+}
+
 TEST_F(ProducerClientFaultInjectionTest, notAuthorizedCreateCall)
 {
     createDefaultProducerClient(FALSE);
