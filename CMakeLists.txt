@@ -253,7 +253,7 @@ if(BUILD_COMMON_CURL)
     target_link_libraries(kvsCommonCurl
             ${PRODUCER_CRYPTO_LIBRARY}
             kvspicUtils
-            CURL::libcurl)
+            ${CURL_LIBRARIES})
 
     install(
       TARGETS kvsCommonCurl
