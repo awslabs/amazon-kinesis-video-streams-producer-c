@@ -217,7 +217,7 @@ endif()
 
 install(
   DIRECTORY ${KINESIS_VIDEO_PRODUCER_C_SRC}/src/include
-  DESTINATION .)
+  DESTINATION include)
 
 if(BUILD_COMMON_LWS)
     configure_file(
