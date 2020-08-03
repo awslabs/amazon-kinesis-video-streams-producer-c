@@ -20,6 +20,7 @@ STATUS blockingLwsCall(PRequestInfo pRequestInfo, PCallInfo pCallInfo)
     CHK(pRequestInfo != NULL && pCallInfo != NULL, STATUS_NULL_ARG);
 
     // Prepare the signaling channel protocols array
+    MEMSET(lwsProtocols, 0x00, SIZEOF(lwsProtocols));
     lwsProtocols[0].name = HTTPS_SCHEME_NAME;
     lwsProtocols[0].callback = lwsIotCallbackRoutine;
     lwsProtocols[1].name = NULL;
