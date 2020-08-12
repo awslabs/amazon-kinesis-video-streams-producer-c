@@ -124,10 +124,11 @@ else()
 endif()
 
 if(BUILD_COMMON_CURL)
-  if (OPEN_SRC_INSTALL_PREFIX)
-    find_package(CURL REQUIRED PATHS ${OPEN_SRC_INSTALL_PREFIX})
-  else()
+  if (WIN32)
     find_package(CURL REQUIRED)
+    set(CURL_LIBRARIES CURL::libcurl)
+  else()
+    pkg_check_modules(CURL REQUIRED libcurl)
   endif()
 
   set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${CURL_INCLUDE_DIRS})
@@ -141,8 +142,8 @@ if (BUILD_COMMON_LWS)
     pkg_check_modules(LIBWEBSOCKETS REQUIRED libwebsockets)
   endif()
 
-    set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${LIBWEBSOCKETS_INCLUDE_DIRS})
-    link_directories(${LIBWEBSOCKETS_LIBRARY_DIRS})
+  set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${LIBWEBSOCKETS_INCLUDE_DIRS})
+  link_directories(${LIBWEBSOCKETS_LIBRARY_DIRS})
 endif()
 
 ############# find dependent libraries end ############
@@ -253,7 +254,7 @@ if(BUILD_COMMON_CURL)
     target_link_libraries(kvsCommonCurl
             ${PRODUCER_CRYPTO_LIBRARY}
             kvspicUtils
-            CURL::libcurl)
+            ${CURL_LIBRARIES})
 
     install(
       TARGETS kvsCommonCurl
