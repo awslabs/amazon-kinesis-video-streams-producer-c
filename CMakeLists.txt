@@ -93,6 +93,7 @@ endif()
 
 ############# fetch repos that we need do add_subdirectory ############
 
+message(STATUS "Fetching repo.")
 # repos that we will build using add_subdirectory will be stored in this path
 set(DEPENDENCY_DOWNLOAD_PATH ${CMAKE_CURRENT_SOURCE_DIR}/dependency)
 set(BUILD_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
@@ -100,6 +101,7 @@ fetch_repo(kvspic ${BUILD_ARGS})
 add_subdirectory("${DEPENDENCY_DOWNLOAD_PATH}/libkvspic/kvspic-src")
 file(GLOB PIC_HEADERS "${pic_project_SOURCE_DIR}/src/*/include")
 include_directories("${PIC_HEADERS}")
+message(STATUS "Finished fetching repo")
 
 ############# fetch repos that we need do add_subdirectory done ############
 
@@ -108,6 +110,7 @@ include_directories("${PIC_HEADERS}")
 find_package(Threads)
 find_package(PkgConfig REQUIRED)
 
+message(STATUS "Here1")
 set(OPEN_SRC_INCLUDE_DIRS ${LIBKVSPIC_INCLUDE_DIRS})
 
 if(USE_OPENSSL)
@@ -123,6 +126,7 @@ else()
   message(FATAL_ERROR "No crypto library selected.")
 endif()
 
+message(STATUS "Here2")
 if(BUILD_COMMON_CURL)
   if (OPEN_SRC_INSTALL_PREFIX)
     find_package(CURL REQUIRED PATHS ${OPEN_SRC_INSTALL_PREFIX})
@@ -133,7 +137,7 @@ if(BUILD_COMMON_CURL)
   set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${CURL_INCLUDE_DIRS})
   link_directories(${CURL_LIBRARY_DIRS})
 endif()
-
+message(STATUS "Here3")
 if (BUILD_COMMON_LWS)
   if (WIN32)
     find_package(LIBWEBSOCKETS REQUIRED PATHS ${OPEN_SRC_INSTALL_PREFIX})
@@ -147,6 +151,7 @@ endif()
 
 ############# find dependent libraries end ############
 
+message(STATUS "Here4")
 if(CMAKE_SIZEOF_VOID_P STREQUAL 4)
     message(STATUS "Bitness 32 bits")
     set(KINESIS_VIDEO_BUILD_BITNESS "x86")
@@ -161,6 +166,7 @@ else()
     message(FATAL_ERROR "Unknown bitness")
 endif()
 
+message(STATUS "Here5")
 if("${CMAKE_C_COMPILER_ID}" MATCHES "GNU|Clang")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
 
@@ -187,10 +193,12 @@ if("${CMAKE_C_COMPILER_ID}" MATCHES "GNU|Clang")
     endif()
 endif()
 
+message(STATUS "Here6")
 if(MSVC)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_WARNINGS -D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
 endif()
 
+message(STATUS "Here7")
 file(GLOB KVS_COMMON_SOURCE_FILES_BASE "src/source/Common/*.c")
 file(GLOB KVS_COMMON_SOURCE_FILES_LWS "src/source/Common/Lws/*.c")
 file(GLOB KVS_COMMON_SOURCE_FILES_CURL "src/source/Common/Curl/*.c")
@@ -215,6 +223,8 @@ if (USE_MBEDTLS)
             MbedCrypto)
 endif()
 
+message(STATUS "Here8")
+message(STATUS "${KINESIS_VIDEO_PRODUCER_C_SRC}")
 install(
   DIRECTORY ${KINESIS_VIDEO_PRODUCER_C_SRC}/src/include
   DESTINATION .)
@@ -242,6 +252,7 @@ if(BUILD_COMMON_LWS)
       DESTINATION lib/pkgconfig)
 endif()
 
+message(STATUS "Here9")
 if(BUILD_COMMON_CURL)
     # producer only uses curl right now
     configure_file(
@@ -254,27 +265,28 @@ if(BUILD_COMMON_CURL)
             ${PRODUCER_CRYPTO_LIBRARY}
             kvspicUtils
             CURL::libcurl)
-
+    message(STATUS "Here10")
     install(
       TARGETS kvsCommonCurl
       ARCHIVE DESTINATION lib
       LIBRARY DESTINATION lib
       RUNTIME DESTINATION bin)
+    message(STATUS "Here11")
     install(
       FILES ${CMAKE_CURRENT_BINARY_DIR}/libkvsCommonCurl.pc
       DESTINATION lib/pkgconfig)
-
+    message(STATUS "Here12")
     configure_file(
       "${CMAKE_CURRENT_SOURCE_DIR}/libcproducer.pc.cmake"
       "${CMAKE_CURRENT_BINARY_DIR}/libcproducer.pc" @ONLY)
-
+    message(STATUS "Here13")
     if (WIN32)
       add_library(cproducer STATIC ${PRODUCER_C_SOURCE_FILES})
     else()
       add_library(cproducer SHARED ${PRODUCER_C_SOURCE_FILES})
     endif()
     target_link_libraries(cproducer PUBLIC kvsCommonCurl kvspic)
-
+    message(STATUS "Here14")
     install(
       TARGETS cproducer
       ARCHIVE DESTINATION lib
@@ -283,10 +295,10 @@ if(BUILD_COMMON_CURL)
     install(
       FILES ${CMAKE_CURRENT_BINARY_DIR}/libcproducer.pc
       DESTINATION lib/pkgconfig)
-
+    message(STATUS "Here15")
     add_executable(kvsVideoOnlyStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsVideoOnlyStreamingSample.c)
     target_link_libraries(kvsVideoOnlyStreamingSample cproducer)
-
+    message(STATUS "Here16")
     add_executable(kvsAacAudioVideoStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsAacAudioVideoStreamingSample.c)
     target_link_libraries(kvsAacAudioVideoStreamingSample cproducer)
 
@@ -294,3 +306,4 @@ if(BUILD_COMMON_CURL)
         add_subdirectory(tst)
     endif()
 endif()
+message(STATUS "Here17")
