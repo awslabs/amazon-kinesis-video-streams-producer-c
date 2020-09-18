@@ -22,7 +22,7 @@
 #define TEST_EXECUTION_DURATION                                 (3 * HUNDREDS_OF_NANOS_IN_A_SECOND)
 #define TEST_KEY_FRAME_INTERVAL                                 50
 #define TEST_STREAM_COUNT                                       2
-#define TEST_FRAME_SIZE                                         1000
+#define TEST_FRAME_SIZE                                         2 * 1024 * 1024
 #define TEST_STREAMING_TOKEN_DURATION                           (40 * HUNDREDS_OF_NANOS_IN_A_SECOND)
 #define TEST_CREDENTIAL_EXPIRATION                              (24 * HUNDREDS_OF_NANOS_IN_AN_HOUR)
 #define TEST_STORAGE_SIZE_IN_BYTES                              (128 * 1024 * 1024ull)

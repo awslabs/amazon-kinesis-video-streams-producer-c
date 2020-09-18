@@ -1,3 +1,4 @@
+#include <com/amazonaws/kinesis/video/mkvgen/Include.h>
 #include "ProducerTestFixture.h"
 
 namespace com { namespace amazonaws { namespace kinesis { namespace video {
@@ -1544,6 +1545,47 @@ TEST_F(ProducerFunctionalityTest, putFrame_stopSync_reset_then_putFrame_again)
         updateFrame();
         THREAD_SLEEP(mFrame.duration);
     }
+
+    EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStreamSync(streamHandle));
+    EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
+    EXPECT_EQ(0, mStreamErrorFnCount);
+    EXPECT_EQ(totalFragments * 2, mPersistedFragmentCount);
+    mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
+}
+
+TEST_F(ProducerFunctionalityTest, putFrame_stopSync_reset_then_putFrame_again_foo)
+{
+    UINT32 j;
+    STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
+    UINT32 totalFragments = 1;
+    UINT32 totalFrames = totalFragments * TEST_FPS;
+
+    createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT, TRUE);
+
+    EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, 15 * HUNDREDS_OF_NANOS_IN_A_SECOND, TEST_STREAM_BUFFER_DURATION));
+    streamHandle = mStreams[0];
+    EXPECT_TRUE(streamHandle != INVALID_STREAM_HANDLE_VALUE);
+
+    for(j = 0; j < totalFrames; ++j) {
+        EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
+        updateFrame();
+        THREAD_SLEEP(mFrame.duration);
+    }
+
+    mFrame.presentationTs += 70 * HUNDREDS_OF_NANOS_IN_A_SECOND;
+//    kinesisVideoStreamTerminated(streamHandle, 0, SERVICE_CALL_NETWORK_CONNECTION_TIMEOUT);
+
+    THREAD_SLEEP(120 * HUNDREDS_OF_NANOS_IN_A_SECOND);
+
+    DLOGD("lala done");
+
+    for(j = 0; j < totalFrames; ++j) {
+        EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
+        updateFrame();
+        THREAD_SLEEP(mFrame.duration);
+    }
+
+
 
     EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStreamSync(streamHandle));
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
