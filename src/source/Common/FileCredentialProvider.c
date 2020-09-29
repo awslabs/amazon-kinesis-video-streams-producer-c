@@ -8,7 +8,7 @@ STATUS createFileCredentialProvider(PCHAR pCredentialsFilepath,
                                     PAwsCredentialProvider* ppCredentialProvider)
 {
     return createFileCredentialProviderWithTime(pCredentialsFilepath,
-                                                kinesisVideoStreamDefaultGetCurrentTime,
+                                                commonDefaultGetCurrentTimeFunc,
                                                 0,
                                                 ppCredentialProvider);
 }
@@ -35,7 +35,7 @@ STATUS createFileCredentialProviderWithTime(PCHAR pCredentialsFilepath,
     STRCPY((PCHAR) pFileCredentialProvider->credentialsFilepath, pCredentialsFilepath);
 
     // Store the time functionality and specify default if NULL
-    pFileCredentialProvider->getCurrentTimeFn = (getCurrentTimeFn == NULL) ? kinesisVideoStreamDefaultGetCurrentTime : getCurrentTimeFn;
+    pFileCredentialProvider->getCurrentTimeFn = (getCurrentTimeFn == NULL) ? commonDefaultGetCurrentTimeFunc : getCurrentTimeFn;
     pFileCredentialProvider->customData = customData;
 
     // Create the credentials object
@@ -137,7 +137,7 @@ STATUS readFileCredentials(PFileCredentialProvider pFileCredentialProvider)
 
     fp = FOPEN((PCHAR) pFileCredentialProvider->credentialsFilepath, "r");
 
-    CHK(fp != NULL, STATUS_OPEN_FILE_FAILED);
+    CHK(fp != NULL, STATUS_FILE_CREDENTIAL_PROVIDER_OPEN_FILE_FAILED);
 
     // Get the size of the file
     FSEEK(fp, 0, SEEK_END);
@@ -146,7 +146,7 @@ STATUS readFileCredentials(PFileCredentialProvider pFileCredentialProvider)
 
     DLOGV("Reading AWS credentials from file: %s, file length = %" PRIu64 ".", pFileCredentialProvider->credentialsFilepath, fileLen);
 
-    CHK(fileLen < MAX_CREDENTIAL_FILE_LEN, STATUS_INVALID_ARG);
+    CHK(fileLen < MAX_CREDENTIAL_FILE_LEN, STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_LENGTH);
 
     FSEEK(fp, 0, SEEK_SET);
 
@@ -176,7 +176,7 @@ STATUS readFileCredentials(PFileCredentialProvider pFileCredentialProvider)
         secretKey = fourthTokenStr;
     }
 
-    CHK(STRCMP(credentialMarker, "CREDENTIALS") == 0 , STATUS_INVALID_ARG);
+    CHK(STRCMP(credentialMarker, "CREDENTIALS") == 0 , STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_FORMAT);
 
     // Set the lengths
     accessKeyIdLen = (UINT32) STRNLEN(accessKeyId, MAX_ACCESS_KEY_LEN);

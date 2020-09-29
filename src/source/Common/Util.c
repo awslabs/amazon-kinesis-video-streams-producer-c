@@ -114,3 +114,9 @@ PCHAR getSslCertNameFromType(SSL_CERTIFICATE_TYPE sslCertificateType)
 
     return retStr;
 }
+
+UINT64 commonDefaultGetCurrentTimeFunc(UINT64 customData)
+{
+    UNUSED_PARAM(customData);
+    return GETTIME();
+}

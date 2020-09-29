@@ -1693,7 +1693,7 @@ TEST_F(ProducerFunctionalityTest, putFrame_stop_reset_then_putFrame_again_multis
 {
     UINT32 j, i;
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
-    UINT32 totalFragments = 5, totalStreams = 10, wait, errorCount;
+    UINT32 totalFragments = 5, totalStreams = 5, wait, errorCount;
     UINT32 totalFrames = totalFragments * TEST_FPS;
 
     createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);

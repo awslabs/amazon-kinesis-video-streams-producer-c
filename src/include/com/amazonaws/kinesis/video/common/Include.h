@@ -13,8 +13,11 @@ extern "C" {
 ////////////////////////////////////////////////////
 // Public headers
 ////////////////////////////////////////////////////
-#include <jsmn.h>
 #include <com/amazonaws/kinesis/video/client/Include.h>
+#ifndef JSMN_HEADER
+#define JSMN_HEADER
+#endif
+#include <com/amazonaws/kinesis/video/common/jsmn.h>
 
 ////////////////////////////////////////////////////
 // Status return codes
@@ -38,6 +41,9 @@ extern "C" {
 #define STATUS_MAX_IOT_THING_NAME_LENGTH                                            STATUS_COMMON_PRODUCER_BASE + 0x0000001e
 #define STATUS_IOT_CREATE_LWS_CONTEXT_FAILED                                        STATUS_COMMON_PRODUCER_BASE + 0x0000001f
 #define STATUS_INVALID_CA_CERT_PATH                                                 STATUS_COMMON_PRODUCER_BASE + 0x00000020
+#define STATUS_FILE_CREDENTIAL_PROVIDER_OPEN_FILE_FAILED                            STATUS_COMMON_PRODUCER_BASE + 0x00000022
+#define STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_LENGTH                         STATUS_COMMON_PRODUCER_BASE + 0x00000023
+#define STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_FORMAT                         STATUS_COMMON_PRODUCER_BASE + 0x00000024
 
 // Continue errors from the new common base
 #define STATUS_COMMON_BASE                                                          0x16000000
@@ -45,6 +51,12 @@ extern "C" {
 ////////////////////////////////////////////////////
 // Main defines
 ////////////////////////////////////////////////////
+
+/**
+ * Environment variable to enable file logging. Run export AWS_ENABLE_FILE_LOGGING=TRUE to enable file
+ * logging
+ */
+#define ENABLE_FILE_LOGGING                                                     ((PCHAR) "AWS_ENABLE_FILE_LOGGING")
 
 /**
  * Max region name
@@ -788,7 +800,33 @@ PUBLIC_API SERVICE_CALL_RESULT getServiceCallResultFromHttpStatus(UINT32);
  */
 PUBLIC_API STATUS releaseCallInfo(PCallInfo);
 
+/**
+ * Creates a file based logger object and installs the global logger callback function
+ *
+ * @param - UINT64 - IN - Size of string buffer in file logger. When the string buffer is full the logger will flush everything into a new file
+ * @param - UINT64 - IN - Max number of log file. When exceeded, the oldest file will be deleted when new one is generated
+ * @param - PCHAR - IN - Directory in which the log file will be generated
+ * @param - BOOL - IN - Whether to print log to std out too
+ * @param - BOOL - IN - Whether to set global logger function pointer
+ * @param - logPrintFunc* - OUT/OPT - Optional function pointer to be returned to the caller that contains the main function for actual output
+ *
+ * @return - STATUS code of the execution
+ */
+PUBLIC_API STATUS createFileLogger(UINT64, UINT64, PCHAR, BOOL, BOOL, logPrintFunc*);
 
+/**
+ * Frees the static file logger object and resets the global logging function if it was
+ * previously set by the create function.
+ *
+ * @return - STATUS code of the execution
+ */
+PUBLIC_API STATUS freeFileLogger();
+
+/**
+ * Helper macros to be used in pairs at the application start and end
+ */
+#define SET_FILE_LOGGER()               createFileLogger(FILE_LOGGER_STRING_BUFFER_SIZE, FILE_LOGGER_LOG_FILE_COUNT, (PCHAR) FILE_LOGGER_LOG_FILE_DIRECTORY_PATH, TRUE, TRUE, NULL)
+#define RESET_FILE_LOGGER()             freeFileLogger()
 
 #ifdef  __cplusplus
 }

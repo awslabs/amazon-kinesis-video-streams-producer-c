@@ -11,8 +11,13 @@
 #define AUDIO_TRACK_SAMPLING_RATE           48000
 #define AUDIO_TRACK_CHANNEL_CONFIG          2
 
-#define NUMBER_OF_H264_FRAME_FILES          403
-#define NUMBER_OF_AAC_FRAME_FILES           582
+#define NUMBER_OF_H264_FRAME_FILES          8
+#define NUMBER_OF_AAC_FRAME_FILES           8
+
+#define FILE_LOGGING_BUFFER_SIZE            (100 * 1024)
+#define MAX_NUMBER_OF_LOG_FILES             5
+
+#define storageSize           (9 * 1024 * 1024)
 
 typedef struct {
     PBYTE buffer;
@@ -150,7 +155,6 @@ INT32 main(INT32 argc, CHAR *argv[])
     CLIENT_HANDLE clientHandle = INVALID_CLIENT_HANDLE_VALUE;
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     STATUS retStatus = STATUS_SUCCESS;
-    PCHAR accessKey = NULL, secretKey = NULL, sessionToken = NULL, streamName = NULL, region = NULL, cacertPath = NULL;
     UINT64 streamStopTime, streamingDuration = DEFAULT_STREAM_DURATION, fileSize = 0;
     TID audioSendTid, videoSendTid;
     SampleCustomData data;
@@ -166,14 +170,24 @@ INT32 main(INT32 argc, CHAR *argv[])
         CHK(FALSE, STATUS_INVALID_ARG);
     }
 
-    if ((accessKey = getenv(ACCESS_KEY_ENV_VAR)) == NULL || (secretKey = getenv(SECRET_KEY_ENV_VAR)) == NULL) {
-        printf("Error missing credentials\n");
-        CHK(FALSE, STATUS_INVALID_ARG);
+    PCHAR accessKey    = "c1ybkrkbr1j10x.credentials.iot.us-west-2.amazonaws.com"; //endpoint
+    PCHAR secretKey    = "/tmp/aws_iot/cert.pem";
+    PCHAR sessionToken = "/tmp/aws_iot/privkey.pem";
+    PCHAR streamName   = argv[1];
+    PCHAR region       = "us-west-2";
+    PCHAR cacertPath   = "/tmp/kvs/kvscert.pem";
+
+    if (argc >= 3) {
+        // Get the duration and convert to an integer
+        CHK_STATUS(STRTOUI64(argv[2], NULL, 10, &streamingDuration));
+        printf("streaming for %" PRIu64 " seconds\n", streamingDuration);
+        streamingDuration *= HUNDREDS_OF_NANOS_IN_A_SECOND;
     }
 
+    //! =================================================
     MEMSET(data.sampleDir, 0x00, MAX_PATH_LEN + 1);
     if (argc < 4) {
-        STRCPY(data.sampleDir, (PCHAR) "../samples");
+        STRCPY(data.sampleDir, (PCHAR) "./samples");
     } else {
         STRNCPY(data.sampleDir, argv[3], MAX_PATH_LEN);
         if (data.sampleDir[STRLEN(data.sampleDir) - 1] == '/') {
@@ -200,25 +214,16 @@ INT32 main(INT32 argc, CHAR *argv[])
         CHK_STATUS(readFile(filePath, TRUE, data.videoFrames[i].buffer, &fileSize));
     }
     printf("Done loading video frames.\n");
+    //! =================================================
 
-    cacertPath = getenv(CACERT_PATH_ENV_VAR);
-    sessionToken = getenv(SESSION_TOKEN_ENV_VAR);
-    streamName = argv[1];
-    if ((region = getenv(DEFAULT_REGION_ENV_VAR)) == NULL) {
-        region = (PCHAR) DEFAULT_AWS_REGION;
-    }
-
-    if (argc >= 3) {
-        // Get the duration and convert to an integer
-        CHK_STATUS(STRTOUI64(argv[2], NULL, 10, &streamingDuration));
-        printf("streaming for %" PRIu64 " seconds\n", streamingDuration);
-        streamingDuration *= HUNDREDS_OF_NANOS_IN_A_SECOND;
-    }
 
     streamStopTime = defaultGetTime() + streamingDuration;
 
     // default storage size is 128MB. Use setDeviceInfoStorageSize after create to change storage size.
     CHK_STATUS(createDefaultDeviceInfo(&pDeviceInfo));
+
+    setDeviceInfoStorageSize(pDeviceInfo, storageSize);
+
     // adjust members of pDeviceInfo here if needed
     pDeviceInfo->clientInfo.loggerLogLevel = LOG_LEVEL_DEBUG;
 
@@ -247,6 +252,17 @@ INT32 main(INT32 argc, CHAR *argv[])
                                                                 NULL,
                                                                 NULL,
                                                                 &pClientCallbacks));
+
+    if(NULL != getenv(ENABLE_FILE_LOGGING)) {
+        if((retStatus = addFileLoggerPlatformCallbacksProvider(pClientCallbacks,
+                                                               FILE_LOGGING_BUFFER_SIZE,
+                                                               MAX_NUMBER_OF_LOG_FILES,
+                                                               (PCHAR) FILE_LOGGER_LOG_FILE_DIRECTORY_PATH,
+                                                               TRUE) != STATUS_SUCCESS)) {
+            printf("File logging enable option failed with 0x%08x error code\n", retStatus);
+        }
+    }
+
     CHK_STATUS(createStreamCallbacks(&pStreamCallbacks));
     CHK_STATUS(addStreamCallbacks(pClientCallbacks, pStreamCallbacks));
 
@@ -283,7 +299,6 @@ CleanUp:
     for(i = 0; i < NUMBER_OF_H264_FRAME_FILES; ++i) {
         SAFE_MEMFREE(data.videoFrames[i].buffer);
     }
-
     freeDeviceInfo(&pDeviceInfo);
     freeStreamInfoProvider(&pStreamInfo);
     freeKinesisVideoStream(&streamHandle);

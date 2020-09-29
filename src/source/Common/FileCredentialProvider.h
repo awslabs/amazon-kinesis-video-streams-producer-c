@@ -40,8 +40,6 @@ STATUS getFileCredentials(PAwsCredentialProvider, PAwsCredentials*);
 // Internal functionality
 STATUS readFileCredentials(PFileCredentialProvider);
 
-
-
 #ifdef  __cplusplus
 }
 #endif

@@ -64,6 +64,19 @@ To build the library run make in the build directory you executed CMake.
 
 `make`
 
+## Development
+
+The repository is using master branch as the aggregation and all of the feature development is done in appropriate feature branches. The PRs (Pull Requests) are cut on a feature branch and once approved with all the checks passed they can be merged by a click of a button on the PR tool. The master branch should always be build-able and all the tests should be passing. We are welcoming any contribution to the code base.
+
+### Release
+The repository is under active development and even with incremental unit test coverage where some of the tests are actually full integration tests, we require more rigorous internal testing in order to 'cut' release versions. The release is cut against a particular commit that gets approved. The general philosophy is to cut a release when a set of commits contribute to a self-containing feature or when we add major internal functionality improvements.
+
+### Versioning
+We deploy 3 digit version strings in a form of 'Major.Minor.Revision' scheme.
+* Major version update - Major functionality changes. Might not have direct backward compatibility. For example, multiple public API parameter changes.
+* Minor version update - Additional features. Major bug fixes. Might have some minor backward compatibility issues. For example, an extra parameter on a callback function.
+* Revision version update - Minor features. Bug fixes. Full backward compatibility. For example, an extra fields added to the public structures with version bump.
+
 ## Documentation
 
 ## Related
