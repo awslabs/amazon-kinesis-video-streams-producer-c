@@ -965,6 +965,79 @@ TEST_F(ProducerClientBasicTest, createStreamStreamUntilTokenRotationStopSyncFree
     EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks));
 }
 
+TEST_F(ProducerClientBasicTest, createStreamPutMultipleFrameTimeoutLatencyStopSyncFree)
+{
+    PDeviceInfo pDeviceInfo;
+    PClientCallbacks pClientCallbacks;
+    CLIENT_HANDLE clientHandle;
+    STREAM_HANDLE streamHandle;
+    PStreamInfo pStreamInfo;
+    CHAR streamName[MAX_STREAM_NAME_LEN + 1];
+    Frame frame;
+    UINT32 i;
+    BYTE frameBuf[100000]; // large frames are needed
+    UINT32 fragmentCount = 3, frameRate = 30, keyFrameInterval = 60;
+
+    frame.version = FRAME_CURRENT_VERSION;
+    frame.duration = 15 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND;
+    frame.frameData = frameBuf;
+    frame.trackId = DEFAULT_VIDEO_TRACK_ID;
+    frame.index = 0;
+    frame.decodingTs = 0;
+    frame.presentationTs = 0;
+    frame.size = SIZEOF(frameBuf);
+    frame.flags = FRAME_FLAG_KEY_FRAME;
+    Frame eofr = EOFR_FRAME_INITIALIZER;
+
+    STRNCPY(streamName, (PCHAR) TEST_STREAM_NAME, MAX_STREAM_NAME_LEN);
+    streamName[MAX_STREAM_NAME_LEN] = '\0';
+    EXPECT_EQ(STATUS_SUCCESS, createDefaultDeviceInfo(&pDeviceInfo));
+    pDeviceInfo->clientInfo.loggerLogLevel = GET_LOGGER_LOG_LEVEL();
+    EXPECT_EQ(STATUS_SUCCESS, createRealtimeVideoStreamInfoProvider(streamName, TEST_RETENTION_PERIOD, TEST_STREAM_BUFFER_DURATION, &pStreamInfo));
+    pStreamInfo->streamCaps.nalAdaptationFlags = NAL_ADAPTATION_FLAG_NONE;
+    pStreamInfo->streamCaps.maxLatency = 15 * HUNDREDS_OF_NANOS_IN_A_SECOND;
+    pStreamInfo->streamCaps.replayDuration = 30 * HUNDREDS_OF_NANOS_IN_A_SECOND;
+    pStreamInfo->streamCaps.bufferDuration = 120 * HUNDREDS_OF_NANOS_IN_A_SECOND;
+    pStreamInfo->streamCaps.connectionStalenessDuration = 40 * HUNDREDS_OF_NANOS_IN_A_SECOND;
+    pStreamInfo->streamCaps.keyFrameFragmentation = TRUE;
+    pStreamInfo->streamCaps.frameRate = frameRate;
+    pStreamInfo->streamCaps.frameTimecodes = TRUE;
+
+    EXPECT_EQ(STATUS_SUCCESS, createDefaultCallbacksProvider(5, mAccessKey, mSecretKey,
+                                                             mSessionToken, MAX_UINT64,
+                                                             mRegion, TEST_CONTROL_PLANE_URI,
+                                                             mCaCertPath, NULL, NULL,
+                                                             API_CALL_CACHE_TYPE_ALL, TEST_CACHING_ENDPOINT_PERIOD,
+                                                             TRUE, &pClientCallbacks));
+    EXPECT_EQ(STATUS_SUCCESS, createKinesisVideoClientSync(pDeviceInfo, pClientCallbacks, &clientHandle));
+    EXPECT_EQ(STATUS_SUCCESS, createKinesisVideoStreamSync(clientHandle, pStreamInfo, &streamHandle));
+
+    for(i = 0; i < fragmentCount * keyFrameInterval; i++) {
+        frame.flags = frame.index % keyFrameInterval == 0 ? FRAME_FLAG_KEY_FRAME : FRAME_FLAG_NONE;
+
+        if (i == keyFrameInterval && frame.flags == FRAME_FLAG_KEY_FRAME) {
+            DLOGD("PAUSING to cause a timeout");
+            EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &eofr));
+            THREAD_SLEEP(60 * HUNDREDS_OF_NANOS_IN_A_SECOND);
+            DLOGD("PAUSING After the pause");
+        }
+
+        frame.decodingTs = GETTIME();
+        frame.presentationTs = frame.decodingTs;
+
+        EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &frame));
+        THREAD_SLEEP(30 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND);
+        frame.index++;
+    }
+
+    EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStreamSync(streamHandle));
+    EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
+    EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoClient(&clientHandle));
+    EXPECT_EQ(STATUS_SUCCESS, freeDeviceInfo(&pDeviceInfo));
+    EXPECT_EQ(STATUS_SUCCESS, freeStreamInfoProvider(&pStreamInfo));
+    EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks));
+}
+
 }  // namespace video
 }  // namespace kinesis
 }  // namespace amazonaws

@@ -32,7 +32,7 @@ STATUS createCurlResponse(PCurlRequest pCurlRequest, PCurlResponse* ppCurlRespon
 
     // init putMedia related members
     pCurlResponse->endOfStream = FALSE;
-    pCurlResponse->paused = TRUE;
+    pCurlResponse->paused = FALSE;
     pCurlResponse->debugDumpFile = FALSE;
     pCurlResponse->debugDumpFilePath[0] = '\0';
 
@@ -485,7 +485,7 @@ STATUS notifyDataAvailable(PCurlResponse pCurlResponse, UINT64 durationAvailable
             // un-pause curl
             result = curl_easy_pause(pCurlResponse->pCurl, CURLPAUSE_SEND_CONT);
             if (result != CURLE_OK) {
-                DLOGW("Failed to un-pause curl with error: %u", result);
+                DLOGW("Failed to un-pause curl with error: %u. Curl object %p", result, pCurlResponse->pCurl);
             }
         }
     }
