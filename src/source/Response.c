@@ -32,7 +32,7 @@ STATUS createCurlResponse(PCurlRequest pCurlRequest, PCurlResponse* ppCurlRespon
 
     // init putMedia related members
     pCurlResponse->endOfStream = FALSE;
-    pCurlResponse->paused = FALSE;
+    pCurlResponse->paused = TRUE;
     pCurlResponse->debugDumpFile = FALSE;
     pCurlResponse->debugDumpFilePath[0] = '\0';
 
