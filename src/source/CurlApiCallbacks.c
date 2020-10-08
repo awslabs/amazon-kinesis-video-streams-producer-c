@@ -2224,8 +2224,8 @@ CleanUp:
 
     if (!requestTerminating) {
         if (!endOfStream) {
-            DLOGW("Stream with streamHandle %" PRIu64 " has exited without triggering end-of-stream. Service call result: %u",
-                  streamHandle, callResult);
+            DLOGW("Stream with streamHandle %" PRIu64 " uploadHandle %" PRIu64 " has exited without triggering end-of-stream. Service call result: %u",
+                  streamHandle, uploadHandle, callResult);
             kinesisVideoStreamTerminated(streamHandle, uploadHandle, callResult);
         }
 
