@@ -162,7 +162,7 @@ else()
     message(FATAL_ERROR "Unknown bitness")
 endif()
 
-if("${CMAKE_C_COMPILER_ID}" MATCHES "GNU|Clang")
+if(${CMAKE_C_COMPILER_ID} MATCHES "GNU|Clang")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
 
     if(CODE_COVERAGE)
