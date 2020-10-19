@@ -80,6 +80,9 @@ STATUS createVideoStreamInfo(STREAMING_TYPE, PCHAR, UINT64, UINT64, PStreamInfo*
 */
 STATUS createAudioVideoStreamInfo(STREAMING_TYPE, PCHAR, UINT64, UINT64, PStreamInfo*);
 
+STATUS createMultiAudioVideoStreamInfo(STREAMING_TYPE, PCHAR, UINT64, UINT64, PStreamInfo*, INT32);
+
+
 #ifdef  __cplusplus
 }
 #endif

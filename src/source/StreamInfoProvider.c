@@ -39,6 +39,17 @@ STATUS createOfflineAudioVideoStreamInfoProvider(PCHAR streamName, UINT64 retent
                                       retention, bufferDuration, ppStreamInfo);
 }
 
+// Creates audio video stream info for real time streaming mode
+STATUS createRealtimeMuLawAudioVideoStreamInfoProvider(PCHAR streamName, UINT64 retention,
+                                                  UINT64 bufferDuration, PStreamInfo* ppStreamInfo)
+{
+
+    return createMultiAudioVideoStreamInfo(STREAMING_TYPE_REALTIME, streamName,
+                                      retention, bufferDuration, ppStreamInfo, 2);
+}
+
+
+
 // Frees the stream info
 STATUS freeStreamInfoProvider(PStreamInfo* ppStreamInfo)
 {
@@ -88,6 +99,21 @@ STATUS createAacAudioTrackInfo(PTrackInfo pTrackInfo)
     STRCPY(pTrackInfo->codecId, MKV_AAC_CODEC_ID);
     STRCPY(pTrackInfo->trackName, DEFAULT_AUDIO_TRACK_NAME);
     pTrackInfo->trackType = MKV_TRACK_INFO_TYPE_AUDIO;
+
+    return retStatus;
+}
+
+// Creates custom track info
+STATUS createTrackInfo(PTrackInfo pTrackInfo, UINT64 trackId, PCHAR codecId, PCHAR trackName, MKV_TRACK_INFO_TYPE trackType)
+{
+    STATUS retStatus = STATUS_SUCCESS;
+
+    pTrackInfo->trackId = trackId;
+    pTrackInfo->codecPrivateData = NULL;
+    pTrackInfo->codecPrivateDataSize = 0;
+    STRCPY(pTrackInfo->codecId, codecId);
+    STRCPY(pTrackInfo->trackName, trackName);
+    pTrackInfo->trackType = trackType;
 
     return retStatus;
 }
@@ -219,6 +245,58 @@ CleanUp:
     LEAVES();
     return retStatus;
 }
+
+
+STATUS createMultiAudioVideoStreamInfo(STREAMING_TYPE streamingType, PCHAR streamName,
+                                  UINT64 retention, UINT64 bufferDuration, PStreamInfo* ppStreamInfo, INT32 trackCount)
+{
+    ENTERS();
+
+    STATUS retStatus = STATUS_SUCCESS;
+    PStreamInfo pStreamInfo = NULL;
+    PTrackInfo pTrackInfo = NULL;
+
+    CHK(ppStreamInfo != NULL && streamName != NULL, STATUS_NULL_ARG);
+    CHK(bufferDuration != 0, STATUS_INVALID_ARG);
+
+    CHK(streamingType != STREAMING_TYPE_OFFLINE || retention != 0, STATUS_INVALID_ARG);
+
+    // Allocate the entire structure
+    pStreamInfo = (PStreamInfo) MEMCALLOC(1, SIZEOF(StreamInfo) + trackCount * SIZEOF(TrackInfo));
+    CHK(pStreamInfo != NULL, STATUS_NOT_ENOUGH_MEMORY);
+
+    pTrackInfo = (PTrackInfo) (pStreamInfo + 1);
+
+    CHAR trackNameBuffer[MKV_MAX_TRACK_NAME_LEN + 1];
+    for (int i = 0; i < trackCount; i++) {
+		switch (i) {
+			case 0: /* must be video */
+				CHK_STATUS(createH264VideoTrackInfo(pTrackInfo));
+				break;
+			default:
+		        snprintf(trackNameBuffer, sizeof(trackNameBuffer), "kvs_audio_track_%d", (i + 1));
+				CHK_STATUS(createTrackInfo(pTrackInfo + i, (i + 1), MKV_PCM_INT_LIT_CODEC_ID, trackNameBuffer, MKV_TRACK_INFO_TYPE_AUDIO));
+		}
+    }
+
+    STRCPY(pStreamInfo->name, streamName);
+    STRCPY(pStreamInfo->streamCaps.contentType, MKV_H264_MULAW_MULTI_CONTENT_TYPE);
+    CHK_STATUS(setStreamInfoDefaults(streamingType, retention, bufferDuration, trackCount, pStreamInfo, pTrackInfo));
+
+CleanUp:
+
+    if (STATUS_FAILED(retStatus)) {
+        freeStreamInfoProvider(&pStreamInfo);
+        pStreamInfo = NULL;
+    }
+
+    if (pStreamInfo != NULL) {
+        *ppStreamInfo = pStreamInfo;
+    }
+    LEAVES();
+    return retStatus;
+}
+
 
 STATUS setStreamInfoBasedOnStorageSize(UINT32 storageSize, UINT64 avgBitrate, UINT32 totalStreamCount, PStreamInfo pStreamInfo)
 {
