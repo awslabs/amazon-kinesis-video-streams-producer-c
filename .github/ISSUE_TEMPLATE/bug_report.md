@@ -7,6 +7,13 @@ assignees: ''
 
 ---
 
+**Media pipeline:**
+ - What is the media source (GStreamer, custom, etc). What is the upstream encoder/pipeline?
+ - What is the media type, configuration
+ - For Video - what's the codec information (Annex-B, AvCC, raw frames), CPD present, etc..
+ - For Audio - what's the audio configuration (CPD generated, etc)..
+ - Intermittent/continuous streaming?
+
 **Logging**
 Add relevant SDK logging.  IMPORTANT NOTE:  Please make sure to NOT share AWS access credentials under any circumstance!  Please make sure they are not in the logs.
 
@@ -36,12 +43,6 @@ If applicable, add screenshots to help explain your problem.
  - OS: [e.g. iOS]
  - Browser [e.g. chrome, safari]
  - Version [e.g. 22]
-
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
-
+ 
 **Additional context**
 Add any other context about the problem here.
