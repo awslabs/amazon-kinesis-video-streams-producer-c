@@ -79,6 +79,9 @@ We deploy 3 digit version strings in a form of 'Major.Minor.Revision' scheme.
 ## Documentation
 
 ## Related
+* [CPP SDK](https://github.com/awslabs/amazon-kinesis-video-streams-producer-sdk-cpp/)
+* [Java SDK](https://github.com/awslabs/amazon-kinesis-video-streams-producer-sdk-java/)
+* [PIC](https://github.com/awslabs/amazon-kinesis-video-streams-pic/)
 
 ## License
 
