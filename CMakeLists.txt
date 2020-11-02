@@ -5,6 +5,7 @@ project(KinesisVideoProducerC LANGUAGES C)
 
 # User Flags
 option(ADD_MUCLIBC "Add -muclibc c flag" OFF)
+option(BUILD_STATIC "Static build" OFF)
 option(BUILD_DEPENDENCIES "Whether or not to build depending libraries from source" ON)
 option(USE_OPENSSL "Use openssl as crypto library" ON)
 option(USE_MBEDTLS "Use mbedtls as crypto library" OFF)
@@ -273,10 +274,15 @@ if(BUILD_COMMON_CURL)
       "${CMAKE_CURRENT_SOURCE_DIR}/libcproducer.pc.cmake"
       "${CMAKE_CURRENT_BINARY_DIR}/libcproducer.pc" @ONLY)
 
+    set(TYPE_OF_LIB SHARED)
+    if (BUILD_STATIC)
+      set(TYPE_OF_LIB STATIC)
+    endif()
+
     if (WIN32)
       add_library(cproducer STATIC ${PRODUCER_C_SOURCE_FILES})
     else()
-      add_library(cproducer SHARED ${PRODUCER_C_SOURCE_FILES})
+      add_library(cproducer ${TYPE_OF_LIB} ${PRODUCER_C_SOURCE_FILES})
     endif()
     target_link_libraries(cproducer PUBLIC kvsCommonCurl kvspic)
 
