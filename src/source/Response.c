@@ -478,7 +478,7 @@ STATUS notifyDataAvailable(PCurlResponse pCurlResponse, UINT64 durationAvailable
         DLOGV("Note data received: duration(100ns): %" PRIu64 " bytes %" PRIu64 " for stream handle %" PRIu64,
               durationAvailable, sizeAvailable, pCurlResponse->pCurlRequest->uploadHandle);
 
-        if (pCurlResponse->paused && pCurlResponse->pCurl != NULL) {
+        while (pCurlResponse->paused && pCurlResponse->pCurl != NULL) {
             pCurlResponse->paused = FALSE;
             // frequent pause unpause causes curl segfault in offline scenario
             THREAD_SLEEP(10 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND);
