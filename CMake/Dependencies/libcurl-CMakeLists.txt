@@ -23,7 +23,7 @@ set(CMAKE_ARGS
 
 # By default use openssl
 if (USE_MBEDTLS)
-    set(CMAKE_ARGS ${CMAKE_ARGS} -DCMAKE_USE_MBEDTLS=1 -DCURL_STATIC_CRT=1)
+    set(CMAKE_ARGS ${CMAKE_ARGS} -DCMAKE_USE_MBEDTLS=1)
 endif()
 
 if (WIN32)
