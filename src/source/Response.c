@@ -289,7 +289,7 @@ VOID terminateCurlSession(PCurlResponse pCurlResponse, UINT64 timeout)
             // give curl sometime to terminate gracefully before actually timing it out.
             THREAD_SLEEP(timeout);
             // unpause curl in case curl is paused
-            curl_easy_pause(pCurlResponse->pCurl, CURLPAUSE_SEND_CONT);
+//            curl_easy_pause(pCurlResponse->pCurl, CURLPAUSE_SEND_CONT);
             curl_easy_setopt(pCurlResponse->pCurl, CURLOPT_TIMEOUT_MS, TIMEOUT_AFTER_STREAM_STOPPED);
             // after timing out curl, give some time for it to take effect.
             THREAD_SLEEP(timeout);
@@ -483,10 +483,10 @@ STATUS notifyDataAvailable(PCurlResponse pCurlResponse, UINT64 durationAvailable
             // frequent pause unpause causes curl segfault in offline scenario
             THREAD_SLEEP(10 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND);
             // un-pause curl
-            result = curl_easy_pause(pCurlResponse->pCurl, CURLPAUSE_SEND_CONT);
-            if (result != CURLE_OK) {
-                DLOGW("Failed to un-pause curl with error: %u", result);
-            }
+//            result = curl_easy_pause(pCurlResponse->pCurl, CURLPAUSE_SEND_CONT);
+//            if (result != CURLE_OK) {
+//                DLOGW("Failed to un-pause curl with error: %u", result);
+//            }
         }
     }
 
