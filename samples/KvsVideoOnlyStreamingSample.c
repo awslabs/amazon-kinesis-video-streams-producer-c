@@ -59,6 +59,9 @@ INT32 main(INT32 argc, CHAR *argv[])
     BYTE frameBuffer[200000]; // Assuming this is enough
     UINT32 frameSize = SIZEOF(frameBuffer), frameIndex = 0, fileIndex = 0;
     UINT64 streamStopTime, streamingDuration = DEFAULT_STREAM_DURATION;
+    DOUBLE startUpLatency;
+    BOOL firstFrame = TRUE;
+    UINT64 startTime;
 
     if (argc < 2) {
         defaultLogPrint(LOG_LEVEL_ERROR, "", "Usage: AWS_ACCESS_KEY_ID=SAMPLEKEY AWS_SECRET_ACCESS_KEY=SAMPLESECRET %s <stream_name> <duration_in_seconds> <frame_files_path>\n", argv[0]);
@@ -102,6 +105,7 @@ INT32 main(INT32 argc, CHAR *argv[])
     CHK_STATUS(setStreamInfoBasedOnStorageSize(DEFAULT_STORAGE_SIZE, RECORDED_FRAME_AVG_BITRATE_BIT_PS, 1, pStreamInfo));
     // adjust members of pStreamInfo here if needed
 
+    startTime = GETTIME();
     CHK_STATUS(createDefaultCallbacksProviderWithAwsCredentials(accessKey,
                                                                 secretKey,
                                                                 sessionToken,
@@ -145,6 +149,11 @@ INT32 main(INT32 argc, CHAR *argv[])
         CHK_STATUS(readFrameData(&frame, frameFilePath));
 
         CHK_STATUS(putKinesisVideoFrame(streamHandle, &frame));
+        if (firstFrame) {
+            startUpLatency = (DOUBLE)(GETTIME() - startTime) / (DOUBLE) HUNDREDS_OF_NANOS_IN_A_MILLISECOND;
+            DLOGD("Start up latency: %lf ms", startUpLatency);
+            firstFrame = FALSE;
+        }
         defaultThreadSleep(frame.duration);
 
         frame.decodingTs += frame.duration;
