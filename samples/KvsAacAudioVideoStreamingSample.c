@@ -30,6 +30,8 @@ typedef struct {
     CHAR sampleDir[MAX_PATH_LEN + 1];
     FrameData audioFrames[NUMBER_OF_AAC_FRAME_FILES];
     FrameData videoFrames[NUMBER_OF_H264_FRAME_FILES];
+    BOOL firstFrame;
+    UINT64 startTime;
 } SampleCustomData, *PSampleCustomData;
 
 PVOID putVideoFrameRoutine(PVOID args)
@@ -40,6 +42,7 @@ PVOID putVideoFrameRoutine(PVOID args)
     UINT32 fileIndex = 0;
     STATUS status;
     UINT64 runningTime;
+    DOUBLE startUpLatency;
 
     CHK(data != NULL, STATUS_NULL_ARG);
 
@@ -57,6 +60,12 @@ PVOID putVideoFrameRoutine(PVOID args)
 
     while (defaultGetTime() < data->streamStopTime) {
         status = putKinesisVideoFrame(data->streamHandle, &frame);
+        if (data->firstFrame) {
+            startUpLatency = (DOUBLE)(GETTIME() - data->startTime) / (DOUBLE) HUNDREDS_OF_NANOS_IN_A_MILLISECOND;
+            DLOGD("Start up latency: %lf ms", startUpLatency);
+            data->firstFrame = FALSE;
+        }
+
         ATOMIC_STORE_BOOL(&data->firstVideoFramePut, TRUE);
         if (STATUS_FAILED(status)) {
             printf("putKinesisVideoFrame failed with 0x%08x\n", status);
@@ -241,6 +250,8 @@ INT32 main(INT32 argc, CHAR *argv[])
     // use relative time mode. Buffer timestamps start from 0
     pStreamInfo->streamCaps.absoluteFragmentTimes = FALSE;
 
+    data.startTime = GETTIME();
+    data.firstFrame = TRUE;
     CHK_STATUS(createDefaultCallbacksProviderWithAwsCredentials(accessKey,
                                                                 secretKey,
                                                                 sessionToken,
