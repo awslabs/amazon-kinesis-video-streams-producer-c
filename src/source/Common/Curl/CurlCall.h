@@ -14,8 +14,6 @@ extern "C" {
 SIZE_T writeCurlResponseCallback(PCHAR, SIZE_T, SIZE_T, PVOID);
 STATUS blockingCurlCall(PRequestInfo, PCallInfo);
 STATUS createCurlHeaderList(PRequestInfo, struct curl_slist**);
-    
-
 
 #ifdef  __cplusplus
 }

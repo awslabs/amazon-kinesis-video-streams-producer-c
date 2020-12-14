@@ -38,10 +38,6 @@ extern "C" {
 // Max parameter JSON string for KMS key len
 #define MAX_JSON_KMS_KEY_ID_STRING_LEN      (MAX_ARN_LEN + 100)
 
-#define SHUTDOWN_SIGNAL_PROPAGATION_TIME        (500 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND)
-
-#define ONGOING_OPERATION_EXIT_TIMEOUT          (120 * HUNDREDS_OF_NANOS_IN_A_SECOND)
-
 // Parameterized string for CreateStream API
 #define CREATE_STREAM_PARAM_JSON_TEMPLATE           "{\n\t\"DeviceName\": \"%s\",\n\t" \
     "\"StreamName\": \"%s\",\n\t\"MediaType\": \"%s\",\n\t" \
@@ -130,8 +126,6 @@ struct __CurlApiCallbacks {
 
     // Ongoing requests: STREAM_HANDLE -> Request
     PHashTable pActiveRequests;
-
-    UINT32 curlApiCallbacksActiveRequestsTableShutdownCallbackPassCount;
 
     // Lock guarding the active requests
     MUTEX activeRequestsLock;

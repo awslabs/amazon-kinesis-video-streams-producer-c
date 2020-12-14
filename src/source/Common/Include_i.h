@@ -18,6 +18,7 @@ extern "C" {
 #include <openssl/sha.h>
 #include <openssl/hmac.h>
 #include <openssl/evp.h>
+#include <openssl/crypto.h>
 
 #define KVS_HMAC(k,klen,m,mlen,ob,plen)             \
     CHK(NULL != HMAC(EVP_sha256(), (k), (INT32) (klen), (m), (mlen), (ob), (plen)), STATUS_HMAC_GENERATION_ERROR);
@@ -45,6 +46,15 @@ extern "C" {
 #endif
 
 #include <com/amazonaws/kinesis/video/common/Include.h>
+
+/**
+* Opaque struct for OpenSSL locking
+*/
+typedef struct __CRYPTO_dynlock_value CRYPTO_dynlock_value;
+struct __CRYPTO_dynlock_value {
+    MUTEX mutex;
+};
+typedef struct __CRYPTO_dynlock_value* PCRYPTO_dynlock_value;
 
 ////////////////////////////////////////////////////
 // Project internal includes

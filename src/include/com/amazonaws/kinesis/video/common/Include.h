@@ -828,6 +828,20 @@ PUBLIC_API STATUS freeFileLogger();
 #define SET_FILE_LOGGER()               createFileLogger(FILE_LOGGER_STRING_BUFFER_SIZE, FILE_LOGGER_LOG_FILE_COUNT, (PCHAR) FILE_LOGGER_LOG_FILE_DIRECTORY_PATH, TRUE, TRUE, NULL)
 #define RESET_FILE_LOGGER()             freeFileLogger()
 
+/**
+ * Initializes global SSL callbacks
+ *
+ * @return - STATUS code of the execution
+ */
+PUBLIC_API STATUS initializeSslCallbacks();
+
+/**
+ * Releases the global SSL callbacks.
+ *
+ * @return - STATUS code of the execution
+ */
+PUBLIC_API STATUS releaseSslCallbacks();
+
 #ifdef  __cplusplus
 }
 #endif
