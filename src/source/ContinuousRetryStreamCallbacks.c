@@ -289,7 +289,7 @@ STATUS continuousRetryStreamErrorReportHandler(UINT64 customData, STREAM_HANDLE 
     UNUSED_PARAM(customData);
     STATUS retStatus = STATUS_SUCCESS;
     TID threadId;
-    DLOGW("Reporting stream error. Errored timecode: %" PRIu64 " Status: 0x%08llx", erroredTimecode, statusCode);
+    DLOGW("Reporting stream error. Errored timecode: %" PRIu64 " Status: 0x%08x", erroredTimecode, statusCode);
 
     // return success if the sdk can recover from the error
     CHK(!IS_RECOVERABLE_ERROR(statusCode), retStatus);
