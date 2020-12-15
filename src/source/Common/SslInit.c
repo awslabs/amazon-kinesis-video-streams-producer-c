@@ -4,7 +4,7 @@
 #define LOG_CLASS "SslInit"
 #include "Include_i.h"
 
-#if defined(KVS_USE_OPENSSL) && defined(OPENSSL_THREADS)
+#if defined(KVS_USE_OPENSSL) && defined(OPENSSL_THREADS) && defined(SET_SSL_CALLBACKS)
 
 // Unfortunately, this should be global due to the OpenSSL interfaces
 static MUTEX *gOpenSslMutexes = NULL;

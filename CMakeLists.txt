@@ -22,6 +22,7 @@ option(MEMORY_SANITIZER "Build with MemorySanitizer." OFF)
 option(THREAD_SANITIZER "Build with ThreadSanitizer." OFF)
 option(UNDEFINED_BEHAVIOR_SANITIZER "Build with UndefinedBehaviorSanitizer." OFF)
 option(ALIGNED_MEMORY_MODEL "Aligned memory model ONLY." OFF)
+option(SET_SSL_CALLBACKS "Set SSL thread and lock callbacks." OFF)
 
 set(CMAKE_MACOSX_RPATH TRUE)
 
@@ -209,8 +210,14 @@ if(ALIGNED_MEMORY_MODEL)
     add_definitions(-DALIGNED_MEMORY_MODEL)
 endif()
 
+if(SET_SSL_CALLBACKS)
+    add_definitions(-DSET_SSL_CALLBACKS)
+endif()
+
+
 # use openssl by default
 set(CPRODUCER_COMMON_TLS_OPTION KVS_USE_OPENSSL)
+
 set(PRODUCER_CRYPTO_LIBRARY
         OpenSSL::Crypto
         OpenSSL::SSL)
