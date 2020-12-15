@@ -37,7 +37,7 @@ CRYPTO_dynlock_value* openSslDynCreateFunction(PCHAR file, INT32 line)
 
     CRYPTO_dynlock_value *pDynLockVal = MEMALLOC(SIZEOF(CRYPTO_dynlock_value));
     if (NULL != pDynLockVal) {
-        pDynLockVal->mutex = MUTEX_CREATE(TRUE);
+        pDynLockVal->mutex = MUTEX_CREATE(FALSE);
     } else {
         DLOGE("Failed to allocated memory for openssl dynamic lock");
     }
@@ -90,7 +90,8 @@ STATUS initializeSslCallbacks()
     STATUS retStatus = STATUS_SUCCESS;
     UINT32 i, count;
 
-    CHECK_EXT(gOpenSslMutexes == 0, "Initializing SSL callbacks while not releasing previous global instance");
+    // Skip if it's already been initialized - effectively making it a singleton
+    CHK(gOpenSslMutexes == NULL, retStatus);
 
     // Allocate the storage for the mutex array
     // The mutex array must support up to CRYPTO_num_locks().
@@ -118,6 +119,12 @@ STATUS releaseSslCallbacks()
 
     // Fast check for call idempotence
     CHK(gOpenSslMutexes != NULL, retStatus);
+
+    CRYPTO_set_locking_callback(NULL);
+    CRYPTO_THREADID_set_callback(NULL);
+    CRYPTO_set_dynlock_create_callback(NULL);
+    CRYPTO_set_dynlock_lock_callback(NULL);
+    CRYPTO_set_dynlock_destroy_callback(NULL);
 
     for (i = 0; i < CRYPTO_num_locks(); i++) {
         if (IS_VALID_MUTEX_VALUE(gOpenSslMutexes[i])) {
