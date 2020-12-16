@@ -14,8 +14,6 @@ extern "C" {
 STATUS blockingLwsCall(PRequestInfo, PCallInfo);
 INT32 lwsIotCallbackRoutine(struct lws*, enum lws_callback_reasons, PVOID, PVOID, size_t);
 
-
-
 #ifdef  __cplusplus
 }
 #endif
