@@ -549,6 +549,44 @@ TEST_F(ProducerFunctionalityTest, intermittent_producer_fail_old_connection_at_t
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
 
+TEST_F(ProducerFunctionalityTest, intermittent_producer_verify_eofr_sent)
+{
+    STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
+    UINT32 i, errCount;
+    UINT32 totalFrames = 510;//30;
+    UINT64 startTime, delay;
+    mFrame.duration = 100*HUNDREDS_OF_NANOS_IN_A_MILLISECOND;
+    mKeyFrameInterval = 10;
+    UPLOAD_HANDLE streamUploadHandle = 0;
+
+    createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
+    EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION));
+    streamHandle = mStreams[0];
+
+    for(i = 0; i < totalFrames; i++) {
+        startTime = GETTIME();
+        // i = 480 will be start of a key frame, if I don't start on key-frame
+        // this test fails
+        if( (i < 30) || (i >= 480) ) {
+            EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
+        }
+        updateFrame();
+
+        delay = GETTIME() - startTime;
+        if (delay < mFrame.duration) {
+            THREAD_SLEEP(mFrame.duration - delay);
+        }
+        EXPECT_EQ(0, mStreamErrorFnCount);
+    }
+
+    EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStreamSync(streamHandle));
+    EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
+    // no new error during shutdown
+    EXPECT_EQ(0, mStreamErrorFnCount);
+
+    mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
+}
+
 TEST_F(ProducerFunctionalityTest, pressure_on_buffer_duration_fail_new_connection_at_token_rotation)
 {
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
