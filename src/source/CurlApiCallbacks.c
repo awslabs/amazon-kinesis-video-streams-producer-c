@@ -1851,7 +1851,7 @@ STATUS tagResourceCurl(UINT64 customData, PCHAR streamArn, UINT32 tagCount, PTag
     // Prepare the tags elements
     for (i = 0, pCurPtr = tagsJson; i < tagCount; i++) {
         charsCopied = SNPRINTF(pCurPtr, MAX_TAGS_JSON_PARAMETER_STRING_LEN - (pCurPtr - tagsJson), TAG_PARAM_JSON_TEMPLATE, tags[i].name, tags[i].value);
-        CHK(charsCopied > 0, STATUS_INTERNAL_ERROR);
+        CHK(charsCopied > 0 && charsCopied < MAX_TAGS_JSON_PARAMETER_STRING_LEN - (pCurPtr - tagsJson), STATUS_INTERNAL_ERROR);
         pCurPtr += charsCopied;
     }
 
