@@ -720,7 +720,6 @@ PUBLIC_API STATUS createAbstractDefaultCallbacksProvider(UINT32, API_CALL_CACHE_
 PUBLIC_API STATUS addFileLoggerPlatformCallbacksProvider(PClientCallbacks, UINT64, UINT64, PCHAR, BOOL);
 /*!@} */
 
-
 #ifdef  __cplusplus
 }
 #endif

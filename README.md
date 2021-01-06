@@ -49,7 +49,7 @@ If you wish to cross-compile `CC` and `CXX` are respected when building the libr
 You can pass the following options to `cmake ..`.
 
 * `-DBUILD_DEPENDENCIES` -- Whether or not to build depending libraries from source
-* `-DBUILD_TEST=TRUE` -- Build unit/integration tests, may be useful for confirm support for your device. `./tst/webrtc_client_test`
+* `-DBUILD_TEST=TRUE` -- Build unit/integration tests, may be useful for confirm support for your device. `./tst/producer_test`
 * `-DCODE_COVERAGE` --  Enable coverage reporting
 * `-DCOMPILER_WARNINGS` -- Enable all compiler warnings
 * `-DADDRESS_SANITIZER` -- Build with AddressSanitizer
@@ -62,6 +62,17 @@ You can pass the following options to `cmake ..`.
 To build the library run make in the build directory you executed CMake.
 
 `make`
+
+### Run unit tests
+Since these tests exercise networking you need to have AWS credentials specified, specifically you need to:
+
+```
+export AWS_SECRET_ACCESS_KEY=<YourAWSSecretAccessKey>
+export AWS_ACCESS_KEY_ID=<YourAWSAccessKey>
+```
+
+Now you can execute the unit tests from the `build` directory as follows:
+`./tst/producer_test`
 
 ## Development
 
