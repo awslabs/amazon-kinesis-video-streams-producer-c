@@ -48,6 +48,17 @@ STATUS createDefaultDeviceInfo(PDeviceInfo* ppDeviceInfo)
     pDeviceInfo->clientInfo.createClientTimeout = 0;
     pDeviceInfo->clientInfo.createStreamTimeout = 0;
 
+    // v2 ClientInfo fields
+    // automaticStreamingFlags - default is to enable automatic intermittent producer
+    // which means we will properly handle the scenario where video is streamed
+    // for a while then there is a gap and then stream starts again without needing
+    // to close the session and open a new one.
+    //
+    // reservedCallbackPeriod - the value INTERMITTENT_PRODUCER_PERIOD_SENTINEL_VALUE
+    // informs PIC to set an internal default value, it is not recommended to change this value.
+    pDeviceInfo->clientInfo.automaticStreamingFlags = AUTOMATIC_STREAMING_INTERMITTENT_PRODUCER;
+    pDeviceInfo->clientInfo.reservedCallbackPeriod = INTERMITTENT_PRODUCER_PERIOD_SENTINEL_VALUE;
+
 CleanUp:
 
     if (!STATUS_SUCCEEDED(retStatus)) {
