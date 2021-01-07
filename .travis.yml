@@ -123,3 +123,40 @@ matrix:
         - export "PATH=/c/Strawberry/perl/site/bin:/c/Strawberry/perl/bin:/c/Strawberry/c/bin:/c/Program Files/NASM:`pwd`/open-source/lib:`pwd`/open-source/bin:$PATH"
         - .github/build_windows.bat
         - cd build/tst && ./producer_test.exe --gtest_filter="-ProducerFunctionalityTest.stop_sending_frame_in_the_middle_of_streaming_offline_mode*"
+    
+    # Generate Doxygen
+    - name: "Generate Doxygen"
+      if: type = push
+      before_install:
+        - docker run -w /src/.github -dit --name alpine -v $(pwd):/src alpine
+        - alpine() { docker exec -it alpine "$@"; }
+        - alpine apk update
+        - alpine apk add doxygen graphviz 
+        - alpine apk add --no-cache ttf-freefont
+      script:
+        # Add SSH key to agent
+        - |
+            eval "$(ssh-agent -s)"
+            openssl aes-256-cbc -K $encrypted_1858eb369f49_key -iv $encrypted_1858eb369f49_iv -in github_deploy_key.enc -out ~\/.ssh/travis_prodc/github_deploy_key -d
+            chmod 600 .github/github_deploy_key
+            ssh-add .github/github_deploy_key
+            rm .github/github_deploy_key
+        # Generate doxygen in container, need latest version
+        - alpine doxygen Doxyfile
+        - alpine chmod -R 777 doc
+        - mv .github/doc/html /tmp
+        # Unshallow repo
+        - |
+            git remote rm origin
+            git remote add origin git@github.com:awslabs/awslabs/amazon-kinesis-video-streams-producer-c.git
+            git fetch
+        # Move to gh-pages and create new commit
+        - |
+            git checkout gh-pages
+            rm -rf * .github
+            mv /tmp/html/* .
+        # Commit and push
+        - |
+            git add .
+            git commit -m "Auto-generated from travis"
+            git push
