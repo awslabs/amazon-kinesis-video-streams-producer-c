@@ -903,16 +903,11 @@ STATUS createDeviceCurl(UINT64 customData, PCHAR deviceName, PServiceCallContext
     STATUS retStatus = STATUS_SUCCESS;
     PCurlApiCallbacks pCurlApiCallbacks = (PCurlApiCallbacks) customData;
     PCallbacksProvider pCallbacksProvider = NULL;
-    BOOL requestLocked = FALSE;
 
     UNUSED_PARAM(deviceName);
 
     CHK(pCurlApiCallbacks != NULL && pCurlApiCallbacks->pCallbacksProvider != NULL, STATUS_INVALID_ARG);
     pCallbacksProvider = pCurlApiCallbacks->pCallbacksProvider;
-
-    // Lock for the guards for exclusive access
-    pCallbacksProvider->clientCallbacks.lockMutexFn(pCallbacksProvider->clientCallbacks.customData, pCurlApiCallbacks->activeRequestsLock);
-    requestLocked = TRUE;
 
     // INFO: Currently, no create device API is defined in the backend.
     // Notify PIC with the result only if we haven't been force terminated
@@ -921,11 +916,6 @@ STATUS createDeviceCurl(UINT64 customData, PCHAR deviceName, PServiceCallContext
     }
 
 CleanUp:
-
-    // Unlock only if previously locked
-    if (requestLocked) {
-        pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData, pCurlApiCallbacks->activeRequestsLock);
-    }
 
     LEAVES();
     return retStatus;
@@ -1650,9 +1640,11 @@ STATUS getStreamingEndpointCachingCurl(UINT64 customData, PCHAR streamName,
     // Force the get endpoint call if we have no up-to-date info
     if (!emulateApiCall) {
         // No longer need to hold the endpoint lock
-        pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData,
-                                                          pCurlApiCallbacks->cachedEndpointsLock);
-        endpointsLocked = FALSE;
+        if(endpointsLocked) {
+            pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData,
+                                                              pCurlApiCallbacks->cachedEndpointsLock);
+            endpointsLocked = FALSE;
+        }
 
         CHK_STATUS(getStreamingEndpointCurl(customData, streamName, apiName, pServiceCallContext));
 
