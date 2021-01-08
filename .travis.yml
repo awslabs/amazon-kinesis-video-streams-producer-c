@@ -126,7 +126,7 @@ matrix:
     
     # Generate Doxygen
     - name: "Generate Doxygen"
-      if: type = push
+      # if: type = push
       before_install:
         - docker run -w /src/.github -dit --name alpine -v $(pwd):/src alpine
         - alpine() { docker exec -it alpine "$@"; }
@@ -137,7 +137,7 @@ matrix:
         # Add SSH key to agent
         - |
             eval "$(ssh-agent -s)"
-            openssl aes-256-cbc -K $encrypted_1858eb369f49_key -iv $encrypted_1858eb369f49_iv -in github_deploy_key.enc -out ~\/.ssh/travis_prodc/github_deploy_key -d
+            openssl aes-256-cbc -K $encrypted_1858eb369f49_key -iv $encrypted_1858eb369f49_iv -in .github/github_deploy_key.enc -out .github/github_deploy_key -d
             chmod 600 .github/github_deploy_key
             ssh-add .github/github_deploy_key
             rm .github/github_deploy_key
@@ -148,7 +148,7 @@ matrix:
         # Unshallow repo
         - |
             git remote rm origin
-            git remote add origin git@github.com:awslabs/awslabs/amazon-kinesis-video-streams-producer-c.git
+            git remote add origin git@github.com:awslabs/amazon-kinesis-video-streams-producer-c.git
             git fetch
         # Move to gh-pages and create new commit
         - |
@@ -160,3 +160,4 @@ matrix:
             git add .
             git commit -m "Auto-generated from travis"
             git push
+
