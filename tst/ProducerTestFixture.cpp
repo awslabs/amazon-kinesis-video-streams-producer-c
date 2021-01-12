@@ -225,7 +225,8 @@ ProducerClientTestBase::ProducerClientTestBase() :
         mStreamCallbacks(NULL),
         mProducerCallbacks(NULL),
         mResetStreamCounter(0),
-        mAuthCallbacks(NULL)
+        mAuthCallbacks(NULL),
+        mConnectionStaleFnCount(0)
 {
     auto logLevelStr = GETENV("AWS_KVS_LOG_LEVEL");
     if (logLevelStr != NULL) {
