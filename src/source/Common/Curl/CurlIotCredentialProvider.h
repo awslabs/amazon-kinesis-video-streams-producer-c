@@ -4,11 +4,11 @@
 
 #pragma once
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 }
 #endif
 #endif /* __KINESIS_VIDEO_CURL_IOT_CREDENTIAL_PROVIDER_INCLUDE_I__ */

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -30,26 +30,26 @@ extern "C" {
 /**
  * This section is done for backward compat. We shouldn't add to it. New status should be added to common base section
  */
-#define STATUS_COMMON_PRODUCER_BASE                                                 0x15000000
-#define STATUS_INVALID_AWS_CREDENTIALS_VERSION                                      STATUS_COMMON_PRODUCER_BASE + 0x00000008
-#define STATUS_MAX_REQUEST_HEADER_COUNT                                             STATUS_COMMON_PRODUCER_BASE + 0x00000009
-#define STATUS_MAX_REQUEST_HEADER_NAME_LEN                                          STATUS_COMMON_PRODUCER_BASE + 0x0000000a
-#define STATUS_MAX_REQUEST_HEADER_VALUE_LEN                                         STATUS_COMMON_PRODUCER_BASE + 0x0000000b
-#define STATUS_INVALID_API_CALL_RETURN_JSON                                         STATUS_COMMON_PRODUCER_BASE + 0x0000000c
-#define STATUS_CURL_INIT_FAILED                                                     STATUS_COMMON_PRODUCER_BASE + 0x0000000d
-#define STATUS_CURL_LIBRARY_INIT_FAILED                                             STATUS_COMMON_PRODUCER_BASE + 0x0000000e
-#define STATUS_HMAC_GENERATION_ERROR                                                STATUS_COMMON_PRODUCER_BASE + 0x00000010
-#define STATUS_IOT_FAILED                                                           STATUS_COMMON_PRODUCER_BASE + 0x00000011
-#define STATUS_MAX_ROLE_ALIAS_LEN_EXCEEDED                                          STATUS_COMMON_PRODUCER_BASE + 0x00000012
-#define STATUS_INVALID_USER_AGENT_LENGTH                                            STATUS_COMMON_PRODUCER_BASE + 0x00000015
-#define STATUS_IOT_EXPIRATION_OCCURS_IN_PAST                                        STATUS_COMMON_PRODUCER_BASE + 0x00000017
-#define STATUS_IOT_EXPIRATION_PARSING_FAILED                                        STATUS_COMMON_PRODUCER_BASE + 0x00000018
-#define STATUS_MAX_IOT_THING_NAME_LENGTH                                            STATUS_COMMON_PRODUCER_BASE + 0x0000001e
-#define STATUS_IOT_CREATE_LWS_CONTEXT_FAILED                                        STATUS_COMMON_PRODUCER_BASE + 0x0000001f
-#define STATUS_INVALID_CA_CERT_PATH                                                 STATUS_COMMON_PRODUCER_BASE + 0x00000020
-#define STATUS_FILE_CREDENTIAL_PROVIDER_OPEN_FILE_FAILED                            STATUS_COMMON_PRODUCER_BASE + 0x00000022
-#define STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_LENGTH                         STATUS_COMMON_PRODUCER_BASE + 0x00000023
-#define STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_FORMAT                         STATUS_COMMON_PRODUCER_BASE + 0x00000024
+#define STATUS_COMMON_PRODUCER_BASE                         0x15000000
+#define STATUS_INVALID_AWS_CREDENTIALS_VERSION              STATUS_COMMON_PRODUCER_BASE + 0x00000008
+#define STATUS_MAX_REQUEST_HEADER_COUNT                     STATUS_COMMON_PRODUCER_BASE + 0x00000009
+#define STATUS_MAX_REQUEST_HEADER_NAME_LEN                  STATUS_COMMON_PRODUCER_BASE + 0x0000000a
+#define STATUS_MAX_REQUEST_HEADER_VALUE_LEN                 STATUS_COMMON_PRODUCER_BASE + 0x0000000b
+#define STATUS_INVALID_API_CALL_RETURN_JSON                 STATUS_COMMON_PRODUCER_BASE + 0x0000000c
+#define STATUS_CURL_INIT_FAILED                             STATUS_COMMON_PRODUCER_BASE + 0x0000000d
+#define STATUS_CURL_LIBRARY_INIT_FAILED                     STATUS_COMMON_PRODUCER_BASE + 0x0000000e
+#define STATUS_HMAC_GENERATION_ERROR                        STATUS_COMMON_PRODUCER_BASE + 0x00000010
+#define STATUS_IOT_FAILED                                   STATUS_COMMON_PRODUCER_BASE + 0x00000011
+#define STATUS_MAX_ROLE_ALIAS_LEN_EXCEEDED                  STATUS_COMMON_PRODUCER_BASE + 0x00000012
+#define STATUS_INVALID_USER_AGENT_LENGTH                    STATUS_COMMON_PRODUCER_BASE + 0x00000015
+#define STATUS_IOT_EXPIRATION_OCCURS_IN_PAST                STATUS_COMMON_PRODUCER_BASE + 0x00000017
+#define STATUS_IOT_EXPIRATION_PARSING_FAILED                STATUS_COMMON_PRODUCER_BASE + 0x00000018
+#define STATUS_MAX_IOT_THING_NAME_LENGTH                    STATUS_COMMON_PRODUCER_BASE + 0x0000001e
+#define STATUS_IOT_CREATE_LWS_CONTEXT_FAILED                STATUS_COMMON_PRODUCER_BASE + 0x0000001f
+#define STATUS_INVALID_CA_CERT_PATH                         STATUS_COMMON_PRODUCER_BASE + 0x00000020
+#define STATUS_FILE_CREDENTIAL_PROVIDER_OPEN_FILE_FAILED    STATUS_COMMON_PRODUCER_BASE + 0x00000022
+#define STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_LENGTH STATUS_COMMON_PRODUCER_BASE + 0x00000023
+#define STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_FORMAT STATUS_COMMON_PRODUCER_BASE + 0x00000024
 /*!@} */
 
 ////////////////////////////////////////////////////
@@ -63,7 +63,7 @@ extern "C" {
 /**
  * Continue errors from the new common base
  */
-#define STATUS_COMMON_BASE                                                          0x16000000
+#define STATUS_COMMON_BASE 0x16000000
 /*!@} */
 
 /////////////////////////////////////////////////////
@@ -78,109 +78,108 @@ extern "C" {
 /**
  * Maximum allowed region name length
  */
-#define MAX_REGION_NAME_LEN                                                     128
+#define MAX_REGION_NAME_LEN 128
 
 /**
  * Maximum allowed user agent string length
  */
-#define MAX_USER_AGENT_LEN                                                      256
+#define MAX_USER_AGENT_LEN 256
 
 /**
  * Maximum allowed custom user agent string length
  */
-#define MAX_CUSTOM_USER_AGENT_LEN                                               128
+#define MAX_CUSTOM_USER_AGENT_LEN 128
 
 /**
  * Maximum allowed custom user agent name postfix string length
  */
-#define MAX_CUSTOM_USER_AGENT_NAME_POSTFIX_LEN                                  32
-
+#define MAX_CUSTOM_USER_AGENT_NAME_POSTFIX_LEN 32
 
 /**
  * Maximum allowed access key id length https://docs.aws.amazon.com/STS/latest/APIReference/API_Credentials.html
  */
-#define MAX_ACCESS_KEY_LEN                                                      128
+#define MAX_ACCESS_KEY_LEN 128
 
 /**
  * Maximum allowed secret access key length
  */
-#define MAX_SECRET_KEY_LEN                                                      128
+#define MAX_SECRET_KEY_LEN 128
 
 /**
  * Maximum allowed session token string length
  */
-#define MAX_SESSION_TOKEN_LEN                                                   2048
+#define MAX_SESSION_TOKEN_LEN 2048
 
 /**
  * Maximum allowed expiration string length
  */
-#define MAX_EXPIRATION_LEN                                                      128
+#define MAX_EXPIRATION_LEN 128
 
 /**
  * Maximum allowed role alias length https://docs.aws.amazon.com/iot/latest/apireference/API_UpdateRoleAlias.html
  */
-#define MAX_ROLE_ALIAS_LEN                                                      128
+#define MAX_ROLE_ALIAS_LEN 128
 
 /**
  * Maximum allowed string length for IoT thing name
  */
-#define MAX_IOT_THING_NAME_LEN                                                  MAX_STREAM_NAME_LEN
+#define MAX_IOT_THING_NAME_LEN MAX_STREAM_NAME_LEN
 
 /**
  * Maximum allowed request header length
  */
-#define MAX_REQUEST_HEADER_NAME_LEN                                             128
+#define MAX_REQUEST_HEADER_NAME_LEN 128
 
 /**
  * Maximum allowed header value length
  */
-#define MAX_REQUEST_HEADER_VALUE_LEN                                            2048
+#define MAX_REQUEST_HEADER_VALUE_LEN 2048
 
 /**
  * Maximum request header length in chars including the name/value, delimiter and null terminator
  */
-#define MAX_REQUEST_HEADER_STRING_LEN                                           (MAX_REQUEST_HEADER_NAME_LEN + MAX_REQUEST_HEADER_VALUE_LEN + 3)
+#define MAX_REQUEST_HEADER_STRING_LEN (MAX_REQUEST_HEADER_NAME_LEN + MAX_REQUEST_HEADER_VALUE_LEN + 3)
 
 /**
  * Maximum length of the credentials file
  */
-#define MAX_CREDENTIAL_FILE_LEN                                                 MAX_AUTH_LEN
+#define MAX_CREDENTIAL_FILE_LEN MAX_AUTH_LEN
 
 /**
  * Buffer length for the error to be stored in
  */
-#define CALL_INFO_ERROR_BUFFER_LEN                                              256
+#define CALL_INFO_ERROR_BUFFER_LEN 256
 
 /**
  * Max parameter JSON string len which will be used for preparing the parameterized strings for the API calls.
  */
-#define MAX_JSON_PARAMETER_STRING_LEN                                          (10 * 1024)
+#define MAX_JSON_PARAMETER_STRING_LEN (10 * 1024)
 /*!@} */
 
 /**
  * Default Video track ID to be used
  */
-#define DEFAULT_VIDEO_TRACK_ID                                                  1
+#define DEFAULT_VIDEO_TRACK_ID 1
 
 /**
  * Default Audio track ID to be used
  */
-#define DEFAULT_AUDIO_TRACK_ID                                                  2
+#define DEFAULT_AUDIO_TRACK_ID 2
 
 /**
  * Default period for the cached endpoint update
  */
-#define DEFAULT_ENDPOINT_CACHE_UPDATE_PERIOD                                    (40 * HUNDREDS_OF_NANOS_IN_A_MINUTE)
+#define DEFAULT_ENDPOINT_CACHE_UPDATE_PERIOD (40 * HUNDREDS_OF_NANOS_IN_A_MINUTE)
 
 /**
  * Sentinel value indicating to use default update period
  */
-#define ENDPOINT_UPDATE_PERIOD_SENTINEL_VALUE                                   0
+#define ENDPOINT_UPDATE_PERIOD_SENTINEL_VALUE 0
 
 /**
  * Max period for the cached endpoint update
  */
-#define MAX_ENDPOINT_CACHE_UPDATE_PERIOD                                        (24 * HUNDREDS_OF_NANOS_IN_AN_HOUR)
+#define MAX_ENDPOINT_CACHE_UPDATE_PERIOD (24 * HUNDREDS_OF_NANOS_IN_AN_HOUR)
 
 /////////////////////////////////////////////////////
 /// Environment variables
@@ -191,48 +190,48 @@ extern "C" {
  *  @{
  */
 
-/** 
+/**
  * AWS Access Key value. Run `export AWS_ACCESS_KEY_ID=<value>` to provide AWS access key
  */
-#define ACCESS_KEY_ENV_VAR                                                      ((PCHAR) "AWS_ACCESS_KEY_ID")
-
-/** 
- * AWS Secret Key value. Run `export AWS_SECRET_ACCESS_KEY=<value>` to provide AWS secret key
- */
-#define SECRET_KEY_ENV_VAR                                                      ((PCHAR) "AWS_SECRET_ACCESS_KEY")
-
-/** 
- * AWS Session token value. Run `export AWS_SESSION_TOKEN=<value>` to provide AWS session token
- */
-#define SESSION_TOKEN_ENV_VAR                                                   ((PCHAR) "AWS_SESSION_TOKEN")
-
-/** 
- * Closest AWS region to run Producer SDK. Run `export AWS_DEFAULT_REGION=<value>` to provide AWS region
- */
-#define DEFAULT_REGION_ENV_VAR                                                  ((PCHAR) "AWS_DEFAULT_REGION")
+#define ACCESS_KEY_ENV_VAR ((PCHAR) "AWS_ACCESS_KEY_ID")
 
 /**
- * KVS CA Cert path. Provide this path if a cert is available in a path other than default. Run 
+ * AWS Secret Key value. Run `export AWS_SECRET_ACCESS_KEY=<value>` to provide AWS secret key
+ */
+#define SECRET_KEY_ENV_VAR ((PCHAR) "AWS_SECRET_ACCESS_KEY")
+
+/**
+ * AWS Session token value. Run `export AWS_SESSION_TOKEN=<value>` to provide AWS session token
+ */
+#define SESSION_TOKEN_ENV_VAR ((PCHAR) "AWS_SESSION_TOKEN")
+
+/**
+ * Closest AWS region to run Producer SDK. Run `export AWS_DEFAULT_REGION=<value>` to provide AWS region
+ */
+#define DEFAULT_REGION_ENV_VAR ((PCHAR) "AWS_DEFAULT_REGION")
+
+/**
+ * KVS CA Cert path. Provide this path if a cert is available in a path other than default. Run
  * `export AWS_KVS_CACERT_PATH=<value>` to provide Cert path
  */
-#define CACERT_PATH_ENV_VAR                                                     ((PCHAR) "AWS_KVS_CACERT_PATH")
+#define CACERT_PATH_ENV_VAR ((PCHAR) "AWS_KVS_CACERT_PATH")
 
 /**
  * KVS log level. KVS provides 7 log levels. Run `export AWS_KVS_LOG_LEVEL=<value>` to select log level
  */
-#define DEBUG_LOG_LEVEL_ENV_VAR                                                 ((PCHAR) "AWS_KVS_LOG_LEVEL")
+#define DEBUG_LOG_LEVEL_ENV_VAR ((PCHAR) "AWS_KVS_LOG_LEVEL")
 
 /**
  * Environment variable to enable file logging. Run export AWS_ENABLE_FILE_LOGGING=TRUE to enable file
  * logging
  */
-#define ENABLE_FILE_LOGGING                                                     ((PCHAR) "AWS_ENABLE_FILE_LOGGING")
+#define ENABLE_FILE_LOGGING ((PCHAR) "AWS_ENABLE_FILE_LOGGING")
 /*!@} */
 
 #ifdef CMAKE_DETECTED_CACERT_PATH
-#define DEFAULT_KVS_CACERT_PATH                                                 KVS_CA_CERT_PATH
+#define DEFAULT_KVS_CACERT_PATH KVS_CA_CERT_PATH
 #else
-#define DEFAULT_KVS_CACERT_PATH                                                 EMPTY_STRING
+#define DEFAULT_KVS_CACERT_PATH EMPTY_STRING
 #endif
 
 /////////////////////////////////////////////////////
@@ -247,76 +246,75 @@ extern "C" {
 /**
  * HTTPS Protocol scheme name
  */
-#define HTTPS_SCHEME_NAME                       "https"
+#define HTTPS_SCHEME_NAME "https"
 
 /**
  * WSS Protocol scheme name
  */
-#define WSS_SCHEME_NAME                         "wss"
-
+#define WSS_SCHEME_NAME "wss"
 
 /**
  * HTTP GET request string
  */
-#define HTTP_REQUEST_VERB_GET_STRING            (PCHAR) "GET"
+#define HTTP_REQUEST_VERB_GET_STRING (PCHAR) "GET"
 /**
  * HTTP PUT request string
  */
-#define HTTP_REQUEST_VERB_PUT_STRING            (PCHAR) "PUT"
+#define HTTP_REQUEST_VERB_PUT_STRING (PCHAR) "PUT"
 /**
  * HTTP POST request string
  */
-#define HTTP_REQUEST_VERB_POST_STRING           (PCHAR) "POST"
+#define HTTP_REQUEST_VERB_POST_STRING (PCHAR) "POST"
 
 /**
  * Schema delimiter string
  */
-#define SCHEMA_DELIMITER_STRING                 (PCHAR) "://"
+#define SCHEMA_DELIMITER_STRING (PCHAR) "://"
 
 /**
  * Default canonical URI if we fail to get anything from the parsing
  */
-#define DEFAULT_CANONICAL_URI_STRING            (PCHAR) "/"
+#define DEFAULT_CANONICAL_URI_STRING (PCHAR) "/"
 
 /**
  * Default AWS region
  */
-#define DEFAULT_AWS_REGION                          "us-west-2"
+#define DEFAULT_AWS_REGION "us-west-2"
 
 /**
  * Control plane prefix
  */
-#define CONTROL_PLANE_URI_PREFIX                    "https://"
+#define CONTROL_PLANE_URI_PREFIX "https://"
 
 /**
  * KVS service name
  */
-#define KINESIS_VIDEO_SERVICE_NAME                  "kinesisvideo"
+#define KINESIS_VIDEO_SERVICE_NAME "kinesisvideo"
 
 /**
  * Control plane postfix
  */
-#define CONTROL_PLANE_URI_POSTFIX                   ".amazonaws.com"
+#define CONTROL_PLANE_URI_POSTFIX ".amazonaws.com"
 
 /**
  * Default user agent name
  */
-#define DEFAULT_USER_AGENT_NAME                     "AWS-SDK-KVS"
+#define DEFAULT_USER_AGENT_NAME "AWS-SDK-KVS"
 
 /**
  * Parameterized string for each tag pair
  */
-#define TAG_PARAM_JSON_TEMPLATE                     "\n\t\t\"%s\": \"%s\","
+#define TAG_PARAM_JSON_TEMPLATE "\n\t\t\"%s\": \"%s\","
 
 /**
  * Header delimiter for requests and it's size
-  */
-#define REQUEST_HEADER_DELIMITER                    ((PCHAR) ": ")
+ */
+#define REQUEST_HEADER_DELIMITER ((PCHAR) ": ")
 
 /**
  * AWS service Request id header name
  */
-#define KVS_REQUEST_ID_HEADER_NAME                  "x-amzn-RequestId"
+#define KVS_REQUEST_ID_HEADER_NAME "x-amzn-RequestId"
 /*!@} */
 
 /////////////////////////////////////////////////////
@@ -329,34 +327,33 @@ extern "C" {
  */
 
 // Max header count
-#define MAX_REQUEST_HEADER_COUNT                    200
+#define MAX_REQUEST_HEADER_COUNT 200
 
 // Max delimiter characters when packing headers into a string for printout
-#define MAX_REQUEST_HEADER_OUTPUT_DELIMITER         5
-
+#define MAX_REQUEST_HEADER_OUTPUT_DELIMITER 5
 
 // HTTP status OK
-#define HTTP_STATUS_CODE_OK                         200
+#define HTTP_STATUS_CODE_OK 200
 
 // HTTP status Request timed out
-#define HTTP_STATUS_CODE_REQUEST_TIMEOUT            408
+#define HTTP_STATUS_CODE_REQUEST_TIMEOUT 408
 
 /**
  * Max number of tokens in the API return JSON
  */
-#define MAX_JSON_TOKEN_COUNT                        100
+#define MAX_JSON_TOKEN_COUNT 100
 
 /**
  * Low speed limits in bytes per duration
  */
-#define DEFAULT_LOW_SPEED_LIMIT                     30
+#define DEFAULT_LOW_SPEED_LIMIT 30
 
 /**
  * Low speed limits in 100ns for the amount of bytes per this duration
  */
-#define DEFAULT_LOW_SPEED_TIME_LIMIT                (30 * HUNDREDS_OF_NANOS_IN_A_SECOND)
+#define DEFAULT_LOW_SPEED_TIME_LIMIT (30 * HUNDREDS_OF_NANOS_IN_A_SECOND)
 
-#define REQUEST_HEADER_DELIMITER_SIZE               (2 * SIZEOF(CHAR))
+#define REQUEST_HEADER_DELIMITER_SIZE (2 * SIZEOF(CHAR))
 /*!@} */
 
 /////////////////////////////////////////////////////
@@ -371,17 +368,17 @@ extern "C" {
 /**
  * Current versions for the public structs
  */
-#define AWS_CREDENTIALS_CURRENT_VERSION             0
+#define AWS_CREDENTIALS_CURRENT_VERSION 0
 
 /*
  * Default SSL port
  */
-#define DEFAULT_SSL_PORT_NUMBER                     443
+#define DEFAULT_SSL_PORT_NUMBER 443
 
 /*
  * Default non-SSL port
  */
-#define DEFAULT_NON_SSL_PORT_NUMBER                 8080
+#define DEFAULT_NON_SSL_PORT_NUMBER 8080
 /*!@} */
 
 ////////////////////////////////////////////////////
@@ -480,25 +477,25 @@ struct __RequestInfo {
 typedef struct __RequestInfo* PRequestInfo;
 
 /**
-* @brief Call Info structure
-*/
+ * @brief Call Info structure
+ */
 typedef struct __CallInfo CallInfo;
 struct __CallInfo {
-    PRequestInfo pRequestInfo;                              //!< Original request info
-    UINT32 httpStatus;                                      //!< HTTP status code of the execution
-    SERVICE_CALL_RESULT callResult;                         //!< Execution result
-    CHAR errorBuffer[CALL_INFO_ERROR_BUFFER_LEN + 1];       //!< Error buffer for curl calls
-    PStackQueue pResponseHeaders;                           //!< Response Headers list
-    PRequestHeader pRequestId;                              //!< Request ID if specified
-    PCHAR responseData;                                     //!< Buffer to write the data to - will be allocated. Buffer is freed by a caller.
-    UINT32 responseDataLen;                                 //!< Response data size
+    PRequestInfo pRequestInfo;                        //!< Original request info
+    UINT32 httpStatus;                                //!< HTTP status code of the execution
+    SERVICE_CALL_RESULT callResult;                   //!< Execution result
+    CHAR errorBuffer[CALL_INFO_ERROR_BUFFER_LEN + 1]; //!< Error buffer for curl calls
+    PStackQueue pResponseHeaders;                     //!< Response Headers list
+    PRequestHeader pRequestId;                        //!< Request ID if specified
+    PCHAR responseData;                               //!< Buffer to write the data to - will be allocated. Buffer is freed by a caller.
+    UINT32 responseDataLen;                           //!< Response data size
 };
 typedef struct __CallInfo* PCallInfo;
 
 /**
  * @brief Abstract base for the credential provider
  */
-typedef struct __AwsCredentialProvider *PAwsCredentialProvider;
+typedef struct __AwsCredentialProvider* PAwsCredentialProvider;
 
 /*! \addtogroup Callbacks
  * Callback definitions
@@ -513,10 +510,9 @@ typedef STATUS (*GetCredentialsFunc)(PAwsCredentialProvider, PAwsCredentials*);
 
 typedef struct __AwsCredentialProvider AwsCredentialProvider;
 struct __AwsCredentialProvider {
-    GetCredentialsFunc getCredentialsFn;     //!< Get credentials function which will be overwritten by different implementations
+    GetCredentialsFunc getCredentialsFn; //!< Get credentials function which will be overwritten by different implementations
 };
 /*!@} */
-
 
 ////////////////////////////////////////////////////
 /// Public functions
@@ -631,9 +627,8 @@ PUBLIC_API STATUS createLwsIotCredentialProvider(PCHAR, PCHAR, PCHAR, PCHAR, PCH
  *
  * @return STATUS code of the execution. STATUS_SUCCESS on success
  */
-PUBLIC_API STATUS createCurlIotCredentialProviderWithTime(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR,
-        GetCurrentTimeFunc, UINT64,
-        PAwsCredentialProvider*);
+PUBLIC_API STATUS createCurlIotCredentialProviderWithTime(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, GetCurrentTimeFunc, UINT64,
+                                                          PAwsCredentialProvider*);
 
 /**
  * @brief Creates an IoT based AWS credential provider object with time function which is based on libWebSockets
@@ -650,9 +645,8 @@ PUBLIC_API STATUS createCurlIotCredentialProviderWithTime(PCHAR, PCHAR, PCHAR, P
  *
  * @return STATUS code of the execution. STATUS_SUCCESS on success
  */
-PUBLIC_API STATUS createLwsIotCredentialProviderWithTime(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR,
-        GetCurrentTimeFunc, UINT64,
-        PAwsCredentialProvider*);
+PUBLIC_API STATUS createLwsIotCredentialProviderWithTime(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, GetCurrentTimeFunc, UINT64,
+                                                         PAwsCredentialProvider*);
 
 /**
  * @brief Frees an IoT based Aws credential provider object
@@ -714,9 +708,7 @@ PUBLIC_API STATUS freeFileCredentialProvider(PAwsCredentialProvider*);
  *
  * @return STATUS code of the execution. STATUS_SUCCESS on success
  */
-PUBLIC_API STATUS createRequestInfo(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR,
-                                    SSL_CERTIFICATE_TYPE, PCHAR,
-                                    UINT64, UINT64, UINT64, UINT64,
+PUBLIC_API STATUS createRequestInfo(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, SSL_CERTIFICATE_TYPE, PCHAR, UINT64, UINT64, UINT64, UINT64,
                                     PAwsCredentials, PRequestInfo*);
 
 /**
@@ -826,12 +818,12 @@ PUBLIC_API STATUS setRequestHeader(PRequestInfo, PCHAR, UINT32, PCHAR, UINT32);
 PUBLIC_API STATUS removeRequestHeader(PRequestInfo, PCHAR);
 
 /**
-* @brief Removes and deletes all headers
-*
-* @param[in] PRequestInfo Request Info object
-*
-* @return STATUS code of the execution. STATUS_SUCCESS on success
-*/
+ * @brief Removes and deletes all headers
+ *
+ * @param[in] PRequestInfo Request Info object
+ *
+ * @return STATUS code of the execution. STATUS_SUCCESS on success
+ */
 PUBLIC_API STATUS removeRequestHeaders(PRequestInfo);
 
 /**
@@ -891,8 +883,9 @@ PUBLIC_API STATUS freeFileLogger();
 /**
  * Helper macros to be used in pairs at the application start and end
  */
-#define SET_FILE_LOGGER()               createFileLogger(FILE_LOGGER_STRING_BUFFER_SIZE, FILE_LOGGER_LOG_FILE_COUNT, (PCHAR) FILE_LOGGER_LOG_FILE_DIRECTORY_PATH, TRUE, TRUE, NULL)
-#define RESET_FILE_LOGGER()             freeFileLogger()
+#define SET_FILE_LOGGER()                                                                                                                            \
+    createFileLogger(FILE_LOGGER_STRING_BUFFER_SIZE, FILE_LOGGER_LOG_FILE_COUNT, (PCHAR) FILE_LOGGER_LOG_FILE_DIRECTORY_PATH, TRUE, TRUE, NULL)
+#define RESET_FILE_LOGGER() freeFileLogger()
 
 /**
  * Initializes global SSL callbacks
@@ -908,7 +901,7 @@ PUBLIC_API STATUS initializeSslCallbacks();
  */
 PUBLIC_API STATUS releaseSslCallbacks();
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 }
 #endif
-#endif  /* __KINESIS_VIDEO_COMMON_INCLUDE__ */
+#endif /* __KINESIS_VIDEO_COMMON_INCLUDE__ */

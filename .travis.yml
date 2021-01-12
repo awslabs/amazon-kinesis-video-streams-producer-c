@@ -29,6 +29,19 @@ matrix:
     - env: allowTestFail=true
 
   include:
+
+    #clang check
+    - name: "clang-format Check"
+      os: linux
+      compiler: clang
+      before_script:
+        - sudo apt-get -q update
+        - sudo apt-get -y install clang-format
+        - mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TEST=TRUE
+      script:
+        - cd ..
+        - bash scripts/check-clang.sh
+
     # MacOS Builds
     - name: "OSX GCC"
       os: osx

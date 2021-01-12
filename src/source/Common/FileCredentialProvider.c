@@ -4,18 +4,12 @@
 #define LOG_CLASS "FileCredentialProvider"
 #include "Include_i.h"
 
-STATUS createFileCredentialProvider(PCHAR pCredentialsFilepath,
-                                    PAwsCredentialProvider* ppCredentialProvider)
+STATUS createFileCredentialProvider(PCHAR pCredentialsFilepath, PAwsCredentialProvider* ppCredentialProvider)
 {
-    return createFileCredentialProviderWithTime(pCredentialsFilepath,
-                                                commonDefaultGetCurrentTimeFunc,
-                                                0,
-                                                ppCredentialProvider);
+    return createFileCredentialProviderWithTime(pCredentialsFilepath, commonDefaultGetCurrentTimeFunc, 0, ppCredentialProvider);
 }
 
-STATUS createFileCredentialProviderWithTime(PCHAR pCredentialsFilepath,
-                                            GetCurrentTimeFunc getCurrentTimeFn,
-                                            UINT64 customData,
+STATUS createFileCredentialProviderWithTime(PCHAR pCredentialsFilepath, GetCurrentTimeFunc getCurrentTimeFn, UINT64 customData,
                                             PAwsCredentialProvider* ppCredentialProvider)
 {
     ENTERS();
@@ -44,7 +38,7 @@ STATUS createFileCredentialProviderWithTime(PCHAR pCredentialsFilepath,
 CleanUp:
 
     if (STATUS_FAILED(retStatus)) {
-        freeFileCredentialProvider((PAwsCredentialProvider *) &pFileCredentialProvider);
+        freeFileCredentialProvider((PAwsCredentialProvider*) &pFileCredentialProvider);
         pFileCredentialProvider = NULL;
     }
 
@@ -117,7 +111,7 @@ STATUS readFileCredentials(PFileCredentialProvider pFileCredentialProvider)
 {
     STATUS retStatus = STATUS_SUCCESS;
     UINT64 fileLen;
-    FILE *fp = NULL;
+    FILE* fp = NULL;
     CHAR credentialMarker[12];
     CHAR thirdTokenStr[MAX(MAX_EXPIRATION_LEN, MAX_SECRET_KEY_LEN) + 1], fourthTokenStr[MAX_SECRET_KEY_LEN + 1], accessKeyId[MAX_ACCESS_KEY_LEN + 1];
     CHAR sessionToken[MAX_SESSION_TOKEN_LEN + 1];
@@ -131,9 +125,8 @@ STATUS readFileCredentials(PFileCredentialProvider pFileCredentialProvider)
     currentTime = pFileCredentialProvider->getCurrentTimeFn(pFileCredentialProvider->customData);
 
     CHK(pFileCredentialProvider->pAwsCredentials == NULL ||
-        currentTime + CREDENTIAL_FILE_READ_GRACE_PERIOD > pFileCredentialProvider->pAwsCredentials->expiration,
+            currentTime + CREDENTIAL_FILE_READ_GRACE_PERIOD > pFileCredentialProvider->pAwsCredentials->expiration,
         retStatus);
-
 
     fp = FOPEN((PCHAR) pFileCredentialProvider->credentialsFilepath, "r");
 
@@ -162,11 +155,7 @@ STATUS readFileCredentials(PFileCredentialProvider pFileCredentialProvider)
      */
 
     FSCANF(fp, "%11s %" STR(MAX_ACCESS_KEY_LEN) "s %" STR(MAX_EXPIRATION_LEN) "s %" STR(MAX_SECRET_KEY_LEN) "s %" STR(MAX_SESSION_TOKEN_LEN) "s",
-           credentialMarker,
-           accessKeyId,
-           thirdTokenStr,
-           fourthTokenStr,
-           sessionToken);
+           credentialMarker, accessKeyId, thirdTokenStr, fourthTokenStr, sessionToken);
 
     // if the fourth token is empty, it means the credential file only has accessKey and secretKey
     if (fourthTokenStr[0] == '\0') {
@@ -176,7 +165,7 @@ STATUS readFileCredentials(PFileCredentialProvider pFileCredentialProvider)
         secretKey = fourthTokenStr;
     }
 
-    CHK(STRCMP(credentialMarker, "CREDENTIALS") == 0 , STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_FORMAT);
+    CHK(STRCMP(credentialMarker, "CREDENTIALS") == 0, STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_FORMAT);
 
     // Set the lengths
     accessKeyIdLen = (UINT32) STRNLEN(accessKeyId, MAX_ACCESS_KEY_LEN);
@@ -194,21 +183,14 @@ STATUS readFileCredentials(PFileCredentialProvider pFileCredentialProvider)
     // rotation to be more frequent.
     expiration = MIN(expiration, currentTime + MAX_ENFORCED_TOKEN_EXPIRATION_DURATION);
 
-    CHK(accessKeyIdLen != 0 &&
-        secretKeyLen != 0, STATUS_INVALID_AUTH_LEN);
+    CHK(accessKeyIdLen != 0 && secretKeyLen != 0, STATUS_INVALID_AUTH_LEN);
 
     if (pFileCredentialProvider->pAwsCredentials != NULL) {
         freeAwsCredentials(&pFileCredentialProvider->pAwsCredentials);
         pFileCredentialProvider->pAwsCredentials = NULL;
     }
 
-    CHK_STATUS(createAwsCredentials(accessKeyId,
-                                    accessKeyIdLen,
-                                    secretKey,
-                                    secretKeyLen,
-                                    sessionToken,
-                                    sessionTokenLen,
-                                    expiration,
+    CHK_STATUS(createAwsCredentials(accessKeyId, accessKeyIdLen, secretKey, secretKeyLen, sessionToken, sessionTokenLen, expiration,
                                     &pFileCredentialProvider->pAwsCredentials));
 
 CleanUp:

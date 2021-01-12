@@ -3,7 +3,7 @@
 
 #pragma once
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -18,7 +18,7 @@ extern "C" {
  */
 STATUS freeFileLoggerPlatformCallbacksFunc(PUINT64);
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 }
 #endif
 #endif /* __KINESISVIDEO_FILE_LOGGER_CALLBACKS_INCLUDE_I__ */

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -23,36 +23,36 @@ extern "C" {
 /*! \addtogroup ProducerBaseStatusCodes
  *  @{
  */
-#define STATUS_PRODUCER_BASE                                                        0x15000000
-#define STATUS_STOP_CALLBACK_CHAIN                                                  STATUS_PRODUCER_BASE + 0x00000001
-#define STATUS_MAX_CALLBACK_CHAIN                                                   STATUS_PRODUCER_BASE + 0x00000002
-#define STATUS_INVALID_PLATFORM_CALLBACKS_VERSION                                   STATUS_PRODUCER_BASE + 0x00000003
-#define STATUS_INVALID_PRODUCER_CALLBACKS_VERSION                                   STATUS_PRODUCER_BASE + 0x00000004
-#define STATUS_INVALID_STREAM_CALLBACKS_VERSION                                     STATUS_PRODUCER_BASE + 0x00000005
-#define STATUS_INVALID_AUTH_CALLBACKS_VERSION                                       STATUS_PRODUCER_BASE + 0x00000006
-#define STATUS_INVALID_API_CALLBACKS_VERSION                                        STATUS_PRODUCER_BASE + 0x00000007
-#define STATUS_INVALID_DESCRIBE_STREAM_RETURN_JSON                                  STATUS_PRODUCER_BASE + 0x0000000f
-#define STATUS_MAX_USER_AGENT_NAME_POSTFIX_LEN_EXCEEDED                             STATUS_PRODUCER_BASE + 0x00000013
-#define STATUS_MAX_CUSTOM_USER_AGENT_LEN_EXCEEDED                                   STATUS_PRODUCER_BASE + 0x00000014
-#define STATUS_INVALID_ENDPOINT_CACHING_PERIOD                                      STATUS_PRODUCER_BASE + 0x00000016
-#define STATUS_DUPLICATE_PRODUCER_CALLBACK_FREE_FUNC                                STATUS_PRODUCER_BASE + 0x00000019
-#define STATUS_DUPLICATE_STREAM_CALLBACK_FREE_FUNC                                  STATUS_PRODUCER_BASE + 0x0000001a
-#define STATUS_DUPLICATE_AUTH_CALLBACK_FREE_FUNC                                    STATUS_PRODUCER_BASE + 0x0000001b
-#define STATUS_DUPLICATE_API_CALLBACK_FREE_FUNC                                     STATUS_PRODUCER_BASE + 0x0000001c
-#define STATUS_FILE_LOGGER_INDEX_FILE_TOO_LARGE                                     STATUS_PRODUCER_BASE + 0x0000001d
-#define STATUS_STREAM_BEING_SHUTDOWN                                                STATUS_PRODUCER_BASE + 0x0000001e
-#define STATUS_CLIENT_BEING_SHUTDOWN                                                STATUS_PRODUCER_BASE + 0x0000001f
+#define STATUS_PRODUCER_BASE                            0x15000000
+#define STATUS_STOP_CALLBACK_CHAIN                      STATUS_PRODUCER_BASE + 0x00000001
+#define STATUS_MAX_CALLBACK_CHAIN                       STATUS_PRODUCER_BASE + 0x00000002
+#define STATUS_INVALID_PLATFORM_CALLBACKS_VERSION       STATUS_PRODUCER_BASE + 0x00000003
+#define STATUS_INVALID_PRODUCER_CALLBACKS_VERSION       STATUS_PRODUCER_BASE + 0x00000004
+#define STATUS_INVALID_STREAM_CALLBACKS_VERSION         STATUS_PRODUCER_BASE + 0x00000005
+#define STATUS_INVALID_AUTH_CALLBACKS_VERSION           STATUS_PRODUCER_BASE + 0x00000006
+#define STATUS_INVALID_API_CALLBACKS_VERSION            STATUS_PRODUCER_BASE + 0x00000007
+#define STATUS_INVALID_DESCRIBE_STREAM_RETURN_JSON      STATUS_PRODUCER_BASE + 0x0000000f
+#define STATUS_MAX_USER_AGENT_NAME_POSTFIX_LEN_EXCEEDED STATUS_PRODUCER_BASE + 0x00000013
+#define STATUS_MAX_CUSTOM_USER_AGENT_LEN_EXCEEDED       STATUS_PRODUCER_BASE + 0x00000014
+#define STATUS_INVALID_ENDPOINT_CACHING_PERIOD          STATUS_PRODUCER_BASE + 0x00000016
+#define STATUS_DUPLICATE_PRODUCER_CALLBACK_FREE_FUNC    STATUS_PRODUCER_BASE + 0x00000019
+#define STATUS_DUPLICATE_STREAM_CALLBACK_FREE_FUNC      STATUS_PRODUCER_BASE + 0x0000001a
+#define STATUS_DUPLICATE_AUTH_CALLBACK_FREE_FUNC        STATUS_PRODUCER_BASE + 0x0000001b
+#define STATUS_DUPLICATE_API_CALLBACK_FREE_FUNC         STATUS_PRODUCER_BASE + 0x0000001c
+#define STATUS_FILE_LOGGER_INDEX_FILE_TOO_LARGE         STATUS_PRODUCER_BASE + 0x0000001d
+#define STATUS_STREAM_BEING_SHUTDOWN                    STATUS_PRODUCER_BASE + 0x0000001e
+#define STATUS_CLIENT_BEING_SHUTDOWN                    STATUS_PRODUCER_BASE + 0x0000001f
 /*!@} */
 
 /**
  * Maximum callbacks in the processing chain
  */
-#define MAX_CALLBACK_CHAIN_COUNT                                                20
+#define MAX_CALLBACK_CHAIN_COUNT 20
 
 /**
  * Default number of the callbacks in the chain
  */
-#define DEFAULT_CALLBACK_CHAIN_COUNT                                            5
+#define DEFAULT_CALLBACK_CHAIN_COUNT 5
 
 /////////////////////////////////////////////////////
 /// Current versions for the public structs
@@ -66,23 +66,23 @@ extern "C" {
 /**
  * Producer callback struct current version
  */
-#define PRODUCER_CALLBACKS_CURRENT_VERSION                                      0
+#define PRODUCER_CALLBACKS_CURRENT_VERSION 0
 /**
  * Platform callback struct current version
  */
-#define PLATFORM_CALLBACKS_CURRENT_VERSION                                      0
+#define PLATFORM_CALLBACKS_CURRENT_VERSION 0
 /**
  * Stream callback struct current version
  */
-#define STREAM_CALLBACKS_CURRENT_VERSION                                        0
+#define STREAM_CALLBACKS_CURRENT_VERSION 0
 /**
  * Auth callback struct current version
  */
-#define AUTH_CALLBACKS_CURRENT_VERSION                                          0
+#define AUTH_CALLBACKS_CURRENT_VERSION 0
 /**
  * API callback struct current version
  */
-#define API_CALLBACKS_CURRENT_VERSION                                           0
+#define API_CALLBACKS_CURRENT_VERSION 0
 /*!@} */
 
 ////////////////////////////////////////////////////
@@ -154,23 +154,22 @@ typedef STATUS (*FreeApiCallbacksFunc)(PUINT64);
  */
 typedef struct __PlatformCallbacks PlatformCallbacks;
 struct __PlatformCallbacks {
-
-    UINT32 version;                                                //!< Version
-    UINT64 customData;                                             //!< Custom data to be passed back to the caller
-    GetCurrentTimeFunc getCurrentTimeFn;                           //!< The GetCurrentTimeFunc callback function
-    GetRandomNumberFunc getRandomNumberFn;                         //!< The GetRandomNumberFunc callback function
-    CreateMutexFunc createMutexFn;                                 //!< The CreateMutexFunc callback function
-    LockMutexFunc lockMutexFn;                                     //!< The LockMutexFunc callback function
-    UnlockMutexFunc unlockMutexFn;                                 //!< The UnlockMutexFunc callback function
-    TryLockMutexFunc tryLockMutexFn;                               //!< The TryLockMutexFunc callback function
-    FreeMutexFunc freeMutexFn;                                     //!< The FreeMutexFunc callback function
-    CreateConditionVariableFunc createConditionVariableFn;         //!< The CreateConditionVariableFunc callback function
-    SignalConditionVariableFunc signalConditionVariableFn;         //!< The SignalConditionVariableFunc callback function
-    BroadcastConditionVariableFunc broadcastConditionVariableFn;   //!< The BroadcastConditionVariableFunc callback function
-    WaitConditionVariableFunc waitConditionVariableFn;             //!< The WaitConditionVariableFunc callback function
-    FreeConditionVariableFunc freeConditionVariableFn;             //!< The FreeConditionVariableFunc callback function
-    LogPrintFunc logPrintFn;                                       //!< The LogPrintFunc callback function
-    FreePlatformCallbacksFunc freePlatformCallbacksFn;             //!< Specialized cleanup callback
+    UINT32 version;                                              //!< Version
+    UINT64 customData;                                           //!< Custom data to be passed back to the caller
+    GetCurrentTimeFunc getCurrentTimeFn;                         //!< The GetCurrentTimeFunc callback function
+    GetRandomNumberFunc getRandomNumberFn;                       //!< The GetRandomNumberFunc callback function
+    CreateMutexFunc createMutexFn;                               //!< The CreateMutexFunc callback function
+    LockMutexFunc lockMutexFn;                                   //!< The LockMutexFunc callback function
+    UnlockMutexFunc unlockMutexFn;                               //!< The UnlockMutexFunc callback function
+    TryLockMutexFunc tryLockMutexFn;                             //!< The TryLockMutexFunc callback function
+    FreeMutexFunc freeMutexFn;                                   //!< The FreeMutexFunc callback function
+    CreateConditionVariableFunc createConditionVariableFn;       //!< The CreateConditionVariableFunc callback function
+    SignalConditionVariableFunc signalConditionVariableFn;       //!< The SignalConditionVariableFunc callback function
+    BroadcastConditionVariableFunc broadcastConditionVariableFn; //!< The BroadcastConditionVariableFunc callback function
+    WaitConditionVariableFunc waitConditionVariableFn;           //!< The WaitConditionVariableFunc callback function
+    FreeConditionVariableFunc freeConditionVariableFn;           //!< The FreeConditionVariableFunc callback function
+    LogPrintFunc logPrintFn;                                     //!< The LogPrintFunc callback function
+    FreePlatformCallbacksFunc freePlatformCallbacksFn;           //!< Specialized cleanup callback
 };
 typedef struct __PlatformCallbacks* PPlatformCallbacks;
 
@@ -179,12 +178,12 @@ typedef struct __PlatformCallbacks* PPlatformCallbacks;
  */
 typedef struct __ProducerCallbacks ProducerCallbacks;
 struct __ProducerCallbacks {
-    UINT32 version;                                                //!< Version
-    UINT64 customData;                                             //!< Custom data to be passed back to the caller
-    StorageOverflowPressureFunc storageOverflowPressureFn;         //!< The StorageOverflowPressureFunc callback function
-    ClientReadyFunc clientReadyFn;                                 //!< The ClientReadyFunc callback function
-    ClientShutdownFunc clientShutdownFn;                           //!< The ClientShutdownFunc callback function
-    FreeProducerCallbacksFunc freeProducerCallbacksFn;             //!< Specialized cleanup callback
+    UINT32 version;                                        //!< Version
+    UINT64 customData;                                     //!< Custom data to be passed back to the caller
+    StorageOverflowPressureFunc storageOverflowPressureFn; //!< The StorageOverflowPressureFunc callback function
+    ClientReadyFunc clientReadyFn;                         //!< The ClientReadyFunc callback function
+    ClientShutdownFunc clientShutdownFn;                   //!< The ClientShutdownFunc callback function
+    FreeProducerCallbacksFunc freeProducerCallbacksFn;     //!< Specialized cleanup callback
 };
 typedef struct __ProducerCallbacks* PProducerCallbacks;
 
@@ -193,20 +192,20 @@ typedef struct __ProducerCallbacks* PProducerCallbacks;
  */
 typedef struct __StreamCallbacks StreamCallbacks;
 struct __StreamCallbacks {
-    UINT32 version;                                                           //!< Version
-    UINT64 customData;                                                        //!< Custom data to be passed back to the caller
-    StreamUnderflowReportFunc streamUnderflowReportFn;                        //!< The StreamUnderflowReportFunc callback function
-    BufferDurationOverflowPressureFunc bufferDurationOverflowPressureFn;      //!< The BufferDurationOverflowPressureFunc callback function
-    StreamLatencyPressureFunc streamLatencyPressureFn;                        //!< The StreamLatencyPressureFunc callback function
-    StreamConnectionStaleFunc streamConnectionStaleFn;                        //!< The StreamConnectionStaleFunc callback function
-    DroppedFrameReportFunc droppedFrameReportFn;                              //!< The DroppedFrameReportFunc callback function
-    DroppedFragmentReportFunc droppedFragmentReportFn;                        //!< The DroppedFragmentReportFunc callback function
-    StreamErrorReportFunc streamErrorReportFn;                                //!< The StreamErrorReportFunc callback function
-    FragmentAckReceivedFunc fragmentAckReceivedFn;                            //!< The FragmentAckReceivedFunc callback function
-    StreamDataAvailableFunc streamDataAvailableFn;                            //!< The StreamDataAvailableFunc callback function
-    StreamReadyFunc streamReadyFn;                                            //!< The StreamReadyFunc callback function
-    StreamClosedFunc streamClosedFn;                                          //!< The StreamClosedFunc callback function
-    StreamShutdownFunc streamShutdownFn;                                      //!< The StreamShutdownFunc callback function
+    UINT32 version;                                                      //!< Version
+    UINT64 customData;                                                   //!< Custom data to be passed back to the caller
+    StreamUnderflowReportFunc streamUnderflowReportFn;                   //!< The StreamUnderflowReportFunc callback function
+    BufferDurationOverflowPressureFunc bufferDurationOverflowPressureFn; //!< The BufferDurationOverflowPressureFunc callback function
+    StreamLatencyPressureFunc streamLatencyPressureFn;                   //!< The StreamLatencyPressureFunc callback function
+    StreamConnectionStaleFunc streamConnectionStaleFn;                   //!< The StreamConnectionStaleFunc callback function
+    DroppedFrameReportFunc droppedFrameReportFn;                         //!< The DroppedFrameReportFunc callback function
+    DroppedFragmentReportFunc droppedFragmentReportFn;                   //!< The DroppedFragmentReportFunc callback function
+    StreamErrorReportFunc streamErrorReportFn;                           //!< The StreamErrorReportFunc callback function
+    FragmentAckReceivedFunc fragmentAckReceivedFn;                       //!< The FragmentAckReceivedFunc callback function
+    StreamDataAvailableFunc streamDataAvailableFn;                       //!< The StreamDataAvailableFunc callback function
+    StreamReadyFunc streamReadyFn;                                       //!< The StreamReadyFunc callback function
+    StreamClosedFunc streamClosedFn;                                     //!< The StreamClosedFunc callback function
+    StreamShutdownFunc streamShutdownFn;                                 //!< The StreamShutdownFunc callback function
 
     // Specialized cleanup callback
     FreeStreamCallbacksFunc freeStreamCallbacksFn;
@@ -218,13 +217,13 @@ typedef struct __StreamCallbacks* PStreamCallbacks;
  */
 typedef struct __AuthCallbacks AuthCallbacks;
 struct __AuthCallbacks {
-    UINT32 version;                                        //!< Version
-    UINT64 customData;                                     //!< Custom data to be passed back to the caller
-    GetSecurityTokenFunc getSecurityTokenFn;               //!< The GetSecurityTokenFunc callback function
-    GetDeviceCertificateFunc getDeviceCertificateFn;       //!< The GetDeviceCertificateFunc callback function
-    DeviceCertToTokenFunc deviceCertToTokenFn;             //!< The DeviceCertToTokenFunc callback function
-    GetDeviceFingerprintFunc getDeviceFingerprintFn;       //!< The GetDeviceFingerprintFunc callback function
-    GetStreamingTokenFunc getStreamingTokenFn;             //!< The GetStreamingTokenFunc callback function
+    UINT32 version;                                  //!< Version
+    UINT64 customData;                               //!< Custom data to be passed back to the caller
+    GetSecurityTokenFunc getSecurityTokenFn;         //!< The GetSecurityTokenFunc callback function
+    GetDeviceCertificateFunc getDeviceCertificateFn; //!< The GetDeviceCertificateFunc callback function
+    DeviceCertToTokenFunc deviceCertToTokenFn;       //!< The DeviceCertToTokenFunc callback function
+    GetDeviceFingerprintFunc getDeviceFingerprintFn; //!< The GetDeviceFingerprintFunc callback function
+    GetStreamingTokenFunc getStreamingTokenFn;       //!< The GetStreamingTokenFunc callback function
 
     //!< Specialized cleanup callback
     FreeAuthCallbacksFunc freeAuthCallbacksFn;
@@ -236,19 +235,18 @@ typedef struct __AuthCallbacks* PAuthCallbacks;
  */
 typedef struct __ApiCallbacks ApiCallbacks;
 struct __ApiCallbacks {
-    UINT32 version;                                    //!< Version
-    UINT64 customData;                                 //!< Custom data to be passed back to the caller
-    CreateStreamFunc createStreamFn;                   //!< The CreateStreamFunc callback function
-    DescribeStreamFunc describeStreamFn;               //!< The DescribeStreamFunc callback function
-    GetStreamingEndpointFunc getStreamingEndpointFn;   //!< The GetStreamingEndpointFunc callback function
-    PutStreamFunc putStreamFn;                         //!< The PutStreamFunc callback function
-    TagResourceFunc tagResourceFn;                     //!< The TagResourceFunc callback function
-    CreateDeviceFunc createDeviceFn;                   //!< The CreateDeviceFunc callback function
-    FreeApiCallbacksFunc freeApiCallbacksFn;           //!< Specialized cleanup callback
+    UINT32 version;                                  //!< Version
+    UINT64 customData;                               //!< Custom data to be passed back to the caller
+    CreateStreamFunc createStreamFn;                 //!< The CreateStreamFunc callback function
+    DescribeStreamFunc describeStreamFn;             //!< The DescribeStreamFunc callback function
+    GetStreamingEndpointFunc getStreamingEndpointFn; //!< The GetStreamingEndpointFunc callback function
+    PutStreamFunc putStreamFn;                       //!< The PutStreamFunc callback function
+    TagResourceFunc tagResourceFn;                   //!< The TagResourceFunc callback function
+    CreateDeviceFunc createDeviceFn;                 //!< The CreateDeviceFunc callback function
+    FreeApiCallbacksFunc freeApiCallbacksFn;         //!< Specialized cleanup callback
 };
 typedef struct __ApiCallbacks* PApiCallbacks;
 /*!@} */
-
 
 ////////////////////////////////////////////////////
 /// Main enum declarations
@@ -277,7 +275,7 @@ typedef enum {
     //!< The cached result will be returned afterwards when the PIC requests the provider to make the
     //!< backend API call.
     //!< This mode is the recommended mode for most of the streaming scenarios and is the default in the samples.
-    //!< 
+    //!<
     //!< NOTE: This mode is most suitable for streaming scenarios when the stream is not dynamically deleted
     //!< or modified by another entity so the cached value of the API calls are static.
     //!< NOTE: This mode will work for non-pre-created streams as the first call will not be cached for
@@ -470,7 +468,7 @@ PUBLIC_API STATUS createRealtimeVideoStreamInfoProvider(PCHAR, UINT64, UINT64, P
  * @param[out] PStreamInfo* Constructed object
  *
  * @return STATUS code of the execution
-*/
+ */
 PUBLIC_API STATUS createOfflineVideoStreamInfoProvider(PCHAR, UINT64, UINT64, PStreamInfo*);
 
 /**
@@ -500,7 +498,7 @@ PUBLIC_API STATUS createRealtimeAudioVideoStreamInfoProvider(PCHAR, UINT64, UINT
  * @param[out] PStreamInfo* Constructed object
  *
  * @return STATUS code of the execution
-*/
+ */
 PUBLIC_API STATUS createOfflineAudioVideoStreamInfoProvider(PCHAR, UINT64, UINT64, PStreamInfo*);
 
 /**
@@ -512,7 +510,7 @@ PUBLIC_API STATUS createOfflineAudioVideoStreamInfoProvider(PCHAR, UINT64, UINT6
  * @param[in] UINT32 Total number of streams per kinesisVideoStreamClient
  * @param[out] PStreamInfo
  * @return STATUS code of the execution
-*/
+ */
 PUBLIC_API STATUS setStreamInfoBasedOnStorageSize(UINT32, UINT64, UINT32, PStreamInfo);
 
 /*
@@ -654,7 +652,7 @@ PUBLIC_API STATUS freeStaticAuthCallbacks(PAuthCallbacks*);
  * @param[out] PStreamCallbacks* Constructed object
  *
  * @return STATUS code of the execution
-*/
+ */
 PUBLIC_API STATUS createStreamCallbacks(PStreamCallbacks*);
 
 /**
@@ -663,7 +661,7 @@ PUBLIC_API STATUS createStreamCallbacks(PStreamCallbacks*);
  * @param[in,out] PStreamCallbacks* the object to be freed
  *
  * @return STATUS code of the execution
-*/
+ */
 PUBLIC_API STATUS freeStreamCallbacks(PStreamCallbacks*);
 
 /**
@@ -720,7 +718,7 @@ PUBLIC_API STATUS createAbstractDefaultCallbacksProvider(UINT32, API_CALL_CACHE_
 PUBLIC_API STATUS addFileLoggerPlatformCallbacksProvider(PClientCallbacks, UINT64, UINT64, PCHAR, BOOL);
 /*!@} */
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 }
 #endif
-#endif  /* __KINESIS_VIDEO_PRODUCER_INCLUDE__ */
+#endif /* __KINESIS_VIDEO_PRODUCER_INCLUDE__ */
