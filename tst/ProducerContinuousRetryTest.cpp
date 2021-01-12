@@ -157,15 +157,13 @@ TEST_F(ProducerContinuousRetryTest, test_stream_recover_after_reset_connnection_
 TEST_F(ProducerContinuousRetryTest, recover_on_retriable_producer_error) {
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     UINT32 i;
-    UINT32 totalFragments = 10; // 130s in total duration
+    UINT32 totalFragments = 10;
     UINT32 totalFrames = totalFragments * TEST_FPS;
     PRotatingStaticAuthCallbacks pAuth;
 
     // block off any acks
     mCurlWriteCallbackPassThrough = TRUE;
     mWriteStatus = STATUS_NOT_IMPLEMENTED;
-
-    mStreamingRotationPeriod = MAX_ENFORCED_TOKEN_EXPIRATION_DURATION;
 
     createDefaultProducerClient(FALSE, TEST_CREATE_STREAM_TIMEOUT, TRUE);
 
@@ -194,24 +192,21 @@ TEST_F(ProducerContinuousRetryTest, recover_on_retriable_producer_error) {
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
     EXPECT_EQ(1, mConnectionStaleFnCount);
     EXPECT_LT(1, mDescribeStreamFnCount);
-    EXPECT_LT(0, mStreamReadyFnCount);
     // Reset connection should trigger a new PutMedia session
-    EXPECT_LT(2, mPutStreamFnCount);
+    EXPECT_EQ(2, mPutStreamFnCount);
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
 
 TEST_F(ProducerContinuousRetryTest, no_recovery_on_non_retriable_producer_error) {
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     UINT32 i;
-    UINT32 totalFragments = 10; // 130s in total duration
+    UINT32 totalFragments = 10;
     UINT32 totalFrames = totalFragments * TEST_FPS;
     PRotatingStaticAuthCallbacks pAuth;
 
     // block off any acks
     mCurlWriteCallbackPassThrough = TRUE;
     mWriteStatus = STATUS_NOT_IMPLEMENTED;
-
-    mStreamingRotationPeriod = MAX_ENFORCED_TOKEN_EXPIRATION_DURATION;
 
     createDefaultProducerClient(FALSE, TEST_CREATE_STREAM_TIMEOUT, TRUE);
 
@@ -240,7 +235,6 @@ TEST_F(ProducerContinuousRetryTest, no_recovery_on_non_retriable_producer_error)
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
     EXPECT_NE(1, mConnectionStaleFnCount);
     EXPECT_EQ(1, mDescribeStreamFnCount); // As there is no retrying on this fault, describe should have not been called again
-    EXPECT_LT(0, mStreamReadyFnCount);
     // Reset connection should trigger a new PutMedia session
     EXPECT_EQ(2, mPutStreamFnCount);
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
@@ -249,15 +243,13 @@ TEST_F(ProducerContinuousRetryTest, no_recovery_on_non_retriable_producer_error)
 TEST_F(ProducerContinuousRetryTest, recover_on_retriable_common_lib_error) {
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     UINT32 i;
-    UINT32 totalFragments = 10; // 130s in total duration
+    UINT32 totalFragments = 10;
     UINT32 totalFrames = totalFragments * TEST_FPS;
     PRotatingStaticAuthCallbacks pAuth;
 
     // block off any acks
     mCurlWriteCallbackPassThrough = TRUE;
     mWriteStatus = STATUS_NOT_IMPLEMENTED;
-
-    mStreamingRotationPeriod = MAX_ENFORCED_TOKEN_EXPIRATION_DURATION;
 
     createDefaultProducerClient(FALSE, TEST_CREATE_STREAM_TIMEOUT, TRUE);
 
@@ -286,24 +278,21 @@ TEST_F(ProducerContinuousRetryTest, recover_on_retriable_common_lib_error) {
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
     EXPECT_EQ(1, mConnectionStaleFnCount);
     EXPECT_LT(1, mDescribeStreamFnCount);
-    EXPECT_LT(0, mStreamReadyFnCount);
     // Reset connection should trigger a new PutMedia session
-    EXPECT_LT(2, mPutStreamFnCount);
+    EXPECT_EQ(2, mPutStreamFnCount);
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
 
 TEST_F(ProducerContinuousRetryTest, no_recovery_on_non_retriable_common_lib_error) {
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     UINT32 i;
-    UINT32 totalFragments = 10; // 130s in total duration
+    UINT32 totalFragments = 10;
     UINT32 totalFrames = totalFragments * TEST_FPS;
     PRotatingStaticAuthCallbacks pAuth;
 
     // block off any acks
     mCurlWriteCallbackPassThrough = TRUE;
     mWriteStatus = STATUS_NOT_IMPLEMENTED;
-
-    mStreamingRotationPeriod = MAX_ENFORCED_TOKEN_EXPIRATION_DURATION;
 
     createDefaultProducerClient(FALSE, TEST_CREATE_STREAM_TIMEOUT, TRUE);
 
@@ -332,7 +321,6 @@ TEST_F(ProducerContinuousRetryTest, no_recovery_on_non_retriable_common_lib_erro
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
     EXPECT_NE(1, mConnectionStaleFnCount);
     EXPECT_EQ(1, mDescribeStreamFnCount); // As there is no retrying on this fault, describe should have not been called again
-    EXPECT_LT(0, mStreamReadyFnCount);
     // Reset connection should trigger a new PutMedia session
     EXPECT_EQ(2, mPutStreamFnCount);
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
