@@ -121,7 +121,7 @@ STATUS getStreamingTokenFileFunc(UINT64 customData, PCHAR streamName, STREAM_ACC
     PCallbacksProvider pCallbacksProvider = NULL;
     PFileAuthCallbacks pFileAuthCallbacks = (PFileAuthCallbacks) customData;
 
-    CHK(pFileAuthCallbacks != NULL, STATUS_NULL_ARG);
+    CHK(pFileAuthCallbacks != NULL && pServiceCallContext != NULL, STATUS_NULL_ARG);
 
     pCallbacksProvider = pFileAuthCallbacks->pCallbacksProvider;
     pCredentialProvider = (PAwsCredentialProvider) pFileAuthCallbacks->pCredentialProvider;
@@ -135,7 +135,7 @@ STATUS getStreamingTokenFileFunc(UINT64 customData, PCHAR streamName, STREAM_ACC
 
 CleanUp:
 
-    if (STATUS_FAILED(retStatus)) {
+    if (STATUS_FAILED(retStatus) && pServiceCallContext != NULL) {
         // Notify PIC on error
         getStreamingTokenResultEvent(pServiceCallContext->customData,
                                      SERVICE_CALL_UNKNOWN,

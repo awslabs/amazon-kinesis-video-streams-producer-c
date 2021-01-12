@@ -40,9 +40,16 @@ extern "C" {
 #define STATUS_DUPLICATE_AUTH_CALLBACK_FREE_FUNC                                    STATUS_PRODUCER_BASE + 0x0000001b
 #define STATUS_DUPLICATE_API_CALLBACK_FREE_FUNC                                     STATUS_PRODUCER_BASE + 0x0000001c
 #define STATUS_FILE_LOGGER_INDEX_FILE_TOO_LARGE                                     STATUS_PRODUCER_BASE + 0x0000001d
-#define STATUS_STREAM_BEING_SHUTDOWN                                                STATUS_PRODUCER_BASE + 0x0000001e
-#define STATUS_CLIENT_BEING_SHUTDOWN                                                STATUS_PRODUCER_BASE + 0x0000001f
+#define STATUS_STREAM_BEING_SHUTDOWN                                                STATUS_PRODUCER_BASE + 0x00000025
+#define STATUS_CLIENT_BEING_SHUTDOWN                                                STATUS_PRODUCER_BASE + 0x00000026
 /*!@} */
+
+/**
+ * Macro for checking whether the status code should be retried by the continuous retry logic
+ */
+#define IS_RETRIABLE_PRODUCER_ERROR(error)  ((error) == STATUS_INVALID_DESCRIBE_STREAM_RETURN_JSON || \
+                                            (error) == STATUS_STREAM_BEING_SHUTDOWN ||    	\
+                                            (error) == STATUS_CLIENT_BEING_SHUTDOWN)
 
 /**
  * Maximum callbacks in the processing chain

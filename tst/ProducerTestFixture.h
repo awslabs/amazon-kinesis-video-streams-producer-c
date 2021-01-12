@@ -362,6 +362,9 @@ protected:
 
     UINT32 loggerLogLevel = LOG_LEVEL_WARN;
 
+    // Stored auth callbacks which is used to inject fault
+    PAuthCallbacks mAuthCallbacks;
+
 private:
 
     // Stored function pointers to reset on exit

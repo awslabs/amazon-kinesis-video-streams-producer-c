@@ -38,6 +38,12 @@ STATUS createRotatingStaticAuthCallbacks(PClientCallbacks pCallbacksProvider, PC
     pStaticAuthCallbacks->authCallbacks.getDeviceFingerprintFn = NULL;
     pStaticAuthCallbacks->rotationPeriod = rotationPeriod;
 
+    // Initialize the fault injection members to defaults
+    pStaticAuthCallbacks->retStatus = STATUS_SUCCESS;
+    pStaticAuthCallbacks->invokeCount = 0;
+    pStaticAuthCallbacks->failCount = 0;
+    pStaticAuthCallbacks->recoverCount = 0;
+
     // Create the credentials object
     CHK_STATUS(createAwsCredentials(accessKeyId, 0, secretKey, 0, sessionToken, 0, expiration,
                                     &pStaticAuthCallbacks->pAwsCredentials));
@@ -119,13 +125,19 @@ STATUS getStreamingTokenEnvVarFunc(UINT64 customData, PCHAR streamName, STREAM_A
     UINT64 currentTime;
     STATUS retStatus = STATUS_SUCCESS;
     PRotatingStaticAuthCallbacks pStaticAuthCallbacks;
-    PCallbacksProvider pCallbacksProvider;
+    PCallbacksProvider pCallbacksProvider = NULL;
     UINT64 expirationTime;
 
     pStaticAuthCallbacks = (PRotatingStaticAuthCallbacks) customData;
-    CHK(pStaticAuthCallbacks != NULL, STATUS_NULL_ARG);
+    CHK(pStaticAuthCallbacks != NULL && pServiceCallContext != NULL, STATUS_NULL_ARG);
     pCallbacksProvider = pStaticAuthCallbacks->pCallbacksProvider;
     CHK(pCallbacksProvider != NULL, STATUS_NULL_ARG);
+
+    // Fault injection
+    if (pStaticAuthCallbacks->invokeCount >= pStaticAuthCallbacks->failCount &&
+        pStaticAuthCallbacks->invokeCount < pStaticAuthCallbacks->recoverCount) {
+        CHK(FALSE, pStaticAuthCallbacks->retStatus);
+    }
 
     currentTime = pCallbacksProvider->clientCallbacks.getCurrentTimeFn(pCallbacksProvider->clientCallbacks.customData);
 
@@ -138,9 +150,23 @@ STATUS getStreamingTokenEnvVarFunc(UINT64 customData, PCHAR streamName, STREAM_A
                                              pStaticAuthCallbacks->pAwsCredentials->size,
                                              expirationTime);
 
-    notifyCallResult(pCallbacksProvider, retStatus, customData);
-
 CleanUp:
+
+    if (pStaticAuthCallbacks != NULL) {
+        pStaticAuthCallbacks->invokeCount++;
+
+        if (STATUS_FAILED(retStatus) && pServiceCallContext != NULL) {
+            // Notify PIC on failure
+            getStreamingTokenResultEvent(pServiceCallContext->customData,
+                                         SERVICE_CALL_UNKNOWN,
+                                         NULL,
+                                         0,
+                                         0);
+
+            // Notify clients
+            notifyCallResult(pCallbacksProvider, retStatus, pServiceCallContext->customData);
+        }
+    }
 
     LEAVES();
     return retStatus;
@@ -156,12 +182,20 @@ STATUS getSecurityTokenEnvVarFunc(UINT64 customData, PBYTE *ppBuffer, PUINT32 pS
     PRotatingStaticAuthCallbacks pStaticAuthCallbacks = (PRotatingStaticAuthCallbacks) customData;
     CHK(pStaticAuthCallbacks != NULL && ppBuffer != NULL && pSize != NULL && pExpiration != NULL, STATUS_NULL_ARG);
 
+    if (pStaticAuthCallbacks->invokeCount >= pStaticAuthCallbacks->failCount &&
+        pStaticAuthCallbacks->invokeCount < pStaticAuthCallbacks->recoverCount) {
+        CHK(FALSE, pStaticAuthCallbacks->retStatus);
+    }
 
     *pExpiration = pStaticAuthCallbacks->pAwsCredentials->expiration;
     *pSize = pStaticAuthCallbacks->pAwsCredentials->size;
     *ppBuffer = (PBYTE) pStaticAuthCallbacks->pAwsCredentials;
 
 CleanUp:
+
+    if (pStaticAuthCallbacks != NULL) {
+        pStaticAuthCallbacks->invokeCount++;
+    }
 
     LEAVES();
     return retStatus;

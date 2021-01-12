@@ -224,7 +224,8 @@ ProducerClientTestBase::ProducerClientTestBase() :
         mReadSize(0),
         mStreamCallbacks(NULL),
         mProducerCallbacks(NULL),
-        mResetStreamCounter(0)
+        mResetStreamCounter(0),
+        mAuthCallbacks(NULL)
 {
     auto logLevelStr = GETENV("AWS_KVS_LOG_LEVEL");
     if (logLevelStr != NULL) {
@@ -456,6 +457,9 @@ VOID ProducerClientTestBase::createDefaultProducerClient(API_CALL_CACHE_TYPE cac
     mDeviceInfo.clientInfo.createClientTimeout = TEST_CREATE_PRODUCER_TIMEOUT;
     mDeviceInfo.clientInfo.createStreamTimeout = createStreamTimeout;
     mDeviceInfo.clientInfo.loggerLogLevel = this->loggerLogLevel;
+
+    // Store the auth callbacks which is used for fault injection
+    mAuthCallbacks = pAuthCallbacks;
 
     // Create the producer client
     EXPECT_EQ(STATUS_SUCCESS, createKinesisVideoClientSync(&mDeviceInfo, mCallbacksProvider, &mClientHandle));
