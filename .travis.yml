@@ -127,6 +127,7 @@ matrix:
     # Generate Doxygen
     - name: "Generate Doxygen"
       if: type = push
+      env: allowTestFail=true
       before_install:
         - docker run -w /src/.github -dit --name alpine -v $(pwd):/src alpine
         - alpine() { docker exec -it alpine "$@"; }
