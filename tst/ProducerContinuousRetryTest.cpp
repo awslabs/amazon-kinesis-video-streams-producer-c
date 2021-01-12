@@ -193,7 +193,7 @@ TEST_F(ProducerContinuousRetryTest, recover_on_retriable_producer_error) {
     EXPECT_EQ(1, mConnectionStaleFnCount);
     EXPECT_LT(1, mDescribeStreamFnCount);
     // Reset connection should trigger a new PutMedia session
-    EXPECT_EQ(2, mPutStreamFnCount);
+    EXPECT_LE(2, mPutStreamFnCount);
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
 
@@ -236,7 +236,7 @@ TEST_F(ProducerContinuousRetryTest, no_recovery_on_non_retriable_producer_error)
     EXPECT_NE(1, mConnectionStaleFnCount);
     EXPECT_EQ(1, mDescribeStreamFnCount); // As there is no retrying on this fault, describe should have not been called again
     // Reset connection should trigger a new PutMedia session
-    EXPECT_EQ(2, mPutStreamFnCount);
+    EXPECT_LE(2, mPutStreamFnCount);
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
 
@@ -279,7 +279,7 @@ TEST_F(ProducerContinuousRetryTest, recover_on_retriable_common_lib_error) {
     EXPECT_EQ(1, mConnectionStaleFnCount);
     EXPECT_LT(1, mDescribeStreamFnCount);
     // Reset connection should trigger a new PutMedia session
-    EXPECT_EQ(2, mPutStreamFnCount);
+    EXPECT_LE(2, mPutStreamFnCount);
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
 
@@ -322,7 +322,7 @@ TEST_F(ProducerContinuousRetryTest, no_recovery_on_non_retriable_common_lib_erro
     EXPECT_NE(1, mConnectionStaleFnCount);
     EXPECT_EQ(1, mDescribeStreamFnCount); // As there is no retrying on this fault, describe should have not been called again
     // Reset connection should trigger a new PutMedia session
-    EXPECT_EQ(2, mPutStreamFnCount);
+    EXPECT_LE(2, mPutStreamFnCount);
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
 
@@ -330,4 +330,3 @@ TEST_F(ProducerContinuousRetryTest, no_recovery_on_non_retriable_common_lib_erro
 }
 }
 }
-
