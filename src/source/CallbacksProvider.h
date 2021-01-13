@@ -6,7 +6,7 @@ CallbacksProvider internal include file
 
 #pragma once
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -80,7 +80,8 @@ STATUS setDefaultPlatformCallbacks(PCallbacksProvider);
  *
  * @return - STATUS code of the execution
  */
-STATUS createDefaultCallbacksProvider(UINT32, PCHAR, PCHAR, PCHAR, UINT64, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, API_CALL_CACHE_TYPE, UINT64, BOOL, PClientCallbacks*);
+STATUS createDefaultCallbacksProvider(UINT32, PCHAR, PCHAR, PCHAR, UINT64, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, API_CALL_CACHE_TYPE, UINT64, BOOL,
+                                      PClientCallbacks*);
 
 ////////////////////////////////////////////////////
 // Aggregate callbacks definitions
@@ -128,9 +129,7 @@ STATUS broadcastConditionVariableAggregate(UINT64, CVAR);
 STATUS waitConditionVariableAggregate(UINT64, CVAR, MUTEX, UINT64);
 VOID freeConditionVariableAggregate(UINT64, CVAR);
 
-
-
-#ifdef  __cplusplus
+#ifdef __cplusplus
 }
 #endif
-#endif  /* __KINESIS_VIDEO_CALLBACKS_PROVIDER_INCLUDE_I__ */
+#endif /* __KINESIS_VIDEO_CALLBACKS_PROVIDER_INCLUDE_I__ */

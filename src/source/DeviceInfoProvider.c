@@ -90,8 +90,7 @@ CleanUp:
     return retStatus;
 }
 
-STATUS setDeviceInfoStorageSizeBasedOnBitrateAndBufferDuration(PDeviceInfo pDeviceInfo,
-                                                               UINT64 averageBitsPerSecond, UINT64 bufferDuration)
+STATUS setDeviceInfoStorageSizeBasedOnBitrateAndBufferDuration(PDeviceInfo pDeviceInfo, UINT64 averageBitsPerSecond, UINT64 bufferDuration)
 {
     ENTERS();
     UINT64 estimatedStorageSize = 0;
@@ -100,9 +99,9 @@ STATUS setDeviceInfoStorageSizeBasedOnBitrateAndBufferDuration(PDeviceInfo pDevi
     CHK(pDeviceInfo != NULL, STATUS_NULL_ARG);
     CHK(averageBitsPerSecond > 0 && bufferDuration > 0, STATUS_INVALID_ARG);
 
-    estimatedStorageSize = (UINT64) (pDeviceInfo->streamCount *
-                           (((DOUBLE) averageBitsPerSecond / 8) * ((DOUBLE) bufferDuration / HUNDREDS_OF_NANOS_IN_A_SECOND)) *
-                           STORAGE_ALLOCATION_DEFRAGMENTATION_FACTOR);
+    estimatedStorageSize =
+        (UINT64)(pDeviceInfo->streamCount * (((DOUBLE) averageBitsPerSecond / 8) * ((DOUBLE) bufferDuration / HUNDREDS_OF_NANOS_IN_A_SECOND)) *
+                 STORAGE_ALLOCATION_DEFRAGMENTATION_FACTOR);
 
     CHK_STATUS(setDeviceInfoStorageSize(pDeviceInfo, estimatedStorageSize));
 

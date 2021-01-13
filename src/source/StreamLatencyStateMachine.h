@@ -3,17 +3,18 @@
 
 #pragma once
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
-#define GRACE_PERIOD_STREAM_LATENCY_STATE_MACHINE                   (30 * HUNDREDS_OF_NANOS_IN_A_SECOND)
-#define VERIFICATION_PERIOD_STREAM_LATENCY_STATE_MACHINE            (60 * HUNDREDS_OF_NANOS_IN_A_SECOND)
+#define GRACE_PERIOD_STREAM_LATENCY_STATE_MACHINE        (30 * HUNDREDS_OF_NANOS_IN_A_SECOND)
+#define VERIFICATION_PERIOD_STREAM_LATENCY_STATE_MACHINE (60 * HUNDREDS_OF_NANOS_IN_A_SECOND)
 
-#define STREAM_LATENCY_STATE_MACHINE_UPDATE_TIMESTAMP(stateMachine) {\
-    (stateMachine)->quietTime = (stateMachine)->currTime + GRACE_PERIOD_STREAM_LATENCY_STATE_MACHINE;\
-    (stateMachine)->backToNormalTime = (stateMachine)->quietTime + VERIFICATION_PERIOD_STREAM_LATENCY_STATE_MACHINE;\
-}
+#define STREAM_LATENCY_STATE_MACHINE_UPDATE_TIMESTAMP(stateMachine)                                                                                  \
+    {                                                                                                                                                \
+        (stateMachine)->quietTime = (stateMachine)->currTime + GRACE_PERIOD_STREAM_LATENCY_STATE_MACHINE;                                            \
+        (stateMachine)->backToNormalTime = (stateMachine)->quietTime + VERIFICATION_PERIOD_STREAM_LATENCY_STATE_MACHINE;                             \
+    }
 
 struct __CallbackStateMachine;
 
@@ -43,9 +44,7 @@ VOID streamLatencyStateMachineSetThrottlePipelineState(PStreamLatencyStateMachin
 VOID streamLatencyStateMachineSetInfiniteRetryState(PStreamLatencyStateMachine);
 STATUS streamLatencyStateMachineDoInfiniteRetry(STREAM_HANDLE, PStreamLatencyStateMachine);
 
-
-
-#ifdef  __cplusplus
+#ifdef __cplusplus
 }
 #endif
 

@@ -16,10 +16,7 @@ CleanUp:
     return retStatus;
 }
 
-STATUS addFileLoggerPlatformCallbacksProvider(PClientCallbacks pClientCallbacks,
-                                              UINT64 stringBufferSize,
-                                              UINT64 maxLogFileCount,
-                                              PCHAR logFileDir,
+STATUS addFileLoggerPlatformCallbacksProvider(PClientCallbacks pClientCallbacks, UINT64 stringBufferSize, UINT64 maxLogFileCount, PCHAR logFileDir,
                                               BOOL printLog)
 {
     STATUS retStatus = STATUS_SUCCESS;
