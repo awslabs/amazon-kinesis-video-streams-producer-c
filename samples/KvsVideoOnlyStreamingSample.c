@@ -53,7 +53,7 @@ INT32 main(INT32 argc, CHAR *argv[])
     CLIENT_HANDLE clientHandle = INVALID_CLIENT_HANDLE_VALUE;
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     STATUS retStatus = STATUS_SUCCESS;
-    PCHAR accessKey = NULL, secretKey = NULL, sessionToken = NULL, streamName = NULL, region = NULL, cacertPath = NULL;
+    PCHAR accessKey = NULL, secretKey = NULL, sessionToken = NULL, streamName = NULL, region = "us-east-1", cacertPath = NULL;
     CHAR frameFilePath[MAX_PATH_LEN + 1];
     Frame frame;
     BYTE frameBuffer[200000]; // Assuming this is enough
@@ -83,9 +83,12 @@ INT32 main(INT32 argc, CHAR *argv[])
     cacertPath = getenv(CACERT_PATH_ENV_VAR);
     sessionToken = getenv(SESSION_TOKEN_ENV_VAR);
     streamName = argv[1];
+    /*
+     * hard coding for test...
     if ((region = getenv(DEFAULT_REGION_ENV_VAR)) == NULL) {
         region = (PCHAR) DEFAULT_AWS_REGION;
     }
+    */
 
     if (argc >= 3) {
         // Get the duration and convert to an integer
@@ -137,8 +140,6 @@ INT32 main(INT32 argc, CHAR *argv[])
     frame.frameData = frameBuffer;
     frame.version = FRAME_CURRENT_VERSION;
     frame.trackId = DEFAULT_VIDEO_TRACK_ID;
-    frame.duration = HUNDREDS_OF_NANOS_IN_A_SECOND / DEFAULT_FPS_VALUE;
-    frame.decodingTs = defaultGetTime(); // current time
     frame.presentationTs = frame.decodingTs;
 
     while(defaultGetTime() < streamStopTime) {
@@ -147,6 +148,9 @@ INT32 main(INT32 argc, CHAR *argv[])
         frame.size = SIZEOF(frameBuffer);
 
         CHK_STATUS(readFrameData(&frame, frameFilePath));
+
+        frame.decodingTs = GETTIME();
+        frame.presentationTs = frame.decodingTs;
 
         CHK_STATUS(putKinesisVideoFrame(streamHandle, &frame));
         if (firstFrame) {

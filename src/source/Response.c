@@ -422,7 +422,7 @@ STATUS curlCompleteSync(PCurlResponse pCurlResponse)
     // NOTE: Blocking call!
     result = curl_easy_perform(pCurlResponse->pCurl);
 
-    ATOMIC_STORE_BOOL(&pCurlRequest->blockedInCurl, TRUE);
+    ATOMIC_STORE_BOOL(&pCurlRequest->blockedInCurl, FALSE);
     CHK(!ATOMIC_LOAD_BOOL(&pCurlRequest->requestInfo.terminating), retStatus);
 
     if (result != CURLE_OK && pCurlResponse->terminated) {
