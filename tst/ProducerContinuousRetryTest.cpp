@@ -191,7 +191,7 @@ TEST_F(ProducerContinuousRetryTest, recover_on_retriable_producer_error) {
     EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStream(streamHandle));
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
     EXPECT_EQ(1, mConnectionStaleFnCount);
-    EXPECT_LT(1, mDescribeStreamFnCount);
+    EXPECT_LE(1, mDescribeStreamFnCount);
     // Reset connection should trigger a new PutMedia session
     EXPECT_LE(2, mPutStreamFnCount);
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
@@ -277,7 +277,7 @@ TEST_F(ProducerContinuousRetryTest, recover_on_retriable_common_lib_error) {
     EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStream(streamHandle));
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
     EXPECT_EQ(1, mConnectionStaleFnCount);
-    EXPECT_LT(1, mDescribeStreamFnCount);
+    EXPECT_LE(1, mDescribeStreamFnCount);
     // Reset connection should trigger a new PutMedia session
     EXPECT_LE(2, mPutStreamFnCount);
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
