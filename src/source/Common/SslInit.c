@@ -7,7 +7,7 @@
 #if defined(KVS_USE_OPENSSL) && defined(OPENSSL_THREADS) && defined(SET_SSL_CALLBACKS)
 
 // Unfortunately, this should be global due to the OpenSSL interfaces
-static MUTEX *gOpenSslMutexes = NULL;
+static MUTEX* gOpenSslMutexes = NULL;
 
 /**
  * Callback to provide mutex on a resource.
@@ -35,7 +35,7 @@ CRYPTO_dynlock_value* openSslDynCreateFunction(PCHAR file, INT32 line)
     UNUSED_PARAM(file);
     UNUSED_PARAM(line);
 
-    CRYPTO_dynlock_value *pDynLockVal = MEMALLOC(SIZEOF(CRYPTO_dynlock_value));
+    CRYPTO_dynlock_value* pDynLockVal = MEMALLOC(SIZEOF(CRYPTO_dynlock_value));
     if (NULL != pDynLockVal) {
         pDynLockVal->mutex = MUTEX_CREATE(FALSE);
     } else {
@@ -63,13 +63,13 @@ VOID openSslDynDestroyFunction(CRYPTO_dynlock_value* pDynLockVal, PCHAR file, IN
  * Callback to provide mutex on a resource. Works on a user defined CRYPTO_dynlock_value instead
  * of an array of mutexes like openSslLockCallback().
  */
-VOID openSslDynLockCallback(INT32 mode, CRYPTO_dynlock_value* pDynLockVal, PCHAR file, INT32 line) 
+VOID openSslDynLockCallback(INT32 mode, CRYPTO_dynlock_value* pDynLockVal, PCHAR file, INT32 line)
 {
     UNUSED_PARAM(file);
     UNUSED_PARAM(line);
 
     CHECK_EXT(pDynLockVal != NULL, "Invalid dynamic lock value specified in the callback");
-    
+
     if (mode & CRYPTO_LOCK) {
         MUTEX_LOCK(pDynLockVal->mutex);
     } else {
@@ -80,7 +80,7 @@ VOID openSslDynLockCallback(INT32 mode, CRYPTO_dynlock_value* pDynLockVal, PCHAR
 /**
  * Sets the currently-executing thread ID.
  */
-VOID openSslThreadIdCallback(CRYPTO_THREADID *id)
+VOID openSslThreadIdCallback(CRYPTO_THREADID* id)
 {
     CRYPTO_THREADID_set_numeric(id, GETTID());
 }
@@ -96,7 +96,7 @@ STATUS initializeSslCallbacks()
     // Allocate the storage for the mutex array
     // The mutex array must support up to CRYPTO_num_locks().
     count = CRYPTO_num_locks();
-    CHK(NULL != (gOpenSslMutexes = (MUTEX*)MEMCALLOC(count, SIZEOF(MUTEX))), STATUS_NOT_ENOUGH_MEMORY);
+    CHK(NULL != (gOpenSslMutexes = (MUTEX*) MEMCALLOC(count, SIZEOF(MUTEX))), STATUS_NOT_ENOUGH_MEMORY);
     for (i = 0; i < count; i++) {
         gOpenSslMutexes[i] = MUTEX_CREATE(FALSE);
     }

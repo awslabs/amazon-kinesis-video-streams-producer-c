@@ -4,13 +4,13 @@
 
 #pragma once
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
 STATUS blockingLwsCall(PRequestInfo, PCallInfo);
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 }
 #endif
 #endif /* __KINESIS_VIDEO_LWS_IOT_CREDENTIAL_PROVIDER_INCLUDE_I__ */

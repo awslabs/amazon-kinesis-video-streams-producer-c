@@ -6,7 +6,7 @@ Main internal include file
 
 #pragma once
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -44,8 +44,8 @@ typedef enum {
 /**
  * Default stream mapping hash table bucket count/length
  */
-#define STREAM_MAPPING_HASH_TABLE_BUCKET_LENGTH        2
-#define STREAM_MAPPING_HASH_TABLE_BUCKET_COUNT         100
+#define STREAM_MAPPING_HASH_TABLE_BUCKET_LENGTH 2
+#define STREAM_MAPPING_HASH_TABLE_BUCKET_COUNT  100
 
 ////////////////////////////////////////////////////
 // Project internal includes
@@ -73,7 +73,7 @@ typedef enum {
 // Project internal functions
 ////////////////////////////////////////////////////
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 }
 #endif
-#endif  /* __KINESIS_VIDEO_PRODUCER_INCLUDE_I__ */
+#endif /* __KINESIS_VIDEO_PRODUCER_INCLUDE_I__ */

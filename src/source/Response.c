@@ -17,10 +17,9 @@ STATUS createCurlResponse(PCurlRequest pCurlRequest, PCurlResponse* ppCurlRespon
     PCHAR debugDumpDataFileDir = NULL;
     UINT32 debugDumpDataFileDirLen = 0;
 
-    CHK(ppCurlResponse != NULL &&
-        pCurlRequest != NULL &&
-        pCurlRequest->pCurlApiCallbacks != NULL &&
-        pCurlRequest->pCurlApiCallbacks->pCallbacksProvider != NULL, STATUS_NULL_ARG);
+    CHK(ppCurlResponse != NULL && pCurlRequest != NULL && pCurlRequest->pCurlApiCallbacks != NULL &&
+            pCurlRequest->pCurlApiCallbacks->pCallbacksProvider != NULL,
+        STATUS_NULL_ARG);
     CHK(IS_VALID_STREAM_HANDLE(pCurlRequest->streamHandle), STATUS_INVALID_ARG);
     pCurlApiCallbacks = pCurlRequest->pCurlApiCallbacks;
     pCallbacksProvider = pCurlApiCallbacks->pCallbacksProvider;
@@ -39,7 +38,7 @@ STATUS createCurlResponse(PCurlRequest pCurlRequest, PCurlResponse* ppCurlRespon
     if ((debugDumpDataFileDir = getenv(KVS_DEBUG_DUMP_DATA_FILE_DIR_ENV_VAR)) != NULL && pCurlRequest->streaming) {
         // debugDumpDataFileDirLen is MAX_PATH_LEN + 1 at max plus null terminator.
         debugDumpDataFileDirLen = (UINT32) SNPRINTF(pCurlResponse->debugDumpFilePath, MAX_PATH_LEN + 1, (PCHAR) "%s/%s_%" PRIu64 ".mkv",
-                 debugDumpDataFileDir, pCurlRequest->streamName, (UINT64) pCurlRequest->uploadHandle);
+                                                    debugDumpDataFileDir, pCurlRequest->streamName, (UINT64) pCurlRequest->uploadHandle);
         CHK(debugDumpDataFileDirLen <= MAX_PATH_LEN, STATUS_PATH_TOO_LONG);
         pCurlResponse->debugDumpFile = TRUE;
         pCurlResponse->debugDumpFilePath[MAX_PATH_LEN] = '\0';
@@ -50,19 +49,13 @@ STATUS createCurlResponse(PCurlRequest pCurlRequest, PCurlResponse* ppCurlRespon
 
     // Create the mutex
     pCurlResponse->lock = pCallbacksProvider->clientCallbacks.createMutexFn(pCallbacksProvider->clientCallbacks.customData, TRUE);
-    CHK(pCurlResponse->lock != INVALID_MUTEX_VALUE , STATUS_INVALID_OPERATION);
+    CHK(pCurlResponse->lock != INVALID_MUTEX_VALUE, STATUS_INVALID_OPERATION);
 
     // Set the parent object
     pCurlResponse->pCurlRequest = pCurlRequest;
 
-    CHK_STATUS(initializeCurlSession(&pCurlRequest->requestInfo,
-                                     &pCurlResponse->callInfo,
-                                     &pCurlResponse->pCurl,
-                                     pCurlRequest,
-                                     writeHeaderCallback,
-                                     postReadCallback,
-                                     postWriteCallback,
-                                     postResponseWriteCallback));
+    CHK_STATUS(initializeCurlSession(&pCurlRequest->requestInfo, &pCurlResponse->callInfo, &pCurlResponse->pCurl, pCurlRequest, writeHeaderCallback,
+                                     postReadCallback, postWriteCallback, postResponseWriteCallback));
 
 CleanUp:
 
@@ -95,8 +88,7 @@ STATUS freeCurlResponse(PCurlResponse* ppCurlResponse)
     // Call is idempotent
     CHK(pCurlResponse != NULL, retStatus);
 
-    if (pCurlResponse->pCurlRequest != NULL &&
-        pCurlResponse->pCurlRequest->pCurlApiCallbacks != NULL &&
+    if (pCurlResponse->pCurlRequest != NULL && pCurlResponse->pCurlRequest->pCurlApiCallbacks != NULL &&
         pCurlResponse->pCurlRequest->pCurlApiCallbacks->pCallbacksProvider != NULL) {
         pCallbacksProvider = pCurlResponse->pCurlRequest->pCurlApiCallbacks->pCallbacksProvider;
     }
@@ -130,14 +122,8 @@ CleanUp:
     return retStatus;
 }
 
-STATUS initializeCurlSession(PRequestInfo pRequestInfo,
-                             PCallInfo pCallInfo,
-                             CURL** ppCurl,
-                             PVOID data,
-                             CurlCallbackFunc writeHeaderFn,
-                             CurlCallbackFunc readFn,
-                             CurlCallbackFunc writeFn,
-                             CurlCallbackFunc responseWriteFn)
+STATUS initializeCurlSession(PRequestInfo pRequestInfo, PCallInfo pCallInfo, CURL** ppCurl, PVOID data, CurlCallbackFunc writeHeaderFn,
+                             CurlCallbackFunc readFn, CurlCallbackFunc writeFn, CurlCallbackFunc responseWriteFn)
 {
     ENTERS();
     STATUS retStatus = STATUS_SUCCESS;
@@ -181,8 +167,7 @@ STATUS initializeCurlSession(PRequestInfo pRequestInfo,
                 // We should check for the extension being PEM
                 length = (UINT32) STRNLEN(pRequestInfo->certPath, MAX_PATH_LEN);
                 CHK(length > ARRAY_SIZE(CA_CERT_FILE_SUFFIX), STATUS_INVALID_ARG_LEN);
-                CHK(0 ==
-                    STRCMPI(CA_CERT_FILE_SUFFIX, &pRequestInfo->certPath[length - ARRAY_SIZE(CA_CERT_FILE_SUFFIX) + 1]),
+                CHK(0 == STRCMPI(CA_CERT_FILE_SUFFIX, &pRequestInfo->certPath[length - ARRAY_SIZE(CA_CERT_FILE_SUFFIX) + 1]),
                     STATUS_INVALID_CA_CERT_PATH);
 
                 curl_easy_setopt(pCurl, CURLOPT_CAINFO, pRequestInfo->certPath);
@@ -197,8 +182,7 @@ STATUS initializeCurlSession(PRequestInfo pRequestInfo,
 
     // set request completion timeout in milliseconds
     if (pRequestInfo->completionTimeout != SERVICE_CALL_INFINITE_TIMEOUT) {
-        curl_easy_setopt(pCurl, CURLOPT_TIMEOUT_MS,
-                         pRequestInfo->completionTimeout / HUNDREDS_OF_NANOS_IN_A_MILLISECOND);
+        curl_easy_setopt(pCurl, CURLOPT_TIMEOUT_MS, pRequestInfo->completionTimeout / HUNDREDS_OF_NANOS_IN_A_MILLISECOND);
     }
     curl_easy_setopt(pCurl, CURLOPT_CONNECTTIMEOUT_MS, pRequestInfo->connectionTimeout / HUNDREDS_OF_NANOS_IN_A_MILLISECOND);
     curl_easy_setopt(pCurl, CURLOPT_TCP_NODELAY, 1);
@@ -207,7 +191,7 @@ STATUS initializeCurlSession(PRequestInfo pRequestInfo,
     curl_easy_setopt(pCurl, CURLOPT_HEADERFUNCTION, writeHeaderFn);
     curl_easy_setopt(pCurl, CURLOPT_HEADERDATA, data);
 
-    switch(pRequestInfo->verb) {
+    switch (pRequestInfo->verb) {
         case HTTP_REQUEST_VERB_GET:
             curl_easy_setopt(pCurl, CURLOPT_HTTPGET, 1L);
             break;
@@ -399,9 +383,7 @@ STATUS curlCompleteSync(PCurlResponse pCurlResponse)
     PCurlRequest pCurlRequest;
     CHAR headers[MAX_REQUEST_HEADER_COUNT * (MAX_REQUEST_HEADER_STRING_LEN + MAX_REQUEST_HEADER_OUTPUT_DELIMITER)];
 
-    CHK(pCurlResponse != NULL &&
-        pCurlResponse->pCurlRequest != NULL &&
-        pCurlResponse->pCurlRequest->pCurlApiCallbacks != NULL, STATUS_NULL_ARG);
+    CHK(pCurlResponse != NULL && pCurlResponse->pCurlRequest != NULL && pCurlResponse->pCurlRequest->pCurlApiCallbacks != NULL, STATUS_NULL_ARG);
     pCurlRequest = pCurlResponse->pCurlRequest;
     pCurlApiCallbacks = pCurlRequest->pCurlApiCallbacks;
 
@@ -431,10 +413,7 @@ STATUS curlCompleteSync(PCurlResponse pCurlResponse)
         pCurlResponse->callInfo.callResult = SERVICE_CALL_REQUEST_TIMEOUT;
     } else if (result != CURLE_OK) {
         curl_easy_getinfo(pCurlResponse->pCurl, CURLINFO_EFFECTIVE_URL, &url);
-        DLOGW("curl perform failed for url %s with result %s: %s",
-              url,
-              curl_easy_strerror(result),
-              pCurlResponse->callInfo.errorBuffer);
+        DLOGW("curl perform failed for url %s with result %s: %s", url, curl_easy_strerror(result), pCurlResponse->callInfo.errorBuffer);
 
         pCurlResponse->callInfo.callResult = getServiceCallResultFromCurlStatus(result);
     } else {
@@ -452,11 +431,8 @@ STATUS curlCompleteSync(PCurlResponse pCurlResponse)
             STRCAT(headers, header->data);
         }
 
-        DLOGW("HTTP Error %lu : Response: %s\nRequest URL: %s\nRequest Headers:%s",
-              pCurlResponse->callInfo.httpStatus,
-              pCurlResponse->callInfo.responseData,
-              url,
-              headers);
+        DLOGW("HTTP Error %lu : Response: %s\nRequest URL: %s\nRequest Headers:%s", pCurlResponse->callInfo.httpStatus,
+              pCurlResponse->callInfo.responseData, url, headers);
     }
 
 CleanUp:
@@ -475,8 +451,8 @@ STATUS notifyDataAvailable(PCurlResponse pCurlResponse, UINT64 durationAvailable
 
     // pCurlResponse should be a putMedia session
     if (!pCurlResponse->terminated) {
-        DLOGV("Note data received: duration(100ns): %" PRIu64 " bytes %" PRIu64 " for stream handle %" PRIu64,
-              durationAvailable, sizeAvailable, pCurlResponse->pCurlRequest->uploadHandle);
+        DLOGV("Note data received: duration(100ns): %" PRIu64 " bytes %" PRIu64 " for stream handle %" PRIu64, durationAvailable, sizeAvailable,
+              pCurlResponse->pCurlRequest->uploadHandle);
 
         if (pCurlResponse->paused && pCurlResponse->pCurl != NULL) {
             pCurlResponse->paused = FALSE;
@@ -572,7 +548,7 @@ SIZE_T postResponseWriteCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PV
         MEMCPY(pNewBuffer, pCurlResponse->callInfo.responseData, pCurlResponse->callInfo.responseDataLen);
 
         // Append the new data
-        MEMCPY((PBYTE)pNewBuffer + pCurlResponse->callInfo.responseDataLen, pBuffer, dataSize);
+        MEMCPY((PBYTE) pNewBuffer + pCurlResponse->callInfo.responseDataLen, pBuffer, dataSize);
 
         // Free the old if exists
         if (pCurlResponse->callInfo.responseData != NULL) {
@@ -596,7 +572,7 @@ SIZE_T postWriteCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID cust
     PCurlApiCallbacks pCurlApiCallbacks;
     SIZE_T dataSize = size * numItems, bufferSize;
     STATUS retStatus = STATUS_SUCCESS;
-    PCurlRequest  pCurlRequest = (PCurlRequest) customData;
+    PCurlRequest pCurlRequest = (PCurlRequest) customData;
 
     if (pCurlRequest == NULL || pCurlRequest->pCurlResponse == NULL || pCurlRequest->pCurlApiCallbacks == NULL ||
         ATOMIC_LOAD_BOOL(&pCurlRequest->requestInfo.terminating)) {
@@ -606,21 +582,15 @@ SIZE_T postWriteCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID cust
     pCurlResponse = pCurlRequest->pCurlResponse;
     pCurlApiCallbacks = pCurlRequest->pCurlApiCallbacks;
 
-    DLOGD("Curl post body write function for stream with handle: %s and upload handle: %" PRIu64 " returned: %.*s",
-          pCurlRequest->streamName, pCurlResponse->pCurlRequest->uploadHandle, dataSize, pBuffer);
+    DLOGD("Curl post body write function for stream with handle: %s and upload handle: %" PRIu64 " returned: %.*s", pCurlRequest->streamName,
+          pCurlResponse->pCurlRequest->uploadHandle, dataSize, pBuffer);
 
     bufferSize = dataSize;
     if (pCurlApiCallbacks->curlWriteCallbackHookFn != NULL) {
-        CHK_STATUS(pCurlApiCallbacks->curlWriteCallbackHookFn(pCurlResponse,
-                                                              pBuffer,
-                                                              (UINT32) dataSize,
-                                                              &pBuffer,
-                                                              (PUINT32) &bufferSize));
+        CHK_STATUS(pCurlApiCallbacks->curlWriteCallbackHookFn(pCurlResponse, pBuffer, (UINT32) dataSize, &pBuffer, (PUINT32) &bufferSize));
     }
 
-    CHK_STATUS(kinesisVideoStreamParseFragmentAck(pCurlResponse->pCurlRequest->streamHandle,
-                                                  pCurlResponse->pCurlRequest->uploadHandle,
-                                                  pBuffer,
+    CHK_STATUS(kinesisVideoStreamParseFragmentAck(pCurlResponse->pCurlRequest->streamHandle, pCurlResponse->pCurlRequest->uploadHandle, pBuffer,
                                                   (UINT32) bufferSize));
 
 CleanUp:
@@ -644,7 +614,7 @@ SIZE_T postReadCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID custo
     STATUS retStatus = STATUS_SUCCESS;
     UINT32 retrievedSize = 0;
     UPLOAD_HANDLE uploadHandle;
-    PCurlRequest  pCurlRequest = (PCurlRequest) customData;
+    PCurlRequest pCurlRequest = (PCurlRequest) customData;
 
     if (pCurlRequest == NULL || pCurlRequest->pCurlResponse == NULL || pCurlRequest->pCurlApiCallbacks == NULL) {
         bytesWritten = CURL_READFUNC_ABORT;
@@ -665,25 +635,18 @@ SIZE_T postReadCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID custo
         CHK(FALSE, retStatus);
     }
 
-    retStatus = getKinesisVideoStreamData(pCurlResponse->pCurlRequest->streamHandle,
-                                          uploadHandle,
-                                          (PBYTE) pBuffer,
-                                          (UINT32) bufferSize,
-                                          &retrievedSize);
+    retStatus =
+        getKinesisVideoStreamData(pCurlResponse->pCurlRequest->streamHandle, uploadHandle, (PBYTE) pBuffer, (UINT32) bufferSize, &retrievedSize);
 
     if (pCurlApiCallbacks->curlReadCallbackHookFn != NULL) {
-        retStatus = pCurlApiCallbacks->curlReadCallbackHookFn(pCurlResponse,
-                                                              uploadHandle,
-                                                              (PBYTE) pBuffer,
-                                                              (UINT32) bufferSize,
-                                                              &retrievedSize,
-                                                              retStatus);
+        retStatus =
+            pCurlApiCallbacks->curlReadCallbackHookFn(pCurlResponse, uploadHandle, (PBYTE) pBuffer, (UINT32) bufferSize, &retrievedSize, retStatus);
     }
 
     bytesWritten = (SIZE_T) retrievedSize;
 
-    DLOGV("Get Stream data returned: buffer size: %u written bytes: %u for upload handle: %" PRIu64 " current stream handle: %" PRIu64,
-          bufferSize, bytesWritten, uploadHandle, pCurlResponse->pCurlRequest->streamHandle);
+    DLOGV("Get Stream data returned: buffer size: %u written bytes: %u for upload handle: %" PRIu64 " current stream handle: %" PRIu64, bufferSize,
+          bytesWritten, uploadHandle, pCurlResponse->pCurlRequest->streamHandle);
 
     // The return should be OK, no more data or an end of stream
     switch (retStatus) {
@@ -698,8 +661,7 @@ SIZE_T postReadCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID custo
             break;
 
         case STATUS_END_OF_STREAM:
-            DLOGI("Reported end-of-stream for stream %s. Upload handle: %" PRIu64,
-                  pCurlRequest->streamName, uploadHandle);
+            DLOGI("Reported end-of-stream for stream %s. Upload handle: %" PRIu64, pCurlRequest->streamName, uploadHandle);
 
             pCurlResponse->endOfStream = TRUE;
 

@@ -6,11 +6,11 @@ Request Info internal header
 
 #pragma once
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 }
 #endif
-#endif  /* __KINESIS_VIDEO_REQUEST_INFO_INCLUDE_I__ */
+#endif /* __KINESIS_VIDEO_REQUEST_INFO_INCLUDE_I__ */

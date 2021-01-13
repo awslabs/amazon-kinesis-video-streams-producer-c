@@ -3,16 +3,17 @@
 
 #pragma once
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
-#define GRACE_PERIOD_CONNECTION_STALE_STATE_MACHINE                     (30 * HUNDREDS_OF_NANOS_IN_A_SECOND)
-#define VERIFICATION_PERIOD_CONNECTION_STALE_STATE_MACHINE              (60 * HUNDREDS_OF_NANOS_IN_A_SECOND)
-#define CONNECTION_STALE_STATE_MACHINE_UPDATE_TIMESTAMP(stateMachine) { \
-    (stateMachine)->quietTime = (stateMachine)->currTime + GRACE_PERIOD_CONNECTION_STALE_STATE_MACHINE; \
-    (stateMachine)->backToNormalTime = (stateMachine)->quietTime + VERIFICATION_PERIOD_CONNECTION_STALE_STATE_MACHINE; \
-}
+#define GRACE_PERIOD_CONNECTION_STALE_STATE_MACHINE        (30 * HUNDREDS_OF_NANOS_IN_A_SECOND)
+#define VERIFICATION_PERIOD_CONNECTION_STALE_STATE_MACHINE (60 * HUNDREDS_OF_NANOS_IN_A_SECOND)
+#define CONNECTION_STALE_STATE_MACHINE_UPDATE_TIMESTAMP(stateMachine)                                                                                \
+    {                                                                                                                                                \
+        (stateMachine)->quietTime = (stateMachine)->currTime + GRACE_PERIOD_CONNECTION_STALE_STATE_MACHINE;                                          \
+        (stateMachine)->backToNormalTime = (stateMachine)->quietTime + VERIFICATION_PERIOD_CONNECTION_STALE_STATE_MACHINE;                           \
+    }
 
 struct __CallbackStateMachine;
 
@@ -38,7 +39,7 @@ STATUS setConnectionStaleStateMachine(struct __CallbackStateMachine*, STREAM_CAL
 STATUS connectionStaleStateMachineSetResetConnectionState(STREAM_HANDLE, PConnectionStaleStateMachine);
 STATUS connectionStaleStateMachineHandleConnectionStale(STREAM_HANDLE, PConnectionStaleStateMachine);
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 }
 #endif
 

@@ -3,7 +3,7 @@
 
 #pragma once
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -58,7 +58,7 @@ STATUS continuousRetryStreamFreeHandler(PUINT64);
 STATUS continuousRetryStreamShutdownHandler(UINT64, STREAM_HANDLE, BOOL);
 STATUS continuousRetryStreamClosedHandler(UINT64, STREAM_HANDLE, UPLOAD_HANDLE);
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 }
 #endif
 
