@@ -4,13 +4,13 @@
 
 #pragma once
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
-* Forward declarations
-*/
+ * Forward declarations
+ */
 
 typedef struct __StaticCredentialProvider StaticCredentialProvider;
 struct __StaticCredentialProvider {
@@ -27,7 +27,7 @@ typedef struct __StaticCredentialProvider* PStaticCredentialProvider;
 ////////////////////////////////////////////////////////////////////////
 STATUS getStaticCredentials(PAwsCredentialProvider, PAwsCredentials*);
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 }
 #endif
 #endif /* __KINESIS_VIDEO_STATIC_CREDENTIAL_PROVIDER_INCLUDE_I__ */

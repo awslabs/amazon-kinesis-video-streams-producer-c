@@ -1,21 +1,21 @@
 #include <com/amazonaws/kinesis/video/cproducer/Include.h>
 
-#define DEFAULT_RETENTION_PERIOD            2 * HUNDREDS_OF_NANOS_IN_AN_HOUR
-#define DEFAULT_BUFFER_DURATION             120 * HUNDREDS_OF_NANOS_IN_A_SECOND
-#define DEFAULT_CALLBACK_CHAIN_COUNT        5
-#define DEFAULT_KEY_FRAME_INTERVAL          45
-#define DEFAULT_FPS_VALUE                   25
-#define DEFAULT_STREAM_DURATION             20 * HUNDREDS_OF_NANOS_IN_A_SECOND
-#define SAMPLE_AUDIO_FRAME_DURATION         (20 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND)
-#define SAMPLE_VIDEO_FRAME_DURATION         (HUNDREDS_OF_NANOS_IN_A_SECOND / DEFAULT_FPS_VALUE)
-#define AUDIO_TRACK_SAMPLING_RATE           48000
-#define AUDIO_TRACK_CHANNEL_CONFIG          2
+#define DEFAULT_RETENTION_PERIOD     2 * HUNDREDS_OF_NANOS_IN_AN_HOUR
+#define DEFAULT_BUFFER_DURATION      120 * HUNDREDS_OF_NANOS_IN_A_SECOND
+#define DEFAULT_CALLBACK_CHAIN_COUNT 5
+#define DEFAULT_KEY_FRAME_INTERVAL   45
+#define DEFAULT_FPS_VALUE            25
+#define DEFAULT_STREAM_DURATION      20 * HUNDREDS_OF_NANOS_IN_A_SECOND
+#define SAMPLE_AUDIO_FRAME_DURATION  (20 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND)
+#define SAMPLE_VIDEO_FRAME_DURATION  (HUNDREDS_OF_NANOS_IN_A_SECOND / DEFAULT_FPS_VALUE)
+#define AUDIO_TRACK_SAMPLING_RATE    48000
+#define AUDIO_TRACK_CHANNEL_CONFIG   2
 
-#define NUMBER_OF_H264_FRAME_FILES          403
-#define NUMBER_OF_AAC_FRAME_FILES           582
+#define NUMBER_OF_H264_FRAME_FILES 403
+#define NUMBER_OF_AAC_FRAME_FILES  582
 
-#define FILE_LOGGING_BUFFER_SIZE            (100 * 1024)
-#define MAX_NUMBER_OF_LOG_FILES             5
+#define FILE_LOGGING_BUFFER_SIZE (100 * 1024)
+#define MAX_NUMBER_OF_LOG_FILES  5
 
 typedef struct {
     PBYTE buffer;
@@ -95,7 +95,7 @@ CleanUp:
         printf("putVideoFrameRoutine failed with 0x%08x", retStatus);
     }
 
-    return (PVOID) (ULONG_PTR) retStatus;
+    return (PVOID)(ULONG_PTR) retStatus;
 }
 
 PVOID putAudioFrameRoutine(PVOID args)
@@ -114,7 +114,7 @@ PVOID putAudioFrameRoutine(PVOID args)
     frame.version = FRAME_CURRENT_VERSION;
     frame.trackId = DEFAULT_AUDIO_TRACK_ID;
     frame.duration = 0;
-    frame.decodingTs = 0; // relative time mode
+    frame.decodingTs = 0;     // relative time mode
     frame.presentationTs = 0; // relative time mode
     frame.index = 0;
     frame.flags = FRAME_FLAG_NONE; // audio track is not used to cut fragment
@@ -150,10 +150,10 @@ CleanUp:
         printf("putAudioFrameRoutine failed with 0x%08x", retStatus);
     }
 
-    return (PVOID) (ULONG_PTR) retStatus;
+    return (PVOID)(ULONG_PTR) retStatus;
 }
 
-INT32 main(INT32 argc, CHAR *argv[])
+INT32 main(INT32 argc, CHAR* argv[])
 {
     PDeviceInfo pDeviceInfo = NULL;
     PStreamInfo pStreamInfo = NULL;
@@ -174,7 +174,8 @@ INT32 main(INT32 argc, CHAR *argv[])
     MEMSET(&data, 0x00, SIZEOF(SampleCustomData));
 
     if (argc < 2) {
-        printf("Usage: AWS_ACCESS_KEY_ID=SAMPLEKEY AWS_SECRET_ACCESS_KEY=SAMPLESECRET %s <stream_name> <duration_in_seconds> <frame_files_path>\n", argv[0]);
+        printf("Usage: AWS_ACCESS_KEY_ID=SAMPLEKEY AWS_SECRET_ACCESS_KEY=SAMPLESECRET %s <stream_name> <duration_in_seconds> <frame_files_path>\n",
+               argv[0]);
         CHK(FALSE, STATUS_INVALID_ARG);
     }
 
@@ -194,7 +195,7 @@ INT32 main(INT32 argc, CHAR *argv[])
     }
 
     printf("Loading audio frames...\n");
-    for(i = 0; i < NUMBER_OF_AAC_FRAME_FILES; ++i) {
+    for (i = 0; i < NUMBER_OF_AAC_FRAME_FILES; ++i) {
         SNPRINTF(filePath, MAX_PATH_LEN, "%s/aacSampleFrames/sample-%03d.aac", data.sampleDir, i + 1);
         CHK_STATUS(readFile(filePath, TRUE, NULL, &fileSize));
         data.audioFrames[i].buffer = (PBYTE) MEMALLOC(fileSize);
@@ -204,7 +205,7 @@ INT32 main(INT32 argc, CHAR *argv[])
     printf("Done loading audio frames.\n");
 
     printf("Loading video frames...\n");
-    for(i = 0; i < NUMBER_OF_H264_FRAME_FILES; ++i) {
+    for (i = 0; i < NUMBER_OF_H264_FRAME_FILES; ++i) {
         SNPRINTF(filePath, MAX_PATH_LEN, "%s/h264SampleFrames/frame-%03d.h264", data.sampleDir, i + 1);
         CHK_STATUS(readFile(filePath, TRUE, NULL, &fileSize));
         data.videoFrames[i].buffer = (PBYTE) MEMALLOC(fileSize);
@@ -239,35 +240,25 @@ INT32 main(INT32 argc, CHAR *argv[])
     // adjust members of pStreamInfo here if needed
 
     // set up audio cpd.
-    pAudioTrack = pStreamInfo->streamCaps.trackInfoList[0].trackId == DEFAULT_AUDIO_TRACK_ID ?
-                  &pStreamInfo->streamCaps.trackInfoList[0] :
-                  &pStreamInfo->streamCaps.trackInfoList[1];
+    pAudioTrack = pStreamInfo->streamCaps.trackInfoList[0].trackId == DEFAULT_AUDIO_TRACK_ID ? &pStreamInfo->streamCaps.trackInfoList[0]
+                                                                                             : &pStreamInfo->streamCaps.trackInfoList[1];
     // generate audio cpd
     pAudioTrack->codecPrivateData = audioCpd;
     pAudioTrack->codecPrivateDataSize = KVS_AAC_CPD_SIZE_BYTE;
-    CHK_STATUS(mkvgenGenerateAacCpd(AAC_LC, AUDIO_TRACK_SAMPLING_RATE, AUDIO_TRACK_CHANNEL_CONFIG, pAudioTrack->codecPrivateData, pAudioTrack->codecPrivateDataSize));
+    CHK_STATUS(mkvgenGenerateAacCpd(AAC_LC, AUDIO_TRACK_SAMPLING_RATE, AUDIO_TRACK_CHANNEL_CONFIG, pAudioTrack->codecPrivateData,
+                                    pAudioTrack->codecPrivateDataSize));
 
     // use relative time mode. Buffer timestamps start from 0
     pStreamInfo->streamCaps.absoluteFragmentTimes = FALSE;
 
     data.startTime = GETTIME();
     data.firstFrame = TRUE;
-    CHK_STATUS(createDefaultCallbacksProviderWithAwsCredentials(accessKey,
-                                                                secretKey,
-                                                                sessionToken,
-                                                                MAX_UINT64,
-                                                                region,
-                                                                cacertPath,
-                                                                NULL,
-                                                                NULL,
+    CHK_STATUS(createDefaultCallbacksProviderWithAwsCredentials(accessKey, secretKey, sessionToken, MAX_UINT64, region, cacertPath, NULL, NULL,
                                                                 &pClientCallbacks));
 
-    if(NULL != getenv(ENABLE_FILE_LOGGING)) {
-        if((retStatus = addFileLoggerPlatformCallbacksProvider(pClientCallbacks,
-                                                               FILE_LOGGING_BUFFER_SIZE,
-                                                               MAX_NUMBER_OF_LOG_FILES,
-                                                               (PCHAR) FILE_LOGGER_LOG_FILE_DIRECTORY_PATH,
-                                                               TRUE) != STATUS_SUCCESS)) {
+    if (NULL != getenv(ENABLE_FILE_LOGGING)) {
+        if ((retStatus = addFileLoggerPlatformCallbacksProvider(pClientCallbacks, FILE_LOGGING_BUFFER_SIZE, MAX_NUMBER_OF_LOG_FILES,
+                                                                (PCHAR) FILE_LOGGER_LOG_FILE_DIRECTORY_PATH, TRUE) != STATUS_SUCCESS)) {
             printf("File logging enable option failed with 0x%08x error code\n", retStatus);
         }
     }
@@ -283,10 +274,8 @@ INT32 main(INT32 argc, CHAR *argv[])
     data.streamStartTime = defaultGetTime();
     ATOMIC_STORE_BOOL(&data.firstVideoFramePut, FALSE);
 
-    THREAD_CREATE(&videoSendTid, putVideoFrameRoutine,
-                          (PVOID) &data);
-    THREAD_CREATE(&audioSendTid, putAudioFrameRoutine,
-                          (PVOID) &data);
+    THREAD_CREATE(&videoSendTid, putVideoFrameRoutine, (PVOID) &data);
+    THREAD_CREATE(&audioSendTid, putAudioFrameRoutine, (PVOID) &data);
 
     THREAD_JOIN(videoSendTid, NULL);
     THREAD_JOIN(audioSendTid, NULL);
@@ -301,11 +290,11 @@ CleanUp:
         printf("Failed with status 0x%08x\n", retStatus);
     }
 
-    for(i = 0; i < NUMBER_OF_AAC_FRAME_FILES; ++i) {
+    for (i = 0; i < NUMBER_OF_AAC_FRAME_FILES; ++i) {
         SAFE_MEMFREE(data.audioFrames[i].buffer);
     }
 
-    for(i = 0; i < NUMBER_OF_H264_FRAME_FILES; ++i) {
+    for (i = 0; i < NUMBER_OF_H264_FRAME_FILES; ++i) {
         SAFE_MEMFREE(data.videoFrames[i].buffer);
     }
     freeDeviceInfo(&pDeviceInfo);

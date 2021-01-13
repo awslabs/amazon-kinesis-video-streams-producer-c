@@ -4,13 +4,13 @@
 
 #pragma once
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
-* Forward declarations
-*/
+ * Forward declarations
+ */
 
 typedef struct __StaticAuthCallbacks StaticAuthCallbacks;
 
@@ -33,10 +33,10 @@ typedef struct __StaticAuthCallbacks* PStaticAuthCallbacks;
 
 // The callback functions
 STATUS getStreamingTokenStaticFunc(UINT64, PCHAR, STREAM_ACCESS_MODE, PServiceCallContext);
-STATUS getSecurityTokenStaticFunc(UINT64, PBYTE *, PUINT32, PUINT64);
+STATUS getSecurityTokenStaticFunc(UINT64, PBYTE*, PUINT32, PUINT64);
 STATUS freeStaticAuthCallbacksFunc(PUINT64);
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 }
 #endif
 #endif /* __KINESIS_VIDEO_STATIC_AUTH_CALLBACKS_INCLUDE_I__ */

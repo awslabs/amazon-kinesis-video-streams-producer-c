@@ -4,8 +4,7 @@
 #define LOG_CLASS "ContinuousRetryStreamCallbacks"
 #include "Include_i.h"
 
-STATUS createContinuousRetryStreamCallbacks(PClientCallbacks pCallbacksProvider,
-                                            PStreamCallbacks* ppStreamCallbacks)
+STATUS createContinuousRetryStreamCallbacks(PClientCallbacks pCallbacksProvider, PStreamCallbacks* ppStreamCallbacks)
 {
     ENTERS();
     STATUS retStatus = STATUS_SUCCESS;
@@ -25,11 +24,12 @@ STATUS createContinuousRetryStreamCallbacks(PClientCallbacks pCallbacksProvider,
     pContinuousRetryStreamCallbacks->pCallbacksProvider = (PCallbacksProvider) pCallbacksProvider;
 
     // Create the mapping table
-    CHK_STATUS(hashTableCreateWithParams(STREAM_MAPPING_HASH_TABLE_BUCKET_COUNT, STREAM_MAPPING_HASH_TABLE_BUCKET_LENGTH, &pContinuousRetryStreamCallbacks->pStreamMapping));
+    CHK_STATUS(hashTableCreateWithParams(STREAM_MAPPING_HASH_TABLE_BUCKET_COUNT, STREAM_MAPPING_HASH_TABLE_BUCKET_LENGTH,
+                                         &pContinuousRetryStreamCallbacks->pStreamMapping));
 
     // Create the guard locks
     pContinuousRetryStreamCallbacks->mappingLock = pContinuousRetryStreamCallbacks->pCallbacksProvider->clientCallbacks.createMutexFn(
-            pContinuousRetryStreamCallbacks->pCallbacksProvider->clientCallbacks.customData, TRUE);
+        pContinuousRetryStreamCallbacks->pCallbacksProvider->clientCallbacks.customData, TRUE);
 
     // Set callbacks
     pContinuousRetryStreamCallbacks->streamCallbacks.streamConnectionStaleFn = continuousRetryStreamConnectionStaleHandler;
@@ -76,8 +76,7 @@ STATUS freeContinuousRetryStreamCallbacks(PStreamCallbacks* ppStreamCallbacks)
     pCallbacksProvider = pContinuousRetryStreamCallbacks->pCallbacksProvider;
 
     // Iterate every item in the mapping table and free
-    CHK_STATUS(hashTableIterateEntries(pContinuousRetryStreamCallbacks->pStreamMapping,
-                                       (UINT64) pContinuousRetryStreamCallbacks,
+    CHK_STATUS(hashTableIterateEntries(pContinuousRetryStreamCallbacks->pStreamMapping, (UINT64) pContinuousRetryStreamCallbacks,
                                        removeMappingEntryCallback));
 
     // Free the stream handle mapping table
@@ -85,8 +84,7 @@ STATUS freeContinuousRetryStreamCallbacks(PStreamCallbacks* ppStreamCallbacks)
 
     // Free the locks
     if (pContinuousRetryStreamCallbacks->mappingLock != INVALID_MUTEX_VALUE) {
-        pCallbacksProvider->clientCallbacks.freeMutexFn(pCallbacksProvider->clientCallbacks.customData,
-                                                        pContinuousRetryStreamCallbacks->mappingLock);
+        pCallbacksProvider->clientCallbacks.freeMutexFn(pCallbacksProvider->clientCallbacks.customData, pContinuousRetryStreamCallbacks->mappingLock);
     }
 
     // Release the object
@@ -118,9 +116,7 @@ CleanUp:
     return retStatus;
 }
 
-STATUS freeStreamMapping(PContinuousRetryStreamCallbacks pContinuousRetryStreamCallbacks,
-                         STREAM_HANDLE streamHandle,
-                         BOOL removeFromTable)
+STATUS freeStreamMapping(PContinuousRetryStreamCallbacks pContinuousRetryStreamCallbacks, STREAM_HANDLE streamHandle, BOOL removeFromTable)
 {
     ENTERS();
     STATUS retStatus = STATUS_SUCCESS;
@@ -129,13 +125,11 @@ STATUS freeStreamMapping(PContinuousRetryStreamCallbacks pContinuousRetryStreamC
     UINT64 value = 0;
     PCallbackStateMachine pCallbackStateMachine;
 
-    CHK(pContinuousRetryStreamCallbacks != NULL && pContinuousRetryStreamCallbacks->pCallbacksProvider != NULL,
-        STATUS_INVALID_ARG);
+    CHK(pContinuousRetryStreamCallbacks != NULL && pContinuousRetryStreamCallbacks->pCallbacksProvider != NULL, STATUS_INVALID_ARG);
     pCallbacksProvider = pContinuousRetryStreamCallbacks->pCallbacksProvider;
 
     // Lock for exclusive operation
-    pCallbacksProvider->clientCallbacks.lockMutexFn(pCallbacksProvider->clientCallbacks.customData,
-                                                    pContinuousRetryStreamCallbacks->mappingLock);
+    pCallbacksProvider->clientCallbacks.lockMutexFn(pCallbacksProvider->clientCallbacks.customData, pContinuousRetryStreamCallbacks->mappingLock);
     tableLocked = TRUE;
 
     // Get the entry if any
@@ -160,8 +154,7 @@ STATUS freeStreamMapping(PContinuousRetryStreamCallbacks pContinuousRetryStreamC
     }
 
     // No longer need to hold the lock to the requests
-    pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData,
-                                                      pContinuousRetryStreamCallbacks->mappingLock);
+    pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData, pContinuousRetryStreamCallbacks->mappingLock);
     tableLocked = FALSE;
 
 CleanUp:
@@ -176,8 +169,7 @@ CleanUp:
     return retStatus;
 }
 
-STATUS getStreamMapping(PContinuousRetryStreamCallbacks pContinuousRetryStreamCallbacks,
-                        STREAM_HANDLE streamHandle,
+STATUS getStreamMapping(PContinuousRetryStreamCallbacks pContinuousRetryStreamCallbacks, STREAM_HANDLE streamHandle,
                         PCallbackStateMachine* ppCallbackStateMachine)
 {
     ENTERS();
@@ -187,15 +179,12 @@ STATUS getStreamMapping(PContinuousRetryStreamCallbacks pContinuousRetryStreamCa
     UINT64 value = 0;
     PCallbackStateMachine pCallbackStateMachine = NULL;
 
-    CHK(pContinuousRetryStreamCallbacks != NULL &&
-        pContinuousRetryStreamCallbacks->pCallbacksProvider != NULL &&
-        ppCallbackStateMachine != NULL,
+    CHK(pContinuousRetryStreamCallbacks != NULL && pContinuousRetryStreamCallbacks->pCallbacksProvider != NULL && ppCallbackStateMachine != NULL,
         STATUS_INVALID_ARG);
     pCallbacksProvider = pContinuousRetryStreamCallbacks->pCallbacksProvider;
 
     // Lock for exclusive operation
-    pCallbacksProvider->clientCallbacks.lockMutexFn(pCallbacksProvider->clientCallbacks.customData,
-                                                    pContinuousRetryStreamCallbacks->mappingLock);
+    pCallbacksProvider->clientCallbacks.lockMutexFn(pCallbacksProvider->clientCallbacks.customData, pContinuousRetryStreamCallbacks->mappingLock);
     tableLocked = TRUE;
 
     // Get the entry if any
@@ -227,8 +216,7 @@ STATUS getStreamMapping(PContinuousRetryStreamCallbacks pContinuousRetryStreamCa
     CHK_STATUS(hashTablePut(pContinuousRetryStreamCallbacks->pStreamMapping, streamHandle, (UINT64) pCallbackStateMachine));
 
     // No longer need to hold the lock to the requests
-    pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData,
-                                                      pContinuousRetryStreamCallbacks->mappingLock);
+    pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData, pContinuousRetryStreamCallbacks->mappingLock);
     tableLocked = FALSE;
 
 CleanUp:
@@ -265,8 +253,7 @@ CleanUp:
     return retStatus;
 }
 
-STATUS continuousRetryStreamConnectionStaleHandler(UINT64 customData, STREAM_HANDLE streamHandle,
-                                                   UINT64 lastBufferingAck)
+STATUS continuousRetryStreamConnectionStaleHandler(UINT64 customData, STREAM_HANDLE streamHandle, UINT64 lastBufferingAck)
 {
     UNUSED_PARAM(lastBufferingAck);
     STATUS retStatus = STATUS_SUCCESS;
@@ -281,8 +268,7 @@ CleanUp:
     return retStatus;
 }
 
-STATUS continuousRetryStreamErrorReportHandler(UINT64 customData, STREAM_HANDLE streamHandle,
-                                               UPLOAD_HANDLE uploadHandle, UINT64 erroredTimecode,
+STATUS continuousRetryStreamErrorReportHandler(UINT64 customData, STREAM_HANDLE streamHandle, UPLOAD_HANDLE uploadHandle, UINT64 erroredTimecode,
                                                STATUS statusCode)
 {
     UNUSED_PARAM(uploadHandle);
@@ -376,5 +362,5 @@ PVOID continuousRetryStreamRestartHandler(PVOID args)
 CleanUp:
 
     LEAVES();
-    return (PVOID) (ULONG_PTR) retStatus;
+    return (PVOID)(ULONG_PTR) retStatus;
 }
