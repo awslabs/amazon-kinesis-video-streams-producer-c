@@ -71,7 +71,7 @@ TEST_F(ProducerClientFaultInjectionTest, invalidArgdDescribeCallNoRetry)
 
 TEST_F(ProducerClientFaultInjectionTest, notAuthorizedDescribeCallWithContinuousCallbacks)
 {
-    createDefaultProducerClient(FALSE, TEST_CREATE_STREAM_TIMEOUT, TRUE);
+    createDefaultProducerClient(FALSE, TEST_CREATE_STREAM_TIMEOUT, TEST_STOP_STREAM_TIMEOUT, TRUE);
 
     mDescribeStreamStatus = STATUS_NOT_IMPLEMENTED; // Non success status
     mDescribeStreamCallResult = SERVICE_CALL_NOT_AUTHORIZED;
@@ -96,7 +96,7 @@ TEST_F(ProducerClientFaultInjectionTest, notAuthorizedDescribeCallWithContinuous
 TEST_F(ProducerClientFaultInjectionTest, timeoutDescribeCallWithContinuousCallbacksRecovers)
 {
     // Set the timeout enough to retry with progressive back-off
-    createDefaultProducerClient(FALSE, TEST_CREATE_STREAM_TIMEOUT, TRUE);
+    createDefaultProducerClient(FALSE, TEST_CREATE_STREAM_TIMEOUT, TEST_STOP_STREAM_TIMEOUT, TRUE);
 
     mDescribeStreamStatus = STATUS_NOT_IMPLEMENTED; // Non success status
     mDescribeStreamCallResult = SERVICE_CALL_NETWORK_CONNECTION_TIMEOUT;
@@ -117,7 +117,7 @@ TEST_F(ProducerClientFaultInjectionTest, timeoutDescribeCallWithContinuousCallba
 
 TEST_F(ProducerClientFaultInjectionTest, invalidArgDescribeCallWithContinuousCallbacksNoRecovery)
 {
-    createDefaultProducerClient(FALSE, TEST_CREATE_STREAM_TIMEOUT, TRUE);
+    createDefaultProducerClient(FALSE, TEST_CREATE_STREAM_TIMEOUT, TEST_STOP_STREAM_TIMEOUT, TRUE);
 
     mDescribeStreamStatus = STATUS_NOT_IMPLEMENTED; // Non success status
     mDescribeStreamCallResult = SERVICE_CALL_INVALID_ARG;
@@ -215,7 +215,7 @@ TEST_F(ProducerClientFaultInjectionTest, invalidArgCreateCall)
 
 TEST_F(ProducerClientFaultInjectionTest, notAuthorizedCreateCallWithContinuousCallbacksRecovers)
 {
-    createDefaultProducerClient(FALSE, 10 * HUNDREDS_OF_NANOS_IN_A_SECOND, TRUE);
+    createDefaultProducerClient(FALSE, 10 * HUNDREDS_OF_NANOS_IN_A_SECOND, TEST_STOP_STREAM_TIMEOUT, TRUE);
 
     // Induce create call
     mDescribeStreamStatus = STATUS_NOT_IMPLEMENTED; // Non success status
@@ -243,7 +243,7 @@ TEST_F(ProducerClientFaultInjectionTest, notAuthorizedCreateCallWithContinuousCa
 
 TEST_F(ProducerClientFaultInjectionTest, invalidArgCreateCallWithContinuousCallbacksRecovers)
 {
-    createDefaultProducerClient(FALSE, 10 * HUNDREDS_OF_NANOS_IN_A_SECOND, TRUE);
+    createDefaultProducerClient(FALSE, 10 * HUNDREDS_OF_NANOS_IN_A_SECOND, TEST_STOP_STREAM_TIMEOUT, TRUE);
 
     // Induce create call
     mDescribeStreamStatus = STATUS_NOT_IMPLEMENTED; // Non success status
@@ -271,7 +271,7 @@ TEST_F(ProducerClientFaultInjectionTest, invalidArgCreateCallWithContinuousCallb
 
 TEST_F(ProducerClientFaultInjectionTest, timeoutCreateCallWithContinuousCallbacksRecovers)
 {
-    createDefaultProducerClient(FALSE, 10 * HUNDREDS_OF_NANOS_IN_A_SECOND, TRUE);
+    createDefaultProducerClient(FALSE, 10 * HUNDREDS_OF_NANOS_IN_A_SECOND, TEST_STOP_STREAM_TIMEOUT, TRUE);
 
     // Induce create call
     mDescribeStreamStatus = STATUS_NOT_IMPLEMENTED; // Non success status

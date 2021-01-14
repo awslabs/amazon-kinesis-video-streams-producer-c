@@ -387,14 +387,15 @@ VOID ProducerClientTestBase::handlePressure(volatile BOOL* pressureFlag, UINT32 
     }
 }
 
-VOID ProducerClientTestBase::createDefaultProducerClient(BOOL cachingEndpoint, UINT64 createStreamTimeout, BOOL continuousRetry)
+VOID ProducerClientTestBase::createDefaultProducerClient(BOOL cachingEndpoint, UINT64 createStreamTimeout, UINT64 stopStreamTimeout, BOOL continuousRetry)
 {
     createDefaultProducerClient(cachingEndpoint ? API_CALL_CACHE_TYPE_ENDPOINT_ONLY : API_CALL_CACHE_TYPE_NONE,
             createStreamTimeout,
+            stopStreamTimeout,
             continuousRetry);
 }
 
-VOID ProducerClientTestBase::createDefaultProducerClient(API_CALL_CACHE_TYPE cacheType, UINT64 createStreamTimeout, BOOL continuousRetry)
+VOID ProducerClientTestBase::createDefaultProducerClient(API_CALL_CACHE_TYPE cacheType, UINT64 createStreamTimeout, UINT64 stopStreamTimeout, BOOL continuousRetry)
 {
     PAuthCallbacks pAuthCallbacks;
     PStreamCallbacks pStreamCallbacks;
@@ -457,6 +458,7 @@ VOID ProducerClientTestBase::createDefaultProducerClient(API_CALL_CACHE_TYPE cac
     // Set quick timeouts
     mDeviceInfo.clientInfo.createClientTimeout = TEST_CREATE_PRODUCER_TIMEOUT;
     mDeviceInfo.clientInfo.createStreamTimeout = createStreamTimeout;
+    mDeviceInfo.clientInfo.stopStreamTimeout = stopStreamTimeout;
     mDeviceInfo.clientInfo.loggerLogLevel = this->loggerLogLevel;
 
     // Store the auth callbacks which is used for fault injection

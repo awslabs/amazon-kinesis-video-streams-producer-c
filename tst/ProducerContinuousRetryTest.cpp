@@ -19,7 +19,7 @@ TEST_F(ProducerContinuousRetryTest, test_stream_callbacks_connection_stale_trigg
 
     mStreamingRotationPeriod = MAX_ENFORCED_TOKEN_EXPIRATION_DURATION;
 
-    createDefaultProducerClient(FALSE, TEST_CREATE_STREAM_TIMEOUT, TRUE);
+    createDefaultProducerClient(FALSE, TEST_CREATE_STREAM_TIMEOUT, TEST_STOP_STREAM_TIMEOUT, TRUE);
 
     mStreamInfo.streamCaps.connectionStalenessDuration = 5 * HUNDREDS_OF_NANOS_IN_A_SECOND;
 
@@ -34,6 +34,7 @@ TEST_F(ProducerContinuousRetryTest, test_stream_callbacks_connection_stale_trigg
     }
 
     DLOGD("Stopping the stream with stream handle %" PRIu64, (UINT64) streamHandle);
+    THREAD_SLEEP(3 * HUNDREDS_OF_NANOS_IN_A_SECOND);
     EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStream(streamHandle));
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
     EXPECT_LT(1, mConnectionStaleFnCount);
@@ -56,7 +57,7 @@ TEST_F(ProducerContinuousRetryTest, test_stream_callbacks_stream_latency_trigger
 
     mStreamingRotationPeriod = MAX_ENFORCED_TOKEN_EXPIRATION_DURATION;
 
-    createDefaultProducerClient(FALSE, TEST_CREATE_STREAM_TIMEOUT, TRUE);
+    createDefaultProducerClient(FALSE, TEST_CREATE_STREAM_TIMEOUT, TEST_STOP_STREAM_TIMEOUT, TRUE);
 
     EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, 5 * HUNDREDS_OF_NANOS_IN_A_SECOND, TEST_STREAM_BUFFER_DURATION));
     streamHandle = mStreams[0];
@@ -69,9 +70,9 @@ TEST_F(ProducerContinuousRetryTest, test_stream_callbacks_stream_latency_trigger
 
     THREAD_SLEEP(mFrame.duration / 2);
     EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
-    THREAD_SLEEP(1 * HUNDREDS_OF_NANOS_IN_A_SECOND);
 
     DLOGD("Stopping the stream with stream handle %" PRIu64, (UINT64) streamHandle);
+    THREAD_SLEEP(3 * HUNDREDS_OF_NANOS_IN_A_SECOND);
     EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStream(streamHandle));
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
     EXPECT_LT(1, mStreamLatencyPressureFnCount);
@@ -90,7 +91,7 @@ TEST_F(ProducerContinuousRetryTest, test_stream_recover_after_reset_connnection)
 
     mStreamingRotationPeriod = MAX_ENFORCED_TOKEN_EXPIRATION_DURATION;
 
-    createDefaultProducerClient(FALSE, TEST_CREATE_STREAM_TIMEOUT, TRUE);
+    createDefaultProducerClient(FALSE, TEST_CREATE_STREAM_TIMEOUT, TEST_STOP_STREAM_TIMEOUT, TRUE);
 
     EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, 5 * HUNDREDS_OF_NANOS_IN_A_SECOND, TEST_STREAM_BUFFER_DURATION));
     streamHandle = mStreams[0];
@@ -126,7 +127,7 @@ TEST_F(ProducerContinuousRetryTest, test_stream_recover_after_reset_connnection_
 
     mStreamingRotationPeriod = MAX_ENFORCED_TOKEN_EXPIRATION_DURATION;
 
-    createDefaultProducerClient(FALSE, TEST_CREATE_STREAM_TIMEOUT, TRUE);
+    createDefaultProducerClient(FALSE, TEST_CREATE_STREAM_TIMEOUT, TEST_STOP_STREAM_TIMEOUT, TRUE);
 
     EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, 5 * HUNDREDS_OF_NANOS_IN_A_SECOND, TEST_STREAM_BUFFER_DURATION));
     streamHandle = mStreams[0];
@@ -165,7 +166,7 @@ TEST_F(ProducerContinuousRetryTest, recover_on_retriable_producer_error) {
     mCurlWriteCallbackPassThrough = TRUE;
     mWriteStatus = STATUS_NOT_IMPLEMENTED;
 
-    createDefaultProducerClient(FALSE, TEST_CREATE_STREAM_TIMEOUT, TRUE);
+    createDefaultProducerClient(FALSE, TEST_CREATE_STREAM_TIMEOUT, 5 * HUNDREDS_OF_NANOS_IN_A_SECOND, TRUE);
 
     // Induce a new session on connection staleness
     mStreamInfo.streamCaps.connectionStalenessDuration = 5 * HUNDREDS_OF_NANOS_IN_A_SECOND;
@@ -188,7 +189,7 @@ TEST_F(ProducerContinuousRetryTest, recover_on_retriable_producer_error) {
     }
 
     DLOGD("Stopping the stream with stream handle %" PRIu64, (UINT64) streamHandle);
-    EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStream(streamHandle));
+    stopKinesisVideoStreamSync(streamHandle);
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
     EXPECT_EQ(1, mConnectionStaleFnCount);
     EXPECT_LE(1, mDescribeStreamFnCount);
@@ -208,7 +209,7 @@ TEST_F(ProducerContinuousRetryTest, no_recovery_on_non_retriable_producer_error)
     mCurlWriteCallbackPassThrough = TRUE;
     mWriteStatus = STATUS_NOT_IMPLEMENTED;
 
-    createDefaultProducerClient(FALSE, TEST_CREATE_STREAM_TIMEOUT, TRUE);
+    createDefaultProducerClient(FALSE, TEST_CREATE_STREAM_TIMEOUT, 5 * HUNDREDS_OF_NANOS_IN_A_SECOND, TRUE);
 
     // Induce a new session on connection staleness
     mStreamInfo.streamCaps.connectionStalenessDuration = 5 * HUNDREDS_OF_NANOS_IN_A_SECOND;
@@ -231,7 +232,7 @@ TEST_F(ProducerContinuousRetryTest, no_recovery_on_non_retriable_producer_error)
     }
 
     DLOGD("Stopping the stream with stream handle %" PRIu64, (UINT64) streamHandle);
-    EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStream(streamHandle));
+    stopKinesisVideoStreamSync(streamHandle);
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
     EXPECT_NE(1, mConnectionStaleFnCount);
     EXPECT_EQ(1, mDescribeStreamFnCount); // As there is no retrying on this fault, describe should have not been called again
@@ -251,7 +252,7 @@ TEST_F(ProducerContinuousRetryTest, recover_on_retriable_common_lib_error) {
     mCurlWriteCallbackPassThrough = TRUE;
     mWriteStatus = STATUS_NOT_IMPLEMENTED;
 
-    createDefaultProducerClient(FALSE, TEST_CREATE_STREAM_TIMEOUT, TRUE);
+    createDefaultProducerClient(FALSE, TEST_CREATE_STREAM_TIMEOUT, 5 * HUNDREDS_OF_NANOS_IN_A_SECOND, TRUE);
 
     // Induce a new session on connection staleness
     mStreamInfo.streamCaps.connectionStalenessDuration = 5 * HUNDREDS_OF_NANOS_IN_A_SECOND;
@@ -274,7 +275,7 @@ TEST_F(ProducerContinuousRetryTest, recover_on_retriable_common_lib_error) {
     }
 
     DLOGD("Stopping the stream with stream handle %" PRIu64, (UINT64) streamHandle);
-    EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStream(streamHandle));
+    stopKinesisVideoStreamSync(streamHandle);
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
     EXPECT_EQ(1, mConnectionStaleFnCount);
     EXPECT_LE(1, mDescribeStreamFnCount);
@@ -294,7 +295,7 @@ TEST_F(ProducerContinuousRetryTest, no_recovery_on_non_retriable_common_lib_erro
     mCurlWriteCallbackPassThrough = TRUE;
     mWriteStatus = STATUS_NOT_IMPLEMENTED;
 
-    createDefaultProducerClient(FALSE, TEST_CREATE_STREAM_TIMEOUT, TRUE);
+    createDefaultProducerClient(FALSE, TEST_CREATE_STREAM_TIMEOUT, 5 * HUNDREDS_OF_NANOS_IN_A_SECOND, TRUE);
 
     // Induce a new session on connection staleness
     mStreamInfo.streamCaps.connectionStalenessDuration = 5 * HUNDREDS_OF_NANOS_IN_A_SECOND;
@@ -317,7 +318,7 @@ TEST_F(ProducerContinuousRetryTest, no_recovery_on_non_retriable_common_lib_erro
     }
 
     DLOGD("Stopping the stream with stream handle %" PRIu64, (UINT64) streamHandle);
-    EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStream(streamHandle));
+    stopKinesisVideoStreamSync(streamHandle);
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
     EXPECT_NE(1, mConnectionStaleFnCount);
     EXPECT_EQ(1, mDescribeStreamFnCount); // As there is no retrying on this fault, describe should have not been called again

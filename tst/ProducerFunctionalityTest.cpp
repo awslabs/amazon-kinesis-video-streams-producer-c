@@ -1055,7 +1055,7 @@ TEST_F(ProducerFunctionalityTest, stream_latency_handling_with_continuous_retry)
 
     mStreamingRotationPeriod = MAX_ENFORCED_TOKEN_EXPIRATION_DURATION;
 
-    createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT, TRUE);
+    createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT, TEST_STOP_STREAM_TIMEOUT, TRUE);
 
     EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, 40 * HUNDREDS_OF_NANOS_IN_A_SECOND, 50 * HUNDREDS_OF_NANOS_IN_A_SECOND));
     streamHandle = mStreams[0];
