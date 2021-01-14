@@ -166,7 +166,7 @@ TEST_F(ProducerContinuousRetryTest, recover_on_retriable_producer_error) {
     mCurlWriteCallbackPassThrough = TRUE;
     mWriteStatus = STATUS_NOT_IMPLEMENTED;
 
-    createDefaultProducerClient(FALSE, TEST_CREATE_STREAM_TIMEOUT, 5 * HUNDREDS_OF_NANOS_IN_A_SECOND, TRUE);
+    createDefaultProducerClient(FALSE, TEST_CREATE_STREAM_TIMEOUT, 30 * HUNDREDS_OF_NANOS_IN_A_SECOND, TRUE);
 
     // Induce a new session on connection staleness
     mStreamInfo.streamCaps.connectionStalenessDuration = 5 * HUNDREDS_OF_NANOS_IN_A_SECOND;
@@ -209,7 +209,7 @@ TEST_F(ProducerContinuousRetryTest, no_recovery_on_non_retriable_producer_error)
     mCurlWriteCallbackPassThrough = TRUE;
     mWriteStatus = STATUS_NOT_IMPLEMENTED;
 
-    createDefaultProducerClient(FALSE, TEST_CREATE_STREAM_TIMEOUT, 5 * HUNDREDS_OF_NANOS_IN_A_SECOND, TRUE);
+    createDefaultProducerClient(FALSE, TEST_CREATE_STREAM_TIMEOUT, 30 * HUNDREDS_OF_NANOS_IN_A_SECOND, TRUE);
 
     // Induce a new session on connection staleness
     mStreamInfo.streamCaps.connectionStalenessDuration = 5 * HUNDREDS_OF_NANOS_IN_A_SECOND;
@@ -252,7 +252,7 @@ TEST_F(ProducerContinuousRetryTest, recover_on_retriable_common_lib_error) {
     mCurlWriteCallbackPassThrough = TRUE;
     mWriteStatus = STATUS_NOT_IMPLEMENTED;
 
-    createDefaultProducerClient(FALSE, TEST_CREATE_STREAM_TIMEOUT, 5 * HUNDREDS_OF_NANOS_IN_A_SECOND, TRUE);
+    createDefaultProducerClient(FALSE, TEST_CREATE_STREAM_TIMEOUT, 30 * HUNDREDS_OF_NANOS_IN_A_SECOND, TRUE);
 
     // Induce a new session on connection staleness
     mStreamInfo.streamCaps.connectionStalenessDuration = 5 * HUNDREDS_OF_NANOS_IN_A_SECOND;
@@ -295,7 +295,7 @@ TEST_F(ProducerContinuousRetryTest, no_recovery_on_non_retriable_common_lib_erro
     mCurlWriteCallbackPassThrough = TRUE;
     mWriteStatus = STATUS_NOT_IMPLEMENTED;
 
-    createDefaultProducerClient(FALSE, TEST_CREATE_STREAM_TIMEOUT, 5 * HUNDREDS_OF_NANOS_IN_A_SECOND, TRUE);
+    createDefaultProducerClient(FALSE, TEST_CREATE_STREAM_TIMEOUT, 30 * HUNDREDS_OF_NANOS_IN_A_SECOND, TRUE);
 
     // Induce a new session on connection staleness
     mStreamInfo.streamCaps.connectionStalenessDuration = 5 * HUNDREDS_OF_NANOS_IN_A_SECOND;
