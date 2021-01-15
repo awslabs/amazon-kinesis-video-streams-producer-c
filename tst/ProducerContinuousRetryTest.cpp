@@ -188,8 +188,9 @@ TEST_F(ProducerContinuousRetryTest, recover_on_retriable_producer_error) {
         THREAD_SLEEP(mFrame.duration / 2); // speed up test
     }
 
-    DLOGD("Stopping the stream with stream handle %" PRIu64, (UINT64) streamHandle);
-    stopKinesisVideoStreamSync(streamHandle);
+    DLOGD("Freeing the stream with stream handle %" PRIu64, (UINT64) streamHandle);
+
+    // We are not even attempting to stop
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
     EXPECT_EQ(1, mConnectionStaleFnCount);
     EXPECT_LE(1, mDescribeStreamFnCount);
@@ -231,8 +232,7 @@ TEST_F(ProducerContinuousRetryTest, no_recovery_on_non_retriable_producer_error)
         THREAD_SLEEP(mFrame.duration / 2); // speed up test
     }
 
-    DLOGD("Stopping the stream with stream handle %" PRIu64, (UINT64) streamHandle);
-    stopKinesisVideoStreamSync(streamHandle);
+    DLOGD("Freeing the stream with stream handle %" PRIu64, (UINT64) streamHandle);
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
     EXPECT_NE(1, mConnectionStaleFnCount);
     EXPECT_EQ(1, mDescribeStreamFnCount); // As there is no retrying on this fault, describe should have not been called again
@@ -274,8 +274,7 @@ TEST_F(ProducerContinuousRetryTest, recover_on_retriable_common_lib_error) {
         THREAD_SLEEP(mFrame.duration / 2); // speed up test
     }
 
-    DLOGD("Stopping the stream with stream handle %" PRIu64, (UINT64) streamHandle);
-    stopKinesisVideoStreamSync(streamHandle);
+    DLOGD("Freeing the stream with stream handle %" PRIu64, (UINT64) streamHandle);
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
     EXPECT_EQ(1, mConnectionStaleFnCount);
     EXPECT_LE(1, mDescribeStreamFnCount);
@@ -317,8 +316,7 @@ TEST_F(ProducerContinuousRetryTest, no_recovery_on_non_retriable_common_lib_erro
         THREAD_SLEEP(mFrame.duration / 2); // speed up test
     }
 
-    DLOGD("Stopping the stream with stream handle %" PRIu64, (UINT64) streamHandle);
-    stopKinesisVideoStreamSync(streamHandle);
+    DLOGD("Freeing the stream with stream handle %" PRIu64, (UINT64) streamHandle);
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
     EXPECT_NE(1, mConnectionStaleFnCount);
     EXPECT_EQ(1, mDescribeStreamFnCount); // As there is no retrying on this fault, describe should have not been called again

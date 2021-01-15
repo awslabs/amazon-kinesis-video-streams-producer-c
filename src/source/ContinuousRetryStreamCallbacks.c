@@ -28,7 +28,7 @@ STATUS createContinuousRetryStreamCallbacks(PClientCallbacks pCallbacksProvider,
                                          &pContinuousRetryStreamCallbacks->pStreamMapping));
 
     // Create the guard locks
-    pContinuousRetryStreamCallbacks->mappingLock = pContinuousRetryStreamCallbacks->pCallbacksProvider->clientCallbacks.createMutexFn(
+    pContinuousRetryStreamCallbacks->syncLock = pContinuousRetryStreamCallbacks->pCallbacksProvider->clientCallbacks.createMutexFn(
         pContinuousRetryStreamCallbacks->pCallbacksProvider->clientCallbacks.customData, TRUE);
 
     // Set callbacks
@@ -64,6 +64,7 @@ STATUS freeContinuousRetryStreamCallbacks(PStreamCallbacks* ppStreamCallbacks)
     ENTERS();
     STATUS retStatus = STATUS_SUCCESS;
     PCallbacksProvider pCallbacksProvider;
+    TID threadId;
     PContinuousRetryStreamCallbacks pContinuousRetryStreamCallbacks = NULL;
 
     CHK(ppStreamCallbacks != NULL, STATUS_NULL_ARG);
@@ -83,8 +84,8 @@ STATUS freeContinuousRetryStreamCallbacks(PStreamCallbacks* ppStreamCallbacks)
     hashTableFree(pContinuousRetryStreamCallbacks->pStreamMapping);
 
     // Free the locks
-    if (pContinuousRetryStreamCallbacks->mappingLock != INVALID_MUTEX_VALUE) {
-        pCallbacksProvider->clientCallbacks.freeMutexFn(pCallbacksProvider->clientCallbacks.customData, pContinuousRetryStreamCallbacks->mappingLock);
+    if (IS_VALID_MUTEX_VALUE(pContinuousRetryStreamCallbacks->syncLock)) {
+        pCallbacksProvider->clientCallbacks.freeMutexFn(pCallbacksProvider->clientCallbacks.customData, pContinuousRetryStreamCallbacks->syncLock);
     }
 
     // Release the object
@@ -124,19 +125,17 @@ STATUS freeStreamMapping(PContinuousRetryStreamCallbacks pContinuousRetryStreamC
     BOOL tableLocked = FALSE;
     UINT64 value = 0;
     PCallbackStateMachine pCallbackStateMachine;
-
     CHK(pContinuousRetryStreamCallbacks != NULL && pContinuousRetryStreamCallbacks->pCallbacksProvider != NULL, STATUS_INVALID_ARG);
     pCallbacksProvider = pContinuousRetryStreamCallbacks->pCallbacksProvider;
 
     // Lock for exclusive operation
-    pCallbacksProvider->clientCallbacks.lockMutexFn(pCallbacksProvider->clientCallbacks.customData, pContinuousRetryStreamCallbacks->mappingLock);
+    pCallbacksProvider->clientCallbacks.lockMutexFn(pCallbacksProvider->clientCallbacks.customData, pContinuousRetryStreamCallbacks->syncLock);
     tableLocked = TRUE;
 
     // Get the entry if any
     retStatus = hashTableGet(pContinuousRetryStreamCallbacks->pStreamMapping, (UINT64) streamHandle, &value);
 
     CHK(retStatus == STATUS_HASH_KEY_NOT_PRESENT || retStatus == STATUS_SUCCESS, retStatus);
-
     if (retStatus == STATUS_HASH_KEY_NOT_PRESENT) {
         // Reset the status if not found
         retStatus = STATUS_SUCCESS;
@@ -149,12 +148,17 @@ STATUS freeStreamMapping(PContinuousRetryStreamCallbacks pContinuousRetryStreamC
             CHK_STATUS(hashTableRemove(pContinuousRetryStreamCallbacks->pStreamMapping, (UINT64) streamHandle));
         }
 
+        // Await for the reset to finish first
+        if (IS_VALID_TID_VALUE(pCallbackStateMachine->resetTid)) {
+            THREAD_JOIN(pCallbackStateMachine->resetTid, NULL);
+        }
+
         // Free the request object
         MEMFREE(pCallbackStateMachine);
     }
 
     // No longer need to hold the lock to the requests
-    pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData, pContinuousRetryStreamCallbacks->mappingLock);
+    pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData, pContinuousRetryStreamCallbacks->syncLock);
     tableLocked = FALSE;
 
 CleanUp:
@@ -162,7 +166,7 @@ CleanUp:
     // Unlock only if previously locked
     if (tableLocked) {
         pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData,
-                                                          pContinuousRetryStreamCallbacks->mappingLock);
+                                                          pContinuousRetryStreamCallbacks->syncLock);
     }
 
     LEAVES();
@@ -184,7 +188,7 @@ STATUS getStreamMapping(PContinuousRetryStreamCallbacks pContinuousRetryStreamCa
     pCallbacksProvider = pContinuousRetryStreamCallbacks->pCallbacksProvider;
 
     // Lock for exclusive operation
-    pCallbacksProvider->clientCallbacks.lockMutexFn(pCallbacksProvider->clientCallbacks.customData, pContinuousRetryStreamCallbacks->mappingLock);
+    pCallbacksProvider->clientCallbacks.lockMutexFn(pCallbacksProvider->clientCallbacks.customData, pContinuousRetryStreamCallbacks->syncLock);
     tableLocked = TRUE;
 
     // Get the entry if any
@@ -207,6 +211,8 @@ STATUS getStreamMapping(PContinuousRetryStreamCallbacks pContinuousRetryStreamCa
 
     pCallbackStateMachine->pContinuousRetryStreamCallbacks = pContinuousRetryStreamCallbacks;
     pCallbackStateMachine->streamReady = FALSE;
+    pCallbackStateMachine->resetTid = INVALID_TID_VALUE;
+    pCallbackStateMachine->streamHandle = INVALID_STREAM_HANDLE_VALUE;
 
     // Set the initial values
     CHK_STATUS(setConnectionStaleStateMachine(pCallbackStateMachine, STREAM_CALLBACK_HANDLING_STATE_NORMAL_STATE, 0, 0, 0));
@@ -216,7 +222,7 @@ STATUS getStreamMapping(PContinuousRetryStreamCallbacks pContinuousRetryStreamCa
     CHK_STATUS(hashTablePut(pContinuousRetryStreamCallbacks->pStreamMapping, streamHandle, (UINT64) pCallbackStateMachine));
 
     // No longer need to hold the lock to the requests
-    pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData, pContinuousRetryStreamCallbacks->mappingLock);
+    pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData, pContinuousRetryStreamCallbacks->syncLock);
     tableLocked = FALSE;
 
 CleanUp:
@@ -224,7 +230,7 @@ CleanUp:
     // Unlock only if previously locked
     if (tableLocked) {
         pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData,
-                                                          pContinuousRetryStreamCallbacks->mappingLock);
+                                                          pContinuousRetryStreamCallbacks->syncLock);
     }
 
     if (STATUS_SUCCEEDED(retStatus)) {
@@ -272,9 +278,16 @@ STATUS continuousRetryStreamErrorReportHandler(UINT64 customData, STREAM_HANDLE 
                                                STATUS statusCode)
 {
     UNUSED_PARAM(uploadHandle);
-    UNUSED_PARAM(customData);
     STATUS retStatus = STATUS_SUCCESS;
+    BOOL locked = FALSE;
     TID threadId;
+    PCallbacksProvider pCallbacksProvider;
+    PCallbackStateMachine pCallbackStateMachine;
+    PContinuousRetryStreamCallbacks pContinuousRetryStreamCallbacks = (PContinuousRetryStreamCallbacks) customData;
+
+    CHK(pContinuousRetryStreamCallbacks != NULL && pContinuousRetryStreamCallbacks->pCallbacksProvider != NULL, STATUS_NULL_ARG);
+    pCallbacksProvider = pContinuousRetryStreamCallbacks->pCallbacksProvider;
+
     DLOGW("Reporting stream error. Errored timecode: %" PRIu64 " Status: 0x%08x", erroredTimecode, statusCode);
 
     // If we have a C producer/Common library layer status codes then we handle it separately
@@ -285,11 +298,29 @@ STATUS continuousRetryStreamErrorReportHandler(UINT64 customData, STREAM_HANDLE 
         CHK(IS_RETRIABLE_ERROR(statusCode), retStatus);
     }
 
+    CHK_STATUS(getStreamMapping(pContinuousRetryStreamCallbacks, streamHandle, &pCallbackStateMachine));
+
+    // Check if we already have an ongoing reset process
+    pCallbacksProvider->clientCallbacks.lockMutexFn(pCallbacksProvider->clientCallbacks.customData, pContinuousRetryStreamCallbacks->syncLock);
+    locked = TRUE;
+
+    // Early exit if we are in the midst of resetting already
+    CHK(!IS_VALID_TID_VALUE(pCallbackStateMachine->resetTid), retStatus);
+
     // Run the reset in a separate thread
-    CHK_STATUS(THREAD_CREATE(&threadId, continuousRetryStreamRestartHandler, (PVOID) streamHandle));
-    CHK_STATUS(THREAD_DETACH(threadId));
+    pCallbackStateMachine->streamHandle = streamHandle;
+    CHK_STATUS(THREAD_CREATE(&threadId, continuousRetryStreamRestartHandler, (PVOID) pCallbackStateMachine));
+    pCallbackStateMachine->resetTid = threadId;
+
+    pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData, pContinuousRetryStreamCallbacks->syncLock);
+    locked = FALSE;
 
 CleanUp:
+
+    if (locked) {
+        pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData, pContinuousRetryStreamCallbacks->syncLock);
+    }
+
     return retStatus;
 }
 
@@ -355,8 +386,20 @@ PVOID continuousRetryStreamRestartHandler(PVOID args)
 {
     ENTERS();
     STATUS retStatus = STATUS_SUCCESS;
-    STREAM_HANDLE streamHandle = (STREAM_HANDLE) args;
+    STREAM_HANDLE streamHandle;
     PStreamInfo pStreamInfo = NULL;
+    PContinuousRetryStreamCallbacks pContinuousRetryStreamCallbacks;
+    PCallbacksProvider pCallbacksProvider = NULL;
+    PCallbackStateMachine pCallbackStateMachine = (PCallbackStateMachine) args;
+
+    CHK(pCallbackStateMachine != NULL &&
+        pCallbackStateMachine->pContinuousRetryStreamCallbacks != NULL &&
+        pCallbackStateMachine->pContinuousRetryStreamCallbacks->pCallbacksProvider != NULL,
+        STATUS_NULL_ARG);
+
+    pContinuousRetryStreamCallbacks = pCallbackStateMachine->pContinuousRetryStreamCallbacks;
+    pCallbacksProvider = pContinuousRetryStreamCallbacks->pCallbacksProvider;
+    streamHandle = pCallbackStateMachine->streamHandle;
 
     // do not reset if in offline mode. Let the application handle the retry
     CHK_STATUS(kinesisVideoStreamGetStreamInfo(streamHandle, &pStreamInfo));
@@ -364,6 +407,12 @@ PVOID continuousRetryStreamRestartHandler(PVOID args)
     CHK_STATUS(kinesisVideoStreamResetStream(streamHandle));
 
 CleanUp:
+
+    if (pCallbacksProvider != NULL) {
+//        pCallbacksProvider->clientCallbacks.lockMutexFn(pCallbacksProvider->clientCallbacks.customData, pContinuousRetryStreamCallbacks->syncLock);
+        pCallbackStateMachine->resetTid = INVALID_TID_VALUE;
+//        pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData, pContinuousRetryStreamCallbacks->syncLock);
+    }
 
     LEAVES();
     return (PVOID)(ULONG_PTR) retStatus;
