@@ -133,7 +133,7 @@ INT32 main(INT32 argc, CHAR* argv[])
     frame.frameData = frameBuffer;
     frame.version = FRAME_CURRENT_VERSION;
     frame.trackId = DEFAULT_VIDEO_TRACK_ID;
-    frame.presentationTs = frame.decodingTs;
+    frame.duration = HUNDREDS_OF_NANOS_IN_A_SECOND / DEFAULT_FPS_VALUE;
 
     while (defaultGetTime() < streamStopTime) {
         frame.index = frameIndex;
@@ -153,8 +153,6 @@ INT32 main(INT32 argc, CHAR* argv[])
         }
         defaultThreadSleep(frame.duration);
 
-        frame.decodingTs += frame.duration;
-        frame.presentationTs = frame.decodingTs;
         frameIndex++;
         fileIndex++;
         fileIndex = fileIndex % NUMBER_OF_FRAME_FILES;

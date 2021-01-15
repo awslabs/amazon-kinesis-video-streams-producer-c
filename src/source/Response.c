@@ -635,15 +635,22 @@ SIZE_T postReadCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID custo
         CHK(FALSE, retStatus);
     }
 
-    retStatus =
-        getKinesisVideoStreamData(pCurlResponse->pCurlRequest->streamHandle, uploadHandle, (PBYTE) pBuffer, (UINT32) bufferSize, &retrievedSize);
+    while ( bytesWritten == 0 ) {
 
-    if (pCurlApiCallbacks->curlReadCallbackHookFn != NULL) {
         retStatus =
-            pCurlApiCallbacks->curlReadCallbackHookFn(pCurlResponse, uploadHandle, (PBYTE) pBuffer, (UINT32) bufferSize, &retrievedSize, retStatus);
-    }
+                getKinesisVideoStreamData(pCurlResponse->pCurlRequest->streamHandle, uploadHandle, (PBYTE) pBuffer,
+                                          (UINT32) bufferSize, &retrievedSize);
 
-    bytesWritten = (SIZE_T) retrievedSize;
+        if (pCurlApiCallbacks->curlReadCallbackHookFn != NULL) {
+            retStatus =
+                    pCurlApiCallbacks->curlReadCallbackHookFn(pCurlResponse, uploadHandle, (PBYTE) pBuffer,
+                                                              (UINT32) bufferSize, &retrievedSize, retStatus);
+        }
+
+        bytesWritten = (SIZE_T) retrievedSize;
+
+        THREAD_SLEEP(10 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND);
+    }
 
     DLOGV("Get Stream data returned: buffer size: %u written bytes: %u for upload handle: %" PRIu64 " current stream handle: %" PRIu64, bufferSize,
           bytesWritten, uploadHandle, pCurlResponse->pCurlRequest->streamHandle);
@@ -674,8 +681,7 @@ SIZE_T postReadCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID custo
             if (bytesWritten == 0) {
                 DLOGD("Pausing CURL read for upload handle: %" PRIu64 " waiting for last ack.", uploadHandle);
                 bytesWritten = CURL_READFUNC_PAUSE;
-            }
-            break;
+                }break;
 
         case STATUS_UPLOAD_HANDLE_ABORTED:
             DLOGW("Reported abort-connection for Upload handle: %" PRIu64, uploadHandle);
