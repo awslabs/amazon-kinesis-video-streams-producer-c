@@ -8,6 +8,7 @@ class ProducerFunctionalityTest : public ProducerClientTestBase {
 extern ProducerClientTestBase* gProducerClientTestBase;
 
 #define FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT    30 * HUNDREDS_OF_NANOS_IN_A_SECOND
+#define FUNCTIONALITY_TEST_STOP_STREAM_TIMEOUT      60 * HUNDREDS_OF_NANOS_IN_A_SECOND
 #define FUNCTIONALITY_TEST_STRESS_TEST_ITERATION    3
 
 TEST_F(ProducerFunctionalityTest, start_stopsync_terminate)
@@ -882,7 +883,7 @@ TEST_F(ProducerFunctionalityTest, high_fragment_rate_file_upload)
     UINT32 totalFrames = totalDuration * TEST_FPS;
     mKeyFrameInterval = 4;
 
-    createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
+    createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT, FUNCTIONALITY_TEST_STOP_STREAM_TIMEOUT);
 
     EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_OFFLINE, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION));
     streamHandle = mStreams[0];

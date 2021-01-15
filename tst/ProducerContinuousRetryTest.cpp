@@ -324,7 +324,7 @@ TEST_F(ProducerContinuousRetryTest, no_recovery_on_non_retriable_common_lib_erro
     }
 
     THREAD_SLEEP(1 * HUNDREDS_OF_NANOS_IN_A_SECOND);
-    
+
     DLOGD("Freeing the stream with stream handle %" PRIu64, (UINT64) streamHandle);
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
     EXPECT_NE(1, mConnectionStaleFnCount);
