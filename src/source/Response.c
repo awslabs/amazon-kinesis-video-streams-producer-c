@@ -27,7 +27,7 @@ STATUS createCurlResponse(PCurlRequest pCurlRequest, PCurlResponse* ppCurlRespon
     // Allocate the entire structure
     pCurlResponse = (PCurlResponse) MEMCALLOC(1, SIZEOF(CurlResponse));
     CHK(pCurlResponse != NULL, STATUS_NOT_ENOUGH_MEMORY);
-    pCurlResponse->terminated = FALSE;
+    ATOMIC_STORE_BOOL(&pCurlResponse->terminated, FALSE);
 
     // init putMedia related members
     pCurlResponse->endOfStream = FALSE;
@@ -269,7 +269,7 @@ VOID terminateCurlSession(PCurlResponse pCurlResponse, UINT64 timeout)
         // by the time the terminate() call is issued. We can't control this timing
         // of the CURL internal buffers so we need to introduce a timeout here before
         // the main curl termination path.
-        if (!pCurlResponse->terminated) {
+        if (!ATOMIC_LOAD_BOOL(&pCurlResponse->terminated)) {
             // give curl sometime to terminate gracefully before actually timing it out.
             THREAD_SLEEP(timeout);
             // unpause curl in case curl is paused
@@ -277,7 +277,7 @@ VOID terminateCurlSession(PCurlResponse pCurlResponse, UINT64 timeout)
             curl_easy_setopt(pCurlResponse->pCurl, CURLOPT_TIMEOUT_MS, TIMEOUT_AFTER_STREAM_STOPPED);
             // after timing out curl, give some time for it to take effect.
             THREAD_SLEEP(timeout);
-            pCurlResponse->terminated = TRUE;
+            ATOMIC_STORE_BOOL(&pCurlResponse->terminated, TRUE);
         }
     }
 }
@@ -407,7 +407,7 @@ STATUS curlCompleteSync(PCurlResponse pCurlResponse)
     ATOMIC_STORE_BOOL(&pCurlRequest->blockedInCurl, FALSE);
     CHK(!ATOMIC_LOAD_BOOL(&pCurlRequest->requestInfo.terminating), retStatus);
 
-    if (result != CURLE_OK && pCurlResponse->terminated) {
+    if (result != CURLE_OK && ATOMIC_LOAD_BOOL(&pCurlResponse->terminated)) {
         // The transmission has been force terminated.
         pCurlResponse->callInfo.httpStatus = HTTP_STATUS_CODE_REQUEST_TIMEOUT;
         pCurlResponse->callInfo.callResult = SERVICE_CALL_REQUEST_TIMEOUT;
@@ -450,7 +450,7 @@ STATUS notifyDataAvailable(PCurlResponse pCurlResponse, UINT64 durationAvailable
     CHK(pCurlResponse != NULL, STATUS_NULL_ARG);
 
     // pCurlResponse should be a putMedia session
-    if (!pCurlResponse->terminated) {
+    if (!ATOMIC_LOAD_BOOL(&pCurlResponse->terminated)) {
         DLOGV("Note data received: duration(100ns): %" PRIu64 " bytes %" PRIu64 " for stream handle %" PRIu64, durationAvailable, sizeAvailable,
               pCurlResponse->pCurlRequest->uploadHandle);
 
@@ -709,7 +709,7 @@ CleanUp:
 
     // Since curl is about to terminate gracefully, set flag to prevent shutdown thread from timing it out.
     if ((bytesWritten == CURL_READFUNC_ABORT || bytesWritten == 0) && pCurlResponse != NULL) {
-        pCurlResponse->terminated = TRUE;
+        ATOMIC_STORE_BOOL(&pCurlResponse->terminated, TRUE);
     }
 
     return bytesWritten;

@@ -48,7 +48,7 @@ struct __CurlResponse {
     CallInfo callInfo;
 
     // Whether the call was force-terminated
-    volatile BOOL terminated;
+    volatile ATOMIC_BOOL terminated;
 
     ///////////////////////////////////////////////
     // Variables needed for putMedia session
