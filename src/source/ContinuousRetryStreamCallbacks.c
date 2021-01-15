@@ -409,9 +409,7 @@ PVOID continuousRetryStreamRestartHandler(PVOID args)
 CleanUp:
 
     if (pCallbacksProvider != NULL) {
-//        pCallbacksProvider->clientCallbacks.lockMutexFn(pCallbacksProvider->clientCallbacks.customData, pContinuousRetryStreamCallbacks->syncLock);
         pCallbackStateMachine->resetTid = INVALID_TID_VALUE;
-//        pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData, pContinuousRetryStreamCallbacks->syncLock);
     }
 
     LEAVES();

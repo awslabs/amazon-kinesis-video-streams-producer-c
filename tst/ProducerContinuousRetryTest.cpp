@@ -188,9 +188,12 @@ TEST_F(ProducerContinuousRetryTest, recover_on_retriable_producer_error) {
         THREAD_SLEEP(mFrame.duration / 2); // speed up test
     }
 
+    // Give a little time for the retry logic
+    THREAD_SLEEP(1 * HUNDREDS_OF_NANOS_IN_A_SECOND);
+
     DLOGD("Freeing the stream with stream handle %" PRIu64, (UINT64) streamHandle);
 
-    // We are not even attempting to stop
+    // We are not even attempting to stop just to test the functionality of simply freeing
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
     EXPECT_EQ(1, mConnectionStaleFnCount);
     EXPECT_LE(1, mDescribeStreamFnCount);
@@ -231,6 +234,8 @@ TEST_F(ProducerContinuousRetryTest, no_recovery_on_non_retriable_producer_error)
         updateFrame();
         THREAD_SLEEP(mFrame.duration / 2); // speed up test
     }
+
+    THREAD_SLEEP(1 * HUNDREDS_OF_NANOS_IN_A_SECOND);
 
     DLOGD("Freeing the stream with stream handle %" PRIu64, (UINT64) streamHandle);
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
@@ -274,6 +279,8 @@ TEST_F(ProducerContinuousRetryTest, recover_on_retriable_common_lib_error) {
         THREAD_SLEEP(mFrame.duration / 2); // speed up test
     }
 
+    THREAD_SLEEP(1 * HUNDREDS_OF_NANOS_IN_A_SECOND);
+
     DLOGD("Freeing the stream with stream handle %" PRIu64, (UINT64) streamHandle);
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
     EXPECT_EQ(1, mConnectionStaleFnCount);
@@ -316,6 +323,8 @@ TEST_F(ProducerContinuousRetryTest, no_recovery_on_non_retriable_common_lib_erro
         THREAD_SLEEP(mFrame.duration / 2); // speed up test
     }
 
+    THREAD_SLEEP(1 * HUNDREDS_OF_NANOS_IN_A_SECOND);
+    
     DLOGD("Freeing the stream with stream handle %" PRIu64, (UINT64) streamHandle);
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
     EXPECT_NE(1, mConnectionStaleFnCount);
