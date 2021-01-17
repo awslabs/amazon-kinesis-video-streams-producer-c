@@ -1600,7 +1600,7 @@ TEST_F(ProducerFunctionalityTest, putFrame_stopSync_timeout_reset_then_putFrame_
     UINT64 stopStreamEndtime;
 
     mDeviceInfo.clientInfo.stopStreamTimeout = 1 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND;
-    createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
+    createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT, 1 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND);
 
     EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION));
     streamHandle = mStreams[0];
