@@ -28,6 +28,12 @@ struct __RotatingStaticAuthCallbacks {
 
     // Back pointer to the callback provider object
     PCallbacksProvider pCallbacksProvider;
+
+    // Members for fault injection
+    volatile UINT32 invokeCount;
+    volatile UINT32 failCount;
+    volatile UINT32 recoverCount;
+    volatile STATUS retStatus;
 };
 
 typedef struct __RotatingStaticAuthCallbacks* PRotatingStaticAuthCallbacks;

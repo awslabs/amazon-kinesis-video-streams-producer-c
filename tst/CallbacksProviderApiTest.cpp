@@ -257,7 +257,7 @@ TEST_F(CallbacksProviderApiTest, createDefaultCallbacksProvider_variations)
     EXPECT_EQ(NULL, pClientCallbacks);
 }
 
-TEST_F(CallbacksProviderApiTest, createStreamVerifyCallbackChainInteration)
+TEST_F(CallbacksProviderApiTest, createStreamVerifyCallbackChainIntegration)
 {
     PDeviceInfo pDeviceInfo;
     CLIENT_HANDLE clientHandle;

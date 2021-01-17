@@ -45,6 +45,7 @@
 
 #define TEST_CREATE_PRODUCER_TIMEOUT (300 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND)
 #define TEST_CREATE_STREAM_TIMEOUT   (10 * HUNDREDS_OF_NANOS_IN_A_SECOND)
+#define TEST_STOP_STREAM_TIMEOUT     (20 * HUNDREDS_OF_NANOS_IN_A_SECOND)
 
 #define TEST_IOT_ENDPOINT              (PCHAR) "Test.iot.endpoint"
 #define TEST_IOT_CERT_PATH             (PCHAR) "/Test/credentials/cert/path"
@@ -198,10 +199,14 @@ class ProducerClientTestBase : public ::testing::Test {
         return (PCHAR)::testing::UnitTest::GetInstance()->current_test_info()->test_case_name();
     };
 
-    VOID createDefaultProducerClient(BOOL cachingEndpoint = FALSE, UINT64 createStreamTimeout = TEST_CREATE_STREAM_TIMEOUT,
+    VOID createDefaultProducerClient(BOOL cachingEndpoint = FALSE,
+                                     UINT64 createStreamTimeout = TEST_CREATE_STREAM_TIMEOUT,
+                                     UINT64 stopStreamTimeout = TEST_STOP_STREAM_TIMEOUT,
                                      BOOL continuousRetry = FALSE);
     VOID createDefaultProducerClient(API_CALL_CACHE_TYPE cacheType = API_CALL_CACHE_TYPE_NONE,
-                                     UINT64 createStreamTimeout = TEST_CREATE_STREAM_TIMEOUT, BOOL continuousRetry = FALSE);
+                                     UINT64 createStreamTimeout = TEST_CREATE_STREAM_TIMEOUT,
+                                     UINT64 stopStreamTimeout = TEST_STOP_STREAM_TIMEOUT,
+                                     BOOL continuousRetry = FALSE);
     STATUS createTestStream(UINT32 index, STREAMING_TYPE streamingType = STREAMING_TYPE_REALTIME, UINT32 maxLatency = TEST_MAX_STREAM_LATENCY,
                             UINT32 bufferDuration = TEST_STREAM_BUFFER_DURATION, BOOL sync = TRUE);
     VOID freeStreams(BOOL sync = FALSE);
@@ -350,7 +355,11 @@ class ProducerClientTestBase : public ::testing::Test {
 
     UINT32 loggerLogLevel = LOG_LEVEL_WARN;
 
-  private:
+    // Stored auth callbacks which is used to inject fault
+    PAuthCallbacks mAuthCallbacks;
+
+private:
+
     // Stored function pointers to reset on exit
     memAlloc mStoredMemAlloc;
     memAlignAlloc mStoredMemAlignAlloc;
