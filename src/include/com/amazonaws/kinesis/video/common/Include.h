@@ -55,18 +55,12 @@ extern "C" {
 /**
  * Macro for checking whether the status code should be retried by the continuous retry logic
  */
-#define IS_RETRIABLE_COMMON_LIB_ERROR(error)    ((error) == STATUS_INVALID_API_CALL_RETURN_JSON || \
-                                                (error) == STATUS_CURL_INIT_FAILED ||    	\
-                                                (error) == STATUS_CURL_LIBRARY_INIT_FAILED ||    	\
-                                                (error) == STATUS_HMAC_GENERATION_ERROR ||    	\
-                                                (error) == STATUS_IOT_FAILED ||    	\
-                                                (error) == STATUS_IOT_EXPIRATION_OCCURS_IN_PAST ||    	\
-                                                (error) == STATUS_IOT_EXPIRATION_PARSING_FAILED ||    	\
-                                                (error) == STATUS_IOT_CREATE_LWS_CONTEXT_FAILED ||    	\
-                                                (error) == STATUS_FILE_CREDENTIAL_PROVIDER_OPEN_FILE_FAILED ||    	\
-                                                (error) == STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_LENGTH ||    	\
-                                                (error) == STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_FORMAT)
-
+#define IS_RETRIABLE_COMMON_LIB_ERROR(error)                                                                                                         \
+    ((error) == STATUS_INVALID_API_CALL_RETURN_JSON || (error) == STATUS_CURL_INIT_FAILED || (error) == STATUS_CURL_LIBRARY_INIT_FAILED ||           \
+     (error) == STATUS_HMAC_GENERATION_ERROR || (error) == STATUS_IOT_FAILED || (error) == STATUS_IOT_EXPIRATION_OCCURS_IN_PAST ||                   \
+     (error) == STATUS_IOT_EXPIRATION_PARSING_FAILED || (error) == STATUS_IOT_CREATE_LWS_CONTEXT_FAILED ||                                           \
+     (error) == STATUS_FILE_CREDENTIAL_PROVIDER_OPEN_FILE_FAILED || (error) == STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_LENGTH ||                \
+     (error) == STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_FORMAT)
 
 ////////////////////////////////////////////////////
 /// New common base status code.

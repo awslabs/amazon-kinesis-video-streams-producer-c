@@ -83,6 +83,7 @@ STATUS ProducerClientTestBase::testStreamErrorReportFunc(UINT64 customData,
     BOOL resetStream = FALSE;
     MUTEX_LOCK(pTest->mTestCallbackLock);
     pTest->mStreamErrorFnCount++;
+    pTest->mLastError = errorStatus;
     if (IS_RETRIABLE_ERROR(errorStatus) && pTest->mResetStreamCounter > 0) {
         pTest->mResetStreamCounter--;
         resetStream = TRUE;
@@ -226,7 +227,11 @@ ProducerClientTestBase::ProducerClientTestBase() :
         mProducerCallbacks(NULL),
         mResetStreamCounter(0),
         mAuthCallbacks(NULL),
-        mConnectionStaleFnCount(0)
+        mConnectionStaleFnCount(0),
+        mLastError(STATUS_SUCCESS),
+        mDescribeRetStatus(STATUS_SUCCESS),
+        mDescribeFailCount(0),
+        mDescribeRecoverCount(0)
 {
     auto logLevelStr = GETENV("AWS_KVS_LOG_LEVEL");
     if (logLevelStr != NULL) {
@@ -737,12 +742,19 @@ STATUS ProducerClientTestBase::testDescribeStreamFunc(UINT64 customData, PCHAR s
 {
     UNUSED_PARAM(streamName);
     UNUSED_PARAM(pServiceCallContext);
+    STATUS retStatus = STATUS_SUCCESS;
 
     ProducerClientTestBase* pTestBase = (ProducerClientTestBase*) customData;
 
+    // Fault injection
+    if (pTestBase->mDescribeStreamFnCount >= pTestBase->mDescribeFailCount &&
+            pTestBase->mDescribeStreamFnCount < pTestBase->mDescribeRecoverCount) {
+        retStatus = pTestBase->mDescribeRetStatus;
+    }
+
     pTestBase->mDescribeStreamFnCount++;
 
-    return STATUS_SUCCESS;
+    return retStatus;
 }
 
 STATUS ProducerClientTestBase::testDescribeStreamSecondFunc(UINT64 customData, PCHAR streamName,

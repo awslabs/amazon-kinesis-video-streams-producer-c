@@ -199,13 +199,10 @@ class ProducerClientTestBase : public ::testing::Test {
         return (PCHAR)::testing::UnitTest::GetInstance()->current_test_info()->test_case_name();
     };
 
-    VOID createDefaultProducerClient(BOOL cachingEndpoint = FALSE,
-                                     UINT64 createStreamTimeout = TEST_CREATE_STREAM_TIMEOUT,
-                                     UINT64 stopStreamTimeout = TEST_STOP_STREAM_TIMEOUT,
-                                     BOOL continuousRetry = FALSE);
+    VOID createDefaultProducerClient(BOOL cachingEndpoint = FALSE, UINT64 createStreamTimeout = TEST_CREATE_STREAM_TIMEOUT,
+                                     UINT64 stopStreamTimeout = TEST_STOP_STREAM_TIMEOUT, BOOL continuousRetry = FALSE);
     VOID createDefaultProducerClient(API_CALL_CACHE_TYPE cacheType = API_CALL_CACHE_TYPE_NONE,
-                                     UINT64 createStreamTimeout = TEST_CREATE_STREAM_TIMEOUT,
-                                     UINT64 stopStreamTimeout = TEST_STOP_STREAM_TIMEOUT,
+                                     UINT64 createStreamTimeout = TEST_CREATE_STREAM_TIMEOUT, UINT64 stopStreamTimeout = TEST_STOP_STREAM_TIMEOUT,
                                      BOOL continuousRetry = FALSE);
     STATUS createTestStream(UINT32 index, STREAMING_TYPE streamingType = STREAMING_TYPE_REALTIME, UINT32 maxLatency = TEST_MAX_STREAM_LATENCY,
                             UINT32 bufferDuration = TEST_STREAM_BUFFER_DURATION, BOOL sync = TRUE);
@@ -353,13 +350,20 @@ class ProducerClientTestBase : public ::testing::Test {
     BufferPressureState mCurrentPressureState;
     UINT32 mPressureHandlerRetryCount;
 
+    // Storing the last error
+    volatile STATUS mLastError;
+
+    // Members for fault injection
+    volatile UINT32 mDescribeFailCount;
+    volatile UINT32 mDescribeRecoverCount;
+    volatile STATUS mDescribeRetStatus;
+
     UINT32 loggerLogLevel = LOG_LEVEL_WARN;
 
     // Stored auth callbacks which is used to inject fault
     PAuthCallbacks mAuthCallbacks;
 
-private:
-
+  private:
     // Stored function pointers to reset on exit
     memAlloc mStoredMemAlloc;
     memAlignAlloc mStoredMemAlignAlloc;

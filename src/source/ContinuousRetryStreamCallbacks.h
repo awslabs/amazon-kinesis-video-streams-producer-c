@@ -42,6 +42,12 @@ typedef struct __CallbackStateMachine {
     // Placeholder for the current stream handle
     volatile STREAM_HANDLE streamHandle;
 
+    // Placeholder for the current upload handle
+    UPLOAD_HANDLE uploadHandle;
+
+    // Placeholder for the timecode
+    UINT64 erroredTimecode;
+
     // Latency state machine
     struct __StreamLatencyStateMachine streamLatencyStateMachine;
 

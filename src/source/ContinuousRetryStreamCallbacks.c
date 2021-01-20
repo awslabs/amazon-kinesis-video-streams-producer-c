@@ -165,8 +165,7 @@ CleanUp:
 
     // Unlock only if previously locked
     if (tableLocked) {
-        pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData,
-                                                          pContinuousRetryStreamCallbacks->syncLock);
+        pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData, pContinuousRetryStreamCallbacks->syncLock);
     }
 
     LEAVES();
@@ -229,8 +228,7 @@ CleanUp:
 
     // Unlock only if previously locked
     if (tableLocked) {
-        pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData,
-                                                          pContinuousRetryStreamCallbacks->syncLock);
+        pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData, pContinuousRetryStreamCallbacks->syncLock);
     }
 
     if (STATUS_SUCCEEDED(retStatus)) {
@@ -277,13 +275,16 @@ CleanUp:
 STATUS continuousRetryStreamErrorReportHandler(UINT64 customData, STREAM_HANDLE streamHandle, UPLOAD_HANDLE uploadHandle, UINT64 erroredTimecode,
                                                STATUS statusCode)
 {
-    UNUSED_PARAM(uploadHandle);
     STATUS retStatus = STATUS_SUCCESS;
     BOOL locked = FALSE;
     TID threadId;
     PCallbacksProvider pCallbacksProvider;
     PCallbackStateMachine pCallbackStateMachine;
     PContinuousRetryStreamCallbacks pContinuousRetryStreamCallbacks = (PContinuousRetryStreamCallbacks) customData;
+
+    // NOTE: STATUS_CONTINUOUS_RETRY_RESET_FAILED error raised by the continuous retry callback error handler reset
+    // thread itself and in this case we should ignore it and let the potential application handler to deal with it
+    CHK(statusCode != STATUS_CONTINUOUS_RETRY_RESET_FAILED, retStatus);
 
     CHK(pContinuousRetryStreamCallbacks != NULL && pContinuousRetryStreamCallbacks->pCallbacksProvider != NULL, STATUS_NULL_ARG);
     pCallbacksProvider = pContinuousRetryStreamCallbacks->pCallbacksProvider;
@@ -295,6 +296,8 @@ STATUS continuousRetryStreamErrorReportHandler(UINT64 customData, STREAM_HANDLE 
     if (!(IS_RETRIABLE_PRODUCER_ERROR(statusCode) || IS_RETRIABLE_COMMON_LIB_ERROR(statusCode))) {
         // return success if the sdk can recover from the error
         CHK(!IS_RECOVERABLE_ERROR(statusCode), retStatus);
+
+        // Here, we check whether the status code is retriable by PIC and let it handle it
         CHK(IS_RETRIABLE_ERROR(statusCode), retStatus);
     }
 
@@ -309,6 +312,8 @@ STATUS continuousRetryStreamErrorReportHandler(UINT64 customData, STREAM_HANDLE 
 
     // Run the reset in a separate thread
     pCallbackStateMachine->streamHandle = streamHandle;
+    pCallbackStateMachine->uploadHandle = uploadHandle;
+    pCallbackStateMachine->erroredTimecode = erroredTimecode;
     CHK_STATUS(THREAD_CREATE(&threadId, continuousRetryStreamRestartHandler, (PVOID) pCallbackStateMachine));
     pCallbackStateMachine->resetTid = threadId;
 
@@ -392,9 +397,8 @@ PVOID continuousRetryStreamRestartHandler(PVOID args)
     PCallbacksProvider pCallbacksProvider = NULL;
     PCallbackStateMachine pCallbackStateMachine = (PCallbackStateMachine) args;
 
-    CHK(pCallbackStateMachine != NULL &&
-        pCallbackStateMachine->pContinuousRetryStreamCallbacks != NULL &&
-        pCallbackStateMachine->pContinuousRetryStreamCallbacks->pCallbacksProvider != NULL,
+    CHK(pCallbackStateMachine != NULL && pCallbackStateMachine->pContinuousRetryStreamCallbacks != NULL &&
+            pCallbackStateMachine->pContinuousRetryStreamCallbacks->pCallbacksProvider != NULL,
         STATUS_NULL_ARG);
 
     pContinuousRetryStreamCallbacks = pCallbackStateMachine->pContinuousRetryStreamCallbacks;
@@ -409,6 +413,19 @@ PVOID continuousRetryStreamRestartHandler(PVOID args)
 CleanUp:
 
     if (pCallbacksProvider != NULL) {
+        // In case of an error we will be calling the overall callback to notify the listening application
+        if (STATUS_FAILED(retStatus)) {
+            // Use the callback provider as the custom data
+            // NOTE: This should be a prompt operation and shouldn't block the thread
+            // NOTE: The handling application should perform it's own cleanup as continuous retry will not retry
+            pCallbacksProvider->clientCallbacks.streamErrorReportFn((UINT64) pCallbacksProvider,
+                                                                    pCallbackStateMachine->streamHandle,
+                                                                    pCallbackStateMachine->uploadHandle,
+                                                                    pCallbackStateMachine->erroredTimecode,
+                                                                    STATUS_CONTINUOUS_RETRY_RESET_FAILED);
+        }
+
+        // Reset the running thread ID just before returning
         pCallbackStateMachine->resetTid = INVALID_TID_VALUE;
     }
 
