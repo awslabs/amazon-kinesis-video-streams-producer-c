@@ -334,6 +334,65 @@ TEST_F(ProducerContinuousRetryTest, no_recovery_on_non_retriable_common_lib_erro
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
 
+TEST_F(ProducerContinuousRetryTest, contrinuous_retry_reset_failure) {
+    STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
+    UINT32 i;
+    UINT32 totalFragments = 10;
+    UINT32 totalFrames = totalFragments * TEST_FPS;
+    PRotatingStaticAuthCallbacks pAuth;
+
+    // block off any acks
+    mCurlWriteCallbackPassThrough = TRUE;
+    mWriteStatus = STATUS_NOT_IMPLEMENTED;
+
+    createDefaultProducerClient(FALSE, TEST_CREATE_STREAM_TIMEOUT, 30 * HUNDREDS_OF_NANOS_IN_A_SECOND, TRUE);
+
+    // Induce a new session on connection staleness
+    mStreamInfo.streamCaps.connectionStalenessDuration = 5 * HUNDREDS_OF_NANOS_IN_A_SECOND;
+
+    EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION));
+    streamHandle = mStreams[0];
+    EXPECT_TRUE(streamHandle != INVALID_STREAM_HANDLE_VALUE);
+
+    // Inject a fault
+    pAuth = (PRotatingStaticAuthCallbacks) mAuthCallbacks;
+    pAuth->retStatus = STATUS_DESCRIBE_STREAM_CALL_FAILED;
+    pAuth->failCount = 0;
+    pAuth->recoverCount = 1000;
+
+    // Make describe to fail consequently
+    mDescribeRecoverCount = 1000;
+    mDescribeRetStatus = STATUS_DESCRIBE_STREAM_CALL_FAILED;
+
+    for(i = 0; i < totalFrames; ++i) {
+        EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
+        updateFrame();
+        THREAD_SLEEP(mFrame.duration / 2); // speed up test
+    }
+
+    // Give a little time for the retry logic
+    // IMPORTANT: In this case our fault injection will still make the retries happen
+    // as we are "cleanly" failing the reset API call to describe, which will call
+    // the handler function in the curl callbacks to call notify with the injected
+    // error which, in turn, would invoke the continuous callback handler which,
+    // in turn would issue a reset
+    THREAD_SLEEP(10 * HUNDREDS_OF_NANOS_IN_A_SECOND);
+
+    DLOGD("Freeing the stream with stream handle %" PRIu64, (UINT64) streamHandle);
+
+    // We are not even attempting to stop just to test the functionality of simply freeing
+    EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
+    EXPECT_EQ(1, mConnectionStaleFnCount);
+    EXPECT_LE(1, mDescribeStreamFnCount);
+
+    EXPECT_LE(1, mStreamErrorFnCount);
+    EXPECT_EQ(STATUS_CONTINUOUS_RETRY_RESET_FAILED, mLastError);
+
+    // We should never reach a new PutStream state after reset
+    EXPECT_EQ(1, mPutStreamFnCount);
+    mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
+}
+
 }
 }
 }
