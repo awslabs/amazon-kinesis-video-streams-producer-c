@@ -463,8 +463,8 @@ TEST_F(ProducerFunctionalityTest, fail_old_connection_at_token_rotation)
     }
 
     DLOGD("Stopping the stream with stream handle %" PRIu64, (UINT64) streamHandle);
-    // expecting no error so far
-    EXPECT_EQ(0, mStreamErrorFnCount);
+    // Aborting an active upload handle will still result in backend sending an INVALID_MKV_DATA
+    EXPECT_EQ(1, mStreamErrorFnCount);
     errCount = mStreamErrorFnCount;
 
     EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStreamSync(streamHandle));
@@ -537,15 +537,18 @@ TEST_F(ProducerFunctionalityTest, intermittent_producer_fail_old_connection_at_t
     }
 
     DLOGD("Stopping the stream with stream handle %" PRIu64, (UINT64) streamHandle);
-    // expecting no error so far
-    EXPECT_EQ(0, mStreamErrorFnCount);
+    // There is a chance of INVALID_MKV_DATA received on the old session as the backend closes
+    // the connection which will be ignored.
+    EXPECT_LE(0, mStreamErrorFnCount);
     errCount = mStreamErrorFnCount;
 
     EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStreamSync(streamHandle));
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
     // no new error during shutdown
     EXPECT_EQ(errCount, mStreamErrorFnCount);
-    EXPECT_EQ(50, mPersistedFragmentCount);
+    // Last fragment of the previous session before the token rotation wouldn't have
+    // a chance to receive the persisted ACK.
+    EXPECT_EQ(49, mPersistedFragmentCount);
 
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
@@ -645,15 +648,16 @@ TEST_F(ProducerFunctionalityTest, pressure_on_buffer_duration_fail_old_connectio
     }
 
     DLOGD("Stopping the stream with stream handle %" PRIu64, (UINT64) streamHandle);
-    // expecting no error so far
-    EXPECT_EQ(0, mStreamErrorFnCount);
+    // Aborting an active upload handle might still result in backend sending an INVALID_MKV_DATA
+    EXPECT_LE(0, mStreamErrorFnCount);
     errCount = mStreamErrorFnCount;
 
     EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStreamSync(streamHandle));
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
     // no new error during shutdown
     EXPECT_EQ(errCount, mStreamErrorFnCount);
-    EXPECT_EQ(totalFragments, mPersistedFragmentCount);
+    // The last fragment of the previous session did not get a persisted ACK as it was torn down
+    EXPECT_EQ(totalFragments - 1, mPersistedFragmentCount);
 
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
@@ -732,15 +736,16 @@ TEST_F(ProducerFunctionalityTest, pressure_on_storage_fail_old_connection_at_tok
     }
 
     DLOGD("Stopping the stream with stream handle %" PRIu64, (UINT64) streamHandle);
-    // expecting no error so far
-    EXPECT_EQ(0, mStreamErrorFnCount);
+    // Aborting an active upload handle might still result in backend sending an INVALID_MKV_DATA
+    EXPECT_LE(0, mStreamErrorFnCount);
     errCount = mStreamErrorFnCount;
 
     EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStreamSync(streamHandle));
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
     // no new error during shutdown
     EXPECT_EQ(errCount, mStreamErrorFnCount);
-    EXPECT_EQ(totalFragments, mPersistedFragmentCount);
+    // The last fragment of the previous session will not receive the persisted ACK
+    EXPECT_EQ(totalFragments - 1, mPersistedFragmentCount);
 
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
