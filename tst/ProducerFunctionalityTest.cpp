@@ -773,15 +773,8 @@ TEST_F(ProducerFunctionalityTest, offline_upload_limited_storage)
     UINT32 totalFragments = 240; // stream more fragments to reach token rotation
     UINT32 totalFrames = totalFragments * TEST_FPS;
 
-    // bump frame size to reach token rotation
-    mFrameSize = 10000;
-    MEMFREE(mFrameBuffer);
-    mFrameBuffer = (PBYTE) MEMALLOC(mFrameSize);
-    mFrame.size = mFrameSize;
-    mFrame.frameData = mFrameBuffer;
-
-    mDeviceInfo.storageInfo.storageSize = 10 * 1024 * 1024;
-    createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
+    mDeviceInfo.storageInfo.storageSize = 1 * 1024 * 1024;
+    createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT, 60 * HUNDREDS_OF_NANOS_IN_A_SECOND, TRUE, 45 * HUNDREDS_OF_NANOS_IN_A_SECOND);
 
     EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_OFFLINE, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION));
     streamHandle = mStreams[0];
