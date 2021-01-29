@@ -200,10 +200,10 @@ class ProducerClientTestBase : public ::testing::Test {
     };
 
     VOID createDefaultProducerClient(BOOL cachingEndpoint = FALSE, UINT64 createStreamTimeout = TEST_CREATE_STREAM_TIMEOUT,
-                                     UINT64 stopStreamTimeout = TEST_STOP_STREAM_TIMEOUT, BOOL continuousRetry = FALSE);
+                                     UINT64 stopStreamTimeout = TEST_STOP_STREAM_TIMEOUT, BOOL continuousRetry = FALSE, UINT64 sessionRotationPeriod = TEST_CREDENTIAL_EXPIRATION);
     VOID createDefaultProducerClient(API_CALL_CACHE_TYPE cacheType = API_CALL_CACHE_TYPE_NONE,
                                      UINT64 createStreamTimeout = TEST_CREATE_STREAM_TIMEOUT, UINT64 stopStreamTimeout = TEST_STOP_STREAM_TIMEOUT,
-                                     BOOL continuousRetry = FALSE);
+                                     BOOL continuousRetry = FALSE, UINT64 sessionRotationPeriod = TEST_CREDENTIAL_EXPIRATION);
     STATUS createTestStream(UINT32 index, STREAMING_TYPE streamingType = STREAMING_TYPE_REALTIME, UINT32 maxLatency = TEST_MAX_STREAM_LATENCY,
                             UINT32 bufferDuration = TEST_STREAM_BUFFER_DURATION, BOOL sync = TRUE);
     VOID freeStreams(BOOL sync = FALSE);

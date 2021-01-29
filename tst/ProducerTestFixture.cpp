@@ -370,16 +370,15 @@ VOID ProducerClientTestBase::handlePressure(volatile BOOL* pressureFlag, UINT32 
 
         // whether to give some extra time for the pressure to relieve. For example, storageOverflow takes longer
         // to recover as it needs to wait for persisted acks.
-        if (gracePeriodSeconds != 0){
+        if (gracePeriodSeconds != 0) {
             DLOGD("Pressure handler in grace period. Sleep for %u seconds.", gracePeriodSeconds);
             THREAD_SLEEP(gracePeriodSeconds * HUNDREDS_OF_NANOS_IN_A_SECOND);
         }
-
     } else if (mCurrentPressureState == BufferInPressure) { // if we are already in pressured state
         if (*pressureFlag) { // still getting the pressure signal, remain in pressured state.
             DLOGD("Pressure handler sleep for 1 second.");
             THREAD_SLEEP(1 * HUNDREDS_OF_NANOS_IN_A_SECOND);
-            *pressureFlag = false;
+            *pressureFlag = FALSE;
             mPressureHandlerRetryCount--;
             if (mPressureHandlerRetryCount == 0) {
                 GTEST_FAIL() << "Pressure handler tried " << TEST_DEFAULT_PRESSURE_HANDLER_RETRY_COUNT << " times without relieving pressure.";
@@ -392,15 +391,16 @@ VOID ProducerClientTestBase::handlePressure(volatile BOOL* pressureFlag, UINT32 
     }
 }
 
-VOID ProducerClientTestBase::createDefaultProducerClient(BOOL cachingEndpoint, UINT64 createStreamTimeout, UINT64 stopStreamTimeout, BOOL continuousRetry)
+VOID ProducerClientTestBase::createDefaultProducerClient(BOOL cachingEndpoint, UINT64 createStreamTimeout, UINT64 stopStreamTimeout, BOOL continuousRetry, UINT64 rotationPeriod)
 {
     createDefaultProducerClient(cachingEndpoint ? API_CALL_CACHE_TYPE_ENDPOINT_ONLY : API_CALL_CACHE_TYPE_NONE,
             createStreamTimeout,
             stopStreamTimeout,
-            continuousRetry);
+            continuousRetry,
+            rotationPeriod);
 }
 
-VOID ProducerClientTestBase::createDefaultProducerClient(API_CALL_CACHE_TYPE cacheType, UINT64 createStreamTimeout, UINT64 stopStreamTimeout, BOOL continuousRetry)
+VOID ProducerClientTestBase::createDefaultProducerClient(API_CALL_CACHE_TYPE cacheType, UINT64 createStreamTimeout, UINT64 stopStreamTimeout, BOOL continuousRetry, UINT64 rotationPeriod)
 {
     PAuthCallbacks pAuthCallbacks;
     PStreamCallbacks pStreamCallbacks;
@@ -414,12 +414,11 @@ VOID ProducerClientTestBase::createDefaultProducerClient(API_CALL_CACHE_TYPE cac
                                                                      TEST_USER_AGENT,
                                                                      &mCallbacksProvider));
 
-    UINT64 expiration = GETTIME() + TEST_CREDENTIAL_EXPIRATION;
     EXPECT_EQ(STATUS_SUCCESS, createRotatingStaticAuthCallbacks(mCallbacksProvider,
                                                                 mAccessKey,
                                                                 mSecretKey,
                                                                 mSessionToken,
-                                                                expiration,
+                                                                rotationPeriod,
                                                                 mStreamingRotationPeriod,
                                                                 &pAuthCallbacks));
 

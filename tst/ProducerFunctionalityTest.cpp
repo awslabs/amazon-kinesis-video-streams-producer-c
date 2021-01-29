@@ -599,7 +599,7 @@ TEST_F(ProducerFunctionalityTest, pressure_on_buffer_duration_fail_new_connectio
     UINT32 totalFrames = totalFragments * TEST_FPS; // need to stream until token rotation
     mCurlEasyPerformInjectionCount = 1;
 
-    createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
+    createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT, 60 * HUNDREDS_OF_NANOS_IN_A_SECOND, TRUE, 45 * HUNDREDS_OF_NANOS_IN_A_SECOND);
 
     EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, 10 * HUNDREDS_OF_NANOS_IN_A_SECOND));
     streamHandle = mStreams[0];
@@ -620,7 +620,8 @@ TEST_F(ProducerFunctionalityTest, pressure_on_buffer_duration_fail_new_connectio
     EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStreamSync(streamHandle));
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
     EXPECT_EQ(1, mStreamErrorFnCount);
-    EXPECT_EQ(totalFragments, mPersistedFragmentCount);
+    // Accounting for re-try
+    EXPECT_LE(totalFragments, mPersistedFragmentCount);
 
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
@@ -632,7 +633,7 @@ TEST_F(ProducerFunctionalityTest, pressure_on_buffer_duration_fail_old_connectio
     UINT32 totalFragments = 120, errCount;
     UINT32 totalFrames = totalFragments * TEST_FPS; // need to stream until token rotation
 
-    createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
+    createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT, 60 * HUNDREDS_OF_NANOS_IN_A_SECOND, TRUE, 45 * HUNDREDS_OF_NANOS_IN_A_SECOND);
 
     EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, 10 * HUNDREDS_OF_NANOS_IN_A_SECOND));
     streamHandle = mStreams[0];
@@ -656,8 +657,8 @@ TEST_F(ProducerFunctionalityTest, pressure_on_buffer_duration_fail_old_connectio
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
     // no new error during shutdown
     EXPECT_EQ(errCount, mStreamErrorFnCount);
-    // The last fragment of the previous session did not get a persisted ACK as it was torn down
-    EXPECT_EQ(totalFragments - 1, mPersistedFragmentCount);
+    // Accounting for re-try
+    EXPECT_LE(totalFragments, mPersistedFragmentCount);
 
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
@@ -666,19 +667,12 @@ TEST_F(ProducerFunctionalityTest, pressure_on_storage_fail_new_connection_at_tok
 {
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     UINT32 i;
-    UINT32 totalFragments = 300;
+    UINT32 totalFragments = 200;
     UINT32 totalFrames = totalFragments * TEST_FPS; // need to stream until token rotation
     mCurlEasyPerformInjectionCount = 1;
 
-    // bump frame size to help stream long enough until token rotation
-    mFrameSize = 6000;
-    MEMFREE(mFrameBuffer);
-    mFrameBuffer = (PBYTE) MEMALLOC(mFrameSize);
-    mFrame.size = mFrameSize;
-    mFrame.frameData = mFrameBuffer;
-
-    mDeviceInfo.storageInfo.storageSize = 10 * 1024 * 1024;
-    createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
+    mDeviceInfo.storageInfo.storageSize = 1 * 1024 * 1024;
+    createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT, 60 * HUNDREDS_OF_NANOS_IN_A_SECOND, TRUE, 45 * HUNDREDS_OF_NANOS_IN_A_SECOND);
 
     EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, 240 * HUNDREDS_OF_NANOS_IN_A_SECOND));
     streamHandle = mStreams[0];
@@ -699,7 +693,8 @@ TEST_F(ProducerFunctionalityTest, pressure_on_storage_fail_new_connection_at_tok
     EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStreamSync(streamHandle));
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
     EXPECT_EQ(1, mStreamErrorFnCount);
-    EXPECT_EQ(totalFragments, mPersistedFragmentCount);
+    // Accounting for re-try
+    EXPECT_LE(totalFragments, mPersistedFragmentCount);
 
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
@@ -708,19 +703,12 @@ TEST_F(ProducerFunctionalityTest, pressure_on_storage_fail_old_connection_at_tok
 {
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     UINT32 i;
-    UINT32 totalFragments = 300, errCount;
+    UINT32 totalFragments = 200, errCount;
     UINT32 totalFrames = totalFragments * TEST_FPS; // need to stream until token rotation
 
-    // bump frame size to help stream long enough until token rotation
-    mFrameSize = 6000;
-    MEMFREE(mFrameBuffer);
-    mFrameBuffer = (PBYTE) MEMALLOC(mFrameSize);
-    mFrame.size = mFrameSize;
-    mFrame.frameData = mFrameBuffer;
-
-    mDeviceInfo.storageInfo.storageSize = 10 * 1024 * 1024;
+    mDeviceInfo.storageInfo.storageSize = 1 * 1024 * 1024;
     mStreamInfo.streamCaps.replayDuration = 240 * HUNDREDS_OF_NANOS_IN_A_SECOND;
-    createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
+    createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT, 60 * HUNDREDS_OF_NANOS_IN_A_SECOND, TRUE, 45 * HUNDREDS_OF_NANOS_IN_A_SECOND);
 
     EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, 240 * HUNDREDS_OF_NANOS_IN_A_SECOND));
     streamHandle = mStreams[0];
@@ -744,12 +732,12 @@ TEST_F(ProducerFunctionalityTest, pressure_on_storage_fail_old_connection_at_tok
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
     // no new error during shutdown
     EXPECT_EQ(errCount, mStreamErrorFnCount);
-    // The last fragment of the previous session will not receive the persisted ACK
-    EXPECT_EQ(totalFragments - 1, mPersistedFragmentCount);
+
+    // Accounting for re-try
+    EXPECT_LE(totalFragments, mPersistedFragmentCount);
 
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
-
 
 TEST_F(ProducerFunctionalityTest, offline_upload_limited_buffer_duration)
 {
@@ -777,8 +765,6 @@ TEST_F(ProducerFunctionalityTest, offline_upload_limited_buffer_duration)
     EXPECT_EQ(FALSE, mBufferDurationInPressure);
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
-
-
 
 TEST_F(ProducerFunctionalityTest, offline_upload_limited_storage)
 {
@@ -1873,4 +1859,3 @@ TEST_F(ProducerFunctionalityTest, dropTailFragPolicyBufferOverflowNoInvalidMkv)
 }
 }
 }
-

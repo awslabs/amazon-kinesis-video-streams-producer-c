@@ -177,17 +177,22 @@ STATUS getSecurityTokenEnvVarFunc(UINT64 customData, PBYTE *ppBuffer, PUINT32 pS
 {
     ENTERS();
     STATUS retStatus = STATUS_SUCCESS;
-
+    UINT64 currentTime;
+    PCallbacksProvider pCallbacksProvider = NULL;
 
     PRotatingStaticAuthCallbacks pStaticAuthCallbacks = (PRotatingStaticAuthCallbacks) customData;
     CHK(pStaticAuthCallbacks != NULL && ppBuffer != NULL && pSize != NULL && pExpiration != NULL, STATUS_NULL_ARG);
+    pCallbacksProvider = pStaticAuthCallbacks->pCallbacksProvider;
 
     if (pStaticAuthCallbacks->invokeCount >= pStaticAuthCallbacks->failCount &&
         pStaticAuthCallbacks->invokeCount < pStaticAuthCallbacks->recoverCount) {
         CHK(FALSE, pStaticAuthCallbacks->retStatus);
     }
 
-    *pExpiration = pStaticAuthCallbacks->pAwsCredentials->expiration;
+    currentTime = pCallbacksProvider->clientCallbacks.getCurrentTimeFn(pCallbacksProvider->clientCallbacks.customData);
+
+    // expiration is now time plus rotation period
+    *pExpiration = currentTime + pStaticAuthCallbacks->rotationPeriod;
     *pSize = pStaticAuthCallbacks->pAwsCredentials->size;
     *ppBuffer = (PBYTE) pStaticAuthCallbacks->pAwsCredentials;
 
