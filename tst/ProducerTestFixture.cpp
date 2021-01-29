@@ -313,7 +313,7 @@ ProducerClientTestBase::ProducerClientTestBase() :
     mStreamInfo.streamCaps.bufferDuration = TEST_STREAM_BUFFER_DURATION;
     mStreamInfo.streamCaps.replayDuration = 10 * HUNDREDS_OF_NANOS_IN_A_SECOND;
     mStreamInfo.streamCaps.fragmentDuration = 2 * HUNDREDS_OF_NANOS_IN_A_SECOND;
-    mStreamInfo.streamCaps.connectionStalenessDuration = 20 * HUNDREDS_OF_NANOS_IN_A_SECOND;
+    mStreamInfo.streamCaps.connectionStalenessDuration = TEST_STREAM_CONNECTION_STALENESS_DURATION;
     mStreamInfo.streamCaps.maxLatency = TEST_MAX_STREAM_LATENCY;
     mStreamInfo.streamCaps.timecodeScale = 1 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND;
     mStreamInfo.streamCaps.frameRate = 100;
@@ -488,7 +488,7 @@ VOID ProducerClientTestBase::updateFrame()
     mFrame.decodingTs = mFrame.presentationTs;
 }
 
-STATUS ProducerClientTestBase::createTestStream(UINT32 index, STREAMING_TYPE streamingType, UINT32 maxLatency, UINT32 bufferDuration, BOOL sync)
+STATUS ProducerClientTestBase::createTestStream(UINT32 index, STREAMING_TYPE streamingType, UINT64 maxLatency, UINT64 bufferDuration, BOOL sync)
 {
     if (index >= TEST_MAX_STREAM_COUNT) {
         return STATUS_INVALID_ARG;

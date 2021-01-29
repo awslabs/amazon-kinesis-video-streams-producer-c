@@ -657,8 +657,8 @@ TEST_F(ProducerFunctionalityTest, pressure_on_buffer_duration_fail_old_connectio
     EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
     // no new error during shutdown
     EXPECT_EQ(errCount, mStreamErrorFnCount);
-    // Accounting for re-try
-    EXPECT_LE(totalFragments, mPersistedFragmentCount);
+    // In this case the old connection has failed so the number of fragment persisted ACKs will be smaller
+    EXPECT_GE(totalFragments, mPersistedFragmentCount);
 
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
@@ -674,7 +674,7 @@ TEST_F(ProducerFunctionalityTest, pressure_on_storage_fail_new_connection_at_tok
     mDeviceInfo.storageInfo.storageSize = 1 * 1024 * 1024;
     createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT, 60 * HUNDREDS_OF_NANOS_IN_A_SECOND, TRUE, 45 * HUNDREDS_OF_NANOS_IN_A_SECOND);
 
-    EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, 240 * HUNDREDS_OF_NANOS_IN_A_SECOND));
+    EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, MAX_UINT64, 240 * HUNDREDS_OF_NANOS_IN_A_SECOND));
     streamHandle = mStreams[0];
 
     for(i = 0; i < totalFrames; ++i) {
@@ -683,6 +683,11 @@ TEST_F(ProducerFunctionalityTest, pressure_on_storage_fail_new_connection_at_tok
             // this should fail the new putMedia at token rotation
             mPutMediaStatus = STATUS_NOT_IMPLEMENTED; // Non success status
             mPutMediaCallResult = SERVICE_CALL_RESOURCE_NOT_FOUND;
+        }
+
+        // Pause initially to allow the first upload handle to proceed
+        if (i == TEST_FPS) {
+            THREAD_SLEEP(3 * HUNDREDS_OF_NANOS_IN_A_SECOND);
         }
 
         updateFrame();
