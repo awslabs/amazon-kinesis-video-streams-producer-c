@@ -1034,7 +1034,8 @@ TEST_F(ProducerFunctionalityTest, basic_reset_connection)
     EXPECT_LT(0, mStreamClosedFnCount);
     EXPECT_LT(0, mFragmentAckReceivedFnCount);
     EXPECT_LT(totalFragments, mPersistedFragmentCount);
-    EXPECT_EQ(3, mPutStreamFnCount);
+    // There should be at least 3 upload handles. In case of any retries we will have more.
+    EXPECT_LE(3, mPutStreamFnCount);
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
 
