@@ -17,10 +17,7 @@ extern "C" {
 
 // HTTP status code not set
 #define HTTP_STATUS_CODE_NOT_SET 0
-
-// Pause/unpause interval for curl
-#define CURL_PAUSE_UNPAUSE_INTERVAL (10 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND)
-
+    
 // CA file extension
 #define CA_CERT_FILE_SUFFIX ".pem"
 

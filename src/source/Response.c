@@ -295,8 +295,6 @@ VOID terminateCurlSession(PCurlResponse pCurlResponse, UINT64 timeout)
         if (!ATOMIC_LOAD_BOOL(&pCurlResponse->terminated)) {
             // give curl sometime to terminate gracefully before actually timing it out.
             THREAD_SLEEP(timeout);
-            // unpause curl in case curl is paused
-            //curl_easy_pause(pCurlResponse->pCurl, CURLPAUSE_SEND_CONT);
             curl_easy_setopt(pCurlResponse->pCurl, CURLOPT_TIMEOUT_MS, TIMEOUT_AFTER_STREAM_STOPPED);
             // after timing out curl, give some time for it to take effect.
             THREAD_SLEEP(timeout);
