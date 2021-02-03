@@ -405,7 +405,6 @@ STATUS curlCompleteSync(PCurlResponse pCurlResponse)
     CURLcode result;
     PCurlRequest pCurlRequest;
     CHAR headers[MAX_REQUEST_HEADER_COUNT * (MAX_REQUEST_HEADER_STRING_LEN + MAX_REQUEST_HEADER_OUTPUT_DELIMITER)];
-    int still_running = 0;
 
     CHK(pCurlResponse != NULL && pCurlResponse->pCurlRequest != NULL && pCurlResponse->pCurlRequest->pCurlApiCallbacks != NULL, STATUS_NULL_ARG);
     pCurlRequest = pCurlResponse->pCurlRequest;
@@ -472,7 +471,6 @@ CleanUp:
 STATUS notifyDataAvailable(PCurlResponse pCurlResponse, UINT64 durationAvailable, UINT64 sizeAvailable)
 {
     STATUS retStatus = STATUS_SUCCESS;
-    CURLMcode result;
     PCallbacksProvider pCallbacksProvider;
 
     CHK(pCurlResponse != NULL, STATUS_NULL_ARG);
