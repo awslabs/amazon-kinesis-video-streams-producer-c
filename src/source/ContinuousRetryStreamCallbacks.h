@@ -21,8 +21,8 @@ struct __ContinuousRetryStreamCallbacks {
     // Back pointer to the callback provider object
     struct __CallbacksProvider* pCallbacksProvider;
 
-    // Lock guarding the mapping table
-    MUTEX mappingLock;
+    // Lock for synchronizing the mapping table and accessing variables
+    MUTEX syncLock;
 
     // Streams state machine table stream handle -> callback state machine
     PHashTable pStreamMapping;
@@ -33,9 +33,28 @@ struct __StreamLatencyStateMachine;
 struct __ConnectionStaleStateMachine;
 
 typedef struct __CallbackStateMachine {
-    struct __StreamLatencyStateMachine streamLatencyStateMachine;
-    struct __ConnectionStaleStateMachine connectionStaleStateMachine;
+    // Indicator of stream being ready
     volatile BOOL streamReady;
+
+    // Reset thread id to keep track
+    volatile TID resetTid;
+
+    // Placeholder for the current stream handle
+    volatile STREAM_HANDLE streamHandle;
+
+    // Placeholder for the current upload handle
+    UPLOAD_HANDLE uploadHandle;
+
+    // Placeholder for the timecode
+    UINT64 erroredTimecode;
+
+    // Latency state machine
+    struct __StreamLatencyStateMachine streamLatencyStateMachine;
+
+    // Staleness state machine
+    struct __ConnectionStaleStateMachine connectionStaleStateMachine;
+
+    // Back pointer to the parent object
     PContinuousRetryStreamCallbacks pContinuousRetryStreamCallbacks;
 } CallbackStateMachine, *PCallbackStateMachine;
 

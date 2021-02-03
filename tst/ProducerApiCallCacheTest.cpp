@@ -14,7 +14,7 @@ TEST_F(ProducerApiCallCacheTest, basicValidateNoCaching)
     mPutMediaCallResult = SERVICE_CALL_UNKNOWN;
     mCurlEasyPerformInjectionCount = 2;
 
-    createDefaultProducerClient(API_CALL_CACHE_TYPE_NONE, 0, TRUE);
+    createDefaultProducerClient(API_CALL_CACHE_TYPE_NONE, 0, TEST_STOP_STREAM_TIMEOUT, TRUE);
     EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, 40 * HUNDREDS_OF_NANOS_IN_A_SECOND, 50 * HUNDREDS_OF_NANOS_IN_A_SECOND));
     streamHandle = mStreams[0];
     EXPECT_TRUE(streamHandle != INVALID_STREAM_HANDLE_VALUE);
@@ -64,7 +64,7 @@ TEST_F(ProducerApiCallCacheTest, basicValidateEndpointOnlyCaching)
 {
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
 
-    createDefaultProducerClient(API_CALL_CACHE_TYPE_ENDPOINT_ONLY, 0, TRUE);
+    createDefaultProducerClient(API_CALL_CACHE_TYPE_ENDPOINT_ONLY, 0, TEST_STOP_STREAM_TIMEOUT, TRUE);
     EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, 40 * HUNDREDS_OF_NANOS_IN_A_SECOND, 50 * HUNDREDS_OF_NANOS_IN_A_SECOND));
     streamHandle = mStreams[0];
     EXPECT_TRUE(streamHandle != INVALID_STREAM_HANDLE_VALUE);
@@ -96,7 +96,7 @@ TEST_F(ProducerApiCallCacheTest, basicValidateCachingAllApis)
     mPutMediaCallResult = SERVICE_CALL_UNKNOWN;
     mCurlEasyPerformInjectionCount = 2;
 
-    createDefaultProducerClient(API_CALL_CACHE_TYPE_ALL, 0, TRUE);
+    createDefaultProducerClient(API_CALL_CACHE_TYPE_ALL, 0, TEST_STOP_STREAM_TIMEOUT, TRUE);
     EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, 40 * HUNDREDS_OF_NANOS_IN_A_SECOND, 50 * HUNDREDS_OF_NANOS_IN_A_SECOND));
     streamHandle = mStreams[0];
     EXPECT_TRUE(streamHandle != INVALID_STREAM_HANDLE_VALUE);

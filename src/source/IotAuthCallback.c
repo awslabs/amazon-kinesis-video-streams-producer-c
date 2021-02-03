@@ -120,7 +120,7 @@ STATUS getStreamingTokenIotFunc(UINT64 customData, PCHAR streamName, STREAM_ACCE
     PCallbacksProvider pCallbacksProvider = NULL;
     PIotAuthCallbacks pIotAuthCallbacks = (PIotAuthCallbacks) customData;
 
-    CHK(pIotAuthCallbacks != NULL, STATUS_NULL_ARG);
+    CHK(pIotAuthCallbacks != NULL && pServiceCallContext != NULL, STATUS_NULL_ARG);
 
     pCallbacksProvider = pIotAuthCallbacks->pCallbacksProvider;
     pCredentialProvider = (PAwsCredentialProvider) pIotAuthCallbacks->pCredentialProvider;
@@ -131,7 +131,7 @@ STATUS getStreamingTokenIotFunc(UINT64 customData, PCHAR streamName, STREAM_ACCE
 
 CleanUp:
 
-    if (STATUS_FAILED(retStatus)) {
+    if (STATUS_FAILED(retStatus) && pServiceCallContext != NULL) {
         // Notify PIC on failure
         getStreamingTokenResultEvent(pServiceCallContext->customData, SERVICE_CALL_UNKNOWN, NULL, 0, 0);
 

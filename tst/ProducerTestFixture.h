@@ -32,7 +32,8 @@
 #define TEST_CACHING_ENDPOINT_PERIOD                       (5 * HUNDREDS_OF_NANOS_IN_A_MINUTE)
 #define TEST_TAG_COUNT                                     5
 #define TEST_DEFAULT_PRESSURE_HANDLER_RETRY_COUNT          10
-#define TEST_DEFAULT_PRESSURE_HANDLER_GRACE_PERIOD_SECONDS 5
+#define TEST_DEFAULT_PRESSURE_HANDLER_GRACE_PERIOD_SECONDS 3
+#define TEST_STREAM_CONNECTION_STALENESS_DURATION          (120 * HUNDREDS_OF_NANOS_IN_A_SECOND)
 
 #define TEST_FPS                    20
 #define TEST_MEDIA_DURATION_SECONDS 60
@@ -45,6 +46,7 @@
 
 #define TEST_CREATE_PRODUCER_TIMEOUT (300 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND)
 #define TEST_CREATE_STREAM_TIMEOUT   (10 * HUNDREDS_OF_NANOS_IN_A_SECOND)
+#define TEST_STOP_STREAM_TIMEOUT     (20 * HUNDREDS_OF_NANOS_IN_A_SECOND)
 
 #define TEST_IOT_ENDPOINT              (PCHAR) "Test.iot.endpoint"
 #define TEST_IOT_CERT_PATH             (PCHAR) "/Test/credentials/cert/path"
@@ -199,11 +201,12 @@ class ProducerClientTestBase : public ::testing::Test {
     };
 
     VOID createDefaultProducerClient(BOOL cachingEndpoint = FALSE, UINT64 createStreamTimeout = TEST_CREATE_STREAM_TIMEOUT,
-                                     BOOL continuousRetry = FALSE);
+                                     UINT64 stopStreamTimeout = TEST_STOP_STREAM_TIMEOUT, BOOL continuousRetry = FALSE, UINT64 sessionRotationPeriod = TEST_CREDENTIAL_EXPIRATION);
     VOID createDefaultProducerClient(API_CALL_CACHE_TYPE cacheType = API_CALL_CACHE_TYPE_NONE,
-                                     UINT64 createStreamTimeout = TEST_CREATE_STREAM_TIMEOUT, BOOL continuousRetry = FALSE);
-    STATUS createTestStream(UINT32 index, STREAMING_TYPE streamingType = STREAMING_TYPE_REALTIME, UINT32 maxLatency = TEST_MAX_STREAM_LATENCY,
-                            UINT32 bufferDuration = TEST_STREAM_BUFFER_DURATION, BOOL sync = TRUE);
+                                     UINT64 createStreamTimeout = TEST_CREATE_STREAM_TIMEOUT, UINT64 stopStreamTimeout = TEST_STOP_STREAM_TIMEOUT,
+                                     BOOL continuousRetry = FALSE, UINT64 sessionRotationPeriod = TEST_CREDENTIAL_EXPIRATION);
+    STATUS createTestStream(UINT32 index, STREAMING_TYPE streamingType = STREAMING_TYPE_REALTIME, UINT64 maxLatency = TEST_MAX_STREAM_LATENCY,
+                            UINT64 bufferDuration = TEST_STREAM_BUFFER_DURATION, BOOL sync = TRUE);
     VOID freeStreams(BOOL sync = FALSE);
     VOID printFrameInfo(PFrame pFrame);
 
@@ -348,7 +351,18 @@ class ProducerClientTestBase : public ::testing::Test {
     BufferPressureState mCurrentPressureState;
     UINT32 mPressureHandlerRetryCount;
 
+    // Storing the last error
+    volatile STATUS mLastError;
+
+    // Members for fault injection
+    volatile UINT32 mDescribeFailCount;
+    volatile UINT32 mDescribeRecoverCount;
+    volatile STATUS mDescribeRetStatus;
+
     UINT32 loggerLogLevel = LOG_LEVEL_WARN;
+
+    // Stored auth callbacks which is used to inject fault
+    PAuthCallbacks mAuthCallbacks;
 
   private:
     // Stored function pointers to reset on exit
