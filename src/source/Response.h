@@ -56,9 +56,6 @@ struct __CurlResponse {
     // track whether end-of-stream has been received from getKinesisVideoStreamData
     BOOL endOfStream;
 
-    // Whether curl is paused
-    volatile BOOL paused;
-
     // Whether to dump streaming session into mkv file
     BOOL debugDumpFile;
 
@@ -67,6 +64,12 @@ struct __CurlResponse {
 
     // Lock for exclusive access
     MUTEX lock;
+
+    // data available lock
+    MUTEX dataAvailableLock;
+
+    // data available CVAR
+    CVAR dataAvailableCvar;
 
     ///////////////////////////////////////////////
 };
