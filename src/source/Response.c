@@ -469,9 +469,10 @@ CleanUp:
 STATUS notifyDataAvailable(PCurlResponse pCurlResponse, UINT64 durationAvailable, UINT64 sizeAvailable)
 {
     STATUS retStatus = STATUS_SUCCESS;
-    PCallbacksProvider pCallbacksProvider;
+    PCallbacksProvider pCallbacksProvider = NULL;
 
     CHK(pCurlResponse != NULL, STATUS_NULL_ARG);
+
 
     if (pCurlResponse->pCurlRequest != NULL && pCurlResponse->pCurlRequest->pCurlApiCallbacks != NULL &&
         pCurlResponse->pCurlRequest->pCurlApiCallbacks->pCallbacksProvider != NULL) {
@@ -483,7 +484,7 @@ STATUS notifyDataAvailable(PCurlResponse pCurlResponse, UINT64 durationAvailable
         DLOGV("Note data received: duration(100ns): %" PRIu64 " bytes %" PRIu64 " for stream handle %" PRIu64, durationAvailable, sizeAvailable,
               pCurlResponse->pCurlRequest->uploadHandle);
 
-        if (pCurlResponse->pCurl != NULL) {
+        if (pCurlResponse->pCurl != NULL && pCallbacksProvider != NULL) {
             pCallbacksProvider->clientCallbacks.lockMutexFn(pCallbacksProvider->clientCallbacks.customData, pCurlResponse->dataAvailableLock);
             CVAR_SIGNAL(pCurlResponse->dataAvailableCvar);
             pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData, pCurlResponse->dataAvailableLock);

@@ -17,7 +17,7 @@ extern "C" {
 
 // HTTP status code not set
 #define HTTP_STATUS_CODE_NOT_SET 0
-    
+
 // CA file extension
 #define CA_CERT_FILE_SUFFIX ".pem"
 
