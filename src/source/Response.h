@@ -13,6 +13,8 @@ extern "C" {
 // Setting this timeout to terminate CURL connection
 #define TIMEOUT_AFTER_STREAM_STOPPED (1 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND)
 
+#define TIMEOUT_TEARDOWN_CURL_NO_DATA (60ULL * HUNDREDS_OF_NANOS_IN_A_SECOND)
+
 // HTTP status code not set
 #define HTTP_STATUS_CODE_NOT_SET 0
 

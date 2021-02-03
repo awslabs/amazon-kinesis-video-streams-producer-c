@@ -642,9 +642,6 @@ SIZE_T postReadCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID custo
     UINT32 retrievedSize = 0;
     UPLOAD_HANDLE uploadHandle;
     PCurlRequest pCurlRequest = (PCurlRequest) customData;
-    CURLMcode curlmCode;
-    UINT8 iter = 0, maxIter = 2;
-    int numfds;
 
     if (pCurlRequest == NULL || pCurlRequest->pCurlResponse == NULL || pCurlRequest->pCurlApiCallbacks == NULL) {
         bytesWritten = CURL_READFUNC_ABORT;
@@ -661,7 +658,23 @@ SIZE_T postReadCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID custo
         CHK(FALSE, retStatus);
     }
 
-    while (iter < maxIter) {
+    retStatus = getKinesisVideoStreamData(pCurlResponse->pCurlRequest->streamHandle, uploadHandle, (PBYTE) pBuffer,
+                                          (UINT32) bufferSize, &retrievedSize);
+
+    if (pCurlApiCallbacks->curlReadCallbackHookFn != NULL) {
+        retStatus =
+                pCurlApiCallbacks->curlReadCallbackHookFn(pCurlResponse, uploadHandle, (PBYTE) pBuffer,
+                                                          (UINT32) bufferSize, &retrievedSize, retStatus);
+    }
+
+    bytesWritten = (SIZE_T) retrievedSize;
+
+    // If conditions are met under which we would have previously called curl pause -- instead wait on CVAR
+    // SIGNAL is in notifyDataAvailable
+    if (bytesWritten == 0 && (retStatus == STATUS_SUCCESS || retStatus == STATUS_NO_MORE_DATA_AVAILABLE || retStatus == STATUS_AWAITING_PERSISTED_ACK)) {
+        pCurlApiCallbacks->pCallbacksProvider->clientCallbacks.lockMutexFn(pCurlApiCallbacks->pCallbacksProvider->clientCallbacks.customData, pCurlResponse->dataAvailableLock);
+        CVAR_WAIT(pCurlResponse->dataAvailableCvar, pCurlResponse->dataAvailableLock, TIMEOUT_TEARDOWN_CURL_NO_DATA);
+        pCurlApiCallbacks->pCallbacksProvider->clientCallbacks.unlockMutexFn(pCurlApiCallbacks->pCallbacksProvider->clientCallbacks.customData, pCurlResponse->dataAvailableLock);
 
         retStatus = getKinesisVideoStreamData(pCurlResponse->pCurlRequest->streamHandle, uploadHandle, (PBYTE) pBuffer,
                                               (UINT32) bufferSize, &retrievedSize);
@@ -673,15 +686,6 @@ SIZE_T postReadCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID custo
         }
 
         bytesWritten = (SIZE_T) retrievedSize;
-
-        if (bytesWritten == 0 && (retStatus == STATUS_SUCCESS || retStatus == STATUS_NO_MORE_DATA_AVAILABLE || retStatus == STATUS_AWAITING_PERSISTED_ACK)) {
-            pCurlApiCallbacks->pCallbacksProvider->clientCallbacks.lockMutexFn(pCurlApiCallbacks->pCallbacksProvider->clientCallbacks.customData, pCurlResponse->dataAvailableLock);
-            CVAR_WAIT(pCurlResponse->dataAvailableCvar, pCurlResponse->dataAvailableLock, 3ULL*HUNDREDS_OF_NANOS_IN_A_SECOND);
-            pCurlApiCallbacks->pCallbacksProvider->clientCallbacks.unlockMutexFn(pCurlApiCallbacks->pCallbacksProvider->clientCallbacks.customData, pCurlResponse->dataAvailableLock);
-        } else {
-            break;
-        }
-        iter++;
     }
 
     DLOGV("Get Stream data returned: buffer size: %u written bytes: %u for upload handle: %" PRIu64 " current stream handle: %" PRIu64, bufferSize,
@@ -694,7 +698,8 @@ SIZE_T postReadCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID custo
             // Media pipeline thread might be blocked due to heap or temporal limit.
             // Pause curl read and wait for persisted ack.
             if (bytesWritten == 0) {
-                DLOGD("Pausing CURL read for upload handle: %" PRIu64, uploadHandle);
+                DLOGD("Error 0 bytes after notify, aborting CURL for upload handle: %" PRIu64, uploadHandle);
+                bytesWritten = CURL_READFUNC_ABORT;
             }
             break;
 
@@ -710,7 +715,8 @@ SIZE_T postReadCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID custo
         case STATUS_AWAITING_PERSISTED_ACK:
             // If bytes_written == 0, set it to pause to exit the loop
             if (bytesWritten == 0) {
-                DLOGD("Pausing CURL read for upload handle: %" PRIu64 " waiting for last ack.", uploadHandle);
+                DLOGD("Error 0 bytes after notify, aborting CURL read for upload handle: %" PRIu64 " waiting for last ack.", uploadHandle);
+                bytesWritten = CURL_READFUNC_ABORT;
             }
             break;
 
