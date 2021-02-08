@@ -183,7 +183,7 @@ namespace com { namespace amazonaws { namespace kinesis { namespace video {
                                                              TEST_STREAM_BUFFER_DURATION,
                                                              &pStreamInfo));
 
-        EXPECT_EQ(FRAME_ORDERING_MODE_MULTI_TRACK_AV_COMPARE_PTS_ONE_MS_COMPENSATE, pStreamInfo->streamCaps.frameOrderingMode);
+        EXPECT_EQ(FRAME_ORDERING_MODE_MULTI_TRACK_AV_COMPARE_PTS_ONE_MS_COMPENSATE_EOFR, pStreamInfo->streamCaps.frameOrderingMode);
         EXPECT_EQ(2, pStreamInfo->streamCaps.trackInfoCount);
         EXPECT_EQ(STREAMING_TYPE_REALTIME, pStreamInfo->streamCaps.streamingType);
         EXPECT_EQ(MKV_TRACK_INFO_TYPE_VIDEO, pStreamInfo->streamCaps.trackInfoList[0].trackType);
@@ -260,7 +260,7 @@ namespace com { namespace amazonaws { namespace kinesis { namespace video {
                                                             TEST_STREAM_BUFFER_DURATION,
                                                             &pStreamInfo));
 
-        EXPECT_EQ(FRAME_ORDERING_MODE_MULTI_TRACK_AV_COMPARE_PTS_ONE_MS_COMPENSATE, pStreamInfo->streamCaps.frameOrderingMode);
+        EXPECT_EQ(FRAME_ORDERING_MODE_MULTI_TRACK_AV_COMPARE_PTS_ONE_MS_COMPENSATE_EOFR, pStreamInfo->streamCaps.frameOrderingMode);
         EXPECT_EQ(2, pStreamInfo->streamCaps.trackInfoCount);
         EXPECT_EQ(STREAMING_TYPE_OFFLINE, pStreamInfo->streamCaps.streamingType);
         EXPECT_EQ(MKV_TRACK_INFO_TYPE_VIDEO, pStreamInfo->streamCaps.trackInfoList[0].trackType);
