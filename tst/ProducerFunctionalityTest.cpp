@@ -613,7 +613,6 @@ TEST_F(ProducerFunctionalityTest, intermittent_producer_verify_eofr_sent_multi_t
     EXPECT_EQ(FRAME_ORDERING_MODE_MULTI_TRACK_AV_COMPARE_PTS_ONE_MS_COMPENSATE_EOFR, pStreamInfo->streamCaps.frameOrderingMode);
     EXPECT_EQ(2, pStreamInfo->streamCaps.trackInfoCount);
 
-
     mStreamInfo = *pStreamInfo;
 
     // Test - we don't have real data
@@ -621,22 +620,26 @@ TEST_F(ProducerFunctionalityTest, intermittent_producer_verify_eofr_sent_multi_t
     mStreamInfo.streamCaps.fragmentDuration = 1 * HUNDREDS_OF_NANOS_IN_A_SECOND;
     mStreamInfo.streamCaps.storePressurePolicy = CONTENT_STORE_PRESSURE_POLICY_OOM;
     mStreamInfo.streamCaps.viewOverflowPolicy = CONTENT_VIEW_OVERFLOW_POLICY_DROP_TAIL_VIEW_ITEM;
-    mStreamInfo.streamCaps.keyFrameFragmentation = FALSE;
-
 
     createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
 
     EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION));
     streamHandle = mStreams[0];
 
+    mFrame.flags = FRAME_FLAG_KEY_FRAME;
+
     for (i = 0; i < totalFrames; i++) {
         startTime = GETTIME();
         // i = 480 will be start of a key frame, if I don't start on key-frame
         // this test fails
-        if( (i < 30) || (i >= 480) ) {
-            mFrame.trackId = 1;
+        if ( (i < 30) || (i >= 480) ) {
+            mFrame.trackId = TEST_VIDEO_TRACK_ID;
             EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
-            mFrame.trackId = 2;
+            mFrame.trackId = TEST_AUDIO_TRACK_ID;
+            // ok key frame we close fragment -- so if audio
+            // is marked key frame we'll create a fragment with no frames in track1 and
+            // throw error
+            mFrame.flags = FRAME_FLAG_NONE;
             EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
         }
         updateFrame();

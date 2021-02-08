@@ -14,6 +14,7 @@
 #define TEST_CERTIFICATE_PATH    EMPTY_STRING
 #define TEST_DEFAULT_CHAIN_COUNT DEFAULT_CALLBACK_CHAIN_COUNT
 
+
 #define TEST_ACCESS_KEY    (PCHAR) "Test access key"
 #define TEST_SECRET_KEY    (PCHAR) "Test secret key"
 #define TEST_SESSION_TOKEN (PCHAR) "Test session token"
@@ -34,6 +35,9 @@
 #define TEST_DEFAULT_PRESSURE_HANDLER_RETRY_COUNT          10
 #define TEST_DEFAULT_PRESSURE_HANDLER_GRACE_PERIOD_SECONDS 3
 #define TEST_STREAM_CONNECTION_STALENESS_DURATION          (120 * HUNDREDS_OF_NANOS_IN_A_SECOND)
+#define TEST_VIDEO_TRACK_ID                                1
+#define TEST_AUDIO_TRACK_ID                                2
+
 
 #define TEST_FPS                    20
 #define TEST_MEDIA_DURATION_SECONDS 60
