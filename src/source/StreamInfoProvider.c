@@ -96,7 +96,7 @@ STATUS setStreamInfoDefaults(STREAMING_TYPE streamingType, UINT64 retention, UIN
     pStreamInfo->streamCaps.fragmentAcks = TRUE;
     pStreamInfo->streamCaps.frameTimecodes = TRUE;
     pStreamInfo->streamCaps.frameOrderingMode =
-        trackCount == 1 ? FRAME_ORDER_MODE_PASS_THROUGH : FRAME_ORDERING_MODE_MULTI_TRACK_AV_COMPARE_PTS_ONE_MS_COMPENSATE;
+        trackCount == 1 ? FRAME_ORDER_MODE_PASS_THROUGH : FRAME_ORDERING_MODE_MULTI_TRACK_AV_COMPARE_PTS_ONE_MS_COMPENSATE_EOFR;
     pStreamInfo->streamCaps.keyFrameFragmentation = TRUE;
     pStreamInfo->streamCaps.maxLatency = (UINT64)(LATENCY_PRESSURE_FACTOR * ((DOUBLE) bufferDuration));
     pStreamInfo->streamCaps.nalAdaptationFlags = NAL_ADAPTATION_ANNEXB_CPD_NALS | NAL_ADAPTATION_ANNEXB_NALS;

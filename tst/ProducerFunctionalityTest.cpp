@@ -591,6 +591,76 @@ TEST_F(ProducerFunctionalityTest, intermittent_producer_verify_eofr_sent)
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
 
+TEST_F(ProducerFunctionalityTest, intermittent_producer_verify_eofr_sent_multi_track)
+{
+    STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
+    UINT32 i, errCount;
+    UINT32 totalFrames = 510;
+    UINT64 startTime, delay;
+    mFrame.duration = 100 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND;
+    mKeyFrameInterval = 10;
+    UPLOAD_HANDLE streamUploadHandle = 0;
+
+
+    PStreamInfo pStreamInfo;
+
+    EXPECT_EQ(STATUS_SUCCESS,
+            createRealtimeAudioVideoStreamInfoProvider(TEST_STREAM_NAME,
+                                                       TEST_RETENTION_PERIOD,
+                                                       TEST_STREAM_BUFFER_DURATION,
+                                                       &pStreamInfo));
+
+    EXPECT_EQ(FRAME_ORDERING_MODE_MULTI_TRACK_AV_COMPARE_PTS_ONE_MS_COMPENSATE_EOFR, pStreamInfo->streamCaps.frameOrderingMode);
+    EXPECT_EQ(2, pStreamInfo->streamCaps.trackInfoCount);
+
+    mStreamInfo = *pStreamInfo;
+
+    // Test - we don't have real data
+    mStreamInfo.streamCaps.nalAdaptationFlags = NAL_ADAPTATION_FLAG_NONE;
+    mStreamInfo.streamCaps.fragmentDuration = 1 * HUNDREDS_OF_NANOS_IN_A_SECOND;
+    mStreamInfo.streamCaps.storePressurePolicy = CONTENT_STORE_PRESSURE_POLICY_OOM;
+    mStreamInfo.streamCaps.viewOverflowPolicy = CONTENT_VIEW_OVERFLOW_POLICY_DROP_TAIL_VIEW_ITEM;
+
+    createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
+
+    EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION));
+    streamHandle = mStreams[0];
+
+    mFrame.flags = FRAME_FLAG_KEY_FRAME;
+
+    for (i = 0; i < totalFrames; i++) {
+        startTime = GETTIME();
+        // i = 480 will be start of a key frame, if I don't start on key-frame
+        // this test fails
+        if ( (i < 30) || (i >= 480) ) {
+            mFrame.trackId = TEST_VIDEO_TRACK_ID;
+            EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
+            mFrame.trackId = TEST_AUDIO_TRACK_ID;
+            // ok key frame we close fragment -- so if audio
+            // is marked key frame we'll create a fragment with no frames in track1 and
+            // throw error
+            mFrame.flags = FRAME_FLAG_NONE;
+            EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
+        }
+        updateFrame();
+
+        delay = GETTIME() - startTime;
+        if (delay < mFrame.duration) {
+            THREAD_SLEEP(mFrame.duration - delay);
+        }
+        EXPECT_EQ(0, mStreamErrorFnCount);
+    }
+
+    EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStreamSync(streamHandle));
+    EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
+    // no new error during shutdown
+    EXPECT_EQ(0, mStreamErrorFnCount);
+    MEMFREE(pStreamInfo);
+
+    mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
+}
+
+
 TEST_F(ProducerFunctionalityTest, pressure_on_buffer_duration_fail_new_connection_at_token_rotation)
 {
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
