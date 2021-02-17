@@ -291,6 +291,141 @@ TEST_F(ProducerFunctionalityTest, create_client_repeated_create_stream_put_frame
         EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
         mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
     }
+
+    EXPECT_EQ(FUNCTIONALITY_TEST_STRESS_TEST_ITERATION, mCurlDescribeStreamCount);
+    EXPECT_EQ(FUNCTIONALITY_TEST_STRESS_TEST_ITERATION, mCurlGetDataEndpointCount);
+}
+
+TEST_F(ProducerFunctionalityTest, create_caching_endpoint_repeated_create_stream_put_frame_free_stream)
+{
+    UINT32 i, j;
+    STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
+    UINT32 totalFragments = 2;
+    UINT32 totalFrames = totalFragments * TEST_FPS;
+
+    createDefaultProducerClient(TRUE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
+
+    for (i = 0; i < FUNCTIONALITY_TEST_STRESS_TEST_ITERATION; i++) {
+
+        EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION, FALSE));
+        streamHandle = mStreams[0];
+        EXPECT_TRUE(streamHandle != INVALID_STREAM_HANDLE_VALUE);
+
+        for (j = 0; j < totalFrames; ++j) {
+            EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
+            updateFrame();
+        }
+
+        mFrame.flags = FRAME_FLAG_NONE;
+        mFrame.presentationTs = 0;
+        mFrame.decodingTs = 0;
+        mFrame.index = 0;
+
+        EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStreamSync(streamHandle));
+        EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
+        mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
+    }
+
+    EXPECT_EQ(0, mCurlDescribeStreamCount);
+    EXPECT_EQ(FUNCTIONALITY_TEST_STRESS_TEST_ITERATION, mCurlGetDataEndpointCount);
+}
+
+TEST_F(ProducerFunctionalityTest, create_caching_endpoint_client_repeated_create_stream_put_frame_reset_stream)
+{
+    UINT32 i, j;
+    STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
+    UINT32 totalFragments = 2;
+    UINT32 totalFrames = totalFragments * TEST_FPS;
+
+    createDefaultProducerClient(TRUE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
+
+    EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION, FALSE));
+    streamHandle = mStreams[0];
+    EXPECT_TRUE(streamHandle != INVALID_STREAM_HANDLE_VALUE);
+
+    for (i = 0; i < FUNCTIONALITY_TEST_STRESS_TEST_ITERATION; i++) {
+        for (j = 0; j < totalFrames; ++j) {
+            EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
+            updateFrame();
+        }
+
+        mFrame.flags = FRAME_FLAG_NONE;
+        mFrame.presentationTs = 0;
+        mFrame.decodingTs = 0;
+        mFrame.index = 0;
+
+        EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStreamSync(streamHandle));
+        EXPECT_EQ(STATUS_SUCCESS, kinesisVideoStreamResetStream(streamHandle));
+    }
+
+    EXPECT_EQ(0, mCurlDescribeStreamCount);
+    EXPECT_EQ(1, mCurlGetDataEndpointCount);
+}
+
+TEST_F(ProducerFunctionalityTest, create_caching_all_repeated_create_stream_put_frame_free_stream)
+{
+    UINT32 i, j;
+    STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
+    UINT32 totalFragments = 2;
+    UINT32 totalFrames = totalFragments * TEST_FPS;
+
+    createDefaultProducerClient(API_CALL_CACHE_TYPE_ALL, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
+
+    for (i = 0; i < FUNCTIONALITY_TEST_STRESS_TEST_ITERATION; i++) {
+
+        EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION, FALSE));
+        streamHandle = mStreams[0];
+        EXPECT_TRUE(streamHandle != INVALID_STREAM_HANDLE_VALUE);
+
+        for (j = 0; j < totalFrames; ++j) {
+            EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
+            updateFrame();
+        }
+
+        mFrame.flags = FRAME_FLAG_NONE;
+        mFrame.presentationTs = 0;
+        mFrame.decodingTs = 0;
+        mFrame.index = 0;
+
+        EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStreamSync(streamHandle));
+        EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
+        mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
+    }
+
+    EXPECT_EQ(FUNCTIONALITY_TEST_STRESS_TEST_ITERATION, mCurlDescribeStreamCount);
+    EXPECT_EQ(FUNCTIONALITY_TEST_STRESS_TEST_ITERATION, mCurlGetDataEndpointCount);
+}
+
+TEST_F(ProducerFunctionalityTest, create_caching_all_client_repeated_create_stream_put_frame_reset_stream)
+{
+    UINT32 i, j;
+    STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
+    UINT32 totalFragments = 2;
+    UINT32 totalFrames = totalFragments * TEST_FPS;
+
+    createDefaultProducerClient(API_CALL_CACHE_TYPE_ALL, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
+
+    EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION, FALSE));
+    streamHandle = mStreams[0];
+    EXPECT_TRUE(streamHandle != INVALID_STREAM_HANDLE_VALUE);
+
+    for (i = 0; i < FUNCTIONALITY_TEST_STRESS_TEST_ITERATION; i++) {
+        for (j = 0; j < totalFrames; ++j) {
+            EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
+            updateFrame();
+        }
+
+        mFrame.flags = FRAME_FLAG_NONE;
+        mFrame.presentationTs = 0;
+        mFrame.decodingTs = 0;
+        mFrame.index = 0;
+
+        EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStreamSync(streamHandle));
+        EXPECT_EQ(STATUS_SUCCESS, kinesisVideoStreamResetStream(streamHandle));
+    }
+
+    EXPECT_EQ(1, mCurlDescribeStreamCount);
+    EXPECT_EQ(1, mCurlGetDataEndpointCount);
 }
 
 TEST_F(ProducerFunctionalityTest, create_client_repeated_create_stream_put_frame_free_stream_multi_stream)

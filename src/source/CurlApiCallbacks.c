@@ -713,8 +713,10 @@ STATUS shutdownStreamCurl(UINT64 customData, STREAM_HANDLE streamHandle, BOOL re
     CHK_STATUS(curlApiCallbacksShutdownActiveUploads(pCurlApiCallbacks, streamHandle, INVALID_UPLOAD_HANDLE_VALUE,
                                                      CURL_API_CALLBACKS_SHUTDOWN_TIMEOUT, FALSE, FALSE));
 
-    // Clear out the cached endpoints
-    CHK_STATUS(curlApiCallbacksShutdownCachedEndpoints(pCurlApiCallbacks, streamHandle, TRUE));
+    // Clear out the cached endpoints only when not resetting
+    if (!resetStream) {
+        CHK_STATUS(curlApiCallbacksShutdownCachedEndpoints(pCurlApiCallbacks, streamHandle, TRUE));
+    }
 
     // at this point all remaining threads should not be blocked and reach termination shortly. Thus spin wait for it
     // to remove itself from the pActiveRequests hashtable and pActiveUploads list
