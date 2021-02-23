@@ -520,7 +520,7 @@ PUBLIC_API STATUS createOfflineAudioVideoStreamInfoProvider(PCHAR, UINT64, UINT6
  */
 PUBLIC_API STATUS setStreamInfoBasedOnStorageSize(UINT32, UINT64, UINT32, PStreamInfo);
 
-/*
+/**
  * Frees the StreamInfo provider object.
  *
  * @param[in,out] PStreamInfo* StreamInfo provider object to be freed
@@ -572,7 +572,7 @@ PUBLIC_API STATUS setDeviceInfoStorageSize(PDeviceInfo, UINT64);
  */
 PUBLIC_API STATUS setDeviceInfoStorageSizeBasedOnBitrateAndBufferDuration(PDeviceInfo, UINT64, UINT64);
 
-/*
+/**
  * Creates the Iot Credentials auth callbacks
  *
  * NOTE: The caller is responsible for releasing the structure by calling
@@ -592,7 +592,7 @@ PUBLIC_API STATUS setDeviceInfoStorageSizeBasedOnBitrateAndBufferDuration(PDevic
  */
 PUBLIC_API STATUS createIotAuthCallbacks(PClientCallbacks, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PAuthCallbacks*);
 
-/*
+/**
  * Frees the Iot Credential auth callbacks
  *
  * @param[in,out] PAuthCallbacks* pointer to AuthCallback provider object
@@ -601,7 +601,7 @@ PUBLIC_API STATUS createIotAuthCallbacks(PClientCallbacks, PCHAR, PCHAR, PCHAR, 
  */
 PUBLIC_API STATUS freeIotAuthCallbacks(PAuthCallbacks*);
 
-/*
+/**
  * Creates the File Credentials auth callbacks
  *
  * NOTE: The caller is responsible for releasing the structure by calling
@@ -615,7 +615,7 @@ PUBLIC_API STATUS freeIotAuthCallbacks(PAuthCallbacks*);
  */
 PUBLIC_API STATUS createFileAuthCallbacks(PClientCallbacks, PCHAR, PAuthCallbacks*);
 
-/*
+/**
  * Frees the File Credential auth callbacks
  *
  * @param[in,out] PAuthCallbacks* pointer to AuthCallback provider object
@@ -624,7 +624,7 @@ PUBLIC_API STATUS createFileAuthCallbacks(PClientCallbacks, PCHAR, PAuthCallback
  */
 PUBLIC_API STATUS freeFileAuthCallbacks(PAuthCallbacks*);
 
-/*
+/**
  * Creates a Static Credentials auth callbacks
  *
  * NOTE: The caller is responsible for releasing the structure by calling
@@ -641,7 +641,7 @@ PUBLIC_API STATUS freeFileAuthCallbacks(PAuthCallbacks*);
  */
 PUBLIC_API STATUS createStaticAuthCallbacks(PClientCallbacks, PCHAR, PCHAR, PCHAR, UINT64, PAuthCallbacks*);
 
-/*
+/**
  * Frees the Static Credential auth callback
  *
  * @param[in,out] PAuthCallbacks* pointer to AuthCallback provider object
@@ -649,6 +649,33 @@ PUBLIC_API STATUS createStaticAuthCallbacks(PClientCallbacks, PCHAR, PCHAR, PCHA
  * @return STATUS status of operation
  */
 PUBLIC_API STATUS freeStaticAuthCallbacks(PAuthCallbacks*);
+
+/**
+ * Creates a Credentials auth callbacks from an existing Credential Provider object
+ *
+ * NOTE: The caller is responsible for releasing the structure by calling
+ * the corresponding free API.
+ *
+ * NOTE: The original Credential Provider object will not be released on free
+ *
+ * @param[in] PCallbacksProvider Pointer to callback provider
+ * @param[in] PAwsCredentialProvider Credential provider object
+ * @param[in,out] PAuthCallbacks* Pointer to pointer to AuthCallback struct
+ *
+ * @return STATUS status of operation
+ */
+PUBLIC_API STATUS createCredentialProviderAuthCallbacks(PClientCallbacks, PAwsCredentialProvider, PAuthCallbacks*);
+
+/**
+ * Frees the Credential Provider based auth callback
+ *
+ * NOTE: The underlying credential provider object will not be freed
+ *
+ * @param[in,out] PAuthCallbacks* pointer to AuthCallback provider object
+ *
+ * @return STATUS status of operation
+ */
+PUBLIC_API STATUS freeCredentialProviderAuthCallbacks(PAuthCallbacks*);
 
 /**
  * Creates StreamCallbacks struct

@@ -382,12 +382,12 @@ extern "C" {
  */
 #define AWS_CREDENTIALS_CURRENT_VERSION 0
 
-/*
+/**
  * Default SSL port
  */
 #define DEFAULT_SSL_PORT_NUMBER 443
 
-/*
+/**
  * Default non-SSL port
  */
 #define DEFAULT_NON_SSL_PORT_NUMBER 8080
