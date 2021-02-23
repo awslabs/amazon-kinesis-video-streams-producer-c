@@ -107,6 +107,60 @@ TEST_F(AuthCallbackTest, verify_fileAuthCallback_provider_works)
     EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks));
 }
 
+TEST_F(AuthCallbackTest, credential_provider_auth_callbacks_test)
+{
+    PDeviceInfo pDeviceInfo;
+    PClientCallbacks pClientCallbacks;
+    PAwsCredentialProvider pAwsCredentialProvider;
+    CLIENT_HANDLE clientHandle;
+    STREAM_HANDLE streamHandle;
+    PStreamInfo pStreamInfo;
+    CHAR streamName[MAX_STREAM_NAME_LEN + 1];
+    PAuthCallbacks pAuthCallbacks;
+
+    STRNCPY(streamName, (PCHAR) TEST_STREAM_NAME, MAX_STREAM_NAME_LEN);
+    streamName[MAX_STREAM_NAME_LEN] = '\0';
+    EXPECT_EQ(STATUS_SUCCESS, createDefaultDeviceInfo(&pDeviceInfo));
+    pDeviceInfo->clientInfo.loggerLogLevel = this->loggerLogLevel;
+    EXPECT_EQ(STATUS_SUCCESS, createRealtimeVideoStreamInfoProvider(streamName,
+                                                                    TEST_RETENTION_PERIOD,
+                                                                    TEST_STREAM_BUFFER_DURATION,
+                                                                    &pStreamInfo));
+    EXPECT_EQ(STATUS_SUCCESS, createAbstractDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT,
+                                                                     API_CALL_CACHE_TYPE_NONE,
+                                                                     TEST_CACHING_ENDPOINT_PERIOD,
+                                                                     mRegion,
+                                                                     TEST_CONTROL_PLANE_URI,
+                                                                     mCaCertPath,
+                                                                     NULL,
+                                                                     NULL,
+                                                                     &pClientCallbacks));
+
+    // Create the credential provider based on static credentials which will be used with auth callbacks
+    EXPECT_EQ(STATUS_SUCCESS, createStaticCredentialProvider(mAccessKey, 0, mSecretKey, 0, mSessionToken, 0,
+                                                             MAX_UINT64, &pAwsCredentialProvider));
+
+    // Creating client should fail with missing auth callbacks
+    EXPECT_EQ(STATUS_SERVICE_CALL_CALLBACKS_MISSING, createKinesisVideoClientSync(pDeviceInfo, pClientCallbacks, &clientHandle));
+
+    // Execute negative tests on the target API
+    EXPECT_EQ(STATUS_NULL_ARG, createCredentialProviderAuthCallbacks(NULL, NULL, NULL));
+    EXPECT_EQ(STATUS_NULL_ARG, createCredentialProviderAuthCallbacks(pClientCallbacks, NULL, NULL));
+    EXPECT_EQ(STATUS_NULL_ARG, createCredentialProviderAuthCallbacks(pClientCallbacks, pAwsCredentialProvider, NULL));
+
+    EXPECT_EQ(STATUS_SUCCESS, createCredentialProviderAuthCallbacks(pClientCallbacks, pAwsCredentialProvider, &pAuthCallbacks));
+
+    EXPECT_EQ(STATUS_SUCCESS, createKinesisVideoClientSync(pDeviceInfo, pClientCallbacks, &clientHandle));
+    EXPECT_EQ(STATUS_SUCCESS, createKinesisVideoStreamSync(clientHandle, pStreamInfo, &streamHandle));
+
+    EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStreamSync(streamHandle));
+    EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
+    EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoClient(&clientHandle));
+    EXPECT_EQ(STATUS_SUCCESS, freeDeviceInfo(&pDeviceInfo));
+    EXPECT_EQ(STATUS_SUCCESS, freeStreamInfoProvider(&pStreamInfo));
+    EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks));
+    EXPECT_EQ(STATUS_SUCCESS, freeStaticCredentialProvider(&pAwsCredentialProvider));
+}
 }  // namespace video
 }  // namespace kinesis
 }  // namespace amazonaws

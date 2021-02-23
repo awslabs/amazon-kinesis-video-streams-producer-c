@@ -13,10 +13,10 @@ STATUS createStaticCredentialProvider(PCHAR accessKeyId, UINT32 accessKeyIdLen, 
     PStaticCredentialProvider pStaticCredentialProvider = NULL;
 
     CHK(ppCredentialProvider != NULL, STATUS_NULL_ARG);
-    // Create the credentials object
 
-    CHK_STATUS(
-        createAwsCredentials(accessKeyId, accessKeyIdLen, secretKey, secretKeyLen, sessionToken, sessionTokenLen, expiration, &pAwsCredentials));
+    // Create the credentials object
+    CHK_STATUS(createAwsCredentials(accessKeyId, accessKeyIdLen, secretKey, secretKeyLen,
+                                    sessionToken, sessionTokenLen, expiration, &pAwsCredentials));
 
     pStaticCredentialProvider = (PStaticCredentialProvider) MEMCALLOC(1, SIZEOF(StaticCredentialProvider));
     CHK(pStaticCredentialProvider != NULL, STATUS_NOT_ENOUGH_MEMORY);
