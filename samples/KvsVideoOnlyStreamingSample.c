@@ -130,7 +130,7 @@ INT32 main(INT32 argc, CHAR* argv[])
     frame.frameData = frameBuffer;
     frame.version = FRAME_CURRENT_VERSION;
     frame.trackId = DEFAULT_VIDEO_TRACK_ID;
-    frame.duration = HUNDREDS_OF_NANOS_IN_A_SECOND / DEFAULT_FPS_VALUE;
+    frame.duration = HUNDREDS_OF_NANOS_IN_A_SECOND / 40;
     frame.decodingTs = defaultGetTime(); // current time
     frame.presentationTs = frame.decodingTs;
 
