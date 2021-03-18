@@ -88,7 +88,6 @@ TEST_F(ProducerFunctionalityTest, reset_stream_on_stream_error_before_putFrame)
     EXPECT_LT(0, mFragmentAckReceivedFnCount);
     EXPECT_EQ(totalFragments, mPersistedFragmentCount);
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
-
 }
 
 TEST_F(ProducerFunctionalityTest, reset_stream_on_stream_error_with_frame_in_buffer)
@@ -794,7 +793,6 @@ TEST_F(ProducerFunctionalityTest, intermittent_producer_verify_eofr_sent_multi_t
 
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
-
 
 TEST_F(ProducerFunctionalityTest, pressure_on_buffer_duration_fail_new_connection_at_token_rotation)
 {

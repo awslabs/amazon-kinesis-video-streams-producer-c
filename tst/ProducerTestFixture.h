@@ -204,7 +204,7 @@ class ProducerClientTestBase : public ::testing::Test {
         return (PCHAR)::testing::UnitTest::GetInstance()->current_test_info()->test_case_name();
     };
 
-    VOID createDefaultProducerClient(BOOL cachingEndpoint = FALSE, UINT64 createStreamTimeout = TEST_CREATE_STREAM_TIMEOUT,
+    VOID createDefaultProducerClient(BOOL cachingEndpoint, UINT64 createStreamTimeout = TEST_CREATE_STREAM_TIMEOUT,
                                      UINT64 stopStreamTimeout = TEST_STOP_STREAM_TIMEOUT, BOOL continuousRetry = FALSE, UINT64 sessionRotationPeriod = TEST_CREDENTIAL_EXPIRATION);
     VOID createDefaultProducerClient(API_CALL_CACHE_TYPE cacheType = API_CALL_CACHE_TYPE_NONE,
                                      UINT64 createStreamTimeout = TEST_CREATE_STREAM_TIMEOUT, UINT64 stopStreamTimeout = TEST_STOP_STREAM_TIMEOUT,
