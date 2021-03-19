@@ -613,6 +613,7 @@ SIZE_T postReadCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID custo
     SIZE_T bufferSize = size * numItems, bytesWritten = 0;
     STATUS retStatus = STATUS_SUCCESS;
     UINT32 retrievedSize = 0;
+    UINT8 iter = 0;
     UPLOAD_HANDLE uploadHandle;
     PCurlRequest pCurlRequest = (PCurlRequest) customData;
 
@@ -635,18 +636,25 @@ SIZE_T postReadCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID custo
         CHK(FALSE, retStatus);
     }
 
-    retStatus =
-        getKinesisVideoStreamData(pCurlResponse->pCurlRequest->streamHandle, uploadHandle, (PBYTE) pBuffer, (UINT32) bufferSize, &retrievedSize);
-
-    if (pCurlApiCallbacks->curlReadCallbackHookFn != NULL) {
+    do {
+        if(iter > 0) {
+            THREAD_SLEEP(30 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND);
+        }
         retStatus =
-            pCurlApiCallbacks->curlReadCallbackHookFn(pCurlResponse, uploadHandle, (PBYTE) pBuffer, (UINT32) bufferSize, &retrievedSize, retStatus);
-    }
+            getKinesisVideoStreamData(pCurlResponse->pCurlRequest->streamHandle, uploadHandle, (PBYTE) pBuffer, (UINT32) bufferSize, &retrievedSize);
 
-    bytesWritten = (SIZE_T) retrievedSize;
+        if (pCurlApiCallbacks->curlReadCallbackHookFn != NULL) {
+            retStatus = pCurlApiCallbacks->curlReadCallbackHookFn(pCurlResponse, uploadHandle, (PBYTE) pBuffer, (UINT32) bufferSize, &retrievedSize,
+                                                                  retStatus);
+        }
 
-    DLOGV("Get Stream data returned: buffer size: %u written bytes: %u for upload handle: %" PRIu64 " current stream handle: %" PRIu64, bufferSize,
-          bytesWritten, uploadHandle, pCurlResponse->pCurlRequest->streamHandle);
+        bytesWritten = (SIZE_T) retrievedSize;
+
+        DLOGV("Get Stream data returned: buffer size: %u written bytes: %u for upload handle: %" PRIu64 " current stream handle: %" PRIu64,
+              bufferSize, bytesWritten, uploadHandle, pCurlResponse->pCurlRequest->streamHandle);
+
+        iter++;
+    } while(iter < 5 && bytesWritten == 0 && (retStatus == STATUS_SUCCESS || retStatus == STATUS_NO_MORE_DATA_AVAILABLE));
 
     // The return should be OK, no more data or an end of stream
     switch (retStatus) {
