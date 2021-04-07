@@ -63,6 +63,18 @@ To build the library run make in the build directory you executed CMake.
 
 `make`
 
+### Run samples
+To run the samples:
+
+```
+export AWS_SECRET_ACCESS_KEY=<YourAWSSecretAccessKey>
+export AWS_ACCESS_KEY_ID=<YourAWSAccessKey>
+```
+For audio+video, run `./kvsAacAudioVideoStreamingSample <channel-name`
+For video only, run `./kvsVideoOnlyStreamingSample <channel-name`
+
+This will stream the video/audio files from the `samples/h264SampleFrames` and `samples/aacSampleFrames` respectively.
+
 ### Run unit tests
 Since these tests exercise networking you need to have AWS credentials specified, specifically you need to:
 
