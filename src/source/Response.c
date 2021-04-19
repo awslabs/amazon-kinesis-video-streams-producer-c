@@ -613,6 +613,7 @@ SIZE_T postReadCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID custo
     SIZE_T bufferSize = size * numItems, bytesWritten = 0;
     STATUS retStatus = STATUS_SUCCESS;
     UINT32 retrievedSize = 0;
+    UINT64 sleepTime = BASE_GET_DATA_SLEEP_TIME;
     UINT8 iter = 0;
     UPLOAD_HANDLE uploadHandle;
     PCurlRequest pCurlRequest = (PCurlRequest) customData;
@@ -637,8 +638,11 @@ SIZE_T postReadCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID custo
     }
 
     do {
-        if(iter > 0) {
-            THREAD_SLEEP(30 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND);
+        // First iteration we do not sleep, after that we sleep
+        // 20 40 80 160 320 (ms)
+        if (iter > 0) {
+            THREAD_SLEEP(sleepTime);
+            sleepTime *=2;
         }
         retStatus =
             getKinesisVideoStreamData(pCurlResponse->pCurlRequest->streamHandle, uploadHandle, (PBYTE) pBuffer, (UINT32) bufferSize, &retrievedSize);
@@ -654,7 +658,7 @@ SIZE_T postReadCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID custo
               bufferSize, bytesWritten, uploadHandle, pCurlResponse->pCurlRequest->streamHandle);
 
         iter++;
-    } while(iter < 5 && bytesWritten == 0 && (retStatus == STATUS_SUCCESS || retStatus == STATUS_NO_MORE_DATA_AVAILABLE));
+    } while(iter < MAX_GET_DATA_ITER && bytesWritten == 0 && (retStatus == STATUS_SUCCESS || retStatus == STATUS_NO_MORE_DATA_AVAILABLE));
 
     // The return should be OK, no more data or an end of stream
     switch (retStatus) {
