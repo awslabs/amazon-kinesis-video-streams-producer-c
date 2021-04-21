@@ -25,6 +25,11 @@ extern "C" {
 // Debug dump data file environment variable
 #define KVS_DEBUG_DUMP_DATA_FILE_DIR_ENV_VAR "KVS_DEBUG_DUMP_DATA_FILE_DIR"
 
+// this is used by postReadCallback to sleep before checking for more data
+#define MAX_GET_DATA_ITER 6
+
+#define BASE_GET_DATA_SLEEP_TIME (20 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND)
+
 /**
  * CURL callback function definitions
  */
