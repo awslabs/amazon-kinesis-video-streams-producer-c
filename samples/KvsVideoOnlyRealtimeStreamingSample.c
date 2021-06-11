@@ -76,10 +76,21 @@ INT32 main(INT32 argc, CHAR* argv[])
         CHK(FALSE, STATUS_INVALID_ARG);
     }
 
+
+#ifdef IOT_CORE_ENABLE_CREDENTIALS
+    PCHAR pIotCoreCredentialEndpoint, pIotCoreCert, pIotCorePrivateKey, pIotCoreRoleAlias, pIotCoreThingName;
+    CHK_ERR((pIotCoreCredentialEndPoint = getenv(IOT_CORE_CREDENTIAL_ENDPOINT)) != NULL, STATUS_INVALID_OPERATION,
+            "AWS_IOT_CORE_CREDENTIAL_ENDPOINT must be set");
+    CHK_ERR((pIotCoreCert = getenv(IOT_CORE_CERT)) != NULL, STATUS_INVALID_OPERATION, "AWS_IOT_CORE_CERT must be set");
+    CHK_ERR((pIotCorePrivateKey = getenv(IOT_CORE_PRIVATE_KEY)) != NULL, STATUS_INVALID_OPERATION, "AWS_IOT_CORE_PRIVATE_KEY must be set");
+    CHK_ERR((pIotCoreRoleAlias = getenv(IOT_CORE_ROLE_ALIAS)) != NULL, STATUS_INVALID_OPERATION, "AWS_IOT_CORE_ROLE_ALIAS must be set");
+    CHK_ERR((pIotCoreThingName = getenv(IOT_CORE_THING_NAME)) != NULL, STATUS_INVALID_OPERATION, "AWS_IOT_CORE_THING_NAME must be set");
+#else
     if ((accessKey = getenv(ACCESS_KEY_ENV_VAR)) == NULL || (secretKey = getenv(SECRET_KEY_ENV_VAR)) == NULL) {
         DLOGE("Error missing credentials");
         CHK(FALSE, STATUS_INVALID_ARG);
     }
+#endif
 
     MEMSET(frameFilePath, 0x00, MAX_PATH_LEN + 1);
     if (argc < 5) {
@@ -87,6 +98,7 @@ INT32 main(INT32 argc, CHAR* argv[])
     } else {
         STRNCPY(frameFilePath, argv[4], MAX_PATH_LEN);
     }
+
 
     cacertPath = getenv(CACERT_PATH_ENV_VAR);
     sessionToken = getenv(SESSION_TOKEN_ENV_VAR);
@@ -122,8 +134,23 @@ INT32 main(INT32 argc, CHAR* argv[])
     // adjust members of pStreamInfo here if needed
 
     startTime = GETTIME();
+
+
+#ifdef IOT_CORE_ENABLE_CREDENTIALS
+    CHK_STATUS(createDefaultCallbacksProviderWithIotCertificate(pIotCoreCredentialEndPoint,
+                                                                    pIotCoreCert,
+                                                                    pIotCorePrivateKey,
+                                                                    cacertPath,
+                                                                    pIotCoreRoleAlias,
+                                                                    pIotCoreThingName,
+                                                                    region,
+                                                                    NULL,
+                                                                    NULL,
+                                                                    &pClientCallbacks));
+#else
     CHK_STATUS(createDefaultCallbacksProviderWithAwsCredentials(accessKey, secretKey, sessionToken, MAX_UINT64, region, cacertPath, NULL, NULL,
                                                                 &pClientCallbacks));
+#endif
 
     if (NULL != getenv(ENABLE_FILE_LOGGING)) {
         if ((retStatus = addFileLoggerPlatformCallbacksProvider(pClientCallbacks, FILE_LOGGING_BUFFER_SIZE, MAX_NUMBER_OF_LOG_FILES,
