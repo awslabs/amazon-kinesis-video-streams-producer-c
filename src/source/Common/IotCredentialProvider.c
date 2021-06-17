@@ -211,6 +211,7 @@ STATUS iotCurlHandler(PIotCredentialProvider pIotCredentialProvider)
 
     formatLen = SNPRINTF(serviceUrl, MAX_URI_CHAR_LEN, "%s%s%s%c%s%s", CONTROL_PLANE_URI_PREFIX, pIotCredentialProvider->iotGetCredentialEndpoint,
                          ROLE_ALIASES_PATH, '/', pIotCredentialProvider->roleAlias, CREDENTIAL_SERVICE);
+    DLOGD("service URL: %s, serviceUrl");
     CHK(formatLen > 0 && formatLen < MAX_URI_CHAR_LEN, STATUS_IOT_FAILED);
 
     // Form a new request info based on the params

@@ -13,6 +13,13 @@
 
 #define FILE_LOGGING_BUFFER_SIZE (100 * 1024)
 #define MAX_NUMBER_OF_LOG_FILES  5
+
+#define IOT_CORE_CREDENTIAL_ENDPOINT    ((PCHAR) "AWS_IOT_CORE_CREDENTIAL_ENDPOINT")
+#define IOT_CORE_CERT                   ((PCHAR) "AWS_IOT_CORE_CERT")
+#define IOT_CORE_PRIVATE_KEY            ((PCHAR) "AWS_IOT_CORE_PRIVATE_KEY")
+#define IOT_CORE_ROLE_ALIAS             ((PCHAR) "AWS_IOT_CORE_ROLE_ALIAS")
+#define IOT_CORE_THING_NAME             ((PCHAR) "AWS_IOT_CORE_THING_NAME")
+
 STATUS readFrameData(PFrame pFrame, PCHAR frameFilePath)
 {
     STATUS retStatus = STATUS_SUCCESS;
@@ -53,7 +60,7 @@ INT32 main(INT32 argc, CHAR* argv[])
     CLIENT_HANDLE clientHandle = INVALID_CLIENT_HANDLE_VALUE;
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     STATUS retStatus = STATUS_SUCCESS;
-    PCHAR accessKey = NULL, secretKey = NULL, sessionToken = NULL, streamName = NULL, region = NULL, cacertPath = NULL;
+    PCHAR accessKey = NULL, secretKey = NULL, sessionToken = NULL, region = NULL, cacertPath = NULL, streamName = NULL;
     CHAR frameFilePath[MAX_PATH_LEN + 1];
     Frame frame;
     BYTE frameBuffer[200000]; // Assuming this is enough
@@ -62,14 +69,21 @@ INT32 main(INT32 argc, CHAR* argv[])
     DOUBLE startUpLatency;
     BOOL firstFrame = TRUE;
     UINT64 startTime;
+    PCHAR piotCoreRoleAlias, piotCoreCredentialEndPoint, piotCoreCert, piotCorePrivateKey, piotCoreThingName;
 
-    if (argc < 2) {
-        defaultLogPrint(
-            LOG_LEVEL_ERROR, "",
-            "Usage: AWS_ACCESS_KEY_ID=SAMPLEKEY AWS_SECRET_ACCESS_KEY=SAMPLESECRET %s <stream_name> <duration_in_seconds> <frame_files_path>\n",
-            argv[0]);
-        CHK(FALSE, STATUS_INVALID_ARG);
-    }
+    CHK_ERR((piotCoreCredentialEndPoint = getenv(IOT_CORE_CREDENTIAL_ENDPOINT)) != NULL, STATUS_INVALID_OPERATION,
+            "AWS_IOT_CORE_CREDENTIAL_ENDPOINT must be set");
+    CHK_ERR((piotCoreCert = getenv(IOT_CORE_CERT)) != NULL, STATUS_INVALID_OPERATION, "AWS_IOT_CORE_CERT must be set");
+    CHK_ERR((piotCorePrivateKey = getenv(IOT_CORE_PRIVATE_KEY)) != NULL, STATUS_INVALID_OPERATION, "AWS_IOT_CORE_PRIVATE_KEY must be set");
+    CHK_ERR((piotCoreRoleAlias = getenv(IOT_CORE_ROLE_ALIAS)) != NULL, STATUS_INVALID_OPERATION, "AWS_IOT_CORE_ROLE_ALIAS must be set");
+    CHK_ERR((piotCoreThingName = getenv(IOT_CORE_THING_NAME)) != NULL, STATUS_INVALID_OPERATION, "AWS_IOT_CORE_THING_NAME must be set");
+//    if (argc < 2) {
+//        defaultLogPrint(
+//            LOG_LEVEL_ERROR, "",
+//            "Usage: AWS_ACCESS_KEY_ID=SAMPLEKEY AWS_SECRET_ACCESS_KEY=SAMPLESECRET %s <stream_name> <duration_in_seconds> <frame_files_path>\n",
+//            argv[0]);
+//        CHK(FALSE, STATUS_INVALID_ARG);
+//    }
 
     if ((accessKey = getenv(ACCESS_KEY_ENV_VAR)) == NULL || (secretKey = getenv(SECRET_KEY_ENV_VAR)) == NULL) {
         defaultLogPrint(LOG_LEVEL_ERROR, "", "Error missing credentials");
@@ -85,7 +99,7 @@ INT32 main(INT32 argc, CHAR* argv[])
 
     cacertPath = getenv(CACERT_PATH_ENV_VAR);
     sessionToken = getenv(SESSION_TOKEN_ENV_VAR);
-    streamName = argv[1];
+//    streamName = argv[1];
     if ((region = getenv(DEFAULT_REGION_ENV_VAR)) == NULL) {
         region = (PCHAR) DEFAULT_AWS_REGION;
     }
@@ -104,13 +118,25 @@ INT32 main(INT32 argc, CHAR* argv[])
     pDeviceInfo->clientInfo.loggerLogLevel = LOG_LEVEL_DEBUG;
     pDeviceInfo->storageInfo.storageSize = DEFAULT_STORAGE_SIZE;
 
-    CHK_STATUS(createRealtimeVideoStreamInfoProvider(streamName, DEFAULT_RETENTION_PERIOD, DEFAULT_BUFFER_DURATION, &pStreamInfo));
+    CHK_STATUS(createRealtimeVideoStreamInfoProvider(piotCoreThingName, DEFAULT_RETENTION_PERIOD, DEFAULT_BUFFER_DURATION, &pStreamInfo));
     CHK_STATUS(setStreamInfoBasedOnStorageSize(DEFAULT_STORAGE_SIZE, RECORDED_FRAME_AVG_BITRATE_BIT_PS, 1, pStreamInfo));
     // adjust members of pStreamInfo here if needed
 
     startTime = GETTIME();
-    CHK_STATUS(createDefaultCallbacksProviderWithAwsCredentials(accessKey, secretKey, sessionToken, MAX_UINT64, region, cacertPath, NULL, NULL,
-                                                                &pClientCallbacks));
+    printf("Thing name: %s", piotCoreThingName);
+    printf("%s, %s, %s, %s, %s, %s", piotCoreCredentialEndPoint, piotCoreCert, piotCorePrivateKey, cacertPath, piotCoreRoleAlias, piotCoreThingName);
+    CHK_STATUS(createDefaultCallbacksProviderWithIotCertificate(piotCoreCredentialEndPoint,
+    		piotCoreCert,
+			piotCorePrivateKey,
+                                                                cacertPath,
+																piotCoreRoleAlias,
+																piotCoreThingName,
+                                                                region,
+                                                                NULL,
+                                                                NULL,
+                                                               &pClientCallbacks));
+//    CHK_STATUS(createDefaultCallbacksProviderWithAwsCredentials(accessKey, secretKey, sessionToken, MAX_UINT64, region, cacertPath, NULL, NULL,
+//                                                                &pClientCallbacks));
 
     if (NULL != getenv(ENABLE_FILE_LOGGING)) {
         if ((retStatus = addFileLoggerPlatformCallbacksProvider(pClientCallbacks, FILE_LOGGING_BUFFER_SIZE, MAX_NUMBER_OF_LOG_FILES,
