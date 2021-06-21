@@ -88,6 +88,91 @@ CleanUp:
     return retStatus;
 }
 
+STATUS blockingLwsHttpCall(PRequestInfo pRequestInfo, PCallInfo pCallInfo)
+{
+    ENTERS();
+    STATUS retStatus = STATUS_SUCCESS;
+    PCHAR pHostStart, pHostEnd;
+    CHAR path[MAX_URI_CHAR_LEN + 1];
+    struct lws_context* lwsContext = NULL;
+    struct lws_context_creation_info creationInfo;
+    struct lws_client_connect_info connectInfo;
+    struct lws* clientLws = NULL;
+    volatile INT32 retVal = 0;
+    struct lws_protocols lwsProtocols[2];
+
+    CHK(pRequestInfo != NULL && pCallInfo != NULL, STATUS_NULL_ARG);
+
+    // Prepare the signaling channel protocols array
+    MEMSET(lwsProtocols, 0x00, SIZEOF(lwsProtocols));
+    lwsProtocols[0].name = HTTP_SCHEME_NAME;
+    lwsProtocols[0].callback = lwsIotCallbackRoutine;
+    lwsProtocols[1].name = NULL;
+    lwsProtocols[1].callback = NULL;
+
+    // Prepare the LWS context
+    MEMSET(&creationInfo, 0x00, SIZEOF(struct lws_context_creation_info));
+    creationInfo.options = 0;
+    creationInfo.port = CONTEXT_PORT_NO_LISTEN;
+    creationInfo.protocols = lwsProtocols;
+    creationInfo.timeout_secs = pRequestInfo->completionTimeout / HUNDREDS_OF_NANOS_IN_A_SECOND;
+    creationInfo.gid = -1;
+    creationInfo.uid = -1;
+    creationInfo.fd_limit_per_thread = 1 + 1 + 1;
+    creationInfo.client_ssl_ca_filepath = pRequestInfo->certPath;
+    creationInfo.client_ssl_cert_filepath = pRequestInfo->sslCertPath;
+    creationInfo.client_ssl_private_key_filepath = pRequestInfo->sslPrivateKeyPath;
+
+    CHK(NULL != (lwsContext = lws_create_context(&creationInfo)), STATUS_IOT_CREATE_LWS_CONTEXT_FAILED);
+
+    // Execute the LWS REST call
+    MEMSET(&connectInfo, 0x00, SIZEOF(struct lws_client_connect_info));
+    connectInfo.context = lwsContext;
+    connectInfo.ssl_connection = LCCSCF_ALLOW_INSECURE;
+    connectInfo.port = pRequestInfo->port;
+
+    CHK_STATUS(getRequestHost(pRequestInfo->url, &pHostStart, &pHostEnd));
+
+    // Store the path
+    STRNCPY(path, pHostEnd, MAX_URI_CHAR_LEN);
+    path[MAX_URI_CHAR_LEN] = '\0';
+
+    // NULL terminate the host
+    *pHostEnd = '\0';
+
+    connectInfo.address = pHostStart;
+    connectInfo.path = path;
+    connectInfo.host = connectInfo.address;
+    connectInfo.method = HTTP_REQUEST_VERB_GET_STRING;
+    connectInfo.protocol = lwsProtocols[0].name;
+    connectInfo.pwsi = &clientLws;
+
+    connectInfo.opaque_user_data = (PVOID) pCallInfo;
+
+    CHK(NULL != lws_client_connect_via_info(&connectInfo), STATUS_IOT_CREATE_LWS_CONTEXT_FAILED);
+
+    while (retVal >= 0 && !ATOMIC_LOAD_BOOL(&pCallInfo->pRequestInfo->terminating)) {
+        retVal = lws_service(lwsContext, 0);
+    }
+
+CleanUp:
+
+    if (lwsContext != NULL) {
+        // Trigger termination
+        ATOMIC_STORE_BOOL(&pCallInfo->pRequestInfo->terminating, TRUE);
+
+        // Cancel the ongoing service if any
+        lws_cancel_service(lwsContext);
+
+        // Destroy the context
+        lws_context_destroy(lwsContext);
+    }
+
+    LEAVES();
+    return retStatus;
+}
+
+
 INT32 lwsIotCallbackRoutine(struct lws* wsi, enum lws_callback_reasons reason, PVOID user, PVOID pDataIn, size_t dataSize)
 {
     UNUSED_PARAM(user);

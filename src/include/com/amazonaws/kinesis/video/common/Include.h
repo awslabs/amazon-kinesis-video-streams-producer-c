@@ -50,6 +50,8 @@ extern "C" {
 #define STATUS_FILE_CREDENTIAL_PROVIDER_OPEN_FILE_FAILED    STATUS_COMMON_PRODUCER_BASE + 0x00000022
 #define STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_LENGTH STATUS_COMMON_PRODUCER_BASE + 0x00000023
 #define STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_FORMAT STATUS_COMMON_PRODUCER_BASE + 0x00000024
+#define STATUS_ECS_FAILED                                   STATUS_COMMON_PRODUCER_BASE + 0x00000025
+#define STATUS_MAX_ECS_TOKEN_LENGTH                         STATUS_COMMON_PRODUCER_BASE + 0x00000026
 /*!@} */
 
 /**
@@ -136,6 +138,8 @@ extern "C" {
  * Maximum allowed string length for IoT thing name
  */
 #define MAX_IOT_THING_NAME_LEN MAX_STREAM_NAME_LEN
+
+#define MAX_ECS_TOKEN_LEN 2048
 
 /**
  * Maximum allowed request header length
@@ -259,6 +263,7 @@ extern "C" {
  * HTTPS Protocol scheme name
  */
 #define HTTPS_SCHEME_NAME "https"
+#define HTTP_SCHEME_NAME  "http"
 
 /**
  * WSS Protocol scheme name
@@ -287,6 +292,8 @@ extern "C" {
  * Default canonical URI if we fail to get anything from the parsing
  */
 #define DEFAULT_CANONICAL_URI_STRING (PCHAR) "/"
+
+#define PORT_DELIMITER_STRING (PCHAR) ":"
 
 /**
  * Default AWS region
@@ -471,6 +478,7 @@ struct __RequestInfo {
                                               //!< NOTE: In streaming mode the body will be NULL
                                               //!< NOTE: The body will follow the main struct
     UINT32 bodySize;                          //!< Size of the body in bytes
+    UINT32 port;                              //!<
     CHAR url[MAX_URI_CHAR_LEN + 1];           //!< The URL for the request
     CHAR certPath[MAX_PATH_LEN + 1];          //!< CA Certificate path to use - optional
     CHAR sslCertPath[MAX_PATH_LEN + 1];       //!< SSL Certificate file path to use - optional
@@ -669,6 +677,10 @@ PUBLIC_API STATUS createLwsIotCredentialProviderWithTime(PCHAR, PCHAR, PCHAR, PC
  */
 PUBLIC_API STATUS freeIotCredentialProvider(PAwsCredentialProvider*);
 
+STATUS createLwsEcsCredentialProvider(PCHAR, PCHAR, PAwsCredentialProvider*);
+STATUS createLwsEcsCredentialProviderWithTime(PCHAR, PCHAR, GetCurrentTimeFunc, UINT64, PAwsCredentialProvider*);
+STATUS freeEcsCredentialProvider(PAwsCredentialProvider*);
+
 /**
  * @brief Creates a File based AWS credential provider object
  *
@@ -720,7 +732,7 @@ PUBLIC_API STATUS freeFileCredentialProvider(PAwsCredentialProvider*);
  *
  * @return STATUS code of the execution. STATUS_SUCCESS on success
  */
-PUBLIC_API STATUS createRequestInfo(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, SSL_CERTIFICATE_TYPE, PCHAR, UINT64, UINT64, UINT64, UINT64,
+PUBLIC_API STATUS createRequestInfo(PCHAR, PCHAR, UINT32, PCHAR, PCHAR, PCHAR, PCHAR, SSL_CERTIFICATE_TYPE, PCHAR, UINT64, UINT64, UINT64, UINT64,
                                     PAwsCredentials, PRequestInfo*);
 
 /**

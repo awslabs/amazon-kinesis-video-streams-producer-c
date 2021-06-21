@@ -1,7 +1,7 @@
 #define LOG_CLASS "RequestInfo"
 #include "Include_i.h"
 
-STATUS createRequestInfo(PCHAR url, PCHAR body, PCHAR region, PCHAR certPath, PCHAR sslCertPath, PCHAR sslPrivateKeyPath,
+STATUS createRequestInfo(PCHAR url, PCHAR body, UINT32 port, PCHAR region, PCHAR certPath, PCHAR sslCertPath, PCHAR sslPrivateKeyPath,
                          SSL_CERTIFICATE_TYPE certType, PCHAR userAgent, UINT64 connectionTimeout, UINT64 completionTimeout, UINT64 lowSpeedLimit,
                          UINT64 lowSpeedTimeLimit, PAwsCredentials pAwsCredentials, PRequestInfo* ppRequestInfo)
 {
@@ -28,6 +28,7 @@ STATUS createRequestInfo(PCHAR url, PCHAR body, PCHAR region, PCHAR certPath, PC
     pRequestInfo->connectionTimeout = connectionTimeout;
     ATOMIC_STORE_BOOL(&pRequestInfo->terminating, FALSE);
     pRequestInfo->bodySize = bodySize;
+    pRequestInfo->port = port;
     pRequestInfo->currentTime = GETTIME();
     pRequestInfo->callAfter = pRequestInfo->currentTime;
     STRNCPY(pRequestInfo->region, region, MAX_REGION_NAME_LEN);
