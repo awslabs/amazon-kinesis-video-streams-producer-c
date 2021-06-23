@@ -57,7 +57,7 @@ STATUS getEcsCredentials(PAwsCredentialProvider, PAwsCredentials*);
 // internal functions
 STATUS ecsCurlHandler(PEcsCredentialProvider);
 STATUS parseEcsResponse(PEcsCredentialProvider, PCallInfo);
-
+STATUS getHostPort(PCHAR, PCHAR*, PCHAR*);
 #ifdef __cplusplus
 }
 #endif

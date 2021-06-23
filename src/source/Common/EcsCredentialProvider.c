@@ -4,60 +4,6 @@
 #define LOG_CLASS "EcsCredentialProvider"
 #include "Include_i.h"
 
-STATUS getHostPort(PCHAR pUrl, PCHAR* ppStart, PCHAR* ppEnd)
-{
-    STATUS retStatus = STATUS_SUCCESS;
-    PCHAR pStart = NULL, pEnd = NULL, pCurPtr;
-    UINT32 urlLen;
-    BOOL iterate = TRUE;
-
-    CHK(pUrl != NULL && ppStart != NULL && ppEnd != NULL, STATUS_NULL_ARG);
-
-    // We know for sure url is NULL terminated
-    urlLen = (UINT32) STRLEN(pUrl);
-
-    // Start from the schema delimiter
-    pStart = STRSTR(pUrl, PORT_DELIMITER_STRING);
-    CHK(pStart != NULL, STATUS_INVALID_ARG);
-
-    // Advance the pStart past the delimiter
-    pStart += STRLEN(PORT_DELIMITER_STRING);
-
-    // Ensure we are not past the string
-    CHK(pUrl + urlLen > pStart, STATUS_INVALID_ARG);
-
-    // Set the end first
-    pEnd = pUrl + urlLen;
-
-    // Find the delimiter which would indicate end of the host - either one of "/:?"
-    pCurPtr = pStart;
-    while (iterate && pCurPtr <= pEnd) {
-        switch (*pCurPtr) {
-            case '/':
-            case ':':
-            case '?':
-                iterate = FALSE;
-
-                // Set the new end value
-                pEnd = pCurPtr;
-            default:
-                pCurPtr++;
-        }
-    }
-
-CleanUp:
-
-    if (ppStart != NULL) {
-        *ppStart = pStart;
-    }
-
-    if (ppEnd != NULL) {
-        *ppEnd = pEnd;
-    }
-
-    return retStatus;
-}
-
 STATUS createEcsCredentialProviderWithTime(PCHAR ecsCredentialFullUri, PCHAR token, GetCurrentTimeFunc getCurrentTimeFn, UINT64 customData,
                                            BlockingServiceCallFunc serviceCallFn, PAwsCredentialProvider* ppCredentialProvider)
 {
@@ -67,6 +13,7 @@ STATUS createEcsCredentialProviderWithTime(PCHAR ecsCredentialFullUri, PCHAR tok
     PCHAR pStart, pEnd;
     UINT32 len;
     UINT32 port = 0;
+    UINT32 fullUriLen = 0;
 
     CHK(ppCredentialProvider != NULL && ecsCredentialFullUri != NULL && token != NULL && serviceCallFn != NULL, STATUS_NULL_ARG);
 
@@ -79,7 +26,9 @@ STATUS createEcsCredentialProviderWithTime(PCHAR ecsCredentialFullUri, PCHAR tok
     pEcsCredentialProvider->getCurrentTimeFn = (getCurrentTimeFn == NULL) ? commonDefaultGetCurrentTimeFunc : getCurrentTimeFn;
     pEcsCredentialProvider->customData = customData;
 
-    CHK(STRNLEN(ecsCredentialFullUri, MAX_URI_CHAR_LEN + 1) <= MAX_URI_CHAR_LEN, MAX_URI_CHAR_LEN);
+    fullUriLen = STRNLEN(ecsCredentialFullUri, MAX_URI_CHAR_LEN + 1);
+
+    CHK(fullUriLen <= MAX_URI_CHAR_LEN, MAX_URI_CHAR_LEN);
     CHK_STATUS(getRequestHost(ecsCredentialFullUri, &pStart, &pEnd));
     len = (UINT32)(pEnd - ecsCredentialFullUri);
     STRNCPY(pEcsCredentialProvider->ecsGetCredentialEndpoint, ecsCredentialFullUri, len);
@@ -88,7 +37,7 @@ STATUS createEcsCredentialProviderWithTime(PCHAR ecsCredentialFullUri, PCHAR tok
     CHK_STATUS(getHostPort(ecsCredentialFullUri + len, &pStart, &pEnd));
     CHK_STATUS(STRTOUI32(pStart, pEnd, 10, &port));
     pEcsCredentialProvider->port = port;
-    len = (ecsCredentialFullUri + STRLEN(ecsCredentialFullUri)) - pEnd;
+    len = (ecsCredentialFullUri + fullUriLen) - pEnd;
     STRNCPY(pEcsCredentialProvider->ecsGetCredentialResource, pEnd + 1, len);
 
     CHK(STRNLEN(token, MAX_ECS_TOKEN_LEN + 1) <= MAX_ECS_TOKEN_LEN, STATUS_MAX_ECS_TOKEN_LENGTH);
@@ -180,7 +129,7 @@ STATUS parseEcsResponse(PEcsCredentialProvider pEcsCredentialProvider, PCallInfo
 
     resultLen = pCallInfo->responseDataLen;
     pResponseStr = pCallInfo->responseData;
-    CHK(resultLen > 0, STATUS_ECS_FAILED);
+    CHK(resultLen > 0, STATUS_ECS_AUTH_FAILED);
 
     jsmn_init(&parser);
     tokenCount = jsmn_parse(&parser, pResponseStr, resultLen, tokens, SIZEOF(tokens) / SIZEOF(jsmntok_t));
@@ -214,7 +163,7 @@ STATUS parseEcsResponse(PEcsCredentialProvider pEcsCredentialProvider, PCallInfo
         }
     }
 
-    CHK(accessKeyId != NULL && secretKey != NULL && sessionToken != NULL, STATUS_ECS_FAILED);
+    CHK(accessKeyId != NULL && secretKey != NULL && sessionToken != NULL, STATUS_ECS_AUTH_RSP_FAILED);
 
     currentTime = pEcsCredentialProvider->getCurrentTimeFn(pEcsCredentialProvider->customData);
     CHK_STATUS(convertTimestampToEpoch(expirationTimestampStr, currentTime / HUNDREDS_OF_NANOS_IN_A_SECOND, &expiration));
@@ -260,7 +209,7 @@ STATUS ecsCurlHandler(PEcsCredentialProvider pEcsCredentialProvider)
 
     formatLen = SNPRINTF(serviceUrl, MAX_URI_CHAR_LEN, "%s/%s", pEcsCredentialProvider->ecsGetCredentialEndpoint,
                          pEcsCredentialProvider->ecsGetCredentialResource);
-    CHK(formatLen > 0 && formatLen < MAX_URI_CHAR_LEN, STATUS_ECS_FAILED);
+    CHK(formatLen > 0 && formatLen < MAX_URI_CHAR_LEN, STATUS_ECS_AUTH_URI_FAILED);
 
     // Form a new request info based on the params
     CHK_STATUS(createRequestInfo(serviceUrl, NULL, pEcsCredentialProvider->port, DEFAULT_AWS_REGION, NULL, NULL, NULL, SSL_CERTIFICATE_TYPE_PEM,
@@ -285,6 +234,60 @@ CleanUp:
     }
 
     releaseCallInfo(&callInfo);
+
+    return retStatus;
+}
+
+STATUS getHostPort(PCHAR pUrl, PCHAR* ppStart, PCHAR* ppEnd)
+{
+    STATUS retStatus = STATUS_SUCCESS;
+    PCHAR pStart = NULL, pEnd = NULL, pCurPtr;
+    UINT32 urlLen;
+    BOOL iterate = TRUE;
+
+    CHK(pUrl != NULL && ppStart != NULL && ppEnd != NULL, STATUS_NULL_ARG);
+
+    // We know for sure url is NULL terminated
+    urlLen = (UINT32) STRLEN(pUrl);
+
+    // Start from the schema delimiter
+    pStart = STRSTR(pUrl, PORT_DELIMITER_STRING);
+    CHK(pStart != NULL, STATUS_INVALID_ARG);
+
+    // Advance the pStart past the delimiter
+    pStart += STRLEN(PORT_DELIMITER_STRING);
+
+    // Ensure we are not past the string
+    CHK(pUrl + urlLen > pStart, STATUS_INVALID_ARG);
+
+    // Set the end first
+    pEnd = pUrl + urlLen;
+
+    // Find the delimiter which would indicate end of the host - either one of "/:?"
+    pCurPtr = pStart;
+    while (iterate && pCurPtr <= pEnd) {
+        switch (*pCurPtr) {
+            case '/':
+            case ':':
+            case '?':
+                iterate = FALSE;
+
+                // Set the new end value
+                pEnd = pCurPtr;
+            default:
+                pCurPtr++;
+        }
+    }
+
+CleanUp:
+
+    if (ppStart != NULL) {
+        *ppStart = pStart;
+    }
+
+    if (ppEnd != NULL) {
+        *ppEnd = pEnd;
+    }
 
     return retStatus;
 }

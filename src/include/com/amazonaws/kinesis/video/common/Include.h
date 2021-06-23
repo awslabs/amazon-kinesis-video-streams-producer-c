@@ -50,8 +50,10 @@ extern "C" {
 #define STATUS_FILE_CREDENTIAL_PROVIDER_OPEN_FILE_FAILED    STATUS_COMMON_PRODUCER_BASE + 0x00000022
 #define STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_LENGTH STATUS_COMMON_PRODUCER_BASE + 0x00000023
 #define STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_FORMAT STATUS_COMMON_PRODUCER_BASE + 0x00000024
-#define STATUS_ECS_FAILED                                   STATUS_COMMON_PRODUCER_BASE + 0x00000025
-#define STATUS_MAX_ECS_TOKEN_LENGTH                         STATUS_COMMON_PRODUCER_BASE + 0x00000026
+#define STATUS_ECS_AUTH_URI_FAILED                          STATUS_COMMON_PRODUCER_BASE + 0x00000025
+#define STATUS_ECS_AUTH_FAILED                              STATUS_COMMON_PRODUCER_BASE + 0x00000026
+#define STATUS_ECS_AUTH_RSP_FAILED                          STATUS_COMMON_PRODUCER_BASE + 0x00000027
+#define STATUS_MAX_ECS_TOKEN_LENGTH                         STATUS_COMMON_PRODUCER_BASE + 0x00000028
 /*!@} */
 
 /**
@@ -139,6 +141,9 @@ extern "C" {
  */
 #define MAX_IOT_THING_NAME_LEN MAX_STREAM_NAME_LEN
 
+/**
+ * Maximum allowed string length for ECS authorization token
+ */
 #define MAX_ECS_TOKEN_LEN 2048
 
 /**
@@ -289,11 +294,14 @@ extern "C" {
 #define SCHEMA_DELIMITER_STRING (PCHAR) "://"
 
 /**
+ *  Port delimiter string
+ */
+#define PORT_DELIMITER_STRING (PCHAR) ":"
+
+/**
  * Default canonical URI if we fail to get anything from the parsing
  */
 #define DEFAULT_CANONICAL_URI_STRING (PCHAR) "/"
-
-#define PORT_DELIMITER_STRING (PCHAR) ":"
 
 /**
  * Default AWS region
@@ -478,7 +486,7 @@ struct __RequestInfo {
                                               //!< NOTE: In streaming mode the body will be NULL
                                               //!< NOTE: The body will follow the main struct
     UINT32 bodySize;                          //!< Size of the body in bytes
-    UINT32 port;                              //!<
+    UINT32 port;                              //!< Port number of the request.
     CHAR url[MAX_URI_CHAR_LEN + 1];           //!< The URL for the request
     CHAR certPath[MAX_PATH_LEN + 1];          //!< CA Certificate path to use - optional
     CHAR sslCertPath[MAX_PATH_LEN + 1];       //!< SSL Certificate file path to use - optional
@@ -677,9 +685,40 @@ PUBLIC_API STATUS createLwsIotCredentialProviderWithTime(PCHAR, PCHAR, PCHAR, PC
  */
 PUBLIC_API STATUS freeIotCredentialProvider(PAwsCredentialProvider*);
 
-STATUS createLwsEcsCredentialProvider(PCHAR, PCHAR, PAwsCredentialProvider*);
-STATUS createLwsEcsCredentialProviderWithTime(PCHAR, PCHAR, GetCurrentTimeFunc, UINT64, PAwsCredentialProvider*);
-STATUS freeEcsCredentialProvider(PAwsCredentialProvider*);
+/**
+ * @brief Creates an ECS based AWS credential provider object using libWebSockets
+ *        https://docs.aws.amazon.com/greengrass/v2/developerguide/token-exchange-service-component.html
+ *        https://docs.aws.amazon.com/greengrass/v2/developerguide/component-environment-variables.html
+ *
+ * @param[in] PCHAR Full uri of ECS credentials which is retrieved from the environment variable(AWS_CONTAINER_CREDENTIALS_FULL_URI)
+ * @param[in] PCHAR Authorization token of ECS credentials which is retrieved from the environment variable(AWS_CONTAINER_AUTHORIZATION_TOKEN)
+ * @param[out] PAwsCredentialProvider* Constructed AWS credentials provider object
+ *
+ * @return STATUS code of the execution. STATUS_SUCCESS on success
+ */
+PUBLIC_API STATUS createLwsEcsCredentialProvider(PCHAR, PCHAR, PAwsCredentialProvider*);
+
+/**
+ * @brief Creates an ECS based AWS credential provider object with time function which is based on libCurl
+ *
+ * @param[in] PCHAR Full uri of ECS credentials which is retrieved from the environment variable(AWS_CONTAINER_CREDENTIALS_FULL_URI)
+ * @param[in] PCHAR Authorization token of ECS credentials which is retrieved from the environment variable(AWS_CONTAINER_AUTHORIZATION_TOKEN)
+ * @param[in] GetCurrentTimeFunc Custom current time function
+ * @param[in] UINT64 Time function custom data
+ * @param[out] PAwsCredentialProvider* Constructed AWS credentials provider object
+ *
+ * @return STATUS code of the execution. STATUS_SUCCESS on success
+ */
+PUBLIC_API STATUS createLwsEcsCredentialProviderWithTime(PCHAR, PCHAR, GetCurrentTimeFunc, UINT64, PAwsCredentialProvider*);
+
+/**
+ * @brief Frees an ECS based Aws credential provider object
+ *
+ * @param[in,out] PAwsCredentialProvider* Object to be destroyed.
+ *
+ * @return STATUS code of the execution. STATUS_SUCCESS on success
+ */
+PUBLIC_API STATUS freeEcsCredentialProvider(PAwsCredentialProvider*);
 
 /**
  * @brief Creates a File based AWS credential provider object
