@@ -248,7 +248,7 @@ STATUS getHostPort(PCHAR pUrl, PCHAR* ppStart, PCHAR* ppEnd)
     CHK(pUrl != NULL && ppStart != NULL && ppEnd != NULL, STATUS_NULL_ARG);
 
     // We know for sure url is NULL terminated
-    urlLen = (UINT32) STRLEN(pUrl);
+    urlLen = (UINT32) STRNLEN(pUrl, MAX_URI_CHAR_LEN + 1);
 
     // Start from the schema delimiter
     pStart = STRSTR(pUrl, PORT_DELIMITER_STRING);

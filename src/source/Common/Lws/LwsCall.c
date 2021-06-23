@@ -172,7 +172,6 @@ CleanUp:
     return retStatus;
 }
 
-
 INT32 lwsIotCallbackRoutine(struct lws* wsi, enum lws_callback_reasons reason, PVOID user, PVOID pDataIn, size_t dataSize)
 {
     UNUSED_PARAM(user);
