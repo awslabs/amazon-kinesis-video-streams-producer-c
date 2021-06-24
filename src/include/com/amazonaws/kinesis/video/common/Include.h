@@ -296,7 +296,7 @@ extern "C" {
 /**
  *  Port delimiter string
  */
-#define PORT_DELIMITER_STRING (PCHAR) ":"
+#define PORT_DELIMITER_STRING ":"
 
 /**
  * Default canonical URI if we fail to get anything from the parsing
