@@ -255,7 +255,7 @@ STATUS getHostPort(PCHAR pUrl, PCHAR* ppStart, PCHAR* ppEnd)
     CHK(pStart != NULL, STATUS_INVALID_ARG);
 
     // Advance the pStart past the delimiter
-    pStart += (ARRAY_SIZE(PORT_DELIMITER_STRING) - 1);
+    pStart += STRLEN(PORT_DELIMITER_STRING);
 
     // Ensure we are not past the string
     CHK(pUrl + urlLen > pStart, STATUS_INVALID_ARG);
