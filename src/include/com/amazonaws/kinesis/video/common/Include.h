@@ -54,6 +54,7 @@ extern "C" {
 #define STATUS_ECS_AUTH_FAILED                              STATUS_COMMON_PRODUCER_BASE + 0x00000026
 #define STATUS_ECS_AUTH_RSP_FAILED                          STATUS_COMMON_PRODUCER_BASE + 0x00000027
 #define STATUS_MAX_ECS_TOKEN_LENGTH                         STATUS_COMMON_PRODUCER_BASE + 0x00000028
+#define STATUS_ECS_URI_LENGTH                               STATUS_COMMON_PRODUCER_BASE + 0x00000029
 /*!@} */
 
 /**

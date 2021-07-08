@@ -28,9 +28,9 @@ STATUS createEcsCredentialProviderWithTime(PCHAR ecsCredentialFullUri, PCHAR tok
 
     fullUriLen = STRNLEN(ecsCredentialFullUri, MAX_URI_CHAR_LEN + 1);
 
-    CHK(fullUriLen <= MAX_URI_CHAR_LEN, MAX_URI_CHAR_LEN);
+    CHK(fullUriLen <= MAX_URI_CHAR_LEN, STATUS_ECS_URI_LENGTH);
     CHK_STATUS(getRequestHost(ecsCredentialFullUri, &pStart, &pEnd));
-    len = (UINT32)(pEnd - ecsCredentialFullUri);
+    len = (UINT32) (pEnd - ecsCredentialFullUri);
     STRNCPY(pEcsCredentialProvider->ecsGetCredentialEndpoint, ecsCredentialFullUri, len);
     pEcsCredentialProvider->ecsGetCredentialEndpoint[len] = '\0';
 
@@ -139,22 +139,22 @@ STATUS parseEcsResponse(PEcsCredentialProvider pEcsCredentialProvider, PCallInfo
 
     for (i = 1; i < (UINT32) tokenCount; i++) {
         if (compareJsonString(pResponseStr, &tokens[i], JSMN_STRING, (PCHAR) "AccessKeyId")) {
-            accessKeyIdLen = (UINT32)(tokens[i + 1].end - tokens[i + 1].start);
+            accessKeyIdLen = (UINT32) (tokens[i + 1].end - tokens[i + 1].start);
             CHK(accessKeyIdLen <= MAX_ACCESS_KEY_LEN, STATUS_INVALID_API_CALL_RETURN_JSON);
             accessKeyId = pResponseStr + tokens[i + 1].start;
             i++;
         } else if (compareJsonString(pResponseStr, &tokens[i], JSMN_STRING, (PCHAR) "SecretAccessKey")) {
-            secretKeyLen = (UINT32)(tokens[i + 1].end - tokens[i + 1].start);
+            secretKeyLen = (UINT32) (tokens[i + 1].end - tokens[i + 1].start);
             CHK(secretKeyLen <= MAX_SECRET_KEY_LEN, STATUS_INVALID_API_CALL_RETURN_JSON);
             secretKey = pResponseStr + tokens[i + 1].start;
             i++;
         } else if (compareJsonString(pResponseStr, &tokens[i], JSMN_STRING, (PCHAR) "Token")) {
-            sessionTokenLen = (UINT32)(tokens[i + 1].end - tokens[i + 1].start);
+            sessionTokenLen = (UINT32) (tokens[i + 1].end - tokens[i + 1].start);
             CHK(sessionTokenLen <= MAX_SESSION_TOKEN_LEN, STATUS_INVALID_API_CALL_RETURN_JSON);
             sessionToken = pResponseStr + tokens[i + 1].start;
             i++;
-        } else if (compareJsonString(pResponseStr, &tokens[i], JSMN_STRING, "Expiration")) {
-            expirationTimestampLen = (UINT32)(tokens[i + 1].end - tokens[i + 1].start);
+        } else if (compareJsonString(pResponseStr, &tokens[i], JSMN_STRING, (PCHAR) "Expiration")) {
+            expirationTimestampLen = (UINT32) (tokens[i + 1].end - tokens[i + 1].start);
             CHK(expirationTimestampLen <= MAX_EXPIRATION_LEN, STATUS_INVALID_API_CALL_RETURN_JSON);
             expirationTimestamp = pResponseStr + tokens[i + 1].start;
             MEMCPY(expirationTimestampStr, expirationTimestamp, expirationTimestampLen);
