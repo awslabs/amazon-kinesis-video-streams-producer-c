@@ -73,6 +73,14 @@ STATUS blockingLwsCall(PRequestInfo pRequestInfo, PCallInfo pCallInfo)
 
 CleanUp:
 
+    if(retStatus == STATUS_IOT_CREATE_LWS_CONTEXT_FAILED)
+    {
+        DLOGW("Unable to create LWS context or connect to Websocket server");
+    }
+    else
+    {
+        CHK_LOG_ERR(retStatus);
+    }
     if (lwsContext != NULL) {
         // Trigger termination
         ATOMIC_STORE_BOOL(&pCallInfo->pRequestInfo->terminating, TRUE);
