@@ -103,7 +103,6 @@ if(KVSPIC_FOUND)
   link_directories(${KVSPIC_LIBRARY_DIRS})
 else()
   ############# fetch repos that we need do add_subdirectory ############
-
   # repos that we will build using add_subdirectory will be stored in this path
   set(DEPENDENCY_DOWNLOAD_PATH ${CMAKE_CURRENT_SOURCE_DIR}/dependency)
   set(BUILD_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
