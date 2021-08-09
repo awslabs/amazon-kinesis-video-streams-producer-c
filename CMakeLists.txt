@@ -5,6 +5,7 @@ project(KinesisVideoProducerC LANGUAGES C)
 
 include(GNUInstallDirs)
 
+
 # User Flags
 option(ADD_MUCLIBC "Add -muclibc c flag" OFF)
 option(BUILD_STATIC "Static build" OFF)
