@@ -3,6 +3,9 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake;${CMAKE_MODULE_PATH}")
 include(Utilities)
 project(KinesisVideoProducerC LANGUAGES C)
 
+include(GNUInstallDirs)
+
+
 # User Flags
 option(ADD_MUCLIBC "Add -muclibc c flag" OFF)
 option(BUILD_STATIC "Static build" OFF)
@@ -257,12 +260,12 @@ if(BUILD_COMMON_LWS)
 
     install(
       TARGETS kvsCommonLws
-      ARCHIVE DESTINATION lib
-      LIBRARY DESTINATION lib
-      RUNTIME DESTINATION bin)
+      ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+      LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+      RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
     install(
       FILES ${CMAKE_CURRENT_BINARY_DIR}/libkvsCommonLws.pc
-      DESTINATION lib/pkgconfig)
+      DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 endif()
 
 if(BUILD_COMMON_CURL)
@@ -280,12 +283,12 @@ if(BUILD_COMMON_CURL)
 
     install(
       TARGETS kvsCommonCurl
-      ARCHIVE DESTINATION lib
-      LIBRARY DESTINATION lib
-      RUNTIME DESTINATION bin)
+      ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+      LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+      RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
     install(
       FILES ${CMAKE_CURRENT_BINARY_DIR}/libkvsCommonCurl.pc
-      DESTINATION lib/pkgconfig)
+      DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 
     configure_file(
       "${CMAKE_CURRENT_SOURCE_DIR}/libcproducer.pc.cmake"
@@ -305,12 +308,12 @@ if(BUILD_COMMON_CURL)
 
     install(
       TARGETS cproducer
-      ARCHIVE DESTINATION lib
-      LIBRARY DESTINATION lib
-      RUNTIME DESTINATION bin)
+      ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+      LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+      RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
     install(
       FILES ${CMAKE_CURRENT_BINARY_DIR}/libcproducer.pc
-      DESTINATION lib/pkgconfig)
+      DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 
     add_executable(kvsVideoOnlyStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsVideoOnlyStreamingSample.c)
     target_link_libraries(kvsVideoOnlyStreamingSample cproducer)
