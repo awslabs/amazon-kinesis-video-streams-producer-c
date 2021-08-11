@@ -70,13 +70,19 @@ To run the samples:
 export AWS_SECRET_ACCESS_KEY=<YourAWSSecretAccessKey>
 export AWS_ACCESS_KEY_ID=<YourAWSAccessKey>
 ```
-For audio+video, run `./kvsAudioVideoStreamingSample <channel-name`
-For video only, run `./kvsVideoOnlyStreamingSample <channel-name`
+For audio+video, run `./kvsAudioVideoStreamingSample <channel-name> <streaming-duration-in-seconds> <sample-location> <audio-codec>`
+
+The last three arguments are optional. By default, 
+* the `streaming-duration-in-seconds` is 20 seconds
+* `sample-location` is `../samples`
+* `audio-codec` is `aac`
+
+If you want to use the sample for `PCM_ALAW/G.711` frames, run 
+`./kvsAudioVideoStreamingSample <channel-name> <streaming_duration> <sample_location> alaw`
+
+For video only, run `./kvsVideoOnlyStreamingSample <channel-name>`
 
 This will stream the video/audio files from the `samples/h264SampleFrames` and `samples/aacSampleFrames` respectively by default. 
-
-If you want to use the sample for PCM_ALAW/G.711 frames, run 
-`./kvsAudioVideoStreamingSample <channel-name> <streaming_duration> <sample_location> alaw`
 
 ### Run unit tests
 Since these tests exercise networking you need to have AWS credentials specified, specifically you need to:

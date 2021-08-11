@@ -174,11 +174,14 @@ INT32 main(INT32 argc, CHAR* argv[])
     UINT32 i;
     CHAR filePath[MAX_PATH_LEN + 1];
     PTrackInfo pAudioTrack = NULL;
-    CHAR audioCodec[AUDIO_CODEC_NAME_MAX_LENGTH] = AUDIO_CODEC_NAME_AAC; //aac audio by default
+    CHAR audioCodec[AUDIO_CODEC_NAME_MAX_LENGTH]; 
     BYTE aacAudioCpd[KVS_AAC_CPD_SIZE_BYTE];
     BYTE alawAudioCpd[KVS_PCM_CPD_SIZE_BYTE];
 
     MEMSET(&data, 0x00, SIZEOF(SampleCustomData));
+
+    STRNCPY(audioCodec, AUDIO_CODEC_NAME_AAC, STRLEN(AUDIO_CODEC_NAME_AAC)); //aac audio by default
+
     if (argc == 5) {
         if (!STRCMP(argv[4], AUDIO_CODEC_NAME_ALAW)){
             STRNCPY(audioCodec, AUDIO_CODEC_NAME_ALAW, STRLEN(AUDIO_CODEC_NAME_ALAW));

@@ -65,27 +65,27 @@ STATUS setStreamInfoDefaults(STREAMING_TYPE, UINT64, UINT64, UINT32, PStreamInfo
 /**
  * Sets Stream Info for given retention, bufferDuration
  * @param - STREAMING_TYPE
+ * @param - VIDEO_CODEC_ID Codec ID of the video(H.264/H.265)
  * @param - PCHAR  - stream name
  * @param - UINT64 - retention
  * @param - UINT64 - bufferDuration
- * @param - VIDEO_CODEC_ID Codec ID of the video(H.264/H.265)
  * @param - PStreamInfo
  * @return - STATUS code of the execution
  */
-STATUS createVideoStreamInfo(STREAMING_TYPE, PCHAR, UINT64, UINT64, VIDEO_CODEC_ID, PStreamInfo*);
+STATUS createVideoStreamInfo(STREAMING_TYPE, VIDEO_CODEC_ID, PCHAR, UINT64, UINT64, PStreamInfo*);
 
 /**
  * Sets Stream Info for audio video stream
  * @param - STREAMING_TYPE
+ * @param - VIDEO_CODEC_ID Codec ID of the video(H.264/H.265)
+ * @param - AUDIO_CODEC_ID Codec ID of the audio(AAC/PCM_ALAW/PCM_MULAW)
  * @param - PCHAR - stream name
  * @param - UINT64 - retention
  * @param - UINT64 - bufferDuration
- * @param - VIDEO_CODEC_ID Codec ID of the video(H.264/H.265)
- * @param - AUDIO_CODEC_ID Codec ID of the audio(AAC/PCM_ALAW/PCM_MULAW)
  * @param - PStreamInfo
  * @return - STATUS code of the execution
  */
-STATUS createAudioVideoStreamInfo(STREAMING_TYPE, PCHAR, UINT64, UINT64, VIDEO_CODEC_ID, AUDIO_CODEC_ID, PStreamInfo*);
+STATUS createAudioVideoStreamInfo(STREAMING_TYPE, VIDEO_CODEC_ID, AUDIO_CODEC_ID, PCHAR, UINT64, UINT64, PStreamInfo*);
 
 #ifdef __cplusplus
 }
