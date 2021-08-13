@@ -80,9 +80,11 @@ The last three arguments are optional. By default,
 If you want to use the sample for `PCM_ALAW/G.711` frames, run 
 `./kvsAudioVideoStreamingSample <channel-name> <streaming_duration> <sample_location> alaw`
 
+This will stream the video/audio files from the `samples/h264SampleFrames` and `samples/aacSampleFrames` or `samples/alawSampleFrames` (as per the choice of audio codec in the last argument) respectively. 
+
 For video only, run `./kvsVideoOnlyStreamingSample <channel-name>`
 
-This will stream the video/audio files from the `samples/h264SampleFrames` and `samples/aacSampleFrames` respectively by default. 
+This will stream the video files from the `samples/h264SampleFrames`. 
 
 ### Run unit tests
 Since these tests exercise networking you need to have AWS credentials specified, specifically you need to:

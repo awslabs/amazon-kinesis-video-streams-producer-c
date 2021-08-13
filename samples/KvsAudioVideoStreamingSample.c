@@ -260,7 +260,7 @@ INT32 main(INT32 argc, CHAR* argv[])
                                                                                              : &pStreamInfo->streamCaps.trackInfoList[1];
         pAudioTrack->codecPrivateData = alawAudioCpd;
         pAudioTrack->codecPrivateDataSize = KVS_PCM_CPD_SIZE_BYTE;
-    CHK_STATUS(mkvgenGeneratePcmCpd(KVS_PCM_FORMAT_CODE_ALAW, ALAW_AUDIO_TRACK_SAMPLING_RATE, ALAW_AUDIO_TRACK_CHANNEL_CONFIG, pAudioTrack->codecPrivateData,
+        CHK_STATUS(mkvgenGeneratePcmCpd(KVS_PCM_FORMAT_CODE_ALAW, ALAW_AUDIO_TRACK_SAMPLING_RATE, ALAW_AUDIO_TRACK_CHANNEL_CONFIG, pAudioTrack->codecPrivateData,
                                     pAudioTrack->codecPrivateDataSize));
     } else {
         CHK_STATUS(createRealtimeAudioVideoStreamInfoProviderWithCodecs(streamName, DEFAULT_RETENTION_PERIOD, DEFAULT_BUFFER_DURATION, VIDEO_CODEC_ID_H264, AUDIO_CODEC_ID_AAC, &pStreamInfo));
