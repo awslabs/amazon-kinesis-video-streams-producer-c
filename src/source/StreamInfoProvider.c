@@ -97,9 +97,9 @@ STATUS createVideoTrackInfo(VIDEO_CODEC_ID videoCodecId, PCHAR contentType, PTra
     STRCPY(pTrackInfo->trackName, DEFAULT_VIDEO_TRACK_NAME);
     pTrackInfo->trackType = MKV_TRACK_INFO_TYPE_VIDEO;
 
-    CleanUp:
+CleanUp:
 
-        return retStatus;
+    return retStatus;
 }
 
 // Creates track info for audio with given codec and sets the content type as per the codec
@@ -133,9 +133,9 @@ STATUS createAudioTrackInfo(AUDIO_CODEC_ID audioCodecId, PCHAR contentType, PTra
     STRCPY(pTrackInfo->trackName, DEFAULT_AUDIO_TRACK_NAME);
     pTrackInfo->trackType = MKV_TRACK_INFO_TYPE_AUDIO;
 
-    CleanUp:
+CleanUp:
 
-        return retStatus;
+    return retStatus;
 }
 
 STATUS setStreamInfoDefaults(STREAMING_TYPE streamingType, UINT64 retention, UINT64 bufferDuration, UINT32 trackCount, PStreamInfo pStreamInfo,
