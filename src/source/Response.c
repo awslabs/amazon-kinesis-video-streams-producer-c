@@ -187,6 +187,19 @@ STATUS initializeCurlSession(PRequestInfo pRequestInfo, PCallInfo pCallInfo, CUR
     curl_easy_setopt(pCurl, CURLOPT_CONNECTTIMEOUT_MS, pRequestInfo->connectionTimeout / HUNDREDS_OF_NANOS_IN_A_MILLISECOND);
     curl_easy_setopt(pCurl, CURLOPT_TCP_NODELAY, 1);
 
+    // setup proxy using environment variable
+    if(getenv("CURLOPT_PROXY") != NULL) {
+        curl_easy_setopt(pCurl, CURLOPT_PROXY, getenv("CURLOPT_PROXY"));
+    }
+
+    if(getenv("CURLOPT_PROXYUSERNAME") != NULL) {
+        curl_easy_setopt(pCurl, CURLOPT_PROXYUSERNAME, getenv("CURLOPT_PROXYUSERNAME"));
+    }
+
+    if(getenv("CURLOPT_PROXYPASSWORD") != NULL) {
+        curl_easy_setopt(pCurl, CURLOPT_PROXYPASSWORD, getenv("CURLOPT_PROXYPASSWORD"));
+    }
+
     // set header callback
     curl_easy_setopt(pCurl, CURLOPT_HEADERFUNCTION, writeHeaderFn);
     curl_easy_setopt(pCurl, CURLOPT_HEADERDATA, data);

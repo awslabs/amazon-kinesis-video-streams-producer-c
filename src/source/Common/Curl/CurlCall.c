@@ -55,6 +55,19 @@ STATUS blockingCurlCall(PRequestInfo pRequestInfo, PCallInfo pCallInfo)
         curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
     }
 
+    // setup proxy using environment variable
+    if(getenv("CURLOPT_PROXY") != NULL) {
+        curl_easy_setopt(curl, CURLOPT_PROXY, getenv("CURLOPT_PROXY"));
+    }
+
+    if(getenv("CURLOPT_PROXYUSERNAME") != NULL) {
+        curl_easy_setopt(curl, CURLOPT_PROXYUSERNAME, getenv("CURLOPT_PROXYUSERNAME"));
+    }
+
+    if(getenv("CURLOPT_PROXYPASSWORD") != NULL) {
+        curl_easy_setopt(curl, CURLOPT_PROXYPASSWORD, getenv("CURLOPT_PROXYPASSWORD"));
+    }
+
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, pHeaderList);
     curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer);
     curl_easy_setopt(curl, CURLOPT_URL, pRequestInfo->url);
