@@ -86,6 +86,15 @@ export AWS_ACCESS_KEY_ID=<YourAWSAccessKey>
 Now you can execute the unit tests from the `build` directory as follows:
 `./tst/producer_test`
 
+### Offline mode
+The samples run in near real time mode by default. In order to set up offline mode, the following APIs can be used in the samples instead of the realtime variant:
+
+For video only: `createOfflineVideoStreamInfoProviderWithCodecs()`
+For video and audio: `createOfflineAudioVideoStreamInfoProviderWithCodecs()`
+
+The 2 APIs are available in [this](https://github.com/awslabs/amazon-kinesis-video-streams-producer-c/blob/412aab82c99a72f9dbde975f5fea81ffdc844ae5/src/include/com/amazonaws/kinesis/video/cproducer/Include.h) header file.
+
+
 ## Development
 
 The repository is using master branch as the aggregation and all of the feature development is done in appropriate feature branches. The PRs (Pull Requests) are cut on a feature branch and once approved with all the checks passed they can be merged by a click of a button on the PR tool. The master branch should always be build-able and all the tests should be passing. We are welcoming any contribution to the code base.
