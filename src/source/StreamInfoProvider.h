@@ -35,17 +35,21 @@ extern "C" {
 
 /**
  * Sets Track Info for the Video Stream
+ * @param - VIDEO_CODEC_ID Codec ID of the video(H.264/H.265)
+ * @param - video content type
  * @param - PTrackInfo
  * @return - STATUS code of the execution
  */
-STATUS createH264VideoTrackInfo(PTrackInfo pTrackInfo);
+STATUS createVideoTrackInfo(VIDEO_CODEC_ID videoCodecId, PCHAR contentType, PTrackInfo pTrackInfo);
 
 /**
  * Sets Track Info for the Audio Stream
+ * @param - AUDIO_CODEC_ID Codec ID of the audio(AAC/PCM_ALAW/PCM_MULAW)
+ * @param - audio content type
  * @param - PTrackInfo
  * @return - STATUS code of the execution
  */
-STATUS createAacAudioTrackInfo(PTrackInfo pTrackInfo);
+STATUS createAudioTrackInfo(AUDIO_CODEC_ID audioCodecId, PCHAR contentType, PTrackInfo pTrackInfo);
 
 /**
  * Sets Stream Info for given retention, bufferDuration
@@ -61,24 +65,27 @@ STATUS setStreamInfoDefaults(STREAMING_TYPE, UINT64, UINT64, UINT32, PStreamInfo
 /**
  * Sets Stream Info for given retention, bufferDuration
  * @param - STREAMING_TYPE
+ * @param - VIDEO_CODEC_ID Codec ID of the video(H.264/H.265)
  * @param - PCHAR  - stream name
  * @param - UINT64 - retention
  * @param - UINT64 - bufferDuration
  * @param - PStreamInfo
  * @return - STATUS code of the execution
  */
-STATUS createVideoStreamInfo(STREAMING_TYPE, PCHAR, UINT64, UINT64, PStreamInfo*);
+STATUS createVideoStreamInfo(STREAMING_TYPE, VIDEO_CODEC_ID, PCHAR, UINT64, UINT64, PStreamInfo*);
 
 /**
  * Sets Stream Info for audio video stream
  * @param - STREAMING_TYPE
+ * @param - VIDEO_CODEC_ID Codec ID of the video(H.264/H.265)
+ * @param - AUDIO_CODEC_ID Codec ID of the audio(AAC/PCM_ALAW/PCM_MULAW)
  * @param - PCHAR - stream name
  * @param - UINT64 - retention
  * @param - UINT64 - bufferDuration
  * @param - PStreamInfo
  * @return - STATUS code of the execution
  */
-STATUS createAudioVideoStreamInfo(STREAMING_TYPE, PCHAR, UINT64, UINT64, PStreamInfo*);
+STATUS createAudioVideoStreamInfo(STREAMING_TYPE, VIDEO_CODEC_ID, AUDIO_CODEC_ID, PCHAR, UINT64, UINT64, PStreamInfo*);
 
 #ifdef __cplusplus
 }
