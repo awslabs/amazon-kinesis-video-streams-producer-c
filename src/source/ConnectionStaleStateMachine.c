@@ -24,7 +24,7 @@ CleanUp:
     return retStatus;
 }
 
-STATUS connectionStaleStateMachineSetResetConnectionState(STREAM_HANDLE streamHandle, PConnectionStaleStateMachine pConnectionStaleStateMachine)
+STATUS connectionStaleStateMachineSetResetConnectionState(STREAM_HANDLE streamHandle, PConnectionStaleStateMachine pConnectionStaleStateMachine, PExponentialBackoffState pExponentialBackoffState)
 {
     STATUS retStatus = STATUS_SUCCESS;
 
@@ -34,6 +34,8 @@ STATUS connectionStaleStateMachineSetResetConnectionState(STREAM_HANDLE streamHa
     CONNECTION_STALE_STATE_MACHINE_UPDATE_TIMESTAMP(pConnectionStaleStateMachine);
 
     if (pConnectionStaleStateMachine->pCallbackStateMachine->streamReady) {
+        // Inject wait time before resetting the connection
+        CHK_STATUS(exponentialBackoffBlockingWait(pExponentialBackoffState));
         CHK_STATUS(kinesisVideoStreamResetConnection(streamHandle));
     } else {
         DLOGW("Stream not ready.");
@@ -43,12 +45,12 @@ CleanUp:
     return retStatus;
 }
 
-STATUS connectionStaleStateMachineHandleConnectionStale(STREAM_HANDLE streamHandle, PConnectionStaleStateMachine pStaleStateMachine)
+STATUS connectionStaleStateMachineHandleConnectionStale(STREAM_HANDLE streamHandle, PConnectionStaleStateMachine pStaleStateMachine, PExponentialBackoffState pExponentialBackoffState)
 {
     STATUS retStatus = STATUS_SUCCESS;
     PCallbacksProvider pCallbacksProvider;
 
-    CHK(pStaleStateMachine != NULL, STATUS_NULL_ARG);
+    CHK(pExponentialBackoffState != NULL, STATUS_NULL_ARG);
 
     pCallbacksProvider = pStaleStateMachine->pCallbackStateMachine->pContinuousRetryStreamCallbacks->pCallbacksProvider;
     pStaleStateMachine->currTime = pCallbacksProvider->clientCallbacks.getCurrentTimeFn(pCallbacksProvider->clientCallbacks.customData);
@@ -58,7 +60,7 @@ STATUS connectionStaleStateMachineHandleConnectionStale(STREAM_HANDLE streamHand
         switch (pStaleStateMachine->currentState) {
             case STREAM_CALLBACK_HANDLING_STATE_NORMAL_STATE:
                 DLOGD("Connection Stale State Machine starting from NORMAL_STATE");
-                CHK_STATUS(connectionStaleStateMachineSetResetConnectionState(streamHandle, pStaleStateMachine));
+                CHK_STATUS(connectionStaleStateMachineSetResetConnectionState(streamHandle, pStaleStateMachine, pExponentialBackoffState));
                 break;
             case STREAM_CALLBACK_HANDLING_STATE_RESET_CONNECTION_STATE:
                 DLOGD("Connection Stale State Machine starting from RESET_CONNECTION_STATE");

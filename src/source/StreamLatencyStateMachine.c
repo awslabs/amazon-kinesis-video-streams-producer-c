@@ -24,7 +24,7 @@ CleanUp:
     return retStatus;
 }
 
-STATUS streamLatencyStateMachineToResetConnectionState(STREAM_HANDLE streamHandle, PStreamLatencyStateMachine pStreamLatencyStateMachine)
+STATUS streamLatencyStateMachineToResetConnectionState(STREAM_HANDLE streamHandle, PStreamLatencyStateMachine pStreamLatencyStateMachine, PExponentialBackoffState pExponentialBackoffState)
 {
     STATUS retStatus = STATUS_SUCCESS;
     CHK(pStreamLatencyStateMachine != NULL, STATUS_NULL_ARG);
@@ -34,6 +34,8 @@ STATUS streamLatencyStateMachineToResetConnectionState(STREAM_HANDLE streamHandl
     pStreamLatencyStateMachine->currentState = STREAM_CALLBACK_HANDLING_STATE_RESET_CONNECTION_STATE;
     STREAM_LATENCY_STATE_MACHINE_UPDATE_TIMESTAMP(pStreamLatencyStateMachine);
     if (pStreamLatencyStateMachine->pCallbackStateMachine->streamReady) {
+        // Inject wait time before resetting connection
+        CHK_STATUS(exponentialBackoffBlockingWait(pExponentialBackoffState));
         kinesisVideoStreamResetConnection(streamHandle);
     } else {
         DLOGW("Stream not ready.");
@@ -59,12 +61,14 @@ VOID streamLatencyStateMachineSetInfiniteRetryState(PStreamLatencyStateMachine p
     pStreamLatencyStateMachine->currentState = STREAM_CALLBACK_HANDLING_STATE_INFINITE_RETRY_STATE;
 }
 
-STATUS streamLatencyStateMachineDoInfiniteRetry(STREAM_HANDLE streamHandle, PStreamLatencyStateMachine pStreamLatencyStateMachine)
+STATUS streamLatencyStateMachineDoInfiniteRetry(STREAM_HANDLE streamHandle, PStreamLatencyStateMachine pStreamLatencyStateMachine, PExponentialBackoffState pExponentialBackoffState)
 {
     STATUS retStatus = STATUS_SUCCESS;
 
     STREAM_LATENCY_STATE_MACHINE_UPDATE_TIMESTAMP(pStreamLatencyStateMachine);
     if (pStreamLatencyStateMachine->pCallbackStateMachine->streamReady) {
+        // Inject wait time before resetting connection
+        CHK_STATUS(exponentialBackoffBlockingWait(pExponentialBackoffState));
         CHK_STATUS(kinesisVideoStreamResetConnection(streamHandle));
     } else {
         DLOGW("Stream not ready.");
@@ -74,12 +78,12 @@ CleanUp:
     return retStatus;
 }
 
-STATUS streamLatencyStateMachineHandleStreamLatency(STREAM_HANDLE streamHandle, PStreamLatencyStateMachine pStreamLatencyStateMachine)
+STATUS streamLatencyStateMachineHandleStreamLatency(STREAM_HANDLE streamHandle, PStreamLatencyStateMachine pStreamLatencyStateMachine, PExponentialBackoffState pExponentialBackoffState)
 {
     STATUS retStatus = STATUS_SUCCESS;
     PCallbacksProvider pCallbacksProvider;
 
-    CHK(pStreamLatencyStateMachine != NULL, STATUS_NULL_ARG);
+    CHK(pStreamLatencyStateMachine != NULL && pExponentialBackoffState != NULL, STATUS_NULL_ARG);
 
     pCallbacksProvider = pStreamLatencyStateMachine->pCallbackStateMachine->pContinuousRetryStreamCallbacks->pCallbacksProvider;
     pStreamLatencyStateMachine->currTime = pCallbacksProvider->clientCallbacks.getCurrentTimeFn(pCallbacksProvider->clientCallbacks.customData);
@@ -93,7 +97,7 @@ STATUS streamLatencyStateMachineHandleStreamLatency(STREAM_HANDLE streamHandle, 
         switch (pStreamLatencyStateMachine->currentState) {
             case STREAM_CALLBACK_HANDLING_STATE_NORMAL_STATE:
                 DLOGD("Stream Latency State Machine starting from NORMAL_STATE");
-                CHK_STATUS(streamLatencyStateMachineToResetConnectionState(streamHandle, pStreamLatencyStateMachine));
+                CHK_STATUS(streamLatencyStateMachineToResetConnectionState(streamHandle, pStreamLatencyStateMachine, pExponentialBackoffState));
                 break;
             case STREAM_CALLBACK_HANDLING_STATE_RESET_CONNECTION_STATE:
                 DLOGD("Stream Latency State Machine starting from RESET_CONNECTION_STATE");
@@ -105,7 +109,7 @@ STATUS streamLatencyStateMachineHandleStreamLatency(STREAM_HANDLE streamHandle, 
                 break;
             case STREAM_CALLBACK_HANDLING_STATE_INFINITE_RETRY_STATE:
                 DLOGD("Stream Latency State Machine starting from INFINITE_RETRY_STATE");
-                CHK_STATUS(streamLatencyStateMachineDoInfiniteRetry(streamHandle, pStreamLatencyStateMachine));
+                CHK_STATUS(streamLatencyStateMachineDoInfiniteRetry(streamHandle, pStreamLatencyStateMachine, pExponentialBackoffState));
                 break;
             default:
                 break;

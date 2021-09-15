@@ -38,11 +38,11 @@ STATUS setStreamLatencyStateMachine(struct __CallbackStateMachine*, STREAM_CALLB
 // Callback function implementations
 ////////////////////////////////////////////////////////////////////////
 
-STATUS streamLatencyStateMachineHandleStreamLatency(STREAM_HANDLE, PStreamLatencyStateMachine);
-STATUS streamLatencyStateMachineToResetConnectionState(STREAM_HANDLE, PStreamLatencyStateMachine);
+STATUS streamLatencyStateMachineHandleStreamLatency(STREAM_HANDLE, PStreamLatencyStateMachine, PExponentialBackoffState);
+STATUS streamLatencyStateMachineToResetConnectionState(STREAM_HANDLE, PStreamLatencyStateMachine, PExponentialBackoffState);
 VOID streamLatencyStateMachineSetThrottlePipelineState(PStreamLatencyStateMachine);
 VOID streamLatencyStateMachineSetInfiniteRetryState(PStreamLatencyStateMachine);
-STATUS streamLatencyStateMachineDoInfiniteRetry(STREAM_HANDLE, PStreamLatencyStateMachine);
+STATUS streamLatencyStateMachineDoInfiniteRetry(STREAM_HANDLE, PStreamLatencyStateMachine, PExponentialBackoffState);
 
 #ifdef __cplusplus
 }

@@ -36,8 +36,8 @@ STATUS setConnectionStaleStateMachine(struct __CallbackStateMachine*, STREAM_CAL
 ////////////////////////////////////////////////////////////////////////
 // Callback function implementations
 ////////////////////////////////////////////////////////////////////////
-STATUS connectionStaleStateMachineSetResetConnectionState(STREAM_HANDLE, PConnectionStaleStateMachine);
-STATUS connectionStaleStateMachineHandleConnectionStale(STREAM_HANDLE, PConnectionStaleStateMachine);
+STATUS connectionStaleStateMachineSetResetConnectionState(STREAM_HANDLE, PConnectionStaleStateMachine, PExponentialBackoffState);
+STATUS connectionStaleStateMachineHandleConnectionStale(STREAM_HANDLE, PConnectionStaleStateMachine, PExponentialBackoffState);
 
 #ifdef __cplusplus
 }

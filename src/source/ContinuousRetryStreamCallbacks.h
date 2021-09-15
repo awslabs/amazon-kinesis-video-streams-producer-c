@@ -10,6 +10,11 @@ extern "C" {
 struct __CallbackStateMachine;
 struct __CallbacksProvider;
 
+/**
+ * @brief Function returning AWS credentials
+ */
+typedef STATUS (*ExponentialWaitFn)(PVOID);
+
 ////////////////////////////////////////////////////////////////////////
 // Struct definition
 ////////////////////////////////////////////////////////////////////////
@@ -26,6 +31,8 @@ struct __ContinuousRetryStreamCallbacks {
 
     // Streams state machine table stream handle -> callback state machine
     PHashTable pStreamMapping;
+
+    ExponentialWaitFn continuousRetryExponentialWaitFn;
 };
 typedef struct __ContinuousRetryStreamCallbacks* PContinuousRetryStreamCallbacks;
 
@@ -47,6 +54,9 @@ typedef struct __CallbackStateMachine {
 
     // Placeholder for the timecode
     UINT64 erroredTimecode;
+
+    // Exponential backoff State
+    PExponentialBackoffState pExponentialBackoffState;
 
     // Latency state machine
     struct __StreamLatencyStateMachine streamLatencyStateMachine;
@@ -76,6 +86,7 @@ STATUS continuousRetryStreamReadyHandler(UINT64, STREAM_HANDLE);
 STATUS continuousRetryStreamFreeHandler(PUINT64);
 STATUS continuousRetryStreamShutdownHandler(UINT64, STREAM_HANDLE, BOOL);
 STATUS continuousRetryStreamClosedHandler(UINT64, STREAM_HANDLE, UPLOAD_HANDLE);
+STATUS continuousRetryExponentialWaitHandler(PVOID);
 
 #ifdef __cplusplus
 }
