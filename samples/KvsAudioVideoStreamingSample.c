@@ -22,6 +22,8 @@
 #define FILE_LOGGING_BUFFER_SIZE (100 * 1024)
 #define MAX_NUMBER_OF_LOG_FILES  5
 
+UINT8 gEventsEnabled = 0;
+
 typedef struct {
     PBYTE buffer;
     UINT32 size;
@@ -63,6 +65,10 @@ PVOID putVideoFrameRoutine(PVOID args)
     // video track is used to mark new fragment. A new fragment is generated for every frame with FRAME_FLAG_KEY_FRAME
     frame.flags = fileIndex % DEFAULT_KEY_FRAME_INTERVAL == 0 ? FRAME_FLAG_KEY_FRAME : FRAME_FLAG_NONE;
 
+    if(gEventsEnabled) {
+        //generate an image and notification event at the start of the video stream.
+        putKinesisVideoEventMetadata(data->streamHandle, STREAM_EVENT_TYPE_NOTIFICATION | STREAM_EVENT_TYPE_IMAGE_GENERATION, NULL);
+    }
     while (defaultGetTime() < data->streamStopTime) {
         status = putKinesisVideoFrame(data->streamHandle, &frame);
         if (data->firstFrame) {
@@ -182,7 +188,12 @@ INT32 main(INT32 argc, CHAR* argv[])
 
     STRNCPY(audioCodec, AUDIO_CODEC_NAME_AAC, STRLEN(AUDIO_CODEC_NAME_AAC)); //aac audio by default
 
-    if (argc == 5) {
+    if (argc == 6) {
+        if (STRCMP(argv[5], "1")){
+            gEventsEnabled = 1;
+        }
+    }
+    if (argc >= 5) {
         if (!STRCMP(argv[4], AUDIO_CODEC_NAME_ALAW)){
             STRNCPY(audioCodec, AUDIO_CODEC_NAME_ALAW, STRLEN(AUDIO_CODEC_NAME_ALAW));
         } 
