@@ -35,7 +35,9 @@ STATUS streamLatencyStateMachineToResetConnectionState(STREAM_HANDLE streamHandl
     STREAM_LATENCY_STATE_MACHINE_UPDATE_TIMESTAMP(pStreamLatencyStateMachine);
     if (pStreamLatencyStateMachine->pCallbackStateMachine->streamReady) {
         // Inject wait time before resetting connection
-        CHK_STATUS(exponentialBackoffBlockingWait(pExponentialBackoffState));
+        if (pExponentialBackoffState != NULL) {
+            CHK_STATUS(exponentialBackoffBlockingWait(pExponentialBackoffState));
+        }
         kinesisVideoStreamResetConnection(streamHandle);
     } else {
         DLOGW("Stream not ready.");
@@ -68,7 +70,9 @@ STATUS streamLatencyStateMachineDoInfiniteRetry(STREAM_HANDLE streamHandle, PStr
     STREAM_LATENCY_STATE_MACHINE_UPDATE_TIMESTAMP(pStreamLatencyStateMachine);
     if (pStreamLatencyStateMachine->pCallbackStateMachine->streamReady) {
         // Inject wait time before resetting connection
-        CHK_STATUS(exponentialBackoffBlockingWait(pExponentialBackoffState));
+        if (pExponentialBackoffState != NULL) {
+            CHK_STATUS(exponentialBackoffBlockingWait(pExponentialBackoffState));
+        }
         CHK_STATUS(kinesisVideoStreamResetConnection(streamHandle));
     } else {
         DLOGW("Stream not ready.");

@@ -35,7 +35,9 @@ STATUS connectionStaleStateMachineSetResetConnectionState(STREAM_HANDLE streamHa
 
     if (pConnectionStaleStateMachine->pCallbackStateMachine->streamReady) {
         // Inject wait time before resetting the connection
-        CHK_STATUS(exponentialBackoffBlockingWait(pExponentialBackoffState));
+        if (pExponentialBackoffState != NULL) {
+            CHK_STATUS(exponentialBackoffBlockingWait(pExponentialBackoffState));
+        }
         CHK_STATUS(kinesisVideoStreamResetConnection(streamHandle));
     } else {
         DLOGW("Stream not ready.");

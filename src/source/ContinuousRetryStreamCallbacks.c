@@ -213,7 +213,11 @@ STATUS getStreamMapping(PContinuousRetryStreamCallbacks pContinuousRetryStreamCa
     pCallbackStateMachine->streamReady = FALSE;
     pCallbackStateMachine->resetTid = INVALID_TID_VALUE;
     pCallbackStateMachine->streamHandle = INVALID_STREAM_HANDLE_VALUE;
+    pCallbackStateMachine->pExponentialBackoffState = NULL;
+
+#ifdef ENABLE_EXPONENTIAL_RETRIES_FOR_CONTINUOUS_RETRIES
     CHK_STATUS(exponentialBackoffStateWithDefaultConfigCreate(&(pCallbackStateMachine->pExponentialBackoffState)));
+#endif
 
     // Set the initial values
     CHK_STATUS(setConnectionStaleStateMachine(pCallbackStateMachine, STREAM_CALLBACK_HANDLING_STATE_NORMAL_STATE, 0, 0, 0));
@@ -236,7 +240,9 @@ CleanUp:
     if (STATUS_SUCCEEDED(retStatus)) {
         *ppCallbackStateMachine = pCallbackStateMachine;
     } else if (freeOnError && pCallbackStateMachine != NULL) {
-        exponentialBackoffStateFree(&(pCallbackStateMachine->pExponentialBackoffState));
+        if (pCallbackStateMachine->pExponentialBackoffState != NULL) {
+            exponentialBackoffStateFree(&(pCallbackStateMachine->pExponentialBackoffState));
+        }
         MEMFREE(pCallbackStateMachine);
     }
 
@@ -317,7 +323,9 @@ STATUS continuousRetryStreamErrorReportHandler(UINT64 customData, STREAM_HANDLE 
             // Note that if the underlying PIC state machine does not change state (for example - a service timeout occurred while
             // describing stream, then PIC stays in same state), then PIC will add its own retry wait time (PIC retries are fairy fast). The result will be
             // a slightly larger wait because of exponentialBackoffBlockingWait combined with PIC's wait time.
-            CHK_STATUS(exponentialBackoffBlockingWait(pCallbackStateMachine->pExponentialBackoffState));
+            if (pCallbackStateMachine->pExponentialBackoffState != NULL) {
+                CHK_STATUS(exponentialBackoffBlockingWait(pCallbackStateMachine->pExponentialBackoffState));
+            }
             CHK(FALSE, retStatus);
         }
 

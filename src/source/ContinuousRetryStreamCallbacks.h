@@ -7,13 +7,15 @@
 extern "C" {
 #endif
 
+/**
+* Enables exponential waits during continuous retries
+*/
+#ifndef ENABLE_EXPONENTIAL_RETRIES_FOR_CONTINUOUS_RETRIES
+#define ENABLE_EXPONENTIAL_RETRIES_FOR_CONTINUOUS_RETRIES
+#endif
+
 struct __CallbackStateMachine;
 struct __CallbacksProvider;
-
-/**
- * @brief Function returning AWS credentials
- */
-typedef STATUS (*ExponentialWaitFn)(PVOID);
 
 ////////////////////////////////////////////////////////////////////////
 // Struct definition
@@ -31,8 +33,6 @@ struct __ContinuousRetryStreamCallbacks {
 
     // Streams state machine table stream handle -> callback state machine
     PHashTable pStreamMapping;
-
-    ExponentialWaitFn continuousRetryExponentialWaitFn;
 };
 typedef struct __ContinuousRetryStreamCallbacks* PContinuousRetryStreamCallbacks;
 
@@ -86,7 +86,6 @@ STATUS continuousRetryStreamReadyHandler(UINT64, STREAM_HANDLE);
 STATUS continuousRetryStreamFreeHandler(PUINT64);
 STATUS continuousRetryStreamShutdownHandler(UINT64, STREAM_HANDLE, BOOL);
 STATUS continuousRetryStreamClosedHandler(UINT64, STREAM_HANDLE, UPLOAD_HANDLE);
-STATUS continuousRetryExponentialWaitHandler(PVOID);
 
 #ifdef __cplusplus
 }
