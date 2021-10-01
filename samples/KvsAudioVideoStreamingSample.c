@@ -65,16 +65,16 @@ PVOID putVideoFrameRoutine(PVOID args)
     // video track is used to mark new fragment. A new fragment is generated for every frame with FRAME_FLAG_KEY_FRAME
     frame.flags = fileIndex % DEFAULT_KEY_FRAME_INTERVAL == 0 ? FRAME_FLAG_KEY_FRAME : FRAME_FLAG_NONE;
 
-    if(gEventsEnabled) {
-        //generate an image and notification event at the start of the video stream.
-        putKinesisVideoEventMetadata(data->streamHandle, STREAM_EVENT_TYPE_NOTIFICATION | STREAM_EVENT_TYPE_IMAGE_GENERATION, NULL);
-    }
     while (defaultGetTime() < data->streamStopTime) {
         status = putKinesisVideoFrame(data->streamHandle, &frame);
         if (data->firstFrame) {
             startUpLatency = (DOUBLE)(GETTIME() - data->startTime) / (DOUBLE) HUNDREDS_OF_NANOS_IN_A_MILLISECOND;
             DLOGD("Start up latency: %lf ms", startUpLatency);
             data->firstFrame = FALSE;
+            if(gEventsEnabled) {
+                //generate an image and notification event at the start of the video stream.
+                putKinesisVideoEventMetadata(data->streamHandle, STREAM_EVENT_TYPE_NOTIFICATION | STREAM_EVENT_TYPE_IMAGE_GENERATION, NULL);
+            }
         }
 
         ATOMIC_STORE_BOOL(&data->firstVideoFramePut, TRUE);
