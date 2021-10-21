@@ -124,7 +124,7 @@ STATUS parseIotResponse(PIotCredentialProvider pIotCredentialProvider, PCallInfo
     jsmn_parser parser;
     jsmntok_t tokens[MAX_JSON_TOKEN_COUNT];
     PCHAR accessKeyId = NULL, secretKey = NULL, sessionToken = NULL, expirationTimestamp = NULL, pResponseStr = NULL;
-    UINT64 expiration, currentTime;
+    UINT64 expiration, currentTime, jitter;
     CHAR expirationTimestampStr[MAX_EXPIRATION_LEN + 1];
 
     CHK(pIotCredentialProvider != NULL && pCallInfo != NULL, STATUS_NULL_ARG);
@@ -176,10 +176,11 @@ STATUS parseIotResponse(PIotCredentialProvider pIotCredentialProvider, PCallInfo
         pIotCredentialProvider->pAwsCredentials = NULL;
     }
 
-    // Fix-up the expiration to be no more than max enforced token rotation to avoid extra token rotations
-    // as we are caching the returned value which is likely to be an hour but we are enforcing max
-    // rotation to be more frequent.
-    expiration = MIN(expiration, currentTime + MAX_ENFORCED_TOKEN_EXPIRATION_DURATION);
+    //add randomized jitter between 1-15% of expiration
+    srand(currentTime);
+    jitter = MAX((rand()%(((expiration/100) * 15) + (expiration%100) * 15/100)), expiration/100);
+    DLOGW("@@@@@@@@@@@ %d, expirationResponse: %llu, jitter: %llu", __LINE__, expiration, jitter);
+    expiration -= jitter;
 
     CHK_STATUS(createAwsCredentials(accessKeyId, accessKeyIdLen, secretKey, secretKeyLen, sessionToken, sessionTokenLen, expiration,
                                     &pIotCredentialProvider->pAwsCredentials));
