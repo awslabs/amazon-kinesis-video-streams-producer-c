@@ -176,11 +176,17 @@ STATUS parseIotResponse(PIotCredentialProvider pIotCredentialProvider, PCallInfo
         pIotCredentialProvider->pAwsCredentials = NULL;
     }
 
-    //add randomized jitter between 1-15% of expiration
+    // add randomized jitter between 1-15% of expiration
     srand(currentTime);
-    jitter = MAX((rand()%(((expiration/100) * 15) + (expiration%100) * 15/100)), expiration/100);
-    DLOGW("@@@@@@@@@@@ %d, expirationResponse: %llu, jitter: %llu", __LINE__, expiration, jitter);
+    expiration -= currentTime;
+    jitter = MAX((rand() % (((expiration / 100) * 15) + (expiration % 100) * 15 / 100)), expiration / 100);
+
+    jitter = rand() %
+        (((expiration / 100) * 15) + (expiration % 100) * 15 / 100)
+
+            DLOGW("@@@@@@@@@@@ %d, expirationResponse: %llu, jitter: %llu", __LINE__, expiration, jitter);
     expiration -= jitter;
+    expiration += currentTime;
 
     CHK_STATUS(createAwsCredentials(accessKeyId, accessKeyIdLen, secretKey, secretKeyLen, sessionToken, sessionTokenLen, expiration,
                                     &pIotCredentialProvider->pAwsCredentials));
