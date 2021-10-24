@@ -177,11 +177,16 @@ STATUS parseIotResponse(PIotCredentialProvider pIotCredentialProvider, PCallInfo
     }
 
     // add randomized jitter between 1-20% of expiration
-    srand(currentTime);
+    UINT64 mod1 = rand()%(sessionTokenLen-1);
+    UINT64 mod2 = rand()%(sessionTokenLen-1);
+    srand(currentTime / ((UINT64)sessionToken[rand()%(sessionTokenLen-1)] + (UINT64)sessionToken[rand()%(sessionTokenLen-1)]));
+    DLOGW("@@@@@@@@@@@ %d, expirationResponse: %llu, jitter: %llu", __LINE__, (UINT64)sessionToken[mod1], (UINT64)sessionToken[mod2]);
     expiration -= currentTime;
-    jitter = MAX((rand() % (((expiration / 100) * 20) + (expiration % 100) * 20 / 100)), expiration / 100);
 
-    jitter = rand() % (((expiration / 100) * 20) + (expiration % 100) * 20 / 100);
+    jitter = (rand()*100) % (((expiration / 100) * 20) + (expiration % 100) * 20 / 100);
+    if (jitter < expiration/100) {
+        jitter += expiration/100;
+    }
 
     DLOGW("@@@@@@@@@@@ %d, expirationResponse: %llu, jitter: %llu", __LINE__, expiration, jitter);
     expiration -= jitter;
