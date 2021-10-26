@@ -221,6 +221,8 @@ CleanUp:
 
     if (STATUS_FAILED(retStatus) && pRequestHeader != NULL) {
         MEMFREE(pRequestHeader);
+    } else {
+        DLOGD("Appending header-> %s : %s", headerName, headerValue);
     }
 
     return retStatus;
