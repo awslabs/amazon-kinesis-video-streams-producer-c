@@ -124,7 +124,7 @@ STATUS parseIotResponse(PIotCredentialProvider pIotCredentialProvider, PCallInfo
     jsmn_parser parser;
     jsmntok_t tokens[MAX_JSON_TOKEN_COUNT];
     PCHAR accessKeyId = NULL, secretKey = NULL, sessionToken = NULL, expirationTimestamp = NULL, pResponseStr = NULL;
-    UINT64 expiration, currentTime, jitter, randMultiplier = (RAND_MAX < HUNDREDS_OF_NANOS_IN_A_SEC) ? HUNDREDS_OF_NANOS_IN_A_SEC : 1;
+    UINT64 expiration, currentTime, jitter, randMultiplier = (RAND_MAX < HUNDREDS_OF_NANOS_IN_A_SECOND) ? HUNDREDS_OF_NANOS_IN_A_SECOND : 1;
     CHAR expirationTimestampStr[MAX_EXPIRATION_LEN + 1];
 
     CHK(pIotCredentialProvider != NULL && pCallInfo != NULL, STATUS_NULL_ARG);
