@@ -124,7 +124,7 @@ STATUS parseIotResponse(PIotCredentialProvider pIotCredentialProvider, PCallInfo
     jsmn_parser parser;
     jsmntok_t tokens[MAX_JSON_TOKEN_COUNT];
     PCHAR accessKeyId = NULL, secretKey = NULL, sessionToken = NULL, expirationTimestamp = NULL, pResponseStr = NULL;
-    UINT64 expiration, currentTime, jitter, randMultiplier = (RAND_MAX < HUNDREDS_OF_NANOS_IN_A_SECOND) ? HUNDREDS_OF_NANOS_IN_A_SECOND : 1;
+    UINT64 expiration, currentTime, jitter, randMultiplier;
     CHAR expirationTimestampStr[MAX_EXPIRATION_LEN + 1];
 
     CHK(pIotCredentialProvider != NULL && pCallInfo != NULL, STATUS_NULL_ARG);
@@ -176,11 +176,9 @@ STATUS parseIotResponse(PIotCredentialProvider pIotCredentialProvider, PCallInfo
         pIotCredentialProvider->pAwsCredentials = NULL;
     }
 
+    randMultiplier = (ULONG_MAX/RAND_MAX) - 1;
     // add randomized jitter between 1-20% of expiration
-    UINT64 mod1 = rand()%(sessionTokenLen-1);
-    UINT64 mod2 = rand()%(sessionTokenLen-1);
     srand(currentTime / ((UINT64)sessionToken[rand()%(sessionTokenLen-1)] + (UINT64)sessionToken[rand()%(sessionTokenLen-1)]));
-    DLOGW("@@@@@@@@@@@ %d, expirationResponse: %llu, jitter: %llu", __LINE__, (UINT64)sessionToken[mod1], (UINT64)sessionToken[mod2]);
     expiration -= currentTime;
 
     jitter = (rand()*randMultiplier) % (((expiration / 100) * 20) + (expiration % 100) * 20 / 100);
