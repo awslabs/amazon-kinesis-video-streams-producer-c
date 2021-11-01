@@ -76,12 +76,11 @@ STATUS blockingCurlCall(PRequestInfo pRequestInfo, PCallInfo pCallInfo)
 
     if (res != CURLE_OK) {
         curl_easy_getinfo(curl, CURLINFO_EFFECTIVE_URL, &url);
-        DLOGE("Curl perform failed for url %s with result %s : %s ", url, curl_easy_strerror(res), errorBuffer);
-        CHK(FALSE, STATUS_IOT_FAILED);
+        CHK_ERR(FALSE, STATUS_CURL_PERFORM_FAILED, "Curl perform failed for url %s with result %s : %s ", url, curl_easy_strerror(res), errorBuffer);
     }
 
     curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpStatusCode);
-    CHK_ERR(httpStatusCode == HTTP_STATUS_CODE_OK, STATUS_IOT_FAILED, "Curl call response failed with http status %lu", httpStatusCode);
+    CHK_ERR(httpStatusCode == HTTP_STATUS_CODE_OK, STATUS_CURL_PERFORM_FAILED, "Curl call response failed with http status %lu", httpStatusCode);
 
 CleanUp:
 
