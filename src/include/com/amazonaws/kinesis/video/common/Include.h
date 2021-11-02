@@ -50,6 +50,7 @@ extern "C" {
 #define STATUS_FILE_CREDENTIAL_PROVIDER_OPEN_FILE_FAILED    STATUS_COMMON_PRODUCER_BASE + 0x00000022
 #define STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_LENGTH STATUS_COMMON_PRODUCER_BASE + 0x00000023
 #define STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_FORMAT STATUS_COMMON_PRODUCER_BASE + 0x00000024
+#define STATUS_TIMESTAMP_STRING_UNRECOGNIZED_FORMAT         STATUS_COMMON_PRODUCER_BASE + 0x00000025
 /*!@} */
 
 /**
@@ -776,7 +777,7 @@ PUBLIC_API BOOL compareJsonString(PCHAR, jsmntok_t*, jsmntype_t, PCHAR);
 /**
  * @brief Converts the timestamp string to time
  *
- * @param[in] PCHAR String to covert
+ * @param[in] PCHAR String to covert (MUST be null terminated)
  * @param[in] UINT64 Current time
  * @param[in,out] PUINT64 Converted time
  *
