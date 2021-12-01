@@ -843,8 +843,6 @@ VOID ProducerClientTestBase::printFrameInfo(PFrame pFrame)
 }
 
 STATUS ProducerClientTestBase::createRetryStrategyFn(PKvsRetryStrategy pKvsRetryStrategy) {
-    printf("\n HAHAHAHAHA");
-    fflush(stdout);
     STATUS retStatus = STATUS_SUCCESS;
     PExponentialBackoffRetryStrategyState pExponentialBackoffRetryStrategyState = NULL;
 
