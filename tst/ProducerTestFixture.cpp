@@ -856,7 +856,7 @@ STATUS ProducerClientTestBase::createRetryStrategyFn(PKvsRetryStrategy pKvsRetry
     pExponentialBackoffRetryStrategyState->exponentialBackoffRetryStrategyConfig.maxRetryWaitTime = HUNDREDS_OF_NANOS_IN_A_MILLISECOND * 75;
 
 CleanUp:
-    return STATUS_SUCCESS;
+    return retStatus;
 }
 
 STATUS ProducerClientTestBase::getCurrentRetryAttemptNumberFn(PKvsRetryStrategy pKvsRetryStrategy, PUINT32 pRetryCount) {
