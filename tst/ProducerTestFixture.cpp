@@ -278,6 +278,11 @@ ProducerClientTestBase::ProducerClientTestBase() :
     mDeviceInfo.clientInfo.loggerLogLevel = this->loggerLogLevel;
     mDeviceInfo.clientInfo.logMetric = TRUE;
 
+    mDeviceInfo.clientInfo.kvsRetryStrategyCallbacks.createRetryStrategyFn = createRetryStrategyFn;
+    mDeviceInfo.clientInfo.kvsRetryStrategyCallbacks.getCurrentRetryAttemptNumberFn = getCurrentRetryAttemptNumberFn;
+    mDeviceInfo.clientInfo.kvsRetryStrategyCallbacks.freeRetryStrategyFn = freeRetryStrategyFn;
+    mDeviceInfo.clientInfo.kvsRetryStrategyCallbacks.executeRetryStrategyFn = executeRetryStrategyFn;
+
     mDefaultRegion[0] = '\0';
     mStreamingRotationPeriod = TEST_STREAMING_TOKEN_DURATION;
 
@@ -835,6 +840,35 @@ VOID ProducerClientTestBase::printFrameInfo(PFrame pFrame)
           pFrame->size,
           pFrame->decodingTs,
           pFrame->presentationTs);
+}
+
+STATUS ProducerClientTestBase::createRetryStrategyFn(PKvsRetryStrategy pKvsRetryStrategy) {
+    STATUS retStatus = STATUS_SUCCESS;
+    PExponentialBackoffRetryStrategyState pExponentialBackoffRetryStrategyState = NULL;
+
+    CHK_STATUS(exponentialBackoffRetryStrategyCreate(pKvsRetryStrategy));
+    CHK(pKvsRetryStrategy->retryStrategyType == KVS_RETRY_STRATEGY_EXPONENTIAL_BACKOFF_WAIT, STATUS_INTERNAL_ERROR);
+
+    pExponentialBackoffRetryStrategyState = TO_EXPONENTIAL_BACKOFF_STATE(pKvsRetryStrategy->pRetryStrategy);
+
+    // Overwrite retry config to avoid slow long running tests
+    pExponentialBackoffRetryStrategyState->exponentialBackoffRetryStrategyConfig.retryFactorTime = HUNDREDS_OF_NANOS_IN_A_MILLISECOND * 5;
+    pExponentialBackoffRetryStrategyState->exponentialBackoffRetryStrategyConfig.maxRetryWaitTime = HUNDREDS_OF_NANOS_IN_A_MILLISECOND * 75;
+
+CleanUp:
+    return retStatus;
+}
+
+STATUS ProducerClientTestBase::getCurrentRetryAttemptNumberFn(PKvsRetryStrategy pKvsRetryStrategy, PUINT32 pRetryCount) {
+    return getExponentialBackoffRetryCount(pKvsRetryStrategy, pRetryCount);
+}
+
+STATUS ProducerClientTestBase::freeRetryStrategyFn(PKvsRetryStrategy pKvsRetryStrategy) {
+    return exponentialBackoffRetryStrategyFree(pKvsRetryStrategy);
+}
+
+STATUS ProducerClientTestBase::executeRetryStrategyFn(PKvsRetryStrategy pKvsRetryStrategy, PUINT64 retryWaitTime) {
+    return getExponentialBackoffRetryStrategyWaitTime(pKvsRetryStrategy, retryWaitTime);
 }
 
 }  // namespace video
