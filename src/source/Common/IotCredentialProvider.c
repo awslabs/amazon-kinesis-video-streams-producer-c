@@ -205,9 +205,11 @@ STATUS iotCurlHandler(PIotCredentialProvider pIotCredentialProvider)
     // Refresh the credentials
     currentTime = pIotCredentialProvider->getCurrentTimeFn(pIotCredentialProvider->customData);
 
+#if 0
     CHK(pIotCredentialProvider->pAwsCredentials == NULL ||
             currentTime + IOT_CREDENTIAL_FETCH_GRACE_PERIOD > pIotCredentialProvider->pAwsCredentials->expiration,
         retStatus);
+#endif
 
     formatLen = SNPRINTF(serviceUrl, MAX_URI_CHAR_LEN, "%s%s%s%c%s%s", CONTROL_PLANE_URI_PREFIX, pIotCredentialProvider->iotGetCredentialEndpoint,
                          ROLE_ALIASES_PATH, '/', pIotCredentialProvider->roleAlias, CREDENTIAL_SERVICE);
