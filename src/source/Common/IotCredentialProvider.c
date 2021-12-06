@@ -103,8 +103,10 @@ STATUS getIotCredentials(PAwsCredentialProvider pCredentialProvider, PAwsCredent
 
     CHK(pIotCredentialProvider != NULL && ppAwsCredentials != NULL, STATUS_NULL_ARG);
 
+    DLOGE("@@@@@@@@@@@@@ %d");
     // Fill the credentials
     CHK_STATUS(iotCurlHandler(pIotCredentialProvider));
+    DLOGE("@@@@@@@@@@@@@ %d");
 
     *ppAwsCredentials = pIotCredentialProvider->pAwsCredentials;
 
@@ -127,7 +129,9 @@ STATUS parseIotResponse(PIotCredentialProvider pIotCredentialProvider, PCallInfo
     UINT64 expiration, currentTime;
     CHAR expirationTimestampStr[MAX_EXPIRATION_LEN + 1];
 
+    DLOGE("@@@@@@@@@@@@@ %d");
     CHK(pIotCredentialProvider != NULL && pCallInfo != NULL, STATUS_NULL_ARG);
+    DLOGE("@@@@@@@@@@@@@ %d");
 
     resultLen = pCallInfo->responseDataLen;
     CHK_ERR(resultLen > 0, STATUS_IOT_INVALID_RESPONSE_LENGTH, "IoT response has a length of 0");
@@ -136,8 +140,10 @@ STATUS parseIotResponse(PIotCredentialProvider pIotCredentialProvider, PCallInfo
     jsmn_init(&parser);
     tokenCount = jsmn_parse(&parser, pResponseStr, resultLen, tokens, SIZEOF(tokens) / SIZEOF(jsmntok_t));
 
+    DLOGE("@@@@@@@@@@@@@ %d");
     CHK(tokenCount > 1, STATUS_INVALID_API_CALL_RETURN_JSON);
     CHK(tokens[0].type == JSMN_OBJECT, STATUS_INVALID_API_CALL_RETURN_JSON);
+    DLOGE("@@@@@@@@@@@@@ %d");
 
     for (i = 1; i < (UINT32) tokenCount; i++) {
         if (compareJsonString(pResponseStr, &tokens[i], JSMN_STRING, (PCHAR) "accessKeyId")) {
@@ -165,7 +171,9 @@ STATUS parseIotResponse(PIotCredentialProvider pIotCredentialProvider, PCallInfo
         }
     }
 
+    DLOGE("@@@@@@@@@@@@@ %d");
     CHK(accessKeyId != NULL && secretKey != NULL && sessionToken != NULL, STATUS_IOT_NULL_AWS_CREDS);
+    DLOGE("@@@@@@@@@@@@@ %d");
 
     currentTime = pIotCredentialProvider->getCurrentTimeFn(pIotCredentialProvider->customData);
     CHK_STATUS(convertTimestampToEpoch(expirationTimestampStr, currentTime / HUNDREDS_OF_NANOS_IN_A_SECOND, &expiration));
@@ -181,8 +189,10 @@ STATUS parseIotResponse(PIotCredentialProvider pIotCredentialProvider, PCallInfo
     // rotation to be more frequent.
     expiration = MIN(expiration, currentTime + MAX_ENFORCED_TOKEN_EXPIRATION_DURATION);
 
+    DLOGE("@@@@@@@@@@@@@ %d");
     CHK_STATUS(createAwsCredentials(accessKeyId, accessKeyIdLen, secretKey, secretKeyLen, sessionToken, sessionTokenLen, expiration,
                                     &pIotCredentialProvider->pAwsCredentials));
+    DLOGE("@@@@@@@@@@@@@ %d");
 
 CleanUp:
 
@@ -202,8 +212,10 @@ STATUS iotCurlHandler(PIotCredentialProvider pIotCredentialProvider)
 
     MEMSET(&callInfo, 0x00, SIZEOF(CallInfo));
 
+    DLOGE("@@@@@@@@@@@@@ %d");
     // Refresh the credentials
     currentTime = pIotCredentialProvider->getCurrentTimeFn(pIotCredentialProvider->customData);
+    DLOGE("@@@@@@@@@@@@@ %d");
 
 #if 0
     CHK(pIotCredentialProvider->pAwsCredentials == NULL ||
@@ -211,26 +223,34 @@ STATUS iotCurlHandler(PIotCredentialProvider pIotCredentialProvider)
         retStatus);
 #endif
 
+    DLOGE("@@@@@@@@@@@@@ %d");
     formatLen = SNPRINTF(serviceUrl, MAX_URI_CHAR_LEN, "%s%s%s%c%s%s", CONTROL_PLANE_URI_PREFIX, pIotCredentialProvider->iotGetCredentialEndpoint,
                          ROLE_ALIASES_PATH, '/', pIotCredentialProvider->roleAlias, CREDENTIAL_SERVICE);
+    DLOGE("@@@@@@@@@@@@@ %d");
     CHK(formatLen > 0 && formatLen < MAX_URI_CHAR_LEN, STATUS_IOT_INVALID_URI_LEN);
 
+    DLOGE("@@@@@@@@@@@@@ %d");
     // Form a new request info based on the params
     CHK_STATUS(createRequestInfo(serviceUrl, NULL, DEFAULT_AWS_REGION, pIotCredentialProvider->caCertPath, pIotCredentialProvider->certPath,
                                  pIotCredentialProvider->privateKeyPath, SSL_CERTIFICATE_TYPE_PEM, DEFAULT_USER_AGENT_NAME,
                                  IOT_REQUEST_CONNECTION_TIMEOUT, IOT_REQUEST_COMPLETION_TIMEOUT, DEFAULT_LOW_SPEED_LIMIT,
                                  DEFAULT_LOW_SPEED_TIME_LIMIT, pIotCredentialProvider->pAwsCredentials, &pRequestInfo));
 
+    DLOGE("@@@@@@@@@@@@@ %d");
     callInfo.pRequestInfo = pRequestInfo;
 
+    DLOGE("@@@@@@@@@@@@@ %d");
     // Append the IoT header
     CHK_STATUS(setRequestHeader(pRequestInfo, IOT_THING_NAME_HEADER, 0, pIotCredentialProvider->thingName, 0));
+    DLOGE("@@@@@@@@@@@@@ %d");
 
     // Perform a blocking call
     CHK_STATUS(pIotCredentialProvider->serviceCallFn(pRequestInfo, &callInfo));
+    DLOGE("@@@@@@@@@@@@@ %d");
 
     // Parse the response and get the credentials
     CHK_STATUS(parseIotResponse(pIotCredentialProvider, &callInfo));
+    DLOGE("@@@@@@@@@@@@@ %d");
 
 CleanUp:
 
