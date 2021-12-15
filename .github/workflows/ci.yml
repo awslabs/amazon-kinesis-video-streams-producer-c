@@ -1,0 +1,184 @@
+name: Producer SDK CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches:
+      - develop
+      - master
+jobs:
+  clang-format-check:
+    runs-on: macos-11
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+      - name: Install clang-format
+        run: |
+          sudo apt-get -q update
+          sudo apt-get -y install clang-format
+          mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TEST=TRUE
+      - name: Run clang format check
+        run: |
+          cd ..
+          bash scripts/check-clang.sh
+
+  mac-os-catalina-build-gcc:
+    runs-on: macos-latest
+    env:
+      CC: gcc
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+      - name: Build repository and run tests with and without auth
+        run: |
+          mkdir build
+          cd build
+          sh -c 'cmake .. -DBUILD_TEST=TRUE;cmake .. -DBUILD_TEST=TRUE'
+          make
+          ./tst/producer_test --gtest_break_on_failure
+
+  mac-os-catalina-build-clang:
+    runs-on: macos-latest
+    env:
+      CC: clang
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+      - name: Build repository
+        run: |
+          mkdir build
+          cd build
+          sh -c 'cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE;cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE'
+          make
+          ./tst/producer_test --gtest_break_on_failure
+
+  linux-gcc-code-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+      - name: Build repository
+        run: |
+          mkdir build
+          cd build
+          cmake .. -DCODE_COVERAGE=TRUE -DBUILD_TEST=TRUE -DBUILD_COMMON_LWS=TRUE
+          export AWS_KVS_LOG_LEVEL=3
+          make
+          ulimit -c unlimited -S
+          timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
+      - name: Code coverage
+        run: |
+          for test_file in $(find cproducer.dir kvsCommonCurl.dir kvsCommonLws.dir -name '*.gcno'); do gcov $test_file; done
+          bash <(curl -s https://codecov.io/bash)
+
+  address-sanitizer:
+    runs-on: ubuntu-18.04
+    env:
+      CC: clang
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+      - name: Build repository
+        run: |
+          mkdir build
+          cd build
+          cmake .. -DBUILD_TEST=TRUE -DADDRESS_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
+          export AWS_KVS_LOG_LEVEL=3
+          make
+          ulimit -c unlimited -S
+          timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
+
+  undefined-behavior-sanitizer:
+    runs-on: ubuntu-latest
+    env:
+      CC: clang
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+      - name: Build repository
+        run: |
+          mkdir build
+          cd build
+          cmake .. -DBUILD_TEST=TRUE -DUNDEFINED_BEHAVIOR_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
+          export AWS_KVS_LOG_LEVEL=3
+          make
+          ulimit -c unlimited -S
+          timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
+
+  memory-sanitizer:
+    runs-on: ubuntu-latest
+    env:
+      CC: clang
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+      - name: Build repository
+        continue-on-error: true
+        run: |
+          mkdir build
+          cd build
+          cmake .. -DBUILD_TEST=TRUE -DMEMORY_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
+          export AWS_KVS_LOG_LEVEL=3
+          make
+          ulimit -c unlimited -S
+          timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
+
+  thread-sanitizer:
+    runs-on: ubuntu-18.04
+    env:
+      CC: clang
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+      - name: Build repository
+        continue-on-error: true
+        run: |
+          mkdir build
+          cd build
+          cmake .. -DBUILD_TEST=TRUE -DTHREAD_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
+          export AWS_KVS_LOG_LEVEL=3
+          make
+          ulimit -c unlimited -S
+          timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
+
+  linux-gcc-4_4:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+      - name: Install deps
+        run: |
+          sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'
+          sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+          sudo add-apt-repository 'deb http://archive.ubuntu.com/ubuntu/ trusty main'
+          sudo add-apt-repository 'deb http://archive.ubuntu.com/ubuntu/ trusty universe'
+          sudo apt-get -q update
+          sudo apt-get -y install gcc-4.4
+          sudo apt-get -y install gdb
+      - name: Build repository
+        run: |
+          export CC=gcc-4.4
+          mkdir build
+          cd build
+          cd build && cmake .. -DBUILD_TEST=TRUE -DBUILD_COMMON_LWS=TRUE
+          export AWS_KVS_LOG_LEVEL=3
+          make
+          ulimit -c unlimited -S
+          timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
+
+  windows-msvc:
+    runs-on: windows-2019
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+      - name: Setup MSVC 
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x86
+      - name: Build and run
+        run: |
+          choco install nasm strawberryperl
+          .github/build_windows.bat
+          cd build/tst && ./producer_test.exe --gtest_break_on_failure
+          
