@@ -15,12 +15,9 @@ jobs:
         uses: actions/checkout@v2
       - name: Install clang-format
         run: |
-          sudo apt-get -q update
-          sudo apt-get -y install clang-format
-          mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TEST=TRUE
+          brew install clang-format@8
       - name: Run clang format check
         run: |
-          cd ..
           bash scripts/check-clang.sh
 
   mac-os-catalina-build-gcc:
@@ -32,8 +29,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Build repository and run tests with and without auth
         run: |
-          mkdir build
-          cd build
+          mkdir build && cd build
           sh -c 'cmake .. -DBUILD_TEST=TRUE;cmake .. -DBUILD_TEST=TRUE'
           make
           ./tst/producer_test --gtest_break_on_failure
@@ -47,8 +43,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Build repository
         run: |
-          mkdir build
-          cd build
+          mkdir build && cd build
           sh -c 'cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE;cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE'
           make
           ./tst/producer_test --gtest_break_on_failure
@@ -60,8 +55,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Build repository
         run: |
-          mkdir build
-          cd build
+          mkdir build && cd build
           cmake .. -DCODE_COVERAGE=TRUE -DBUILD_TEST=TRUE -DBUILD_COMMON_LWS=TRUE
           export AWS_KVS_LOG_LEVEL=3
           make
@@ -73,7 +67,7 @@ jobs:
           bash <(curl -s https://codecov.io/bash)
 
   address-sanitizer:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     env:
       CC: clang
     steps:
@@ -81,8 +75,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Build repository
         run: |
-          mkdir build
-          cd build
+          mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DADDRESS_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
           export AWS_KVS_LOG_LEVEL=3
           make
@@ -98,8 +91,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Build repository
         run: |
-          mkdir build
-          cd build
+          mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DUNDEFINED_BEHAVIOR_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
           export AWS_KVS_LOG_LEVEL=3
           make
@@ -116,8 +108,7 @@ jobs:
       - name: Build repository
         continue-on-error: true
         run: |
-          mkdir build
-          cd build
+          mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DMEMORY_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
           export AWS_KVS_LOG_LEVEL=3
           make
@@ -134,8 +125,7 @@ jobs:
       - name: Build repository
         continue-on-error: true
         run: |
-          mkdir build
-          cd build
+          mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DTHREAD_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
           export AWS_KVS_LOG_LEVEL=3
           make
@@ -159,9 +149,8 @@ jobs:
       - name: Build repository
         run: |
           export CC=gcc-4.4
-          mkdir build
-          cd build
-          cd build && cmake .. -DBUILD_TEST=TRUE -DBUILD_COMMON_LWS=TRUE
+          mkdir build && cd build
+          cmake .. -DBUILD_TEST=TRUE -DBUILD_COMMON_LWS=TRUE
           export AWS_KVS_LOG_LEVEL=3
           make
           ulimit -c unlimited -S
