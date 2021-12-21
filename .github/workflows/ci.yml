@@ -1,4 +1,4 @@
-name: Producer SDK CI
+name: Producer C SDK CI
 
 on:
   push:
