@@ -168,6 +168,11 @@ jobs:
       - name: Build and run
         run: |
           choco install nasm strawberryperl
-          .github/build_windows.bat
-          cd build/tst && ./producer_test.exe --gtest_break_on_failure
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat"
+          mkdir build
+          cd build
+          cmd.exe /c cmake -G "NMake Makefiles" ..
+          cmake -G "NMake Makefiles" -DBUILD_TEST=TRUE ..
+          nmake
+          cd tst && ./producer_test.exe --gtest_break_on_failure
           
