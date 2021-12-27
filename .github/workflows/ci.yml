@@ -23,12 +23,16 @@ jobs:
   mac-os-catalina-build-gcc:
     runs-on: macos-latest
     env:
-      CC: gcc
+      CC: gcc-11
+      CXX: g++-11
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
       - name: Build repository and run tests with and without auth
         run: |
+          unset AWS_SESSION_TOKEN
           mkdir build && cd build
           sh -c 'cmake .. -DBUILD_TEST=TRUE;cmake .. -DBUILD_TEST=TRUE'
           make
@@ -38,11 +42,15 @@ jobs:
     runs-on: macos-latest
     env:
       CC: clang
+      CXX: clang++
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
       - name: Build repository
         run: |
+          unset AWS_SESSION_TOKEN
           mkdir build && cd build
           sh -c 'cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE;cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE'
           make
@@ -50,11 +58,15 @@ jobs:
 
   linux-gcc-code-coverage:
     runs-on: ubuntu-latest
+    env: 
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
       - name: Build repository
         run: |
+          unset AWS_SESSION_TOKEN
           mkdir build && cd build
           cmake .. -DCODE_COVERAGE=TRUE -DBUILD_TEST=TRUE -DBUILD_COMMON_LWS=TRUE
           export AWS_KVS_LOG_LEVEL=3
@@ -70,11 +82,15 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CC: clang
+      CXX: clang++
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
       - name: Build repository
         run: |
+          unset AWS_SESSION_TOKEN
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DADDRESS_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
           export AWS_KVS_LOG_LEVEL=3
@@ -86,11 +102,15 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CC: clang
+      CXX: clang++
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
       - name: Build repository
         run: |
+          unset AWS_SESSION_TOKEN
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DUNDEFINED_BEHAVIOR_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
           export AWS_KVS_LOG_LEVEL=3
@@ -102,12 +122,16 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CC: clang
+      CXX: clang++
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
       - name: Build repository
         continue-on-error: true
         run: |
+          unset AWS_SESSION_TOKEN
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DMEMORY_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
           export AWS_KVS_LOG_LEVEL=3
@@ -119,12 +143,16 @@ jobs:
     runs-on: ubuntu-18.04
     env:
       CC: clang
+      CXX: clang++
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
       - name: Build repository
         continue-on-error: true
         run: |
+          unset AWS_SESSION_TOKEN
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DTHREAD_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
           export AWS_KVS_LOG_LEVEL=3
@@ -134,6 +162,9 @@ jobs:
 
   linux-gcc-4_4:
     runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
@@ -148,6 +179,7 @@ jobs:
           sudo apt-get -y install gdb
       - name: Build repository
         run: |
+          unset AWS_SESSION_TOKEN
           export CC=gcc-4.4
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DBUILD_COMMON_LWS=TRUE
@@ -158,6 +190,9 @@ jobs:
 
   windows-msvc:
     runs-on: windows-2019
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
@@ -167,6 +202,7 @@ jobs:
           arch: x86
       - name: Build and run
         run: |
+          unset AWS_SESSION_TOKEN
           choco install nasm strawberryperl
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat"
           mkdir build
