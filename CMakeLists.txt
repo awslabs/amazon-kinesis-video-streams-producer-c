@@ -321,6 +321,9 @@ if(BUILD_COMMON_CURL)
     add_executable(kvsAudioVideoStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsAudioVideoStreamingSample.c)
     target_link_libraries(kvsAudioVideoStreamingSample cproducer)
 
+    add_executable(kvsAudioVideoMultipleEventsStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsAudioVideoMultipleEventsStreamingSample.c)
+    target_link_libraries(kvsAudioVideoMultipleEventsStreamingSample cproducer)
+
     if (BUILD_TEST)
         add_subdirectory(tst)
     endif()

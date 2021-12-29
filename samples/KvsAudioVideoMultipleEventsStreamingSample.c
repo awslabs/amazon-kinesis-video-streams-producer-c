@@ -74,7 +74,6 @@ PVOID putVideoFrameRoutine(PVOID args)
             if(gEventsEnabled) {
                 //generate an image and notification event at the start of the video stream.
                 putKinesisVideoEventMetadata(data->streamHandle, STREAM_EVENT_TYPE_NOTIFICATION | STREAM_EVENT_TYPE_IMAGE_GENERATION, NULL);
-                printf("Adding event metadata\n");
             }
         }
 
@@ -92,6 +91,13 @@ PVOID putVideoFrameRoutine(PVOID args)
         frame.flags = fileIndex % DEFAULT_KEY_FRAME_INTERVAL == 0 ? FRAME_FLAG_KEY_FRAME : FRAME_FLAG_NONE;
         frame.frameData = data->videoFrames[fileIndex].buffer;
         frame.size = data->videoFrames[fileIndex].size;
+        if(fileIndex % DEFAULT_KEY_FRAME_INTERVAL == 1) {
+            if(gEventsEnabled) {
+                //generate an image and notification event at the start of the video stream.
+                putKinesisVideoEventMetadata(data->streamHandle, STREAM_EVENT_TYPE_NOTIFICATION | STREAM_EVENT_TYPE_IMAGE_GENERATION, NULL);
+                printf("Adding event metadata\n");
+            }
+        }
 
         // synchronize putKinesisVideoFrame to running time
         runningTime = defaultGetTime() - data->streamStartTime;
