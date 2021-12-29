@@ -301,7 +301,7 @@ extern "C" {
 /**
  * Control plane prefix
  */
-#define CONTROL_PLANE_URI_PREFIX "https://"
+#define CONTROL_PLANE_URI_PREFIX "https://beta."
 
 /**
  * KVS service name
