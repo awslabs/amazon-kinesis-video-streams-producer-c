@@ -92,8 +92,7 @@ If you want to use the sample for `PCM_ALAW/G.711` frames, run
 
 This will stream the video/audio files from the `samples/h264SampleFrames` and `samples/aacSampleFrames` or `samples/alawSampleFrames` (as per the choice of audio codec in the last argument) respectively. 
 
-For this private beta, events have been enabled by default. For a single notication at the start of the stream, use kvsAudioVideoStreamingSample, for an event on every key frame use kvsAudioVideoMultipleEventsStreamingSample.
-You can adjust when you want to attach an event as you see you fit by changing when putKinesisVideoEvent().
+The samples show the usage of the “putKinesisVideoEventMetadata ()” API in two places - one at the start of the stream and another at every fragment. You could decide when to call the new KVS C Producer SDK API “putKinesisVideoEventMetadata ()” within your client application based on your use case.
 
 For video only, run `./kvsVideoOnlyStreamingSample <channel-name>`
 
