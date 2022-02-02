@@ -251,7 +251,8 @@ jobs:
       - name: Build and run
         run: |
           choco install nasm strawberryperl
-          set PATH=%PATH%;\c\Strawberry\perl\site\bin;\c\Strawberry\perl\bin:\c\Strawberry\c\bin;\c\Program Files\NASM:%cd%\open-source\lib;%cd%\open-source\bin
+          echo %cd%
+          set PATH=%PATH%;C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;C:\"Program Files"\NASM;%cd%\open-source\lib;%cd%\open-source\bin
           .github/build_windows.bat
           cd tst && ./producer_test.exe --gtest_break_on_failure
   # arm-cross-compilation:
