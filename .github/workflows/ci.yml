@@ -252,9 +252,8 @@ jobs:
         run: |
           pwd
           choco install nasm strawberryperl
-          $env:Path += ";C:\Strawberry\perl\site\bin"
+          $env:Path += ";C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;C:\Program Files\NASM;$pwd\open-source\lib;$pwd\open-source\bin"
           echo $env:Path
-          set PATH=%PATH%;C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin
           .github/build_windows.bat
           cd tst && ./producer_test.exe --gtest_break_on_failure
   # arm-cross-compilation:
