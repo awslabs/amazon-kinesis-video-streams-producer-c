@@ -252,11 +252,10 @@ jobs:
         run: |
           pwd
           choco install nasm strawberryperl
-          $env:Path += ';C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin'
-          $env:Path += ';"C:\Program Files\NASM"'
-          $env:Path += ';"$pwd\open-source\lib"'
-          $env:Path += ';"$pwd\open-source\bin"'
+          $env:Path += ';C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;C:\Program Files\NASM;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\lib;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\bin'
           echo $env:Path
+          .github/build_windows.bat
+
   # arm-cross-compilation:
   #   runs-on: ubuntu-latest
   #   steps:
