@@ -254,7 +254,8 @@ jobs:
           $env:Path += ';C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;C:\Program Files\NASM;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\lib;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\bin'
           git config --system core.longpaths true
           .github/build_windows.bat
-          cd tst && producer_test.exe --gtest_break_on_failure
+          cd build\tst
+          & "D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\build\producer_test.exe" --gtest_break_on_failure
 
   # arm-cross-compilation:
   #   runs-on: ubuntu-latest
