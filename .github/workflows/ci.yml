@@ -246,16 +246,13 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
       - name: Clone repository
         uses: actions/checkout@v2
+
       - name: Build and run
         run: |
           choco install nasm strawberryperl
           $env:Path += ';C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;C:\Program Files\NASM;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\lib;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\bin'
           git config --system core.longpaths true
-          mkdir build
-          cd build
-          cmake -G "NMake Makefiles" -DBUILD_TEST=TRUE ..
-          nmake
-          D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\build\tst\producer_test.exe --gtest_break_on_failure
+          .github/build_windows.bat
   # arm-cross-compilation:
   #   runs-on: ubuntu-latest
   #   steps:
