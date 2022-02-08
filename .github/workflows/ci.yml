@@ -51,9 +51,6 @@ jobs:
     permissions:
       id-token: write
       contents: read
-    env:
-      CC: clang
-      CXX: clang++
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
