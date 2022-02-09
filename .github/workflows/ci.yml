@@ -3,8 +3,7 @@ name: Producer C SDK CI
 on:
   push:
     branches:
-      - develop
-      - master
+    - github_actions_windows_setup
   pull_request:
     branches:
       - develop
