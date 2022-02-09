@@ -3,11 +3,12 @@ name: Producer C SDK CI
 on:
   push:
     branches:
-    - github_actions_windows_setup
+      - github_actions_windows_setup
   pull_request:
     branches:
       - develop
       - master
+
 jobs:
   windows-msvc:
     runs-on: windows-2022
@@ -15,14 +16,14 @@ jobs:
       id-token: write
       contents: read
     steps:
-        name: Configure AWS Credentials
+      - name: Clone repository
+        uses: actions/checkout@v2
+      - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
           aws-region: ${{ secrets.AWS_REGION }}
-      - name: Clone repository
-        uses: actions/checkout@v2
       - name: Build and run
         run: |
           choco install nasm strawberryperl
