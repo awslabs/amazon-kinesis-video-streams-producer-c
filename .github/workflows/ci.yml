@@ -23,13 +23,13 @@ jobs:
   #         bash scripts/check-clang.sh
 
   mac-os-catalina-build-gcc:
-    runs-on: macos-latest
+    runs-on: macos-10.15
     permissions:
       id-token: write
       contents: read
     env:
-      CC: gcc
-      CXX: gcc++
+      CC: gcc-11
+      CXX: gcc++-11
     steps:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -47,7 +47,7 @@ jobs:
           ./tst/producer_test --gtest_break_on_failure
 
   mac-os-catalina-build-clang:
-    runs-on: macos-latest
+    runs-on: macos-10.15
     permissions:
       id-token: write
       contents: read
