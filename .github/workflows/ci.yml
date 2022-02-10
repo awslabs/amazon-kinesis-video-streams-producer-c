@@ -230,7 +230,8 @@ jobs:
           make
           ulimit -c unlimited -S
           timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
-windows-msvc:
+
+  windows-msvc:
     runs-on: windows-2022
     permissions:
       id-token: write
@@ -252,6 +253,7 @@ windows-msvc:
           $env:AWS_KVS_LOG_LEVEL=7
           .github/build_windows.bat
           & "D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\build\tst\producer_test.exe" --gtest_filter="-ProducerFunctionalityTest.pressure_on_buffer_duration_fail_new_connection_at_token_rotation"
+  
   arm-cross-compilation:
     runs-on: ubuntu-18.04
     steps:
