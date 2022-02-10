@@ -28,8 +28,8 @@ jobs:
       id-token: write
       contents: read
     env:
-      CC: gcc-11
-      CXX: g++-11
+      CC: gcc
+      CXX: gcc++
     steps:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -45,12 +45,15 @@ jobs:
           sh -c 'cmake .. -DBUILD_TEST=TRUE;cmake .. -DBUILD_TEST=TRUE'
           make
           ./tst/producer_test --gtest_break_on_failure
-
+          
   mac-os-catalina-build-clang:
     runs-on: macos-latest
     permissions:
       id-token: write
       contents: read
+    env:
+      CC: clang
+      CXX: clang++
     steps:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
