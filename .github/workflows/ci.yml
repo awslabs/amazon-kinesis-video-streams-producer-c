@@ -28,8 +28,8 @@ jobs:
       id-token: write
       contents: read
     env:
-      CC: gcc-11
-      CXX: gcc++-11
+      CC: gcc
+      CXX: gcc++
       AWS_KVS_LOG_LEVEL: 1
     steps:
       - name: Configure AWS Credentials
@@ -40,10 +40,8 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
       - name: Clone repository
         uses: actions/checkout@v2
-      - name: Build repository and run tests with and without auth
+      - name: Build repository and run tests
         run: |
-          echo $CC
-          echo $CXX
           mkdir build && cd build
           sh -c 'cmake .. -DBUILD_TEST=TRUE;cmake .. -DBUILD_TEST=TRUE'
           make
