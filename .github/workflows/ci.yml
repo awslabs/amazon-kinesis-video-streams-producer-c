@@ -30,6 +30,7 @@ jobs:
     env:
       CC: gcc-11
       CXX: gcc++-11
+      AWS_KVS_LOG_LEVEL: 1
     steps:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -41,19 +42,20 @@ jobs:
         uses: actions/checkout@v2
       - name: Build repository and run tests with and without auth
         run: |
+          echo $CC
+          echo $CXX
           mkdir build && cd build
           sh -c 'cmake .. -DBUILD_TEST=TRUE;cmake .. -DBUILD_TEST=TRUE'
           make
           ./tst/producer_test --gtest_break_on_failure
 
   mac-os-catalina-build-clang:
-    runs-on: macos-10.15
+    runs-on: macos-latest
     permissions:
       id-token: write
       contents: read
     env:
-      CC: clang
-      CXX: clang++
+      AWS_KVS_LOG_LEVEL: 1
     steps:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -72,6 +74,8 @@ jobs:
 
   # linux-gcc-code-coverage:
   #   runs-on: ubuntu-18.04
+  #    env:
+  #      AWS_KVS_LOG_LEVEL: 3
   #   permissions:
   #     id-token: write
   #     contents: read
@@ -88,7 +92,6 @@ jobs:
   #       run: |
   #         mkdir build && cd build
   #         cmake .. -DCODE_COVERAGE=TRUE -DBUILD_TEST=TRUE -DBUILD_COMMON_LWS=TRUE
-  #         export AWS_KVS_LOG_LEVEL=3
   #         make
   #         ulimit -c unlimited -S
   #         timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
@@ -105,6 +108,7 @@ jobs:
   #   env:
   #     CC: clang
   #     CXX: clang++
+  #      AWS_KVS_LOG_LEVEL: 3
   #   steps:
   #     - name: Clone repository
   #       uses: actions/checkout@v2
@@ -118,7 +122,6 @@ jobs:
   #       run: |
   #         mkdir build && cd build
   #         cmake .. -DBUILD_TEST=TRUE -DADDRESS_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
-  #         export AWS_KVS_LOG_LEVEL=3
   #         make
   #         ulimit -c unlimited -S
   #         timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
@@ -131,6 +134,7 @@ jobs:
   #   env:
   #     CC: clang
   #     CXX: clang++
+  #     AWS_KVS_LOG_LEVEL: 3
   #   steps:
   #     - name: Clone repository
   #       uses: actions/checkout@v2
@@ -144,7 +148,6 @@ jobs:
   #       run: |
   #         mkdir build && cd build
   #         cmake .. -DBUILD_TEST=TRUE -DUNDEFINED_BEHAVIOR_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
-  #         export AWS_KVS_LOG_LEVEL=3
   #         make
   #         ulimit -c unlimited -S
   #         timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
@@ -157,6 +160,7 @@ jobs:
   #   env:
   #     CC: clang
   #     CXX: clang++
+  #     AWS_KVS_LOG_LEVEL: 3
   #   steps:
   #     - name: Clone repository
   #       uses: actions/checkout@v2
@@ -170,7 +174,6 @@ jobs:
   #       run: |
   #         mkdir build && cd build
   #         cmake .. -DBUILD_TEST=TRUE -DMEMORY_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
-  #         export AWS_KVS_LOG_LEVEL=3
   #         make
   #         ulimit -c unlimited -S
   #         timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
@@ -183,6 +186,7 @@ jobs:
   #   env:
   #     CC: clang
   #     CXX: clang++
+  #     AWS_KVS_LOG_LEVEL: 3
   #   steps:
   #     - name: Clone repository
   #       uses: actions/checkout@v2
@@ -196,13 +200,15 @@ jobs:
   #       run: |
   #         mkdir build && cd build
   #         cmake .. -DBUILD_TEST=TRUE -DTHREAD_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
-  #         export AWS_KVS_LOG_LEVEL=3
   #         make
   #         ulimit -c unlimited -S
   #         timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
 
   # linux-gcc-4_4:
   #   runs-on: ubuntu-18.04
+  #   env:
+  #      AWS_KVS_LOG_LEVEL: 3
+  #      CC: gcc-4.4
   #   permissions:
   #     id-token: write
   #     contents: read
@@ -226,10 +232,8 @@ jobs:
   #         sudo apt-get -y install gdb
   #     - name: Build repository
   #       run: |
-  #         export CC=gcc-4.4
   #         mkdir build && cd build
   #         cmake .. -DBUILD_TEST=TRUE -DBUILD_COMMON_LWS=TRUE
-  #         export AWS_KVS_LOG_LEVEL=3
   #         make
   #         ulimit -c unlimited -S
   #         timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
@@ -259,6 +263,10 @@ jobs:
   
   # arm-cross-compilation:
   #   runs-on: ubuntu-18.04
+  #   env:
+  #      CC: arm-linux-gnueabi-gcc
+  #      CXX: arm-linux-gnueabi-g++
+  #      AR: arm-linux-gnueabi-ar
   #   steps:
   #     - name: Set up QEMU
   #       id: qemu
@@ -275,7 +283,6 @@ jobs:
   #       run: |
   #         sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'
   #         mkdir build && cd build
-  #         export CC=arm-linux-gnueabi-gcc CXX=arm-linux-gnueabi-g++ AR=arm-linux-gnueabi-ar
   #         cmake .. -DBUILD_TEST=TRUE -DBUILD_OPENSSL_PLATFORM=linux-generic32
   #         make
           
