@@ -29,7 +29,7 @@ jobs:
       contents: read
     env:
       CC: gcc
-      CXX: gcc++
+      CXX: g++
       AWS_KVS_LOG_LEVEL: 1
     steps:
       - name: Configure AWS Credentials
@@ -54,6 +54,8 @@ jobs:
       contents: read
     env:
       AWS_KVS_LOG_LEVEL: 1
+      CC: clang
+      CXX: clang++
     steps:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
