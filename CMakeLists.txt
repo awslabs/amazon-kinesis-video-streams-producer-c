@@ -5,7 +5,6 @@ project(KinesisVideoProducerC LANGUAGES C)
 
 include(GNUInstallDirs)
 
-
 # User Flags
 option(ADD_MUCLIBC "Add -muclibc c flag" OFF)
 option(BUILD_STATIC "Static build" OFF)
@@ -15,6 +14,7 @@ option(USE_MBEDTLS "Use mbedtls as crypto library" OFF)
 option(BUILD_COMMON_LWS "Whether or not to build ProducerC libwebsockets common library" OFF)
 option(BUILD_COMMON_CURL "Whether or not to build ProducerC curl common library" ON)
 option(BUILD_OPENSSL_PLATFORM "If buildng OpenSSL what is the target platform" OFF)
+option(BUILD_AWS_CRT "Build AWS CRT" ON)
 
 # Developer Flags
 option(BUILD_TEST "Build the testing tree." OFF)
@@ -87,6 +87,18 @@ if(BUILD_DEPENDENCIES)
                     -DUSE_OPENSSL=${USE_OPENSSL}
                     -DUSE_MBEDTLS=${USE_MBEDTLS})
     build_dependency(curl ${BUILD_ARGS})
+  endif()
+
+  if(BUILD_AWS_CRT)
+      build_dependency(awscommon)
+      build_dependency(awslc)
+      build_dependency(awscal) #this needs awslc
+      build_dependency(s2ntls) #this needs awslc
+      build_dependency(awsio) #this needs awscal, s2ntls and awscommon
+      build_dependency(awscompression) #this needs awscommon
+      build_dependency(awshttp) #needs awsio and awscompression
+      build_dependency(awssdkutils) #this needs awscommon
+      build_dependency(awsauth) #this needs awscal, awshttp and awssdkutils
   endif()
 
   if(BUILD_TEST)

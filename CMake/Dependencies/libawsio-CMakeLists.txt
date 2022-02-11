@@ -1,0 +1,16 @@
+# Need to update to v0.10.19 once aws-c-common new version is released.
+# aws-c-common introduces a new macro AWS_ERROR_PLATFORM_NOT_SUPPORTED which is being used in aws-c-io 0.10.19
+# Using aws-c-common most recent version with 0.10.19 leads to `AWS_ERROR_PLATFORM_NOT_SUPPORTED` undefined error
+# Once the macro is available in an official release in common, but aws-c-common and aws-c-io must be updated.
+
+cmake_minimum_required(VERSION 3.6.3)
+
+project(libawsio-download NONE)
+include(ExternalProject)
+
+ExternalProject_Add(project_libawsio
+    GIT_REPOSITORY    https://github.com/awslabs/aws-c-io.git
+    GIT_TAG           v0.10.15
+    CMAKE_ARGS        -DCMAKE_PREFIX_PATH=${OPEN_SRC_INSTALL_PREFIX}
+                      -DCMAKE_INSTALL_PREFIX=${OPEN_SRC_INSTALL_PREFIX}
+)
