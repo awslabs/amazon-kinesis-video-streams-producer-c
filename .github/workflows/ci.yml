@@ -22,7 +22,7 @@ jobs:
   #       run: |
   #         bash scripts/check-clang.sh
 
-  mac-os-catalina-build-gcc:
+  mac-os-build-gcc:
     runs-on: macos-10.15
     permissions:
       id-token: write
@@ -30,47 +30,45 @@ jobs:
     env:
       CC: gcc
       CXX: g++
-      AWS_KVS_LOG_LEVEL: 1
+      AWS_KVS_LOG_LEVEL: 2
     steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
           aws-region: ${{ secrets.AWS_REGION }}
-      - name: Clone repository
-        uses: actions/checkout@v2
-      - name: Build repository and run tests
+      - name: Build repository
         run: |
           mkdir build && cd build
           sh -c 'cmake .. -DBUILD_TEST=TRUE;cmake .. -DBUILD_TEST=TRUE'
           make
-          ./tst/producer_test --gtest_break_on_failure
+          ./tst/producer_test
 
-  mac-os-catalina-build-clang:
+  mac-os-build-clang:
     runs-on: macos-latest
+    env:
+      AWS_KVS_LOG_LEVEL: 2
     permissions:
       id-token: write
       contents: read
-    env:
-      AWS_KVS_LOG_LEVEL: 1
-      CC: clang
-      CXX: clang++
     steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
           aws-region: ${{ secrets.AWS_REGION }}
-      - name: Clone repository
-        uses: actions/checkout@v2
       - name: Build repository
         run: |
           mkdir build && cd build
           sh -c 'cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE;cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE'
           make
-          ./tst/producer_test --gtest_break_on_failure
+          ./tst/producer_test
 
   # linux-gcc-code-coverage:
   #   runs-on: ubuntu-18.04
