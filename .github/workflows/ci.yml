@@ -2,7 +2,8 @@ name: Producer C SDK CI
 
 on:
   push:
-    branches: ["**"]
+    branches: 
+      - github_actions_mac_setup
   pull_request:
     branches:
       - develop
