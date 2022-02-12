@@ -1,0 +1,68 @@
+name: Producer C SDK CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches:
+      - develop
+      - master
+jobs:
+  # clang-format-check:
+  #   runs-on: macos-latest
+  #   steps:
+  #     - name: Clone repository
+  #       uses: actions/checkout@v2
+  #     - name: Install clang-format
+  #       run: |
+  #         brew install clang-format@8
+  #     - name: Run clang format check
+  #       run: |
+  #         bash scripts/check-clang.sh
+
+  mac-os-build-gcc:
+    runs-on: macos-10.15
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      CC: gcc
+      CXX: g++
+      AWS_KVS_LOG_LEVEL: 2
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Build repository
+        run: |
+          mkdir build && cd build
+          sh -c 'cmake .. -DBUILD_TEST=TRUE;cmake .. -DBUILD_TEST=TRUE'
+          make
+          ./tst/producer_test
+  mac-os-build-clang:
+    runs-on: macos-latest
+    env:
+      AWS_KVS_LOG_LEVEL: 2
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Build repository
+        run: |
+          mkdir build && cd build
+          sh -c 'cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE;cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE'
+          make
+          ./tst/producer_test
