@@ -51,6 +51,8 @@ struct __CurlRequest {
     // upload handle if request.streaming is TRUE
     UPLOAD_HANDLE uploadHandle;
     // Body of the request will follow if specified
+
+    //UINT64
 };
 typedef struct __CurlRequest* PCurlRequest;
 

@@ -20,6 +20,13 @@ extern "C" {
 #define TAG_RESOURCE_API_POSTFIX      "/tagStream"
 #define PUT_MEDIA_API_POSTFIX         "/putMedia"
 
+// API map to UINT64 for clock skew map
+#define CREATE_API_ID            ((UINT64) 0)       // 0x00
+#define DESCRIBE_API_ID          ((UINT64)(1 << 0)) // 0x01
+#define GET_DATA_ENDPOINT_ID     ((UINT64)(1 << 1)) // 0x02
+#define TAG_RESOURCE_ID          ((UINT64)(1 << 2)) // 0x04
+#define PUT_MEDIA_ID             ((UINT64)(1 << 3)) // 0x08
+
 // NOTE: THe longest string would be the tag resource where we get the maximal tag count and sizes plus some extra.
 #define MAX_TAGS_JSON_PARAMETER_STRING_LEN (MAX_JSON_PARAMETER_STRING_LEN + (MAX_TAG_COUNT * (MAX_TAG_NAME_LEN + MAX_TAG_VALUE_LEN)))
 

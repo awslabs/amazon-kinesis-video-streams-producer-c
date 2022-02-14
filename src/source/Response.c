@@ -431,6 +431,8 @@ STATUS curlCompleteSync(PCurlResponse pCurlResponse)
             STRCAT(headers, header->data);
         }
 
+        //pCurlResponse->callInfo.
+
         DLOGW("HTTP Error %lu : Response: %s\nRequest URL: %s\nRequest Headers:%s", pCurlResponse->callInfo.httpStatus,
               pCurlResponse->callInfo.responseData, url, headers);
     }
@@ -480,6 +482,8 @@ SIZE_T writeHeaderCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID cu
     SIZE_T dataSize, nameLen, valueLen;
     PCHAR pValueStart, pValueEnd;
     PRequestHeader pRequestHeader;
+    time_t t;
+    UINT64 currentTime;
 
     PCurlRequest pCurlRequest = (PCurlRequest) customData;
     if (pCurlRequest == NULL) {
@@ -492,6 +496,9 @@ SIZE_T writeHeaderCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID cu
     if (pCurlResponse == NULL) {
         return CURL_READFUNC_ABORT;
     }
+
+    // This is how to get current time
+    // currentTime = pCurlRequest->pCurlApiCallbacks->pCallbacksProvider->clientCallbacks.getCurrentTimeFn(pCurlRequest->pCurlApiCallbacks->pCallbacksProvider->clientCallbacks.customData);
 
     PCHAR pDelimiter = STRNCHR(pBuffer, (UINT32) dataSize, ':');
     if (pDelimiter != NULL) {
@@ -510,6 +517,11 @@ SIZE_T writeHeaderCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID cu
         // Only process if we have less than max
         if (nameLen < MAX_REQUEST_HEADER_NAME_LEN && valueLen < MAX_REQUEST_HEADER_VALUE_LEN) {
             createRequestHeader(pBuffer, (UINT32) nameLen, pValueStart, (UINT32) valueLen, &pRequestHeader);
+            DLOGV("Response Header:  %s : %s", pRequestHeader->pName, pRequestHeader->pValue);
+            if (STRNCMP(pRequestHeader->pName, "Date", nameLen) == 0) {
+                t = curl_getdate(pRequestHeader->pValue, NULL);
+                DLOGV("Epoch Seconds:  %llu", t);
+            }
 
             if (pRequestHeader != NULL) {
                 stackQueueEnqueue(pCurlResponse->callInfo.pResponseHeaders, (UINT64) pRequestHeader);

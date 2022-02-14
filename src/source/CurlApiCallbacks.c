@@ -979,6 +979,8 @@ STATUS createStreamCurl(UINT64 customData, PCHAR deviceName, PCHAR streamName, P
     pCallbacksProvider->clientCallbacks.lockMutexFn(pCallbacksProvider->clientCallbacks.customData, pCurlRequest->startLock);
     startLocked = TRUE;
 
+
+
     // Start the request/response thread
     CHK_STATUS(THREAD_CREATE(&threadId, createStreamCurlHandler, (PVOID) pCurlRequest));
     CHK_STATUS(THREAD_DETACH(threadId));
