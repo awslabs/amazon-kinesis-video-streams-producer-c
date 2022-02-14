@@ -48,6 +48,7 @@ matrix:
       os: osx
       osx_image: xcode12.5
       compiler: gcc
+      env: CPATH=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include
       before_script:
         - mkdir build && cd build && cmake .. -DBUILD_TEST=TRUE
       script:
@@ -59,6 +60,7 @@ matrix:
       os: osx
       osx_image: xcode12.5
       compiler: clang
+      env: CPATH=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include
       before_script:
         - mkdir build && cd build && cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE
       script:
