@@ -46,7 +46,7 @@ matrix:
     # MacOS Builds
     - name: "OSX GCC"
       os: osx
-      osx_image: xcode12.5
+      osx_image: xcode12
       compiler: gcc
       env: CPATH=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include
       before_script:
@@ -58,7 +58,7 @@ matrix:
 
     - name: "OSX Clang"
       os: osx
-      osx_image: xcode12.5
+      osx_image: xcode12
       compiler: clang
       env: CPATH=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include
       before_script:
