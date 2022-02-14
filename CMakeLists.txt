@@ -91,9 +91,11 @@ if(BUILD_DEPENDENCIES)
 
   if(BUILD_AWS_CRT)
       build_dependency(awscommon)
-      build_dependency(awslc)
+      if (UNIX AND NOT APPLE)
+        build_dependency(awslc)
+        build_dependency(s2ntls) #this needs awslc
+      endif()
       build_dependency(awscal) #this needs awslc
-      build_dependency(s2ntls) #this needs awslc
       build_dependency(awsio) #this needs awscal, s2ntls and awscommon
       build_dependency(awscompression) #this needs awscommon
       build_dependency(awshttp) #needs awsio and awscompression
@@ -134,6 +136,9 @@ endif()
 ############# find dependent libraries ############
 
 find_package(Threads)
+if(APPLE)
+    list(APPEND PLATFORM_LIBS dl Threads::Threads "-framework CoreFoundation")
+endif()
 
 set(OPEN_SRC_INCLUDE_DIRS ${LIBKVSPIC_INCLUDE_DIRS})
 
@@ -291,7 +296,8 @@ if(BUILD_COMMON_CURL)
     target_link_libraries(kvsCommonCurl
             ${PRODUCER_CRYPTO_LIBRARY}
             kvspicUtils
-            ${CURL_LIBRARIES})
+            ${CURL_LIBRARIES}
+            aws-c-common)
 
     install(
       TARGETS kvsCommonCurl
@@ -316,7 +322,7 @@ if(BUILD_COMMON_CURL)
     else()
       add_library(cproducer ${TYPE_OF_LIB} ${PRODUCER_C_SOURCE_FILES})
     endif()
-    target_link_libraries(cproducer PUBLIC kvsCommonCurl kvspic)
+    target_link_libraries(cproducer PUBLIC kvsCommonCurl kvspic aws-c-common)
 
     install(
       TARGETS cproducer

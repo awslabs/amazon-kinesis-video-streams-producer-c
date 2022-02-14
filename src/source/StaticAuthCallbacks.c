@@ -16,6 +16,10 @@ STATUS createStaticAuthCallbacks(PClientCallbacks pCallbacksProvider, PCHAR acce
     PAwsCredentialProvider pCredentialProvider = NULL;
 
     CHK(pCallbacksProvider != NULL && ppStaticAuthCallbacks != NULL, STATUS_NULL_ARG);
+    struct aws_allocator *allocator;
+    struct aws_mutex mutex = AWS_MUTEX_INIT;
+    aws_mutex_lock(&mutex);
+//    aws_mutex_unlock(&mutex);
 
     // Allocate the entire structure
     pStaticAuthCallbacks = (PStaticAuthCallbacks) MEMCALLOC(1, SIZEOF(StaticAuthCallbacks));
