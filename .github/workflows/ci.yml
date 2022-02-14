@@ -21,6 +21,41 @@ jobs:
   #       run: |
   #         bash scripts/check-clang.sh
 
+  mac-os-build-gcc-ltc:
+    runs-on: macos-latest
+    env:
+      CC: gcc-11
+      CXX: g++-11
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+      - name: Build repository and run tests with and without auth
+        run: |
+          unset AWS_SESSION_TOKEN
+          mkdir build && cd build
+          sh -c 'cmake .. -DBUILD_TEST=TRUE;cmake .. -DBUILD_TEST=TRUE'
+          make
+          ./tst/producer_test --gtest_break_on_failure
+  mac-os-build-clang-ltc:
+    runs-on: macos-latest
+    env:
+      CC: clang
+      CXX: clang++
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+      - name: Build repository
+        run: |
+          unset AWS_SESSION_TOKEN
+          mkdir build && cd build
+          sh -c 'cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE;cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE'
+          make
+          ./tst/producer_test --gtest_break_on_failure
+
   mac-os-build-gcc:
     runs-on: macos-10.15
     permissions:
