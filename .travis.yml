@@ -46,6 +46,7 @@ matrix:
     # MacOS Builds
     - name: "OSX GCC"
       os: osx
+      osx_image: xcode12.5
       compiler: gcc
       before_script:
         - mkdir build && cd build && cmake .. -DBUILD_TEST=TRUE
@@ -56,6 +57,7 @@ matrix:
 
     - name: "OSX Clang"
       os: osx
+      osx_image: xcode12.5
       compiler: clang
       before_script:
         - mkdir build && cd build && cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE
