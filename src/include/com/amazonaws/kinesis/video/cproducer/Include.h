@@ -15,9 +15,6 @@ extern "C" {
 ////////////////////////////////////////////////////
 #include <com/amazonaws/kinesis/video/client/Include.h>
 #include <com/amazonaws/kinesis/video/common/Include.h>
-#include <aws/common/logging.h>
-#include <aws/common/allocator.h>
-#include <aws/common/mutex.h>
 
 ////////////////////////////////////////////////////
 /// Producer base return codes

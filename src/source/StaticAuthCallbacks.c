@@ -16,19 +16,6 @@ STATUS createStaticAuthCallbacks(PClientCallbacks pCallbacksProvider, PCHAR acce
     PAwsCredentialProvider pCredentialProvider = NULL;
 
     CHK(pCallbacksProvider != NULL && ppStaticAuthCallbacks != NULL, STATUS_NULL_ARG);
-//    struct aws_logger logger;
-//    AWS_ZERO_STRUCT(logger);
-//    struct aws_logger_standard_options logger_options = {
-//            .level = AWS_LOG_LEVEL_INFO,
-//            .file = stderr,
-//    };
-//    aws_logger_init_standard(&logger, aws_default_allocator(), &logger_options);
-//    aws_logger_set(&logger);
-//    printf("initialized logger\n");
-//    struct aws_allocator *allocator = aws_mem_tracer_new(aws_default_allocator(), NULL, AWS_MEMTRACE_STACKS, 8);
-    struct aws_mutex mutex = AWS_MUTEX_INIT;
-    aws_mutex_lock(&mutex);
-    aws_mutex_unlock(&mutex);
 
     // Allocate the entire structure
     pStaticAuthCallbacks = (PStaticAuthCallbacks) MEMCALLOC(1, SIZEOF(StaticAuthCallbacks));
