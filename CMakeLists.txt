@@ -31,6 +31,10 @@ set(CMAKE_MACOSX_RPATH TRUE)
 
 get_filename_component(ROOT "${CMAKE_CURRENT_SOURCE_DIR}" ABSOLUTE)
 
+if(APPLE)
+    set(CFLIBRARY "-framework CoreFoundation")
+endif()
+
 if(NOT KINESIS_VIDEO_PRODUCER_C_SRC)
     if(DEFINED ENV{KINESIS_VIDEO_PRODUCER_C_SRC})
         set(KINESIS_VIDEO_PRODUCER_C_SRC $ENV{KINESIS_VIDEO_PRODUCER_C_SRC})
@@ -136,9 +140,6 @@ endif()
 ############# find dependent libraries ############
 
 find_package(Threads)
-if(APPLE)
-    list(APPEND PLATFORM_LIBS dl Threads::Threads "-framework CoreFoundation")
-endif()
 
 set(OPEN_SRC_INCLUDE_DIRS ${LIBKVSPIC_INCLUDE_DIRS})
 
@@ -294,6 +295,7 @@ if(BUILD_COMMON_CURL)
     add_library(kvsCommonCurl STATIC ${KVS_COMMON_SOURCE_FILES_BASE} ${KVS_COMMON_SOURCE_FILES_CURL})
     target_compile_definitions(kvsCommonCurl PRIVATE KVS_BUILD_WITH_CURL ${CPRODUCER_COMMON_TLS_OPTION})
     target_link_libraries(kvsCommonCurl
+            ${CFLIBRARY}
             ${PRODUCER_CRYPTO_LIBRARY}
             kvspicUtils
             ${CURL_LIBRARIES}
@@ -322,7 +324,7 @@ if(BUILD_COMMON_CURL)
     else()
       add_library(cproducer ${TYPE_OF_LIB} ${PRODUCER_C_SOURCE_FILES})
     endif()
-    target_link_libraries(cproducer PUBLIC kvsCommonCurl kvspic aws-c-common)
+    target_link_libraries(cproducer PUBLIC kvsCommonCurl ${CFLIBRARY} kvspic aws-c-common)
 
     install(
       TARGETS cproducer
