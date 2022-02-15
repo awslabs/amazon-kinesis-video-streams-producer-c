@@ -53,7 +53,7 @@ matrix:
         - mkdir build && cd build && cmake .. -DBUILD_TEST=TRUE
       script:
         - make
-        - AWS_KVS_LOG_LEVEL=2 ./tst/producer_test --gtest_break_on_failure --gtest_filter="ProducerClientBasicTest.create_produce_*:ProducerFunctionalityTest.pressure_on_buffer_duration_fail_old_connection_at_token_rotation:ProducerFunctionalityTest.curl_timeout_idling_force_ack:ProducerFunctionalityTest.dropTailFragPolicyBufferOverflowNoInvalidMkv"
+        - ./tst/producer_test --gtest_break_on_failure
       after_failure: skip # timeout not available on MacOS
 
     - name: "OSX Clang"
@@ -65,7 +65,7 @@ matrix:
         - mkdir build && cd build && cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE
       script:
         - make
-        - AWS_KVS_LOG_LEVEL=2 ./tst/producer_test --gtest_break_on_failure --gtest_filter="ProducerClientBasicTest.create_produce_*:ProducerFunctionalityTest.pressure_on_buffer_duration_fail_old_connection_at_token_rotation:ProducerFunctionalityTest.curl_timeout_idling_force_ack:ProducerFunctionalityTest.dropTailFragPolicyBufferOverflowNoInvalidMkv"
+        - ./tst/producer_test --gtest_break_on_failure
       after_failure: skip # timeout not available on MacOS
 
     # Code Coverage

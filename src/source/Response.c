@@ -647,12 +647,9 @@ SIZE_T postReadCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID custo
         retStatus =
             getKinesisVideoStreamData(pCurlResponse->pCurlRequest->streamHandle, uploadHandle, (PBYTE) pBuffer, (UINT32) bufferSize, &retrievedSize);
 
-        DLOGE("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ %d 0x%.08x", __LINE__, retStatus);
-
         if (pCurlApiCallbacks->curlReadCallbackHookFn != NULL) {
             retStatus = pCurlApiCallbacks->curlReadCallbackHookFn(pCurlResponse, uploadHandle, (PBYTE) pBuffer, (UINT32) bufferSize, &retrievedSize,
                                                                   retStatus);
-        DLOGE("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ %d 0x%.08x", __LINE__, retStatus);
         }
 
         bytesWritten = (SIZE_T) retrievedSize;
@@ -663,7 +660,6 @@ SIZE_T postReadCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID custo
         iter++;
     } while(iter < MAX_GET_DATA_ITER && bytesWritten == 0 && (retStatus == STATUS_SUCCESS || retStatus == STATUS_NO_MORE_DATA_AVAILABLE));
 
-        DLOGE("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ %d 0x%.08x", __LINE__, retStatus);
     // The return should be OK, no more data or an end of stream
     switch (retStatus) {
         case STATUS_SUCCESS:
