@@ -347,6 +347,7 @@ PVOID ProducerClientTestBase::basicProducerRoutine(STREAM_HANDLE streamHandle, S
 
     UINT32 index = 0, persistentMetadataIndex = 0;
     UINT64 timestamp = GETTIME();
+    UINT64 diffTime;
     Frame frame;
     std::string persistentMetadataName;
     TID tid = GETTID();
@@ -449,7 +450,10 @@ EXPECT_TRUE(kinesis_video_stream->putFrame(eofr));
 
         // Sleep a while for non-offline modes
         if (streamingType != STREAMING_TYPE_OFFLINE) {
-            THREAD_SLEEP(TEST_FRAME_DURATION);
+            diffTime = GETTIME()-timestamp;
+            if (diffTime < TEST_FRAME_DURATION) {
+                THREAD_SLEEP(TEST_FRAME_DURATION-diffTime);
+            }
         }
     }
 
