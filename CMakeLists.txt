@@ -29,6 +29,18 @@ option(SET_SSL_CALLBACKS "Set SSL thread and lock callbacks." OFF)
 
 set(CMAKE_MACOSX_RPATH TRUE)
 
+# Empty set AWS CRT related variables
+set(CFLIBRARY)
+set(AWS_C_COMMON_LIBRARY)
+set(AWS_LC_LIBRARY)
+set(AWS_S2N_TLS_LIBRARY)
+set(AWS_C_CAL_LIBRARY)
+set(AWS_C_IO_LIBRARY)
+set(AWS_C_COMPRESSION_LIBRARY)
+set(AWS_C_HTTP_LIBRARY)
+set(AWS_C_SDKUTILS_LIBRARY)
+set(AWS_C_AUTH_LIBRARY)
+
 get_filename_component(ROOT "${CMAKE_CURRENT_SOURCE_DIR}" ABSOLUTE)
 
 if(NOT KINESIS_VIDEO_PRODUCER_C_SRC)
@@ -124,7 +136,7 @@ if(BUILD_AWS_CRT)
     set(AWS_C_IO_LIBRARY "aws-c-io")
     set(AWS_C_COMPRESSION_LIBRARY "aws-c-compression")
     set(AWS_C_HTTP_LIBRARY "aws-c-http")
-    set(AWS_SDK_UTILS_LIBRARY "aws-c-sdkutils")
+    set(AWS_C_SDKUTILS_LIBRARY "aws-c-sdkutils")
     set(AWS_C_AUTH_LIBRARY "aws-c-auth")
 endif()
 
