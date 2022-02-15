@@ -42,7 +42,16 @@ function(build_dependency lib_name)
       usrsctp
       websockets
       curl
-      mbedtls)
+      mbedtls
+      awscommon
+      awslc
+      awscal
+      s2ntls
+      awsio
+      awscompression
+      awssdkutils
+      awsauth
+      awshttp)
   list(FIND supported_libs ${lib_name} index)
   if(${index} EQUAL -1)
     message(WARNING "${lib_name} is not supported to build from source")

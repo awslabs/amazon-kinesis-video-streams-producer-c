@@ -1,0 +1,10 @@
+cmake_minimum_required(VERSION 3.6.3)
+
+project(libawscommon-download NONE)
+include(ExternalProject)
+
+ExternalProject_Add(project_libawscommon
+    GIT_REPOSITORY    https://github.com/awslabs/aws-c-common.git
+    GIT_TAG           v0.6.13
+    CMAKE_ARGS        -DCMAKE_INSTALL_PREFIX=${OPEN_SRC_INSTALL_PREFIX}
+)

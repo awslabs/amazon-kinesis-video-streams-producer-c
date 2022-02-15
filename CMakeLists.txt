@@ -5,7 +5,6 @@ project(KinesisVideoProducerC LANGUAGES C)
 
 include(GNUInstallDirs)
 
-
 # User Flags
 option(ADD_MUCLIBC "Add -muclibc c flag" OFF)
 option(BUILD_STATIC "Static build" OFF)
@@ -15,6 +14,7 @@ option(USE_MBEDTLS "Use mbedtls as crypto library" OFF)
 option(BUILD_COMMON_LWS "Whether or not to build ProducerC libwebsockets common library" OFF)
 option(BUILD_COMMON_CURL "Whether or not to build ProducerC curl common library" ON)
 option(BUILD_OPENSSL_PLATFORM "If buildng OpenSSL what is the target platform" OFF)
+option(BUILD_AWS_CRT "Build AWS CRT" ON) #Note this does not work for linux platform. Build tested on MacOS only
 
 # Developer Flags
 option(BUILD_TEST "Build the testing tree." OFF)
@@ -28,6 +28,18 @@ option(ALIGNED_MEMORY_MODEL "Aligned memory model ONLY." OFF)
 option(SET_SSL_CALLBACKS "Set SSL thread and lock callbacks." OFF)
 
 set(CMAKE_MACOSX_RPATH TRUE)
+
+# Empty set AWS CRT related variables
+set(CFLIBRARY)
+set(AWS_C_COMMON_LIBRARY)
+set(AWS_LC_LIBRARY)
+set(AWS_S2N_TLS_LIBRARY)
+set(AWS_C_CAL_LIBRARY)
+set(AWS_C_IO_LIBRARY)
+set(AWS_C_COMPRESSION_LIBRARY)
+set(AWS_C_HTTP_LIBRARY)
+set(AWS_C_SDKUTILS_LIBRARY)
+set(AWS_C_AUTH_LIBRARY)
 
 get_filename_component(ROOT "${CMAKE_CURRENT_SOURCE_DIR}" ABSOLUTE)
 
@@ -89,6 +101,20 @@ if(BUILD_DEPENDENCIES)
     build_dependency(curl ${BUILD_ARGS})
   endif()
 
+  if(BUILD_AWS_CRT)
+      build_dependency(awscommon)
+      if (UNIX AND NOT APPLE)
+        build_dependency(awslc)
+        build_dependency(s2ntls) #this needs awslc
+      endif()
+      build_dependency(awscal) #this needs awslc
+      build_dependency(awsio) #this needs awscal, s2ntls and awscommon
+      build_dependency(awscompression) #this needs awscommon
+      build_dependency(awshttp) #needs awsio and awscompression
+      build_dependency(awssdkutils) #this needs awscommon
+      build_dependency(awsauth) #this needs awscal, awshttp and awssdkutils
+  endif()
+
   if(BUILD_TEST)
     build_dependency(gtest)
   endif()
@@ -97,6 +123,22 @@ if(BUILD_DEPENDENCIES)
 endif()
 
 find_package(PkgConfig REQUIRED)
+
+############# Set AWS CRT based variables #############
+if(BUILD_AWS_CRT)
+    if(APPLE)
+        set(CFLIBRARY "-framework CoreFoundation")
+    endif()
+    set(AWS_C_COMMON_LIBRARY "aws-c-common")
+    set(AWS_LC_LIBRARY "AWSLC")
+    set(AWS_S2N_TLS_LIBRARY "s2n")
+    set(AWS_C_CAL_LIBRARY "aws-c-cal")
+    set(AWS_C_IO_LIBRARY "aws-c-io")
+    set(AWS_C_COMPRESSION_LIBRARY "aws-c-compression")
+    set(AWS_C_HTTP_LIBRARY "aws-c-http")
+    set(AWS_C_SDKUTILS_LIBRARY "aws-c-sdkutils")
+    set(AWS_C_AUTH_LIBRARY "aws-c-auth")
+endif()
 
 ############# Check system for kvspic #############
 
@@ -253,6 +295,7 @@ if(BUILD_COMMON_LWS)
     add_library(kvsCommonLws STATIC ${KVS_COMMON_SOURCE_FILES_BASE} ${KVS_COMMON_SOURCE_FILES_LWS})
     target_compile_definitions(kvsCommonLws PRIVATE KVS_BUILD_WITH_LWS ${CPRODUCER_COMMON_TLS_OPTION})
     target_link_libraries(kvsCommonLws
+            ${CFLIBRARY}
             ${OPENSSL_CRYPTO_LIBRARY}
             ${OPENSSL_SSL_LIBRARY}
             ${LIBWEBSOCKETS_LIBRARIES}
@@ -277,9 +320,11 @@ if(BUILD_COMMON_CURL)
     add_library(kvsCommonCurl STATIC ${KVS_COMMON_SOURCE_FILES_BASE} ${KVS_COMMON_SOURCE_FILES_CURL})
     target_compile_definitions(kvsCommonCurl PRIVATE KVS_BUILD_WITH_CURL ${CPRODUCER_COMMON_TLS_OPTION})
     target_link_libraries(kvsCommonCurl
+            ${CFLIBRARY}
             ${PRODUCER_CRYPTO_LIBRARY}
             kvspicUtils
-            ${CURL_LIBRARIES})
+            ${CURL_LIBRARIES}
+            ${AWS_C_COMMON_LIBRARY})
 
     install(
       TARGETS kvsCommonCurl
@@ -304,7 +349,7 @@ if(BUILD_COMMON_CURL)
     else()
       add_library(cproducer ${TYPE_OF_LIB} ${PRODUCER_C_SOURCE_FILES})
     endif()
-    target_link_libraries(cproducer PUBLIC kvsCommonCurl kvspic)
+    target_link_libraries(cproducer PUBLIC kvsCommonCurl ${CFLIBRARY} kvspic ${AWS_C_COMMON_LIBRARY})
 
     install(
       TARGETS cproducer
