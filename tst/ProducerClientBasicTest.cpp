@@ -575,7 +575,7 @@ TEST_F(ProducerClientBasicTest, create_produce_stream_parallel)
     }
 
     // Wait for some time to produce
-    THREAD_SLEEP(TEST_EXECUTION_DURATION);
+    THREAD_SLEEP(2*TEST_EXECUTION_DURATION);
 
     // Indicate the cancel for the threads
     mStopProducer = TRUE;
@@ -621,7 +621,7 @@ TEST_F(ProducerClientBasicTest, create_produce_client_parallel)
     }
 
     // Wait for some time to produce
-    THREAD_SLEEP(TEST_EXECUTION_DURATION);
+    THREAD_SLEEP(2*TEST_EXECUTION_DURATION);
 
     // Indicate the cancel for the threads
     mStopProducer = TRUE;
