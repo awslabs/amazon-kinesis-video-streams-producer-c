@@ -31,11 +31,11 @@ jobs:
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
-      - name: Build repository and run tests with and without auth
+      - name: Build repository and run tests
         run: |
           unset AWS_SESSION_TOKEN
           mkdir build && cd build
-          sh -c 'cmake .. -DBUILD_TEST=TRUE;cmake .. -DBUILD_TEST=TRUE'
+          cmake .. -DBUILD_TEST=TRUE
           make
           ./tst/producer_test --gtest_break_on_failure
   mac-os-build-clang-ltc:
@@ -45,6 +45,8 @@ jobs:
       CXX: clang++
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      LDFLAGS: -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib
+      CPATH: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
@@ -52,7 +54,7 @@ jobs:
         run: |
           unset AWS_SESSION_TOKEN
           mkdir build && cd build
-          sh -c 'cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE;cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE'
+          cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE
           make
           ./tst/producer_test --gtest_break_on_failure
 
@@ -77,13 +79,15 @@ jobs:
       - name: Build repository
         run: |
           mkdir build && cd build
-          sh -c 'cmake .. -DBUILD_TEST=TRUE;cmake .. -DBUILD_TEST=TRUE'
+          cmake .. -DBUILD_TEST=TRUE
           make
           ./tst/producer_test
   mac-os-build-clang:
     runs-on: macos-latest
     env:
       AWS_KVS_LOG_LEVEL: 2
+      LDFLAGS: -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib
+      CPATH: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/
     permissions:
       id-token: write
       contents: read
@@ -99,6 +103,6 @@ jobs:
       - name: Build repository
         run: |
           mkdir build && cd build
-          sh -c 'cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE;cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE'
+          cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE
           make
           ./tst/producer_test
