@@ -80,8 +80,8 @@ jobs:
 
   linux-gcc-code-coverage:
     runs-on: ubuntu-18.04
-     env:
-       AWS_KVS_LOG_LEVEL: 2
+    env:
+      AWS_KVS_LOG_LEVEL: 2
     permissions:
       id-token: write
       contents: read
