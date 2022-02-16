@@ -24,7 +24,7 @@ jobs:
       - name: Build repository
         run: |
           mkdir build && cd build
-          cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE
+          cmake ..
           make
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
