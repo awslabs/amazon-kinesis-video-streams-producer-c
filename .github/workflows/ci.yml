@@ -9,7 +9,7 @@ on:
       - develop
       - master
 jobs:
-  mac-os-build-clang:
+  mac-os-run-sample:
     runs-on: macos-latest
     env:
       AWS_KVS_LOG_LEVEL: 2
@@ -35,4 +35,4 @@ jobs:
       - name: Run tests
         run: |
           cd build
-          ./tst/producer_test
+          ./kvsVideoOnlyStreamingSample testChannel 5400 ../samples
