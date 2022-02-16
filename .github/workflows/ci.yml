@@ -9,105 +9,30 @@ on:
       - develop
       - master
 jobs:
-  # clang-format-check:
-  #   runs-on: macos-latest
-  #   steps:
-  #     - name: Clone repository
-  #       uses: actions/checkout@v2
-  #     - name: Install clang-format
-  #       run: |
-  #         brew install clang-format@8
-  #     - name: Run clang format check
-  #       run: |
-  #         bash scripts/check-clang.sh
-
-  # mac-os-build-gcc-ltc:
-  #   runs-on: macos-latest
-  #   env:
-  #     CC: gcc-11
-  #     CXX: g++-11
-  #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #   steps:
-  #     - name: Clone repository
-  #       uses: actions/checkout@v2
-  #     - name: Build repository and run tests
-  #       run: |
-  #         unset AWS_SESSION_TOKEN
-  #         mkdir build && cd build
-  #         cmake .. -DBUILD_TEST=TRUE
-  #         make
-  #         ./tst/producer_test --gtest_break_on_failure
-  # mac-os-build-clang-ltc:
-  #   runs-on: macos-latest
-  #   env:
-  #     CC: clang
-  #     CXX: clang++
-  #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #     LDFLAGS: -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib
-  #     CPATH: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/
-  #   steps:
-  #     - name: Clone repository
-  #       uses: actions/checkout@v2
-  #     - name: Build repository
-  #       run: |
-  #         unset AWS_SESSION_TOKEN
-  #         mkdir build && cd build
-  #         cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE
-  #         make
-  #         ./tst/producer_test --gtest_break_on_failure
-
-  # mac-os-build-gcc:
-  #   runs-on: macos-10.15
-  #   permissions:
-  #     id-token: write
-  #     contents: read
-  #   env:
-  #     CC: gcc
-  #     CXX: g++
-  #     AWS_KVS_LOG_LEVEL: 2
-  #   steps:
-  #     - name: Clone repository
-  #       uses: actions/checkout@v2
-  #     - name: Configure AWS Credentials
-  #       uses: aws-actions/configure-aws-credentials@v1
-  #       with:
-  #         role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-  #         role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-  #         aws-region: ${{ secrets.AWS_REGION }}
-  #     - name: Build repository
-  #       run: |
-  #         mkdir build && cd build
-  #         cmake .. -DBUILD_TEST=TRUE
-  #         make
-  #         ./tst/producer_test
   mac-os-build-clang:
     runs-on: macos-latest
     env:
       AWS_KVS_LOG_LEVEL: 2
       LDFLAGS: -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib
       CPATH: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/
-      AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-      AWS_WEB_IDENTITY_TOKEN_FILE: /tmp/awscreds
-      AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
     permissions:
       id-token: write
       contents: read
     steps:
-      - run: sleep 5
       - name: Clone repository
         uses: actions/checkout@v2
-      - name: Configure AWS
-        run: |
-          echo AWS_WEB_IDENTITY_TOKEN_FILE=$AWS_WEB_IDENTITY_TOKEN_FILE >> $GITHUB_ENV
-          echo AWS_ROLE_ARN=$AWS_ROLE_ARN >> $GITHUB_ENV
-          echo AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION >> $GITHUB_ENV
-
-          curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL" | jq -r '.value' > $AWS_WEB_IDENTITY_TOKEN_FILE
       - name: Build repository
         run: |
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE
           make
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Run tests
+        run: |
+          pwd
           ./tst/producer_test
