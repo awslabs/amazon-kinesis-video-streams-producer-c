@@ -35,4 +35,4 @@ jobs:
       - name: Run tests
         run: |
           cd build
-          ./kvsVideoOnlyStreamingSample testChannel 5400 ../samples
+          ./kvsVideoOnlyStreamingSample testChannel 5400
