@@ -58,6 +58,16 @@ You can pass the following options to `cmake ..`.
 * `-DUNDEFINED_BEHAVIOR_SANITIZER` Build with UndefinedBehaviorSanitizer
 * `-DALIGNED_MEMORY_MODEL` Build for aligned memory model only devices. Default is OFF.
 
+
+DMEMORY_SANITIZER, DTHREAD_SANITIZER etc. flags works only with clang compiler 
+and not with gcc compiler. For using clang (on Ubuntu), do the following - 
+```
+sudo apt-get install clang
+export CC=/usr/bin/clang
+export CXX=/usr/bin/clang++
+cmake .. -DMEMORY_SANITIZER=TRUE
+```
+
 ### Build
 To build the library run make in the build directory you executed CMake.
 
@@ -78,9 +88,11 @@ The last three arguments are optional. By default,
 * `audio-codec` is `aac`
 
 If you want to use the sample for `PCM_ALAW/G.711` frames, run 
-`./kvsAudioVideoStreamingSample <channel-name> <streaming_duration> <sample_location> alaw`
+`./kvsAudioVideoStreamingSample <channel-name> <streaming_duration> <sample_location> alaw 0`
 
 This will stream the video/audio files from the `samples/h264SampleFrames` and `samples/aacSampleFrames` or `samples/alawSampleFrames` (as per the choice of audio codec in the last argument) respectively. 
+
+If you want to enable KVS events in fragment metadata, change the 5th parameter from 0 -> 1. This feature is found only in the audio/video sample, but can be written into the video only sample as well.
 
 For video only, run `./kvsVideoOnlyStreamingSample <channel-name>`
 
@@ -97,9 +109,17 @@ export AWS_ACCESS_KEY_ID=<YourAWSAccessKey>
 Now you can execute the unit tests from the `build` directory as follows:
 `./tst/producer_test`
 
-## Development
+### Offline mode
+The samples run in near real time mode by default. In order to set up offline mode, the following APIs can be used in the samples instead of the realtime variant:
 
-The repository is using `develop` branch as the aggregation and all of the feature development is done in appropriate feature branches. The PRs (Pull Requests) are cut on a feature branch and once approved with all the checks passed they can be merged by a click of a button on the PR tool. The master branch should always be build-able and all the tests should be passing. We are welcoming any contribution to the code base. The master branch contains our most recent release cycle from develop.
+For video only: `createOfflineVideoStreamInfoProviderWithCodecs()`
+For video and audio: `createOfflineAudioVideoStreamInfoProviderWithCodecs()`
+
+The 2 APIs are available in [this](https://github.com/awslabs/amazon-kinesis-video-streams-producer-c/blob/412aab82c99a72f9dbde975f5fea81ffdc844ae5/src/include/com/amazonaws/kinesis/video/cproducer/Include.h) header file.
+
+
+## Development
+The repository is using `develop` branch as the aggregation and all of the feature development is done in appropriate feature branches. The PRs (Pull Requests) are cut on a feature branch and once approved with all the checks passed they can be merged by a click of a button on the PR tool. The master branch should always be build-able and all the tests should be passing. We are welcoming any contribution to the code base. The master branch contains our most recent release cycle from `develop`.
 
 ### Release
 The repository is under active development and even with incremental unit test coverage where some of the tests are actually full integration tests, we require more rigorous internal testing in order to 'cut' release versions. The release is cut against a particular commit that gets approved. The general philosophy is to cut a release when a set of commits contribute to a self-containing feature or when we add major internal functionality improvements.
