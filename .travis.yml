@@ -31,28 +31,19 @@ matrix:
 
   include:
 
-    # # MemorySanitizer
-    # - name: "Linux Clang MemorySanitizer"
-    #   os: linux
-    #   compiler: clang
-    #   env: allowTestFail=true
-    #   before_script: mkdir build && cd build && cmake .. -DBUILD_TEST=TRUE -DMEMORY_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
+    # MemorySanitizer
+    - name: "Linux Clang MemorySanitizer"
+      os: linux
+      compiler: clang
+      env: allowTestFail=true
+      before_script: mkdir build && cd build && cmake .. -DBUILD_TEST=TRUE -DMEMORY_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
 
-    # # ThreadSanitizer
-    # - name: "Linux Clang ThreadSanitizer"
-    #   os: linux
-    #   compiler: clang
-    #   env: allowTestFail=true
-    #   before_script: mkdir build && cd build && cmake .. -DBUILD_TEST=TRUE -DTHREAD_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
-    
-    # - name: "Windows MSVC"
-    #   os: windows
-    #   script:
-    #     - choco install nasm strawberryperl
-    #     - unset CC CC_FOR_BUILD CXX CXX_FOR_BUILD # We want to use MSVC
-    #     - export "PATH=/c/Strawberry/perl/site/bin:/c/Strawberry/perl/bin:/c/Strawberry/c/bin:/c/Program Files/NASM:`pwd`/open-source/lib:`pwd`/open-source/bin:$PATH"
-    #     - .github/build_windows.bat
-    #     - cd build/tst && ./producer_test.exe --gtest_break_on_failure
+    # ThreadSanitizer
+    - name: "Linux Clang ThreadSanitizer"
+      os: linux
+      compiler: clang
+      env: allowTestFail=true
+      before_script: mkdir build && cd build && cmake .. -DBUILD_TEST=TRUE -DTHREAD_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
  
     # Generate Doxygen
     - name: "Generate Doxygen"
