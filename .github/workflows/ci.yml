@@ -34,5 +34,5 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
       - name: Run tests
         run: |
-          pwd
+          cd build
           ./tst/producer_test
