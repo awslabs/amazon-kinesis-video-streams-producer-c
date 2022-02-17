@@ -349,7 +349,8 @@ if(BUILD_COMMON_CURL)
     else()
       add_library(cproducer ${TYPE_OF_LIB} ${PRODUCER_C_SOURCE_FILES})
     endif()
-    target_link_libraries(cproducer PUBLIC kvsCommonCurl ${CFLIBRARY} kvspic ${AWS_C_COMMON_LIBRARY})
+    #m needs to be linked for math library otherwise build fails in linux with undefined reference
+    target_link_libraries(cproducer PUBLIC kvsCommonCurl ${CFLIBRARY} kvspic ${AWS_C_COMMON_LIBRARY} m)
 
     install(
       TARGETS cproducer
