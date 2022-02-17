@@ -19,20 +19,18 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - name: Clone repository
-        uses: actions/checkout@v2
-      - name: Build repository
-        run: |
-          mkdir build && cd build
-          cmake ..
-          make
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
           aws-region: ${{ secrets.AWS_REGION }}
-      - name: Run tests
+          role-duration-seconds: 10800
+      - name: Clone repository
+        uses: actions/checkout@v2
+      - name: Build repository
         run: |
-          cd build
-          ./kvsVideoOnlyStreamingSample testChannel 5400
+          mkdir build && cd build
+          cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE
+          make
+          ./tst/producer_test --gtest_break_on_failure
