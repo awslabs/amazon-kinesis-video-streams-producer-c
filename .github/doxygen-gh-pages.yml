@@ -1,0 +1,14 @@
+name: Doxygen GitHub Pages Deploy Action Producer C SDK
+
+on:
+  push:
+    branches:
+      - doxygen-ga-develop
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: DenverCoder1/doxygen-github-pages-action@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
