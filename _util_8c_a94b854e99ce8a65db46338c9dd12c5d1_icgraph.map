@@ -1,8 +1,0 @@
-<map id="getSslCertNameFromType" name="getSslCertNameFromType">
-<area shape="rect" id="node1" title=" " alt="" coords="929,31,1107,57"/>
-<area shape="rect" id="node2" href="$_curl_call_8c.html#ab70b26a9640d5350ce72429cfe799b54" title=" " alt="" coords="764,31,881,57"/>
-<area shape="rect" id="node3" href="$group___public_member_functions.html#ga614ff0bb778c3c1fb27e66d4429327fa" title="Creates an IoT based AWS credential provider object with time function which is based on libCurl." alt="" coords="512,23,716,65"/>
-<area shape="rect" id="node4" href="$group___public_member_functions.html#gab4a9b009056672dbeeea6c79bfc6a797" title="Creates an IoT based AWS credential provider object using libCurl." alt="" coords="260,5,464,32"/>
-<area shape="rect" id="node5" href="$group___public_member_functions.html#ga8a84bd94812cefeab5b52176e5d7401c" title=" " alt="" coords="283,56,441,83"/>
-<area shape="rect" id="node6" href="$group___public_member_functions.html#ga750983add758649af12b8317d8483c3e" title=" " alt="" coords="5,49,212,90"/>
-</map>

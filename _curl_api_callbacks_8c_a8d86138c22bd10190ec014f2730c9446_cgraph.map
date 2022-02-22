@@ -1,9 +1,0 @@
-<map id="curlApiCallbacksShutdownActiveRequests" name="curlApiCallbacksShutdownActiveRequests">
-<area shape="rect" id="node1" title=" " alt="" coords="5,49,184,90"/>
-<area shape="rect" id="node2" href="$_request_8c.html#a36fd2f8a04c9b5d96868fb7ba2900c54" title=" " alt="" coords="247,31,364,57"/>
-<area shape="rect" id="node7" href="$_response_8c.html#a46fd3b69d83e915ba67fd37d18d3fc0a" title=" " alt="" coords="232,81,379,108"/>
-<area shape="rect" id="node3" href="$_response_8c.html#ac5a157a934cb29139ae9f4e2a2eddc9d" title=" " alt="" coords="445,5,571,32"/>
-<area shape="rect" id="node6" href="$group___public_member_functions.html#ga78fbbf4618d7ecb4e883ff1cc31b9a7f" title="Removes and deletes all headers." alt="" coords="427,56,589,83"/>
-<area shape="rect" id="node4" href="$_response_8c.html#a3772ea3621f6312e8cc3c864f1251190" title=" " alt="" coords="637,5,763,32"/>
-<area shape="rect" id="node5" href="$group___public_member_functions.html#ga990bf7f36204bd92eb9137f53c2d4118" title="Releases the CallInfo allocations." alt="" coords="811,5,920,32"/>
-</map>

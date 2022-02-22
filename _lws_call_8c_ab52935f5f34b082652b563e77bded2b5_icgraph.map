@@ -1,6 +1,0 @@
-<map id="lwsIotCallbackRoutine" name="lwsIotCallbackRoutine">
-<area shape="rect" id="node1" title=" " alt="" coords="675,13,828,39"/>
-<area shape="rect" id="node2" href="$_lws_call_8c.html#a8705286265a9091eddf08dcbfd4b89c4" title=" " alt="" coords="509,13,627,39"/>
-<area shape="rect" id="node3" href="$group___public_member_functions.html#gae28f29d61cd81a083bd475601ace42e8" title="Creates an IoT based AWS credential provider object with time function which is based on libWebSocket..." alt="" coords="257,5,461,47"/>
-<area shape="rect" id="node4" href="$group___public_member_functions.html#ga3f966d72311ebdfc66dfcf77aaf41684" title="Creates an IoT based AWS credential provider object using libWebSockets." alt="" coords="5,13,209,39"/>
-</map>
