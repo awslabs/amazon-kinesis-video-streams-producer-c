@@ -4,7 +4,7 @@
 # Project related configuration options
 #---------------------------------------------------------------------------
 PROJECT_NAME           = "Amazon Kinesis Producer C SDK"
-OUTPUT_DIRECTORY       = doc
+OUTPUT_DIRECTORY       = docs/html
 INPUT                  = ../src/include/ ../README.md ../src/source/
 FILE_PATTERNS          = Include.h *.c
 RECURSIVE              = YES
