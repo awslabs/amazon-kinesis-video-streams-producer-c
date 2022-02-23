@@ -12,7 +12,7 @@ jobs:
       - name: Install Doxygen
         run: sudo apt-get install doxygen -y
       - name: Generate Doxygen Documentation
-        run: doxygen Doxyfile
+        run: doxygen ./Doxyfile
         shell: bash
       - uses: JamesIves/github-pages-deploy-action@v4.2.5
         with:
