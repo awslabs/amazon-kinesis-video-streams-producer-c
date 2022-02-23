@@ -19,7 +19,10 @@ jobs:
         shell: bash
 
       - name: Generate Doxygen Documentation
-        run: doxygen
+        run: |
+          doxygen
+          chmod -R 777 doc
+          mv .github/doc/html /tmp
         shell: bash
       
       - name: Deploy
