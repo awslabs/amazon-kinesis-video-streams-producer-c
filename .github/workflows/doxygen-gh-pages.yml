@@ -3,7 +3,7 @@ name: Doxygen GitHub Pages Deploy Action Producer C SDK
 on:
   push:
     branches:
-      - doxygen-ga-develop
+      - master
 
 jobs:
   generate-and-deploy-doxygen:
@@ -11,20 +11,17 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-        with:
-          submodules: "true"
 
-      - name: Install Doxygen
-        run: sudo apt-get install doxygen -y
+      - name: Install requirements
+        run: sudo apt-get install doxygen graphviz -y
         shell: bash
 
       - name: Generate Doxygen Documentation
-        run: doxygen
+        run: doxygen Doxyfile
         shell: bash
-      
+
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4.2.5
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          folder: doc
+          folder: doc/html
           branch: gh-pages
