@@ -1,0 +1,7 @@
+<map id="createStaticCredentialProvider" name="createStaticCredentialProvider">
+<area shape="rect" id="node1" title="Creates a Static AWS credential provider object." alt="" coords="5,56,227,83"/>
+<area shape="rect" id="node2" href="$group__PublicMemberFunctions.html#ga91f39f496f456f5cfd1c68924edb3c29" title="Creates an AWS credentials object." alt="" coords="296,5,460,32"/>
+<area shape="rect" id="node4" href="$group__PublicMemberFunctions.html#ga94a14bb7bbda0b12bd2afb55da9374ce" title="Frees a Static Aws credential provider object." alt="" coords="275,56,481,83"/>
+<area shape="rect" id="node5" href="$StaticCredentialProvider_8c.html#a2f5490ab05f15466a4218788806af6d5" title=" " alt="" coords="301,107,455,133"/>
+<area shape="rect" id="node3" href="$group__PublicMemberFunctions.html#ga3c6cf4b6ce6b8188234420b5e83e4b60" title="Frees an Aws credentials object." alt="" coords="529,31,679,57"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="freeStaticCredentialProvider" name="freeStaticCredentialProvider">
+<area shape="rect" id="node1" title="Frees a Static Aws credential provider object." alt="" coords="5,5,212,32"/>
+<area shape="rect" id="node2" href="$group__PublicMemberFunctions.html#ga3c6cf4b6ce6b8188234420b5e83e4b60" title="Frees an Aws credentials object." alt="" coords="260,5,409,32"/>
+</map>

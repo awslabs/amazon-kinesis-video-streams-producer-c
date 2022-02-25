@@ -1,0 +1,7 @@
+<map id="createRequestInfo" name="createRequestInfo">
+<area shape="rect" id="node1" title="Creates a Request Info object." alt="" coords="5,31,147,57"/>
+<area shape="rect" id="node2" href="$group__PublicMemberFunctions.html#ga6dd7dc026ade725d77dc81b87d6315f5" title="Frees a Request Info object." alt="" coords="203,5,329,32"/>
+<area shape="rect" id="node4" href="$group__PublicMemberFunctions.html#ga6a74472309dd33aac2f06fcd6ae60c78" title="Sets a header in the request info." alt="" coords="195,56,337,83"/>
+<area shape="rect" id="node3" href="$group__PublicMemberFunctions.html#ga78fbbf4618d7ecb4e883ff1cc31b9a7f" title="Removes and deletes all headers." alt="" coords="385,5,564,32"/>
+<area shape="rect" id="node5" href="$group__PublicMemberFunctions.html#ga3bcd06b33fcbc9619f81e3920fca97a2" title="Creates a request header." alt="" coords="393,56,556,83"/>
+</map>
