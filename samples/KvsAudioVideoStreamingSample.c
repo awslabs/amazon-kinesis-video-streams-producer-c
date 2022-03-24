@@ -71,6 +71,8 @@ PVOID putVideoFrameRoutine(PVOID args)
             startUpLatency = (DOUBLE)(GETTIME() - data->startTime) / (DOUBLE) HUNDREDS_OF_NANOS_IN_A_MILLISECOND;
             DLOGD("Start up latency: %lf ms", startUpLatency);
             data->firstFrame = FALSE;
+        }
+        else if (frame.flags == FRAME_FLAG_KEY_FRAME) {
             if(gEventsEnabled) {
                 //generate an image and notification event at the start of the video stream.
                 putKinesisVideoEventMetadata(data->streamHandle, STREAM_EVENT_TYPE_NOTIFICATION | STREAM_EVENT_TYPE_IMAGE_GENERATION, NULL);
@@ -189,7 +191,7 @@ INT32 main(INT32 argc, CHAR* argv[])
     STRNCPY(audioCodec, AUDIO_CODEC_NAME_AAC, STRLEN(AUDIO_CODEC_NAME_AAC)); //aac audio by default
 
     if (argc == 6) {
-        if (STRCMP(argv[5], "1")){
+        if (!STRCMP(argv[5], "1")){
             gEventsEnabled = 1;
         }
     }
