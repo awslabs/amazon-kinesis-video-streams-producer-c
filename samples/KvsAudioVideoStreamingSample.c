@@ -22,7 +22,10 @@
 #define FILE_LOGGING_BUFFER_SIZE (100 * 1024)
 #define MAX_NUMBER_OF_LOG_FILES  5
 
+#define KEYFRAME_EVENT_INTERVAL 200
+
 UINT8 gEventsEnabled = 0;
+UINT16 gKeyFrameCount = 0;
 
 typedef struct {
     PBYTE buffer;
@@ -73,19 +76,25 @@ PVOID putVideoFrameRoutine(PVOID args)
             data->firstFrame = FALSE;
         }
         else if (frame.flags == FRAME_FLAG_KEY_FRAME) {
-            switch (gEventsEnabled) {
-                case 1:
-                    putKinesisVideoEventMetadata(data->streamHandle, STREAM_EVENT_TYPE_NOTIFICATION, NULL);
-                    break;
-                case 2:
-                    putKinesisVideoEventMetadata(data->streamHandle, STREAM_EVENT_TYPE_IMAGE_GENERATION, NULL);
-                    break;
-                case 3:
-                    putKinesisVideoEventMetadata(data->streamHandle, STREAM_EVENT_TYPE_NOTIFICATION | STREAM_EVENT_TYPE_IMAGE_GENERATION, NULL);
-                    break;
-                default:
-                    break;
+            if(gKeyFrameCount%KEYFRAME_EVENT_INTERVAL == 0)
+            {
+                //reset to 0 to avoid overflow in long running applications
+                gKeyFrameCount = 0;
+                switch (gEventsEnabled) {
+                    case 1:
+                        putKinesisVideoEventMetadata(data->streamHandle, STREAM_EVENT_TYPE_NOTIFICATION, NULL);
+                        break;
+                    case 2:
+                        putKinesisVideoEventMetadata(data->streamHandle, STREAM_EVENT_TYPE_IMAGE_GENERATION, NULL);
+                        break;
+                    case 3:
+                        putKinesisVideoEventMetadata(data->streamHandle, STREAM_EVENT_TYPE_NOTIFICATION | STREAM_EVENT_TYPE_IMAGE_GENERATION, NULL);
+                        break;
+                    default:
+                        break;
+                }
             }
+            gKeyFrameCount++;
         }
 
         ATOMIC_STORE_BOOL(&data->firstVideoFramePut, TRUE);
