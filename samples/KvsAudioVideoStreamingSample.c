@@ -73,9 +73,18 @@ PVOID putVideoFrameRoutine(PVOID args)
             data->firstFrame = FALSE;
         }
         else if (frame.flags == FRAME_FLAG_KEY_FRAME) {
-            if(gEventsEnabled) {
-                //generate an image and notification event at the start of the video stream.
-                putKinesisVideoEventMetadata(data->streamHandle, STREAM_EVENT_TYPE_NOTIFICATION | STREAM_EVENT_TYPE_IMAGE_GENERATION, NULL);
+            switch (gEventsEnabled) {
+                case 1:
+                    putKinesisVideoEventMetadata(data->streamHandle, STREAM_EVENT_TYPE_NOTIFICATION, NULL);
+                    break;
+                case 2:
+                    putKinesisVideoEventMetadata(data->streamHandle, STREAM_EVENT_TYPE_IMAGE_GENERATION, NULL);
+                    break;
+                case 3:
+                    putKinesisVideoEventMetadata(data->streamHandle, STREAM_EVENT_TYPE_NOTIFICATION | STREAM_EVENT_TYPE_IMAGE_GENERATION, NULL);
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -191,7 +200,13 @@ INT32 main(INT32 argc, CHAR* argv[])
     STRNCPY(audioCodec, AUDIO_CODEC_NAME_AAC, STRLEN(AUDIO_CODEC_NAME_AAC)); //aac audio by default
 
     if (argc == 6) {
-        if (!STRCMP(argv[5], "1")){
+        if (!STRCMP(argv[5], "both")){
+            gEventsEnabled = 3;
+        }
+        if (!STRCMP(argv[5], "image")){
+            gEventsEnabled = 2;
+        }
+        if (!STRCMP(argv[5], "notification")){
             gEventsEnabled = 1;
         }
     }

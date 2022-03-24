@@ -88,11 +88,15 @@ The last three arguments are optional. By default,
 * `audio-codec` is `aac`
 
 If you want to use the sample for `PCM_ALAW/G.711` frames, run 
-`./kvsAudioVideoStreamingSample <channel-name> <streaming_duration> <sample_location> alaw 0`
+`./kvsAudioVideoStreamingSample <channel-name> <streaming_duration> <sample_location> alaw`
 
 This will stream the video/audio files from the `samples/h264SampleFrames` and `samples/aacSampleFrames` or `samples/alawSampleFrames` (as per the choice of audio codec in the last argument) respectively. 
 
-If you want to enable KVS events in fragment metadata, change the 5th parameter from 0 -> 1. This feature is found only in the audio/video sample, but can be written into the video only sample as well.
+If you want to enable KVS events in fragment metadata and automatically add an event on every key frame, add a 5th input.
+"notification" for a notification event.
+"image" for an image generation event.
+"both" for both. Otherwise leave it blank
+This feature is found only in the audio/video sample, but can be written into the video only sample as well.
 
 For video only, run `./kvsVideoOnlyStreamingSample <channel-name>`
 
