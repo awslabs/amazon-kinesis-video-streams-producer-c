@@ -22,7 +22,10 @@
 #define FILE_LOGGING_BUFFER_SIZE (100 * 1024)
 #define MAX_NUMBER_OF_LOG_FILES  5
 
+#define KEYFRAME_EVENT_INTERVAL 200
+
 UINT8 gEventsEnabled = 0;
+UINT16 gKeyFrameCount = 0;
 
 typedef struct {
     PBYTE buffer;
@@ -71,10 +74,27 @@ PVOID putVideoFrameRoutine(PVOID args)
             startUpLatency = (DOUBLE)(GETTIME() - data->startTime) / (DOUBLE) HUNDREDS_OF_NANOS_IN_A_MILLISECOND;
             DLOGD("Start up latency: %lf ms", startUpLatency);
             data->firstFrame = FALSE;
-            if(gEventsEnabled) {
-                //generate an image and notification event at the start of the video stream.
-                putKinesisVideoEventMetadata(data->streamHandle, STREAM_EVENT_TYPE_NOTIFICATION | STREAM_EVENT_TYPE_IMAGE_GENERATION, NULL);
+        }
+        else if (frame.flags == FRAME_FLAG_KEY_FRAME) {
+            if(gKeyFrameCount%KEYFRAME_EVENT_INTERVAL == 0)
+            {
+                //reset to 0 to avoid overflow in long running applications
+                gKeyFrameCount = 0;
+                switch (gEventsEnabled) {
+                    case 1:
+                        putKinesisVideoEventMetadata(data->streamHandle, STREAM_EVENT_TYPE_NOTIFICATION, NULL);
+                        break;
+                    case 2:
+                        putKinesisVideoEventMetadata(data->streamHandle, STREAM_EVENT_TYPE_IMAGE_GENERATION, NULL);
+                        break;
+                    case 3:
+                        putKinesisVideoEventMetadata(data->streamHandle, STREAM_EVENT_TYPE_NOTIFICATION | STREAM_EVENT_TYPE_IMAGE_GENERATION, NULL);
+                        break;
+                    default:
+                        break;
+                }
             }
+            gKeyFrameCount++;
         }
 
         ATOMIC_STORE_BOOL(&data->firstVideoFramePut, TRUE);
@@ -189,7 +209,13 @@ INT32 main(INT32 argc, CHAR* argv[])
     STRNCPY(audioCodec, AUDIO_CODEC_NAME_AAC, STRLEN(AUDIO_CODEC_NAME_AAC)); //aac audio by default
 
     if (argc == 6) {
-        if (STRCMP(argv[5], "1")){
+        if (!STRCMP(argv[5], "both")){
+            gEventsEnabled = 3;
+        }
+        if (!STRCMP(argv[5], "image")){
+            gEventsEnabled = 2;
+        }
+        if (!STRCMP(argv[5], "notification")){
             gEventsEnabled = 1;
         }
     }
