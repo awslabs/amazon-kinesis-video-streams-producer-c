@@ -17,6 +17,7 @@ extern "C" {
 #define SSL_CERTIFICATE_TYPE_DER_STR     ((PCHAR) "DER")
 #define SSL_CERTIFICATE_TYPE_ENG_STR     ((PCHAR) "ENG")
 #define SSL_CERTIFICATE_TYPE_PEM_STR     ((PCHAR) "PEM")
+#define IOT_EXPIRATION_TIMESTAMP_STR     ((PCHAR) "YYYY-MM-DDTHH:mm:SSZ")
 
 PCHAR getSslCertNameFromType(SSL_CERTIFICATE_TYPE);
 UINT64 commonDefaultGetCurrentTimeFunc(UINT64);
