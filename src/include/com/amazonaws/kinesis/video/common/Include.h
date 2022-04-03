@@ -77,6 +77,11 @@ extern "C" {
  * Continue errors from the new common base
  */
 #define STATUS_COMMON_BASE 0x16000000
+#define STATUS_CURL_PERFORM_FAILED                      STATUS_COMMON_BASE + 0x00000001
+#define STATUS_IOT_INVALID_RESPONSE_LENGTH              STATUS_COMMON_BASE + 0x00000002
+#define STATUS_IOT_NULL_AWS_CREDS                       STATUS_COMMON_BASE + 0x00000003
+#define STATUS_IOT_INVALID_URI_LEN                      STATUS_COMMON_BASE + 0x00000004
+#define STATUS_TIMESTAMP_STRING_UNRECOGNIZED_FORMAT     STATUS_COMMON_BASE + 0x00000005
 /*!@} */
 
 /////////////////////////////////////////////////////
