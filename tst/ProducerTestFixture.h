@@ -244,6 +244,12 @@ class ProducerClientTestBase : public ::testing::Test {
     static STATUS curlWriteCallbackHookFunc(PCurlResponse, PCHAR, UINT32, PCHAR*, PUINT32);
     static STATUS curlReadCallbackHookFunc(PCurlResponse, UPLOAD_HANDLE, PBYTE, UINT32, PUINT32, STATUS);
 
+    // Test retry strategy callbacks
+    static STATUS createRetryStrategyFn(PKvsRetryStrategy);
+    static STATUS getCurrentRetryAttemptNumberFn(PKvsRetryStrategy, PUINT32);
+    static STATUS freeRetryStrategyFn(PKvsRetryStrategy);
+    static STATUS executeRetryStrategyFn(PKvsRetryStrategy, PUINT64);
+
     CLIENT_HANDLE mClientHandle;
     PClientCallbacks mCallbacksProvider;
     DeviceInfo mDeviceInfo;

@@ -268,7 +268,7 @@ TEST_F(ProducerContinuousRetryTest, recover_on_retriable_common_lib_error) {
 
     // Inject a fault
     pAuth = (PRotatingStaticAuthCallbacks) mAuthCallbacks;
-    pAuth->retStatus = STATUS_IOT_FAILED;
+    pAuth->retStatus = STATUS_CURL_PERFORM_FAILED;
     pAuth->failCount = 0;
     pAuth->recoverCount = 3; // 1 for main token, 1 for the security token for the first session
     // and only then should fail for the last token.

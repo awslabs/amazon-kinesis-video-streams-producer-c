@@ -81,7 +81,7 @@ TEST_F(CallbacksProviderPublicApiTest, createDefaultCallbacksProviderWithIotCert
             NULL,
             &pClientCallbacks));
 
-    EXPECT_EQ(STATUS_IOT_FAILED, createDefaultCallbacksProviderWithIotCertificate(
+    EXPECT_EQ(STATUS_CURL_PERFORM_FAILED, createDefaultCallbacksProviderWithIotCertificate(
             TEST_IOT_ENDPOINT,
             TEST_IOT_CERT_PATH,
             TEST_IOT_ROLE_ALIAS,
@@ -153,7 +153,7 @@ TEST_F(CallbacksProviderPublicApiTest, createDefaultCallbacksProviderWithIotCert
             NULL,
             &pClientCallbacks));
 
-    EXPECT_EQ(STATUS_IOT_FAILED, createDefaultCallbacksProviderWithIotCertificate(
+    EXPECT_EQ(STATUS_CURL_PERFORM_FAILED, createDefaultCallbacksProviderWithIotCertificate(
             TEST_IOT_ENDPOINT,
             TEST_IOT_CERT_PATH,
             TEST_IOT_CERT_PRIVATE_KEY_PATH,

@@ -58,6 +58,16 @@ You can pass the following options to `cmake ..`.
 * `-DUNDEFINED_BEHAVIOR_SANITIZER` Build with UndefinedBehaviorSanitizer
 * `-DALIGNED_MEMORY_MODEL` Build for aligned memory model only devices. Default is OFF.
 
+
+DMEMORY_SANITIZER, DTHREAD_SANITIZER etc. flags works only with clang compiler 
+and not with gcc compiler. For using clang (on Ubuntu), do the following - 
+```
+sudo apt-get install clang
+export CC=/usr/bin/clang
+export CXX=/usr/bin/clang++
+cmake .. -DMEMORY_SANITIZER=TRUE
+```
+
 ### Build
 To build the library run make in the build directory you executed CMake.
 

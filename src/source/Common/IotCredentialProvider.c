@@ -130,8 +130,8 @@ STATUS parseIotResponse(PIotCredentialProvider pIotCredentialProvider, PCallInfo
     CHK(pIotCredentialProvider != NULL && pCallInfo != NULL, STATUS_NULL_ARG);
 
     resultLen = pCallInfo->responseDataLen;
+    CHK_ERR(resultLen > 0, STATUS_IOT_INVALID_RESPONSE_LENGTH, "IoT response has a length of 0");
     pResponseStr = pCallInfo->responseData;
-    CHK(resultLen > 0, STATUS_IOT_FAILED);
 
     jsmn_init(&parser);
     tokenCount = jsmn_parse(&parser, pResponseStr, resultLen, tokens, SIZEOF(tokens) / SIZEOF(jsmntok_t));
@@ -165,7 +165,7 @@ STATUS parseIotResponse(PIotCredentialProvider pIotCredentialProvider, PCallInfo
         }
     }
 
-    CHK(accessKeyId != NULL && secretKey != NULL && sessionToken != NULL, STATUS_IOT_FAILED);
+    CHK(accessKeyId != NULL && secretKey != NULL && sessionToken != NULL, STATUS_IOT_NULL_AWS_CREDS);
 
     currentTime = pIotCredentialProvider->getCurrentTimeFn(pIotCredentialProvider->customData);
     CHK_STATUS(convertTimestampToEpoch(expirationTimestampStr, currentTime / HUNDREDS_OF_NANOS_IN_A_SECOND, &expiration));
@@ -211,7 +211,7 @@ STATUS iotCurlHandler(PIotCredentialProvider pIotCredentialProvider)
 
     formatLen = SNPRINTF(serviceUrl, MAX_URI_CHAR_LEN, "%s%s%s%c%s%s", CONTROL_PLANE_URI_PREFIX, pIotCredentialProvider->iotGetCredentialEndpoint,
                          ROLE_ALIASES_PATH, '/', pIotCredentialProvider->roleAlias, CREDENTIAL_SERVICE);
-    CHK(formatLen > 0 && formatLen < MAX_URI_CHAR_LEN, STATUS_IOT_FAILED);
+    CHK(formatLen > 0 && formatLen < MAX_URI_CHAR_LEN, STATUS_IOT_INVALID_URI_LEN);
 
     // Form a new request info based on the params
     CHK_STATUS(createRequestInfo(serviceUrl, NULL, DEFAULT_AWS_REGION, pIotCredentialProvider->caCertPath, pIotCredentialProvider->certPath,
