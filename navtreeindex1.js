@@ -1,5 +1,6 @@
 var NAVTREEINDEX1 =
 {
+"struct____AuthCallbacks.html":[1,8,9],
 "struct____AuthCallbacks.html#a096f97f4ab65325b09776f42b98b769b":[1,8,9,3],
 "struct____AuthCallbacks.html#a2489cd12b331a1c1121891d6ce793707":[1,8,9,6],
 "struct____AuthCallbacks.html#a62dc3b695250ae0c24e6db763fa77ae4":[1,8,9,5],
