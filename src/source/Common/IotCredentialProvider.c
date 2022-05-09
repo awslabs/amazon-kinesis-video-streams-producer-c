@@ -183,12 +183,10 @@ STATUS parseIotResponse(PIotCredentialProvider pIotCredentialProvider, PCallInfo
     srand(currentTime / ((UINT64) sessionToken[rand() % (sessionTokenLen - 1)] + (UINT64) sessionToken[rand() % (sessionTokenLen - 1)]));
     expiration -= currentTime;
 
-    // remainder after dividing by 20%
-    jitter = (rand() * randMultiplier) % (((expiration / 100) * 20) + (expiration % 100) * 20 / 100);
-    // if remainder is below 1%, add 1%. Adding instead of setting avoids a normal distribution having a large accumulation at exactly 1%.
-    if (jitter < expiration / 100) {
-        jitter += expiration / 100;
-    }
+    // remainder after dividing by 19%
+    jitter = (rand() * randMultiplier) % (((expiration / 100) * 19) + (expiration % 100) * 19 / 100);
+    // add exaction 1% to change to range from 0-19 to 1-20;
+    jitter += expiration / 100;
 
     expiration -= jitter;
     expiration += currentTime;
