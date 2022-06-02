@@ -57,6 +57,7 @@ You can pass the following options to `cmake ..`.
 * `-DTHREAD_SANITIZER` -- Build with ThreadSanitizer
 * `-DUNDEFINED_BEHAVIOR_SANITIZER` Build with UndefinedBehaviorSanitizer
 * `-DALIGNED_MEMORY_MODEL` Build for aligned memory model only devices. Default is OFF.
+* `-DLOCAL_OPENSSL_BUILD` Whether or not to use local OpenSSL build. Default is OFF.
 
 
 DMEMORY_SANITIZER, DTHREAD_SANITIZER etc. flags works only with clang compiler 
@@ -67,6 +68,7 @@ export CC=/usr/bin/clang
 export CXX=/usr/bin/clang++
 cmake .. -DMEMORY_SANITIZER=TRUE
 ```
+DLOCAL_OPENSSL_BUILD requires first installing OpenSSL 1.1 (`brew install openssl@1.1` for Mac) and then running `export PKG_CONFIG_PATH="<YOUR-PATH>/openssl@1.1/lib/pkgconfig"` (your path can be printed to terminal using `which openssl` on Linux/Mac).
 
 ### Build
 To build the library run make in the build directory you executed CMake.
@@ -117,6 +119,14 @@ For video and audio: `createOfflineAudioVideoStreamInfoProviderWithCodecs()`
 
 The 2 APIs are available in [this](https://github.com/awslabs/amazon-kinesis-video-streams-producer-c/blob/412aab82c99a72f9dbde975f5fea81ffdc844ae5/src/include/com/amazonaws/kinesis/video/cproducer/Include.h) header file.
 
+## DEBUG
+* When building OpenSSL during `cmake ..`, if you encounter an architecture error such as `ld: symbol(s) not found for architecture i386`, building with a local OpenSSL build may help. First install OpenSSL 1.1 (for Mac: `brew install openssl@1.1`). Next set `export PKG_CONFIG_PATH="<YOUR-PATH>/openssl@1.1/lib/pkgconfig"` (your path can be printed to terminal using `which openssl` on Linux/Mac). Now set the following flag to ON when building: `cmake .. -DLOCAL_OPENSSL_BUILD=ON`. If there are still errors regarding locating the local OpenSSL library:
+    * The following environment variables may need to be set to export:
+        `export LDFLAGS="-L/<YOUR-PATH>/openssl@1.1/lib"` and `export CPPFLAGS="-I/<YOUR-PATH>/openssl@1.1/include"`
+    * The path to OpenSSL’s root directory may need to be specified when running `cmake`:
+        `-DOPENSSL_ROOT_DIR="<YOUR-PATH>/openssl@1.1/include/openssl"`
+    * If you need to have openssl@1.1 first in your PATH, run:
+        `echo 'export PATH="<YOUR-PATH>/openssl@1.1/bin:$PATH"' >> ~/.zshrc`
 
 ## Development
 The repository is using `develop` branch as the aggregation and all of the feature development is done in appropriate feature branches. The PRs (Pull Requests) are cut on a feature branch and once approved with all the checks passed they can be merged by a click of a button on the PR tool. The master branch should always be build-able and all the tests should be passing. We are welcoming any contribution to the code base. The master branch contains our most recent release cycle from `develop`.
