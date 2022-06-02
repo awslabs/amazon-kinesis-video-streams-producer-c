@@ -122,7 +122,7 @@ The 2 APIs are available in [this](https://github.com/awslabs/amazon-kinesis-vid
 ## DEBUG
 * When building OpenSSL during `cmake ..`, if you encounter an architecture error such as `ld: symbol(s) not found for architecture i386`, building with a local OpenSSL build may help. First install OpenSSL 1.1 (for Mac: `brew install openssl@1.1`). Next set `export PKG_CONFIG_PATH="<YOUR-PATH>/openssl@1.1/lib/pkgconfig"` (your path can be printed to terminal using `which openssl` on Linux/Mac). Now set the following flag to ON when building: `cmake .. -DLOCAL_OPENSSL_BUILD=ON`. If there are still errors regarding locating the local OpenSSL library:
     * The following environment variables may need to be set to export:
-        `export LDFLAGS="-L/<YOUR-PATH>/openssl@1.1/lib"` and `export CPPFLAGS="-I/<YOUR-PATH>/openssl@1.1/include"`
+        `export LDFLAGS="-L<YOUR-PATH>/openssl@1.1/lib"` and `export CPPFLAGS="-I<YOUR-PATH>/openssl@1.1/include"`
     * The path to OpenSSL’s root directory may need to be specified when running `cmake`:
         `-DOPENSSL_ROOT_DIR="<YOUR-PATH>/openssl@1.1/include/openssl"`
     * If you need to have openssl@1.1 first in your PATH, run:
