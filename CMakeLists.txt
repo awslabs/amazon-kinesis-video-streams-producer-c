@@ -65,6 +65,7 @@ if(BUILD_DEPENDENCIES)
   endif()
 
   if(NOT LOCAL_OPENSSL_BUILD)
+    message(STATUS "Building non-local OpenSSL")
     if(USE_OPENSSL)
       set(BUILD_ARGS -DBUILD_STATIC=${BUILD_STATIC}
                     -DBUILD_OPENSSL_PLATFORM=${BUILD_OPENSSL_PLATFORM})
