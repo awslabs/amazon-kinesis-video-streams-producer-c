@@ -1241,9 +1241,9 @@ STATUS fragmentAckReceivedAggregate(UINT64 customData, STREAM_HANDLE streamHandl
     STATUS retStatus = STATUS_SUCCESS;
     PCallbacksProvider pCallbacksProvider = (PCallbacksProvider) customData;
     UINT32 i;
-
     CHK(pCallbacksProvider != NULL, STATUS_INVALID_ARG);
 
+    DLOGW("TID 0x%016" PRIx64 " Calling producer C fragmentAckRecieved ", GETTID());
     for (i = 0; i < pCallbacksProvider->streamCallbacksCount; i++) {
         if (pCallbacksProvider->pStreamCallbacks[i].fragmentAckReceivedFn != NULL) {
             retStatus = pCallbacksProvider->pStreamCallbacks[i].fragmentAckReceivedFn(pCallbacksProvider->pStreamCallbacks[i].customData,
