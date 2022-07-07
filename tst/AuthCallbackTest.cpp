@@ -55,7 +55,7 @@ TEST_F(AuthCallbackTest, invalidIoTExpirationParsing_Returns_Failure)
                                       iotTimeInEpoch,
                                       &expirationTimestampInEpoch));
 
-    EXPECT_EQ(STATUS_EMPTY_STRING,
+    EXPECT_EQ(STATUS_TIMESTAMP_STRING_UNRECOGNIZED_FORMAT,
               convertTimestampToEpoch(emptyIotExpirationTimestamp, iotTimeInEpoch, &expirationTimestampInEpoch));
 
 }
