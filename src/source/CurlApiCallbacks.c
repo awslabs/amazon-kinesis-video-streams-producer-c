@@ -1426,6 +1426,7 @@ PVOID describeStreamCurlHandler(PVOID arg)
 
 CleanUp:
 
+    CHK_LOG_ERR(retStatus);
     // Preserve the values as we need to free the request before the event notification
     if (pCurlRequest->pCurlResponse != NULL) {
         callResult = pCurlRequest->pCurlResponse->callInfo.callResult;
