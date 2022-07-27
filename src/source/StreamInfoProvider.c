@@ -119,7 +119,6 @@ STATUS createAudioTrackInfo(AUDIO_CODEC_ID audioCodecId, PCHAR contentType, PTra
 {
     STATUS retStatus = STATUS_SUCCESS;
 
-    // pTrackInfo->trackId = pTrackInfo->trackId + 1;
     pTrackInfo->trackId = audioTrackId;
     pTrackInfo->codecPrivateData = NULL;
     pTrackInfo->codecPrivateDataSize = 0;

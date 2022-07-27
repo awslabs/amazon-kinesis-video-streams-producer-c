@@ -18,16 +18,12 @@
 #define FILE_LOGGING_BUFFER_SIZE (100 * 1024)
 #define MAX_NUMBER_OF_LOG_FILES  5
 
-// UINT8 gEventsEnabled = 0;
-// UINT16 gKeyFrameCount = 0;
-
 typedef struct {
     PBYTE buffer;
     UINT32 size;
 } FrameData, *PFrameData;
 
 typedef struct {
-    volatile ATOMIC_BOOL firstVideoFramePut;
     UINT64 streamStopTime;
     UINT64 streamStartTime;
     STREAM_HANDLE streamHandle;
@@ -101,7 +97,7 @@ INT32 main(INT32 argc, CHAR* argv[])
     STATUS retStatus = STATUS_SUCCESS;
     PCHAR accessKey = NULL, secretKey = NULL, sessionToken = NULL, streamName = NULL, region = NULL, cacertPath = NULL;
     UINT64 streamStopTime, streamingDuration = DEFAULT_STREAM_DURATION, fileSize = 0;
-    TID audioSendTid, videoSendTid;
+    TID audioSendTid;
     SampleCustomData data;
     UINT32 i;
     CHAR filePath[MAX_PATH_LEN + 1];
@@ -114,17 +110,6 @@ INT32 main(INT32 argc, CHAR* argv[])
 
     STRNCPY(audioCodec, AUDIO_CODEC_NAME_AAC, STRLEN(AUDIO_CODEC_NAME_AAC)); //aac audio by default
 
-    // if (argc == 6) {
-    //     if (!STRCMP(argv[5], "both")){
-    //         gEventsEnabled = 3;
-    //     }
-    //     if (!STRCMP(argv[5], "image")){
-    //         gEventsEnabled = 2;
-    //     }
-    //     if (!STRCMP(argv[5], "notification")){
-    //         gEventsEnabled = 1;
-    //     }
-    // }
     if (argc >= 5) {
         if (!STRCMP(argv[2], AUDIO_CODEC_NAME_ALAW)){
             STRNCPY(audioCodec, AUDIO_CODEC_NAME_ALAW, STRLEN(AUDIO_CODEC_NAME_ALAW));
@@ -234,7 +219,6 @@ INT32 main(INT32 argc, CHAR* argv[])
     data.streamStopTime = streamStopTime;
     data.streamHandle = streamHandle;
     data.streamStartTime = defaultGetTime();
-    ATOMIC_STORE_BOOL(&data.firstVideoFramePut, FALSE);
 
     THREAD_CREATE(&audioSendTid, putAudioFrameRoutine, (PVOID) &data);
 
