@@ -185,6 +185,11 @@ extern "C" {
 #define DEFAULT_AUDIO_TRACK_ID 2
 
 /**
+ * Default Audio only track ID to be used
+ */
+#define DEFAULT_AUDIO_ONLY_TRACK_ID 1
+
+/**
  * Default period for the cached endpoint update
  */
 #define DEFAULT_ENDPOINT_CACHE_UPDATE_PERIOD (40 * HUNDREDS_OF_NANOS_IN_A_MINUTE)

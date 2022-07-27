@@ -15,6 +15,7 @@ extern "C" {
 
 #define VIDEO_ONLY_TRACK_COUNT       1
 #define VIDEO_WITH_AUDIO_TRACK_COUNT 2
+#define AUDIO_ONLY_TRACK_COUNT       1
 
 #define STREAM_INFO_DEFAULT_CONNECTION_STALE_DURATION (5 * HUNDREDS_OF_NANOS_IN_A_SECOND)
 #define STREAM_INFO_DEFAULT_FRAGMENT_DURATION         (2 * HUNDREDS_OF_NANOS_IN_A_SECOND)
@@ -47,15 +48,16 @@ STATUS createVideoTrackInfo(VIDEO_CODEC_ID videoCodecId, PCHAR contentType, PTra
  * @param - AUDIO_CODEC_ID Codec ID of the audio(AAC/PCM_ALAW/PCM_MULAW)
  * @param - audio content type
  * @param - PTrackInfo
+ * @param - UINT32 - trackId for audio stream
  * @return - STATUS code of the execution
  */
-STATUS createAudioTrackInfo(AUDIO_CODEC_ID audioCodecId, PCHAR contentType, PTrackInfo pTrackInfo);
+STATUS createAudioTrackInfo(AUDIO_CODEC_ID audioCodecId, PCHAR contentType, PTrackInfo pTrackInfo, UINT32 audioTrackId);
 
 /**
  * Sets Stream Info for given retention, bufferDuration
  * @param - UINT64 - retention
  * @param - UINT64 - bufferDuration
- * @param - UINT32 - trackCount 1 for Video, 2 Video with Audio
+ * @param - UINT32 - trackCount 1 for Video, 2 Video with Audio, 1 for Audio only
  * @param - PTrackInfo
  * @param - PStreamInfo
  * @return - STATUS code of the execution
@@ -86,6 +88,18 @@ STATUS createVideoStreamInfo(STREAMING_TYPE, VIDEO_CODEC_ID, PCHAR, UINT64, UINT
  * @return - STATUS code of the execution
  */
 STATUS createAudioVideoStreamInfo(STREAMING_TYPE, VIDEO_CODEC_ID, AUDIO_CODEC_ID, PCHAR, UINT64, UINT64, PStreamInfo*);
+
+/**
+ * Sets Stream Info for audio only stream
+ * @param - STREAMING_TYPE
+ * @param - AUDIO_CODEC_ID Codec ID of the audio(AAC/PCM_ALAW/PCM_MULAW)
+ * @param - PCHAR - stream name
+ * @param - UINT64 - retention
+ * @param - UINT64 - bufferDuration
+ * @param - PStreamInfo
+ * @return - STATUS code of the execution
+ */
+STATUS createAudioStreamInfo(STREAMING_TYPE, AUDIO_CODEC_ID, PCHAR, UINT64, UINT64, PStreamInfo*);
 
 #ifdef __cplusplus
 }

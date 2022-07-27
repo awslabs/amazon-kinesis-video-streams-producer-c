@@ -574,6 +574,38 @@ PUBLIC_API STATUS createRealtimeAudioVideoStreamInfoProviderWithCodecs(PCHAR, UI
 PUBLIC_API STATUS createOfflineAudioVideoStreamInfoProviderWithCodecs(PCHAR, UINT64, UINT64, VIDEO_CODEC_ID, AUDIO_CODEC_ID, PStreamInfo*);
 
 /**
+ * Creates Stream Info for RealTime Audio only Streaming Scenario
+ *
+ * NOTE: The caller is responsible for releasing the structure by calling
+ * the corresponding free API.
+ *
+ * @param[in,opt] PCHAR stream name
+ * @param[in] UINT64 retention in 100ns time unit
+ * @param[in] UINT64 buffer duration in 100ns time unit
+ * @param[in] AUDIO_CODEC_ID Codec ID of the audio(AAC/PCM_ALAW/PCM_MULAW)
+ * @param[out] PStreamInfo* Constructed object
+ *
+ * @return STATUS code of the execution
+ */
+PUBLIC_API STATUS createRealtimeAudioStreamInfoProviderWithCodecs(PCHAR, UINT64, UINT64, AUDIO_CODEC_ID, PStreamInfo*);
+
+/**
+ * Creates Stream Info for Offline Audio only Streaming Scenario
+ *
+ * NOTE: The caller is responsible for releasing the structure by calling
+ * the corresponding free API.
+ *
+ * @param[in,opt] PCHAR stream name
+ * @param[in] UINT64 retention in 100ns time unit
+ * @param[in] UINT64 buffer duration in 100ns time unit
+ * @param[in] AUDIO_CODEC_ID Codec ID of the audio(AAC/PCM_ALAW/PCM_MULAW)
+ * @param[out] PStreamInfo* Constructed object
+ *
+ * @return STATUS code of the execution
+ */
+PUBLIC_API STATUS createOfflineAudioStreamInfoProviderWithCodecs(PCHAR, UINT64, UINT64, AUDIO_CODEC_ID, PStreamInfo*);
+
+/**
  * Configure streaminfo based on given storage size and average bitrate
  * Will change buffer duration, stream latency duration.
  *
