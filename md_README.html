@@ -158,6 +158,8 @@ Run samples</h3>
 <p>If you want to enable KVS events in fragment metadata, change the 5th parameter from 0 -&gt; 1. This feature is found only in the audio/video sample, but can be written into the video only sample as well.</p>
 <p>For video only, run <code>./kvsVideoOnlyStreamingSample &lt;channel-name&gt;</code></p>
 <p>This will stream the video files from the <code>samples/h264SampleFrames</code>.</p>
+<p>For audio only, run <code>./kvsAudioOnlyStreamingSample &lt;channel-name&gt; &lt;streaming_duration&gt; &lt;sample_location&gt; &lt;audio-codec&gt;</code>.</p>
+<p>This will stream the audio files from the <code>samples/aacSampleFrames</code> or <code>samples/alawSampleFrames</code> (as per the choice of audio codec in the last argument) respectively.</p>
 <h3><a class="anchor" id="autotoc_md8"></a>
 Run unit tests</h3>
 <p>Since these tests exercise networking you need to have AWS credentials specified, specifically you need to:</p>
@@ -200,7 +202,7 @@ License</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Tue Apr 5 2022 16:45:05 for Amazon Kinesis Producer C SDK by
+    <li class="footer">Generated on Wed Jul 27 2022 14:47:09 for Amazon Kinesis Producer C SDK by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.17 </li>
   </ul>
