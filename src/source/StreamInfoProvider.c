@@ -48,6 +48,18 @@ STATUS createOfflineAudioVideoStreamInfoProviderWithCodecs(PCHAR streamName, UIN
     return createAudioVideoStreamInfo(STREAMING_TYPE_OFFLINE, videoCodecId, audioCodecId, streamName, retention, bufferDuration, ppStreamInfo);
 }
 
+// Creates audio only stream info for real time streaming mode
+STATUS createRealtimeAudioStreamInfoProviderWithCodecs(PCHAR streamName, UINT64 retention, UINT64 bufferDuration, AUDIO_CODEC_ID audioCodecId, PStreamInfo* ppStreamInfo)
+{
+    return createAudioStreamInfo(STREAMING_TYPE_REALTIME, audioCodecId, streamName, retention, bufferDuration, ppStreamInfo);
+}
+
+// Creates audio only stream info for offline streaming mode
+STATUS createOfflineAudioStreamInfoProviderWithCodecs(PCHAR streamName, UINT64 retention, UINT64 bufferDuration, AUDIO_CODEC_ID audioCodecId, PStreamInfo* ppStreamInfo)
+{
+    return createAudioStreamInfo(STREAMING_TYPE_OFFLINE, audioCodecId, streamName, retention, bufferDuration, ppStreamInfo);
+}
+
 // Frees the stream info
 STATUS freeStreamInfoProvider(PStreamInfo* ppStreamInfo)
 {
@@ -103,11 +115,12 @@ CleanUp:
 }
 
 // Creates track info for audio with given codec and sets the content type as per the codec
-STATUS createAudioTrackInfo(AUDIO_CODEC_ID audioCodecId, PCHAR contentType, PTrackInfo pTrackInfo)
+STATUS createAudioTrackInfo(AUDIO_CODEC_ID audioCodecId, PCHAR contentType, PTrackInfo pTrackInfo, UINT32 audioTrackId)
 {
     STATUS retStatus = STATUS_SUCCESS;
 
-    pTrackInfo->trackId = DEFAULT_AUDIO_TRACK_ID;
+    // pTrackInfo->trackId = pTrackInfo->trackId + 1;
+    pTrackInfo->trackId = audioTrackId;
     pTrackInfo->codecPrivateData = NULL;
     pTrackInfo->codecPrivateDataSize = 0;
 
@@ -244,10 +257,50 @@ STATUS createAudioVideoStreamInfo(STREAMING_TYPE streamingType, VIDEO_CODEC_ID v
 
     CHK_STATUS(createVideoTrackInfo(videoCodecId, pStreamInfo->streamCaps.contentType, pTrackInfo));
     STRCAT(pStreamInfo->streamCaps.contentType, ","); //concatenating audio content type to video content type
-    CHK_STATUS(createAudioTrackInfo(audioCodecId, pStreamInfo->streamCaps.contentType, pTrackInfo + 1));
+    CHK_STATUS(createAudioTrackInfo(audioCodecId, pStreamInfo->streamCaps.contentType, pTrackInfo + 1, DEFAULT_AUDIO_TRACK_ID));
 
     STRCPY(pStreamInfo->name, streamName);
     CHK_STATUS(setStreamInfoDefaults(streamingType, retention, bufferDuration, VIDEO_WITH_AUDIO_TRACK_COUNT, pStreamInfo, pTrackInfo));
+
+CleanUp:
+
+    if (STATUS_FAILED(retStatus)) {
+        freeStreamInfoProvider(&pStreamInfo);
+        pStreamInfo = NULL;
+    }
+
+    if (pStreamInfo != NULL) {
+        *ppStreamInfo = pStreamInfo;
+    }
+    LEAVES();
+    return retStatus;
+}
+
+STATUS createAudioStreamInfo(STREAMING_TYPE streamingType, AUDIO_CODEC_ID audioCodecId, PCHAR streamName, UINT64 retention, UINT64 bufferDuration, PStreamInfo* ppStreamInfo)
+{
+    ENTERS();
+
+    STATUS retStatus = STATUS_SUCCESS;
+    PStreamInfo pStreamInfo = NULL;
+    PTrackInfo pTrackInfo = NULL;
+
+    CHK(ppStreamInfo != NULL && streamName != NULL, STATUS_NULL_ARG);
+    CHK(bufferDuration != 0, STATUS_INVALID_ARG);
+
+    CHK(streamingType != STREAMING_TYPE_OFFLINE || retention != 0, STATUS_INVALID_ARG);
+
+    // Allocate the entire structure
+    pStreamInfo = (PStreamInfo) MEMCALLOC(1, SIZEOF(StreamInfo) + AUDIO_ONLY_TRACK_COUNT * SIZEOF(TrackInfo));
+    CHK(pStreamInfo != NULL, STATUS_NOT_ENOUGH_MEMORY);
+
+    pTrackInfo = (PTrackInfo)(pStreamInfo + 1);
+
+    CHK(pTrackInfo != NULL && pStreamInfo->streamCaps.contentType != NULL, STATUS_NULL_ARG);
+
+    CHK_STATUS(createAudioTrackInfo(audioCodecId, pStreamInfo->streamCaps.contentType, pTrackInfo, DEFAULT_AUDIO_ONLY_TRACK_ID));
+
+    STRCPY(pStreamInfo->name, streamName);
+    CHK_STATUS(setStreamInfoDefaults(streamingType, retention, bufferDuration, AUDIO_ONLY_TRACK_COUNT, pStreamInfo, pTrackInfo));
 
 CleanUp:
 

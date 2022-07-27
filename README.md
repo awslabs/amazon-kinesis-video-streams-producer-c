@@ -98,6 +98,10 @@ For video only, run `./kvsVideoOnlyStreamingSample <channel-name>`
 
 This will stream the video files from the `samples/h264SampleFrames`. 
 
+For audio only, run `./kvsAudioOnlyStreamingSample <channel-name> <streaming_duration> <sample_location> <audio-codec>`.
+
+This will stream the audio files from the `samples/aacSampleFrames` or `samples/alawSampleFrames` (as per the choice of audio codec in the last argument) respectively. 
+
 ### Run unit tests
 Since these tests exercise networking you need to have AWS credentials specified, specifically you need to:
 
