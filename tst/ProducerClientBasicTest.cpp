@@ -679,13 +679,13 @@ TEST_F(ProducerClientBasicTest, cachingEndpointProvider_Returns_EndpointFromCach
     EXPECT_TRUE(mProducerStopped) << "Producer thread failed to stop cleanly";
 
     // Expect the number of calls
-    EXPECT_EQ((ITERATION_COUNT + 1) * TEST_STREAM_COUNT, mPutStreamFnCount);
-    EXPECT_EQ((ITERATION_COUNT + 1) * TEST_STREAM_COUNT, mGetStreamingEndpointFnCount);
+    EXPECT_EQ((ITERATION_COUNT + 1 + 1) * TEST_STREAM_COUNT, mPutStreamFnCount);
+    EXPECT_EQ((ITERATION_COUNT + 1 + 1) * TEST_STREAM_COUNT, mGetStreamingEndpointFnCount);
     EXPECT_EQ(0, mCurlCreateStreamCount);
     EXPECT_EQ(0, mCurlDescribeStreamCount);
     EXPECT_EQ(0, mCurlTagResourceCount);
     EXPECT_EQ(1 * TEST_STREAM_COUNT, mCurlGetDataEndpointCount);
-    EXPECT_EQ((ITERATION_COUNT + 1) * TEST_STREAM_COUNT, mCurlPutMediaCount);
+    EXPECT_EQ((ITERATION_COUNT + 1 + 1) * TEST_STREAM_COUNT, mCurlPutMediaCount);
 
     // We will block for some time due to an incorrect implementation of the awaiting code
     // NOTE: The proper implementation should use synchronization primitives to await for the
