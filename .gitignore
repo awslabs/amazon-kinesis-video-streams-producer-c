@@ -8,3 +8,4 @@ cmake-build-release/
 open-source
 outputs
 dependency/
+cmake-build-producerc/

@@ -88,7 +88,7 @@ The last three arguments are optional. By default,
 * `audio-codec` is `aac`
 
 If you want to use the sample for `PCM_ALAW/G.711` frames, run 
-`./kvsAudioVideoStreamingSample <channel-name> <streaming_duration> <sample_location> alaw`
+`./kvsAudioVideoStreamingSample <channel-name> <streaming_duration> <sample_location> alaw 0`
 
 This will stream the video/audio files from the `samples/h264SampleFrames` and `samples/aacSampleFrames` or `samples/alawSampleFrames` (as per the choice of audio codec in the last argument) respectively. 
 

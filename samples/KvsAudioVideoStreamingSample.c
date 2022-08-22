@@ -74,6 +74,10 @@ PVOID putVideoFrameRoutine(PVOID args)
             startUpLatency = (DOUBLE)(GETTIME() - data->startTime) / (DOUBLE) HUNDREDS_OF_NANOS_IN_A_MILLISECOND;
             DLOGD("Start up latency: %lf ms", startUpLatency);
             data->firstFrame = FALSE;
+            if(gEventsEnabled) {
+                //generate an image and notification event at the start of the video stream.
+                putKinesisVideoEventMetadata(data->streamHandle, STREAM_EVENT_TYPE_NOTIFICATION | STREAM_EVENT_TYPE_IMAGE_GENERATION, NULL);
+            }
         }
         else if (frame.flags == FRAME_FLAG_KEY_FRAME) {
             if(gKeyFrameCount%KEYFRAME_EVENT_INTERVAL == 0)
