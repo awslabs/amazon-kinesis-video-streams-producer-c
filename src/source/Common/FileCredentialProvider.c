@@ -121,9 +121,9 @@ STATUS readFileCredentials(PFileCredentialProvider pFileCredentialProvider)
 
     CHK(pFileCredentialProvider != NULL && pFileCredentialProvider->credentialsFilepath != NULL, STATUS_NULL_ARG);
 
-    // Refresh the credentials by reading from the credentials file if needed
+    // Only refresh the credentials by reading from the credentials file if needed.
+    // If we already have credentials and they are not expiring soon, we return successfully here.
     currentTime = pFileCredentialProvider->getCurrentTimeFn(pFileCredentialProvider->customData);
-
     CHK(pFileCredentialProvider->pAwsCredentials == NULL ||
             currentTime + CREDENTIAL_FILE_READ_GRACE_PERIOD > pFileCredentialProvider->pAwsCredentials->expiration,
         retStatus);
@@ -173,7 +173,10 @@ STATUS readFileCredentials(PFileCredentialProvider pFileCredentialProvider)
     sessionTokenLen = (UINT32) STRNLEN(sessionToken, MAX_SESSION_TOKEN_LEN);
 
     if (expirationStr != NULL) {
-        convertTimestampToEpoch(expirationStr, currentTime / HUNDREDS_OF_NANOS_IN_A_SECOND, &expiration);
+        // It makes more sense for createDefaultCallbacksProviderWithFileAuth to fail if the credentials are expired
+        // than for it to succeed and let later service calls fail. Clients who cache credentials in a file will not
+        // see an error the first time they call createDefaultCallbacksProviderWithFileAuth without this check.
+        CHK_STATUS(convertTimestampToEpoch(expirationStr, currentTime / HUNDREDS_OF_NANOS_IN_A_SECOND, &expiration));
     } else {
         expiration = currentTime + MAX_ENFORCED_TOKEN_EXPIRATION_DURATION;
     }
