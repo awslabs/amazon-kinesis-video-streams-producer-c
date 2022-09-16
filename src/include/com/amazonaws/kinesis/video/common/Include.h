@@ -99,6 +99,11 @@ extern "C" {
 #define MAX_REGION_NAME_LEN 128
 
 /**
+ * Maximum allowed service name length
+ */
+#define MAX_SERVICE_NAME_LEN 128
+
+/**
  * Maximum allowed user agent string length
  */
 #define MAX_USER_AGENT_LEN 256
@@ -483,6 +488,7 @@ struct __RequestInfo {
                                               //!< NOTE: The body will follow the main struct
     UINT32 bodySize;                          //!< Size of the body in bytes
     CHAR url[MAX_URI_CHAR_LEN + 1];           //!< The URL for the request
+    CHAR service[MAX_SERVICE_NAME_LEN + 1];   //!< The AWS service for the request
     CHAR certPath[MAX_PATH_LEN + 1];          //!< CA Certificate path to use - optional
     CHAR sslCertPath[MAX_PATH_LEN + 1];       //!< SSL Certificate file path to use - optional
     CHAR sslPrivateKeyPath[MAX_PATH_LEN + 1]; //!< SSL Certificate private key file path to use - optional
