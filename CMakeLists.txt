@@ -274,12 +274,21 @@ if(BUILD_COMMON_CURL)
       "${CMAKE_CURRENT_SOURCE_DIR}/libkvsCommonCurl.pc.cmake"
       "${CMAKE_CURRENT_BINARY_DIR}/libkvsCommonCurl.pc" @ONLY)
 
+    if(BUILD_STATIC)
+      # Curl will enable ZLIB as part of its build if it finds
+      # the package. We need to therefore link it for static builds. 
+      find_package(ZLIB)
+      if(ZLIB_FOUND)
+        list(APPEND CURL_LIBRARIES z)
+      endif()
+    endif()
+
     add_library(kvsCommonCurl STATIC ${KVS_COMMON_SOURCE_FILES_BASE} ${KVS_COMMON_SOURCE_FILES_CURL})
     target_compile_definitions(kvsCommonCurl PRIVATE KVS_BUILD_WITH_CURL ${CPRODUCER_COMMON_TLS_OPTION})
     target_link_libraries(kvsCommonCurl
-            ${PRODUCER_CRYPTO_LIBRARY}
             kvspicUtils
-            ${CURL_LIBRARIES})
+            ${CURL_LIBRARIES}
+            ${PRODUCER_CRYPTO_LIBRARY})
 
     install(
       TARGETS kvsCommonCurl
