@@ -228,6 +228,10 @@ Functions</h2></td></tr>
 <tr class="separator:ga07a041952a2f6903caff94343621bb5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga70f651dfddea8ff8e60c89571204be15"><td class="memItemLeft" align="right" valign="top">PUBLIC_API STATUS&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PublicMemberFunctions.html#ga70f651dfddea8ff8e60c89571204be15">createOfflineAudioVideoStreamInfoProviderWithCodecs</a> (PCHAR, UINT64, UINT64, VIDEO_CODEC_ID, AUDIO_CODEC_ID, PStreamInfo *)</td></tr>
 <tr class="separator:ga70f651dfddea8ff8e60c89571204be15"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga89a47793d740f5b3771fa64c784661c5"><td class="memItemLeft" align="right" valign="top">PUBLIC_API STATUS&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PublicMemberFunctions.html#ga89a47793d740f5b3771fa64c784661c5">createRealtimeAudioStreamInfoProviderWithCodecs</a> (PCHAR, UINT64, UINT64, AUDIO_CODEC_ID, PStreamInfo *)</td></tr>
+<tr class="separator:ga89a47793d740f5b3771fa64c784661c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga88878d02f9fb754fc88f78ff29b69640"><td class="memItemLeft" align="right" valign="top">PUBLIC_API STATUS&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PublicMemberFunctions.html#ga88878d02f9fb754fc88f78ff29b69640">createOfflineAudioStreamInfoProviderWithCodecs</a> (PCHAR, UINT64, UINT64, AUDIO_CODEC_ID, PStreamInfo *)</td></tr>
+<tr class="separator:ga88878d02f9fb754fc88f78ff29b69640"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaace44f4e1d4a1ac64a21101cfbc3c62a"><td class="memItemLeft" align="right" valign="top">PUBLIC_API STATUS&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PublicMemberFunctions.html#gaace44f4e1d4a1ac64a21101cfbc3c62a">setStreamInfoBasedOnStorageSize</a> (UINT32, UINT64, UINT32, PStreamInfo)</td></tr>
 <tr class="separator:gaace44f4e1d4a1ac64a21101cfbc3c62a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gac6ee2669ba7255b501b631f6f6117249"><td class="memItemLeft" align="right" valign="top">PUBLIC_API STATUS&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PublicMemberFunctions.html#gac6ee2669ba7255b501b631f6f6117249">freeStreamInfoProvider</a> (PStreamInfo *)</td></tr>
@@ -2667,6 +2671,77 @@ Here is the caller graph for this function:</div>
 
 </div>
 </div>
+<a id="ga88878d02f9fb754fc88f78ff29b69640"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga88878d02f9fb754fc88f78ff29b69640">&#9670;&nbsp;</a></span>createOfflineAudioStreamInfoProviderWithCodecs()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">PUBLIC_API STATUS createOfflineAudioStreamInfoProviderWithCodecs </td>
+          <td>(</td>
+          <td class="paramtype">PCHAR&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UINT64&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UINT64&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">AUDIO_CODEC_ID&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">PStreamInfo *&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Creates Stream Info for Offline Audio only Streaming Scenario</p>
+<p>NOTE: The caller is responsible for releasing the structure by calling the corresponding free API.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir"></td><td class="paramname">[in,opt]</td><td>PCHAR stream name </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">UINT64</td><td>retention in 100ns time unit </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">UINT64</td><td>buffer duration in 100ns time unit </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">AUDIO_CODEC_ID</td><td>Codec ID of the audio(AAC/PCM_ALAW/PCM_MULAW) </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">PStreamInfo*</td><td>Constructed object</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>STATUS code of the execution </dd></dl>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="group__PublicMemberFunctions_ga88878d02f9fb754fc88f78ff29b69640_cgraph.png" border="0" usemap="#group__PublicMemberFunctions_ga88878d02f9fb754fc88f78ff29b69640_cgraph" alt=""/></div>
+<map name="group__PublicMemberFunctions_ga88878d02f9fb754fc88f78ff29b69640_cgraph" id="group__PublicMemberFunctions_ga88878d02f9fb754fc88f78ff29b69640_cgraph">
+<area shape="rect" title=" " alt="" coords="5,49,196,90"/>
+<area shape="rect" href="StreamInfoProvider_8c.html#a7b48d1f01f7d970a9e9b785efed5d1b4" title=" " alt="" coords="244,56,416,83"/>
+<area shape="rect" href="StreamInfoProvider_8c.html#acabe2f99f2e1937b598bf55fa4655757" title=" " alt="" coords="472,5,631,32"/>
+<area shape="rect" href="group__PublicMemberFunctions.html#gac6ee2669ba7255b501b631f6f6117249" title=" " alt="" coords="464,56,639,83"/>
+<area shape="rect" href="StreamInfoProvider_8c.html#a4b2dccb57947255c377bfa22bdb7ca3e" title=" " alt="" coords="467,107,636,133"/>
+</map>
+</div>
+
+</div>
+</div>
 <a id="ga8c784ef1f2639742b65a76a162dcf9ae"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga8c784ef1f2639742b65a76a162dcf9ae">&#9670;&nbsp;</a></span>createOfflineAudioVideoStreamInfoProvider()</h2>
 
@@ -2723,7 +2798,7 @@ Here is the call graph for this function:</div>
 <map name="group__PublicMemberFunctions_ga8c784ef1f2639742b65a76a162dcf9ae_cgraph" id="group__PublicMemberFunctions_ga8c784ef1f2639742b65a76a162dcf9ae_cgraph">
 <area shape="rect" title=" " alt="" coords="5,74,232,115"/>
 <area shape="rect" href="StreamInfoProvider_8c.html#aa23defed686418bae50b0d19deb73bce" title=" " alt="" coords="280,81,489,108"/>
-<area shape="rect" href="StreamInfoProvider_8c.html#abf387fc8f0542a03dc22ce2cabf15e00" title=" " alt="" coords="545,5,704,32"/>
+<area shape="rect" href="StreamInfoProvider_8c.html#acabe2f99f2e1937b598bf55fa4655757" title=" " alt="" coords="545,5,704,32"/>
 <area shape="rect" href="StreamInfoProvider_8c.html#ad5f6df119c04cc525d42cf3c40a6cc59" title=" " alt="" coords="545,56,704,83"/>
 <area shape="rect" href="group__PublicMemberFunctions.html#gac6ee2669ba7255b501b631f6f6117249" title=" " alt="" coords="537,107,712,133"/>
 <area shape="rect" href="StreamInfoProvider_8c.html#a4b2dccb57947255c377bfa22bdb7ca3e" title=" " alt="" coords="540,157,709,184"/>
@@ -2802,7 +2877,7 @@ Here is the call graph for this function:</div>
 <map name="group__PublicMemberFunctions_ga70f651dfddea8ff8e60c89571204be15_cgraph" id="group__PublicMemberFunctions_ga70f651dfddea8ff8e60c89571204be15_cgraph">
 <area shape="rect" title=" " alt="" coords="5,74,232,115"/>
 <area shape="rect" href="StreamInfoProvider_8c.html#aa23defed686418bae50b0d19deb73bce" title=" " alt="" coords="280,81,489,108"/>
-<area shape="rect" href="StreamInfoProvider_8c.html#abf387fc8f0542a03dc22ce2cabf15e00" title=" " alt="" coords="545,5,704,32"/>
+<area shape="rect" href="StreamInfoProvider_8c.html#acabe2f99f2e1937b598bf55fa4655757" title=" " alt="" coords="545,5,704,32"/>
 <area shape="rect" href="StreamInfoProvider_8c.html#ad5f6df119c04cc525d42cf3c40a6cc59" title=" " alt="" coords="545,56,704,83"/>
 <area shape="rect" href="group__PublicMemberFunctions.html#gac6ee2669ba7255b501b631f6f6117249" title=" " alt="" coords="537,107,712,133"/>
 <area shape="rect" href="StreamInfoProvider_8c.html#a4b2dccb57947255c377bfa22bdb7ca3e" title=" " alt="" coords="540,157,709,184"/>
@@ -2946,6 +3021,77 @@ Here is the call graph for this function:</div>
 
 </div>
 </div>
+<a id="ga89a47793d740f5b3771fa64c784661c5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga89a47793d740f5b3771fa64c784661c5">&#9670;&nbsp;</a></span>createRealtimeAudioStreamInfoProviderWithCodecs()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">PUBLIC_API STATUS createRealtimeAudioStreamInfoProviderWithCodecs </td>
+          <td>(</td>
+          <td class="paramtype">PCHAR&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UINT64&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UINT64&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">AUDIO_CODEC_ID&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">PStreamInfo *&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Creates Stream Info for RealTime Audio only Streaming Scenario</p>
+<p>NOTE: The caller is responsible for releasing the structure by calling the corresponding free API.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir"></td><td class="paramname">[in,opt]</td><td>PCHAR stream name </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">UINT64</td><td>retention in 100ns time unit </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">UINT64</td><td>buffer duration in 100ns time unit </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">AUDIO_CODEC_ID</td><td>Codec ID of the audio(AAC/PCM_ALAW/PCM_MULAW) </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">PStreamInfo*</td><td>Constructed object</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>STATUS code of the execution </dd></dl>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="group__PublicMemberFunctions_ga89a47793d740f5b3771fa64c784661c5_cgraph.png" border="0" usemap="#group__PublicMemberFunctions_ga89a47793d740f5b3771fa64c784661c5_cgraph" alt=""/></div>
+<map name="group__PublicMemberFunctions_ga89a47793d740f5b3771fa64c784661c5_cgraph" id="group__PublicMemberFunctions_ga89a47793d740f5b3771fa64c784661c5_cgraph">
+<area shape="rect" title=" " alt="" coords="5,49,212,90"/>
+<area shape="rect" href="StreamInfoProvider_8c.html#a7b48d1f01f7d970a9e9b785efed5d1b4" title=" " alt="" coords="260,56,432,83"/>
+<area shape="rect" href="StreamInfoProvider_8c.html#acabe2f99f2e1937b598bf55fa4655757" title=" " alt="" coords="488,5,647,32"/>
+<area shape="rect" href="group__PublicMemberFunctions.html#gac6ee2669ba7255b501b631f6f6117249" title=" " alt="" coords="480,56,655,83"/>
+<area shape="rect" href="StreamInfoProvider_8c.html#a4b2dccb57947255c377bfa22bdb7ca3e" title=" " alt="" coords="483,107,652,133"/>
+</map>
+</div>
+
+</div>
+</div>
 <a id="ga6f9f574d825407dd045e87351951ba85"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga6f9f574d825407dd045e87351951ba85">&#9670;&nbsp;</a></span>createRealtimeAudioVideoStreamInfoProvider()</h2>
 
@@ -3002,7 +3148,7 @@ Here is the call graph for this function:</div>
 <map name="group__PublicMemberFunctions_ga6f9f574d825407dd045e87351951ba85_cgraph" id="group__PublicMemberFunctions_ga6f9f574d825407dd045e87351951ba85_cgraph">
 <area shape="rect" title=" " alt="" coords="5,74,201,115"/>
 <area shape="rect" href="StreamInfoProvider_8c.html#aa23defed686418bae50b0d19deb73bce" title=" " alt="" coords="249,81,459,108"/>
-<area shape="rect" href="StreamInfoProvider_8c.html#abf387fc8f0542a03dc22ce2cabf15e00" title=" " alt="" coords="515,5,673,32"/>
+<area shape="rect" href="StreamInfoProvider_8c.html#acabe2f99f2e1937b598bf55fa4655757" title=" " alt="" coords="515,5,673,32"/>
 <area shape="rect" href="StreamInfoProvider_8c.html#ad5f6df119c04cc525d42cf3c40a6cc59" title=" " alt="" coords="515,56,673,83"/>
 <area shape="rect" href="group__PublicMemberFunctions.html#gac6ee2669ba7255b501b631f6f6117249" title=" " alt="" coords="507,107,681,133"/>
 <area shape="rect" href="StreamInfoProvider_8c.html#a4b2dccb57947255c377bfa22bdb7ca3e" title=" " alt="" coords="509,157,679,184"/>
@@ -3081,7 +3227,7 @@ Here is the call graph for this function:</div>
 <map name="group__PublicMemberFunctions_ga07a041952a2f6903caff94343621bb5c_cgraph" id="group__PublicMemberFunctions_ga07a041952a2f6903caff94343621bb5c_cgraph">
 <area shape="rect" title=" " alt="" coords="5,74,231,115"/>
 <area shape="rect" href="StreamInfoProvider_8c.html#aa23defed686418bae50b0d19deb73bce" title=" " alt="" coords="279,81,488,108"/>
-<area shape="rect" href="StreamInfoProvider_8c.html#abf387fc8f0542a03dc22ce2cabf15e00" title=" " alt="" coords="544,5,703,32"/>
+<area shape="rect" href="StreamInfoProvider_8c.html#acabe2f99f2e1937b598bf55fa4655757" title=" " alt="" coords="544,5,703,32"/>
 <area shape="rect" href="StreamInfoProvider_8c.html#ad5f6df119c04cc525d42cf3c40a6cc59" title=" " alt="" coords="544,56,703,83"/>
 <area shape="rect" href="group__PublicMemberFunctions.html#gac6ee2669ba7255b501b631f6f6117249" title=" " alt="" coords="536,107,711,133"/>
 <area shape="rect" href="StreamInfoProvider_8c.html#a4b2dccb57947255c377bfa22bdb7ca3e" title=" " alt="" coords="539,157,708,184"/>
@@ -4472,17 +4618,20 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="group__PublicMemberFunctions_gac6ee2669ba7255b501b631f6f6117249_icgraph.png" border="0" usemap="#group__PublicMemberFunctions_gac6ee2669ba7255b501b631f6f6117249_icgraph" alt=""/></div>
 <map name="group__PublicMemberFunctions_gac6ee2669ba7255b501b631f6f6117249_icgraph" id="group__PublicMemberFunctions_gac6ee2669ba7255b501b631f6f6117249_icgraph">
-<area shape="rect" title=" " alt="" coords="537,242,712,269"/>
-<area shape="rect" href="StreamInfoProvider_8c.html#aa23defed686418bae50b0d19deb73bce" title=" " alt="" coords="280,143,489,170"/>
-<area shape="rect" href="StreamInfoProvider_8c.html#a5c26f8d9518a9c6d3dcf2baccf97a9c7" title=" " alt="" coords="299,339,471,366"/>
-<area shape="rect" href="group__PublicMemberFunctions.html#ga8c784ef1f2639742b65a76a162dcf9ae" title=" " alt="" coords="5,5,232,47"/>
-<area shape="rect" href="group__PublicMemberFunctions.html#ga70f651dfddea8ff8e60c89571204be15" title=" " alt="" coords="5,71,232,112"/>
-<area shape="rect" href="group__PublicMemberFunctions.html#ga6f9f574d825407dd045e87351951ba85" title=" " alt="" coords="21,136,217,177"/>
-<area shape="rect" href="group__PublicMemberFunctions.html#ga07a041952a2f6903caff94343621bb5c" title=" " alt="" coords="6,201,231,243"/>
-<area shape="rect" href="group__PublicMemberFunctions.html#gabffb66f6cffe57ec0fa39c1257008697" title=" " alt="" coords="23,267,214,308"/>
-<area shape="rect" href="group__PublicMemberFunctions.html#ga6e083dfc57516c4efaa9951df09c6848" title=" " alt="" coords="23,332,214,373"/>
-<area shape="rect" href="group__PublicMemberFunctions.html#ga6f65415b32d0ffca37e95c5d6b9723b7" title=" " alt="" coords="15,397,222,439"/>
-<area shape="rect" href="group__PublicMemberFunctions.html#ga727bdc885fc70ac48b9ddc784f504ce4" title=" " alt="" coords="15,463,222,504"/>
+<area shape="rect" title=" " alt="" coords="537,241,712,267"/>
+<area shape="rect" href="StreamInfoProvider_8c.html#a7b48d1f01f7d970a9e9b785efed5d1b4" title=" " alt="" coords="299,78,471,105"/>
+<area shape="rect" href="StreamInfoProvider_8c.html#aa23defed686418bae50b0d19deb73bce" title=" " alt="" coords="280,241,489,267"/>
+<area shape="rect" href="StreamInfoProvider_8c.html#a5c26f8d9518a9c6d3dcf2baccf97a9c7" title=" " alt="" coords="299,470,471,497"/>
+<area shape="rect" href="group__PublicMemberFunctions.html#ga88878d02f9fb754fc88f78ff29b69640" title=" " alt="" coords="23,5,214,47"/>
+<area shape="rect" href="group__PublicMemberFunctions.html#ga89a47793d740f5b3771fa64c784661c5" title=" " alt="" coords="15,71,222,112"/>
+<area shape="rect" href="group__PublicMemberFunctions.html#ga8c784ef1f2639742b65a76a162dcf9ae" title=" " alt="" coords="5,136,232,177"/>
+<area shape="rect" href="group__PublicMemberFunctions.html#ga70f651dfddea8ff8e60c89571204be15" title=" " alt="" coords="5,201,232,243"/>
+<area shape="rect" href="group__PublicMemberFunctions.html#ga6f9f574d825407dd045e87351951ba85" title=" " alt="" coords="21,267,217,308"/>
+<area shape="rect" href="group__PublicMemberFunctions.html#ga07a041952a2f6903caff94343621bb5c" title=" " alt="" coords="6,332,231,373"/>
+<area shape="rect" href="group__PublicMemberFunctions.html#gabffb66f6cffe57ec0fa39c1257008697" title=" " alt="" coords="23,397,214,439"/>
+<area shape="rect" href="group__PublicMemberFunctions.html#ga6e083dfc57516c4efaa9951df09c6848" title=" " alt="" coords="23,463,214,504"/>
+<area shape="rect" href="group__PublicMemberFunctions.html#ga6f65415b32d0ffca37e95c5d6b9723b7" title=" " alt="" coords="15,528,222,569"/>
+<area shape="rect" href="group__PublicMemberFunctions.html#ga727bdc885fc70ac48b9ddc784f504ce4" title=" " alt="" coords="15,593,222,635"/>
 </map>
 </div>
 
@@ -5411,7 +5560,7 @@ Here is the call graph for this function:</div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Mon Aug 22 2022 16:26:39 for Amazon Kinesis Producer C SDK by
+    <li class="footer">Generated on Fri Sep 23 2022 16:01:59 for Amazon Kinesis Producer C SDK by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.17 </li>
   </ul>
