@@ -311,7 +311,7 @@ jobs:
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DBUILD_OPENSSL_PLATFORM=linux-generic64
           make
-          file libKinesisVideoProducer.so
+          file libcproducer.so
   linux-aarch64-cross-compilation:
     runs-on: ubuntu-latest
     env:
@@ -330,7 +330,7 @@ jobs:
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DBUILD_OPENSSL_PLATFORM=linux-aarch64
           make
-          file libKinesisVideoProducer.so
+          file libcproducer.so
   arm32-cross-compilation:
     runs-on: ubuntu-latest
     env:
@@ -349,6 +349,6 @@ jobs:
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DBUILD_OPENSSL_PLATFORM=linux-generic32
           make
-          file libKinesisVideoProducer.so
+          file libcproducer.so
 
           
