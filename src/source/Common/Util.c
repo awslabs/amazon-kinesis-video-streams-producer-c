@@ -18,6 +18,7 @@ STATUS convertTimestampToEpoch(PCHAR expirationTimestampStr, UINT64 nowTime, PUI
     MEMSET(&ioTExpiration, 0x00, SIZEOF(struct tm));
 
     // iot expiration timestamp format "YYYY-MM-DDTHH:mm:SSZ"
+    CHK(STRLEN(expirationTimestampStr) == STRLEN(IOT_EXPIRATION_TIMESTAMP_STR), STATUS_TIMESTAMP_STRING_UNRECOGNIZED_FORMAT);
 
     CHK_STATUS(STRTOUI32(expirationTimestampStr, expirationTimestampStr + 4, IOT_EXPIRATION_PARSE_CONVERSION_BASE, (PUINT32) &ioTExpiration.tm_year));
     ioTExpiration.tm_year -= 1900;

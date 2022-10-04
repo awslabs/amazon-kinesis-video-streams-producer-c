@@ -40,9 +40,9 @@ extern "C" {
 #define STATUS_DUPLICATE_AUTH_CALLBACK_FREE_FUNC        STATUS_PRODUCER_BASE + 0x0000001b
 #define STATUS_DUPLICATE_API_CALLBACK_FREE_FUNC         STATUS_PRODUCER_BASE + 0x0000001c
 #define STATUS_FILE_LOGGER_INDEX_FILE_TOO_LARGE         STATUS_PRODUCER_BASE + 0x0000001d
-#define STATUS_STREAM_BEING_SHUTDOWN                    STATUS_PRODUCER_BASE + 0x00000025
-#define STATUS_CLIENT_BEING_SHUTDOWN                    STATUS_PRODUCER_BASE + 0x00000026
-#define STATUS_CONTINUOUS_RETRY_RESET_FAILED            STATUS_PRODUCER_BASE + 0x00000027
+#define STATUS_STREAM_BEING_SHUTDOWN                    STATUS_PRODUCER_BASE + 0x00000026
+#define STATUS_CLIENT_BEING_SHUTDOWN                    STATUS_PRODUCER_BASE + 0x00000027
+#define STATUS_CONTINUOUS_RETRY_RESET_FAILED            STATUS_PRODUCER_BASE + 0x00000028
 /*!@} */
 
 /**
@@ -507,6 +507,71 @@ PUBLIC_API STATUS createRealtimeAudioVideoStreamInfoProvider(PCHAR, UINT64, UINT
  * @return STATUS code of the execution
  */
 PUBLIC_API STATUS createOfflineAudioVideoStreamInfoProvider(PCHAR, UINT64, UINT64, PStreamInfo*);
+
+/**
+ * Creates Stream Info for RealTime Streaming Scenario using default values.
+ *
+ * NOTE: The caller is responsible for releasing the structure by calling
+ * the corresponding free API.
+ *
+ * @param[in,opt] PCHAR stream name
+ * @param[in] UINT64 retention in 100ns time unit
+ * @param[in] UINT64 buffer duration in 100ns time unit
+ * @param[in] VIDEO_CODEC_ID Codec ID of the video(H.264/H.265)
+ * @param[out] PStreamInfo* Constructed object
+ * @return STATUS code of the execution
+ */
+PUBLIC_API STATUS createRealtimeVideoStreamInfoProviderWithCodecs(PCHAR, UINT64, UINT64, VIDEO_CODEC_ID, PStreamInfo*);
+
+/**
+ * Creates Stream Info for Offline Video Streaming Scenario.
+ *
+ * NOTE: The caller is responsible for releasing the structure by calling
+ * the corresponding free API.
+ *
+ * @param[in,opt] PCHAR stream name
+ * @param[in] UINT64 etention in 100ns time unit. Should be greater than 0.
+ * @param[in] UINT64 buffer duration in 100ns time unit
+ * @param[in] VIDEO_CODEC_ID Codec ID of the video(H.264/H.265)
+ * @param[out] PStreamInfo* Constructed object
+ *
+ * @return STATUS code of the execution
+ */
+PUBLIC_API STATUS createOfflineVideoStreamInfoProviderWithCodecs(PCHAR, UINT64, UINT64, VIDEO_CODEC_ID, PStreamInfo*);
+
+/**
+ * Creates Stream Info for RealTime Audio Video Streaming Scenario
+ *
+ * NOTE: The caller is responsible for releasing the structure by calling
+ * the corresponding free API.
+ *
+ * @param[in,opt] PCHAR stream name
+ * @param[in] UINT64 retention in 100ns time unit
+ * @param[in] UINT64 buffer duration in 100ns time unit
+ * @param[in] VIDEO_CODEC_ID Codec ID of the video(H.264/H.265)
+ * @param[in] AUDIO_CODEC_ID Codec ID of the audio(AAC/PCM_ALAW/PCM_MULAW)
+ * @param[out] PStreamInfo* Constructed object
+ *
+ * @return STATUS code of the execution
+ */
+PUBLIC_API STATUS createRealtimeAudioVideoStreamInfoProviderWithCodecs(PCHAR, UINT64, UINT64, VIDEO_CODEC_ID, AUDIO_CODEC_ID, PStreamInfo*);
+
+/**
+ * Creates Stream Info for Offline Audio Video Streaming Scenario
+ *
+ * NOTE: The caller is responsible for releasing the structure by calling
+ * the corresponding free API.
+ *
+ * @param[in,opt] PCHAR stream name
+ * @param[in] UINT64 retention in 100ns time unit
+ * @param[in] UINT64 buffer duration in 100ns time unit
+ * @param[in] VIDEO_CODEC_ID Codec ID of the video(H.264/H.265)
+ * @param[in] AUDIO_CODEC_ID Codec ID of the audio(AAC/PCM_ALAW/PCM_MULAW)
+ * @param[out] PStreamInfo* Constructed object
+ *
+ * @return STATUS code of the execution
+ */
+PUBLIC_API STATUS createOfflineAudioVideoStreamInfoProviderWithCodecs(PCHAR, UINT64, UINT64, VIDEO_CODEC_ID, AUDIO_CODEC_ID, PStreamInfo*);
 
 /**
  * Configure streaminfo based on given storage size and average bitrate

@@ -1,12 +1,15 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.6.3)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake;${CMAKE_MODULE_PATH}")
 include(Utilities)
 project(KinesisVideoProducerC LANGUAGES C)
 
 set(KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION 1)
-set(KINESIS_VIDEO_PRODUCER_C_MINOR_VERSION 2)
+set(KINESIS_VIDEO_PRODUCER_C_MINOR_VERSION 4)
 set(KINESIS_VIDEO_PRODUCER_C_PATCH_VERSION 0)
 set(KINESIS_VIDEO_PRODUCER_C_VERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION}.${KINESIS_VIDEO_PRODUCER_C_MINOR_VERSION}.${KINESIS_VIDEO_PRODUCER_C_PATCH_VERSION})
+
+include(GNUInstallDirs)
+
 
 # User Flags
 option(ADD_MUCLIBC "Add -muclibc c flag" OFF)
@@ -103,22 +106,32 @@ if(BUILD_DEPENDENCIES)
   message(STATUS "Finished building dependencies.")
 endif()
 
-############# fetch repos that we need do add_subdirectory ############
+find_package(PkgConfig REQUIRED)
 
-# repos that we will build using add_subdirectory will be stored in this path
-set(DEPENDENCY_DOWNLOAD_PATH ${CMAKE_CURRENT_SOURCE_DIR}/dependency)
-set(BUILD_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
-fetch_repo(kvspic ${BUILD_ARGS})
-add_subdirectory("${DEPENDENCY_DOWNLOAD_PATH}/libkvspic/kvspic-src")
-file(GLOB PIC_HEADERS "${pic_project_SOURCE_DIR}/src/*/include")
-include_directories("${PIC_HEADERS}")
+############# Check system for kvspic #############
 
-############# fetch repos that we need do add_subdirectory done ############
+pkg_check_modules(KVSPIC libkvspicUtils)
+if(KVSPIC_FOUND)
+  set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${KVSPIC_INCLUDE_DIRS})
+  link_directories(${KVSPIC_LIBRARY_DIRS})
+else()
+  ############# fetch repos that we need do add_subdirectory ############
+  # repos that we will build using add_subdirectory will be stored in this path
+  set(DEPENDENCY_DOWNLOAD_PATH ${CMAKE_CURRENT_SOURCE_DIR}/dependency)
+  set(BUILD_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
+  fetch_repo(kvspic ${BUILD_ARGS})
+  add_subdirectory("${DEPENDENCY_DOWNLOAD_PATH}/libkvspic/kvspic-src")
+  file(GLOB PIC_HEADERS "${pic_project_SOURCE_DIR}/src/*/include")
+  include_directories("${PIC_HEADERS}")
+
+  ############# fetch repos that we need do add_subdirectory done ############
+endif()
+
+############# Check system for kvspic done #############
 
 ############# find dependent libraries ############
 
 find_package(Threads)
-find_package(PkgConfig REQUIRED)
 
 set(OPEN_SRC_INCLUDE_DIRS ${LIBKVSPIC_INCLUDE_DIRS})
 
@@ -260,12 +273,12 @@ if(BUILD_COMMON_LWS)
 
     install(
       TARGETS kvsCommonLws
-      ARCHIVE DESTINATION lib
-      LIBRARY DESTINATION lib
-      RUNTIME DESTINATION bin)
+      ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+      LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+      RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
     install(
       FILES ${CMAKE_CURRENT_BINARY_DIR}/libkvsCommonLws.pc
-      DESTINATION lib/pkgconfig)
+      DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 endif()
 
 if(BUILD_COMMON_CURL)
@@ -286,12 +299,12 @@ if(BUILD_COMMON_CURL)
 
     install(
       TARGETS kvsCommonCurl
-      ARCHIVE DESTINATION lib
-      LIBRARY DESTINATION lib
-      RUNTIME DESTINATION bin)
+      ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+      LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+      RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
     install(
       FILES ${CMAKE_CURRENT_BINARY_DIR}/libkvsCommonCurl.pc
-      DESTINATION lib/pkgconfig)
+      DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 
     configure_file(
       "${CMAKE_CURRENT_SOURCE_DIR}/libcproducer.pc.cmake"
@@ -309,18 +322,18 @@ if(BUILD_COMMON_CURL)
 
     install(
       TARGETS cproducer
-      ARCHIVE DESTINATION lib
-      LIBRARY DESTINATION lib
-      RUNTIME DESTINATION bin)
+      ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+      LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+      RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
     install(
       FILES ${CMAKE_CURRENT_BINARY_DIR}/libcproducer.pc
-      DESTINATION lib/pkgconfig)
+      DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 
     add_executable(kvsVideoOnlyStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsVideoOnlyStreamingSample.c)
     target_link_libraries(kvsVideoOnlyStreamingSample cproducer)
 
-    add_executable(kvsAacAudioVideoStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsAacAudioVideoStreamingSample.c)
-    target_link_libraries(kvsAacAudioVideoStreamingSample cproducer)
+    add_executable(kvsAudioVideoStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsAudioVideoStreamingSample.c)
+    target_link_libraries(kvsAudioVideoStreamingSample cproducer)
 
     if (BUILD_TEST)
         add_subdirectory(tst)

@@ -347,6 +347,7 @@ PVOID ProducerClientTestBase::basicProducerRoutine(STREAM_HANDLE streamHandle, S
 
     UINT32 index = 0, persistentMetadataIndex = 0;
     UINT64 timestamp = GETTIME();
+    UINT64 diffTime;
     Frame frame;
     std::string persistentMetadataName;
     TID tid = GETTID();
@@ -449,7 +450,10 @@ EXPECT_TRUE(kinesis_video_stream->putFrame(eofr));
 
         // Sleep a while for non-offline modes
         if (streamingType != STREAMING_TYPE_OFFLINE) {
-            THREAD_SLEEP(TEST_FRAME_DURATION);
+            diffTime = GETTIME()-timestamp;
+            if (diffTime < TEST_FRAME_DURATION) {
+                THREAD_SLEEP(TEST_FRAME_DURATION-diffTime);
+            }
         }
     }
 
@@ -516,7 +520,7 @@ TEST_F(ProducerClientBasicTest, create_produce_stream)
 #endif
 
     // Wait for some time to produce
-    THREAD_SLEEP(TEST_EXECUTION_DURATION);
+    THREAD_SLEEP(2*TEST_EXECUTION_DURATION);
 
     // Indicate the cancel for the threads
     mStopProducer = TRUE;
@@ -571,7 +575,7 @@ TEST_F(ProducerClientBasicTest, create_produce_stream_parallel)
     }
 
     // Wait for some time to produce
-    THREAD_SLEEP(TEST_EXECUTION_DURATION);
+    THREAD_SLEEP(2*TEST_EXECUTION_DURATION);
 
     // Indicate the cancel for the threads
     mStopProducer = TRUE;
@@ -617,7 +621,7 @@ TEST_F(ProducerClientBasicTest, create_produce_client_parallel)
     }
 
     // Wait for some time to produce
-    THREAD_SLEEP(TEST_EXECUTION_DURATION);
+    THREAD_SLEEP(2*TEST_EXECUTION_DURATION);
 
     // Indicate the cancel for the threads
     mStopProducer = TRUE;
@@ -675,13 +679,13 @@ TEST_F(ProducerClientBasicTest, cachingEndpointProvider_Returns_EndpointFromCach
     EXPECT_TRUE(mProducerStopped) << "Producer thread failed to stop cleanly";
 
     // Expect the number of calls
-    EXPECT_EQ((ITERATION_COUNT + 1) * TEST_STREAM_COUNT, mPutStreamFnCount);
-    EXPECT_EQ((ITERATION_COUNT + 1) * TEST_STREAM_COUNT, mGetStreamingEndpointFnCount);
+    EXPECT_EQ((ITERATION_COUNT + 1 + 1) * TEST_STREAM_COUNT, mPutStreamFnCount);
+    EXPECT_EQ((ITERATION_COUNT + 1 + 1) * TEST_STREAM_COUNT, mGetStreamingEndpointFnCount);
     EXPECT_EQ(0, mCurlCreateStreamCount);
     EXPECT_EQ(0, mCurlDescribeStreamCount);
     EXPECT_EQ(0, mCurlTagResourceCount);
     EXPECT_EQ(1 * TEST_STREAM_COUNT, mCurlGetDataEndpointCount);
-    EXPECT_EQ((ITERATION_COUNT + 1) * TEST_STREAM_COUNT, mCurlPutMediaCount);
+    EXPECT_EQ((ITERATION_COUNT + 1 + 1) * TEST_STREAM_COUNT, mCurlPutMediaCount);
 
     // We will block for some time due to an incorrect implementation of the awaiting code
     // NOTE: The proper implementation should use synchronization primitives to await for the

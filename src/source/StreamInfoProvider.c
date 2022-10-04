@@ -7,24 +7,45 @@
 // Creates video stream info for real time streaming mode
 STATUS createRealtimeVideoStreamInfoProvider(PCHAR streamName, UINT64 retention, UINT64 bufferDuration, PStreamInfo* ppStreamInfo)
 {
-    return createVideoStreamInfo(STREAMING_TYPE_REALTIME, streamName, retention, bufferDuration, ppStreamInfo);
+    return createVideoStreamInfo(STREAMING_TYPE_REALTIME, VIDEO_CODEC_ID_H264, streamName, retention, bufferDuration, ppStreamInfo);
 }
-
 // Creates video stream info for offline streaming mode
 STATUS createOfflineVideoStreamInfoProvider(PCHAR streamName, UINT64 retention, UINT64 bufferDuration, PStreamInfo* ppStreamInfo)
 {
-    return createVideoStreamInfo(STREAMING_TYPE_OFFLINE, streamName, retention, bufferDuration, ppStreamInfo);
+    return createVideoStreamInfo(STREAMING_TYPE_OFFLINE, VIDEO_CODEC_ID_H264, streamName, retention, bufferDuration, ppStreamInfo);
 }
 // Creates audio video stream info for real time streaming mode
 STATUS createRealtimeAudioVideoStreamInfoProvider(PCHAR streamName, UINT64 retention, UINT64 bufferDuration, PStreamInfo* ppStreamInfo)
 {
-    return createAudioVideoStreamInfo(STREAMING_TYPE_REALTIME, streamName, retention, bufferDuration, ppStreamInfo);
+    return createAudioVideoStreamInfo(STREAMING_TYPE_REALTIME, VIDEO_CODEC_ID_H264, AUDIO_CODEC_ID_AAC, streamName, retention, bufferDuration, ppStreamInfo);
 }
 
 // Creates audio video stream info for offline streaming mode
 STATUS createOfflineAudioVideoStreamInfoProvider(PCHAR streamName, UINT64 retention, UINT64 bufferDuration, PStreamInfo* ppStreamInfo)
 {
-    return createAudioVideoStreamInfo(STREAMING_TYPE_OFFLINE, streamName, retention, bufferDuration, ppStreamInfo);
+    return createAudioVideoStreamInfo(STREAMING_TYPE_OFFLINE, VIDEO_CODEC_ID_H264, AUDIO_CODEC_ID_AAC, streamName, retention, bufferDuration, ppStreamInfo);
+}
+
+// Creates video stream info for real time streaming mode
+STATUS createRealtimeVideoStreamInfoProviderWithCodecs(PCHAR streamName, UINT64 retention, UINT64 bufferDuration, VIDEO_CODEC_ID videoCodecId, PStreamInfo* ppStreamInfo)
+{
+    return createVideoStreamInfo(STREAMING_TYPE_REALTIME, videoCodecId, streamName, retention, bufferDuration, ppStreamInfo);
+}
+// Creates video stream info for offline streaming mode
+STATUS createOfflineVideoStreamInfoProviderWithCodecs(PCHAR streamName, UINT64 retention, UINT64 bufferDuration, VIDEO_CODEC_ID videoCodecId, PStreamInfo* ppStreamInfo)
+{
+    return createVideoStreamInfo(STREAMING_TYPE_OFFLINE, videoCodecId, streamName, retention, bufferDuration, ppStreamInfo);
+}
+// Creates audio video stream info for real time streaming mode
+STATUS createRealtimeAudioVideoStreamInfoProviderWithCodecs(PCHAR streamName, UINT64 retention, UINT64 bufferDuration, VIDEO_CODEC_ID videoCodecId, AUDIO_CODEC_ID audioCodecId, PStreamInfo* ppStreamInfo)
+{
+    return createAudioVideoStreamInfo(STREAMING_TYPE_REALTIME, videoCodecId, audioCodecId, streamName, retention, bufferDuration, ppStreamInfo);
+}
+
+// Creates audio video stream info for offline streaming mode
+STATUS createOfflineAudioVideoStreamInfoProviderWithCodecs(PCHAR streamName, UINT64 retention, UINT64 bufferDuration, VIDEO_CODEC_ID videoCodecId, AUDIO_CODEC_ID audioCodecId, PStreamInfo* ppStreamInfo)
+{
+    return createAudioVideoStreamInfo(STREAMING_TYPE_OFFLINE, videoCodecId, audioCodecId, streamName, retention, bufferDuration, ppStreamInfo);
 }
 
 // Frees the stream info
@@ -49,33 +70,70 @@ CleanUp:
     LEAVES();
     return retStatus;
 }
-
-// Creates H264 track info for video
-STATUS createH264VideoTrackInfo(PTrackInfo pTrackInfo)
+// Creates track info for video with given codec and sets the content type as per the codec
+STATUS createVideoTrackInfo(VIDEO_CODEC_ID videoCodecId, PCHAR contentType, PTrackInfo pTrackInfo)
 {
     STATUS retStatus = STATUS_SUCCESS;
 
     pTrackInfo->trackId = DEFAULT_VIDEO_TRACK_ID;
     pTrackInfo->codecPrivateData = NULL;
     pTrackInfo->codecPrivateDataSize = 0;
-    STRCPY(pTrackInfo->codecId, MKV_H264_AVC_CODEC_ID);
+
+    CHK(pTrackInfo != NULL && contentType != NULL, STATUS_NULL_ARG);
+
+    switch (videoCodecId) {
+        case VIDEO_CODEC_ID_H264:
+            STRCPY(pTrackInfo->codecId, MKV_H264_AVC_CODEC_ID);
+            STRCAT(contentType, MKV_H264_CONTENT_TYPE);
+            break;
+        case VIDEO_CODEC_ID_H265:
+            STRCPY(pTrackInfo->codecId, MKV_H265_HEVC_CODEC_ID);
+            STRCAT(contentType, MKV_H265_CONTENT_TYPE);
+            break;
+        default:
+            STRCPY(pTrackInfo->codecId, MKV_H264_AVC_CODEC_ID);
+            STRCAT(contentType, MKV_H265_CONTENT_TYPE);
+    }
     STRCPY(pTrackInfo->trackName, DEFAULT_VIDEO_TRACK_NAME);
     pTrackInfo->trackType = MKV_TRACK_INFO_TYPE_VIDEO;
+
+CleanUp:
 
     return retStatus;
 }
 
-// Creates AAC track info for audio
-STATUS createAacAudioTrackInfo(PTrackInfo pTrackInfo)
+// Creates track info for audio with given codec and sets the content type as per the codec
+STATUS createAudioTrackInfo(AUDIO_CODEC_ID audioCodecId, PCHAR contentType, PTrackInfo pTrackInfo)
 {
     STATUS retStatus = STATUS_SUCCESS;
 
     pTrackInfo->trackId = DEFAULT_AUDIO_TRACK_ID;
     pTrackInfo->codecPrivateData = NULL;
     pTrackInfo->codecPrivateDataSize = 0;
-    STRCPY(pTrackInfo->codecId, MKV_AAC_CODEC_ID);
+
+    CHK(pTrackInfo != NULL && contentType != NULL, STATUS_NULL_ARG);
+
+    switch (audioCodecId) {
+        case AUDIO_CODEC_ID_AAC:
+            STRCPY(pTrackInfo->codecId, MKV_AAC_CODEC_ID);
+            STRCAT(contentType, MKV_AAC_CONTENT_TYPE);
+            break;
+        case AUDIO_CODEC_ID_PCM_ALAW:
+            STRCPY(pTrackInfo->codecId, MKV_PCM_CODEC_ID);
+            STRCAT(contentType, MKV_ALAW_CONTENT_TYPE);
+            break;
+        case AUDIO_CODEC_ID_PCM_MULAW:
+            STRCPY(pTrackInfo->codecId, MKV_PCM_CODEC_ID);
+            STRCAT(contentType, MKV_MULAW_CONTENT_TYPE);
+            break;
+        default:
+            STRCPY(pTrackInfo->codecId, MKV_AAC_CODEC_ID);
+            STRCAT(contentType, MKV_AAC_CONTENT_TYPE);
+    }
     STRCPY(pTrackInfo->trackName, DEFAULT_AUDIO_TRACK_NAME);
     pTrackInfo->trackType = MKV_TRACK_INFO_TYPE_AUDIO;
+
+CleanUp:
 
     return retStatus;
 }
@@ -122,7 +180,7 @@ STATUS setStreamInfoDefaults(STREAMING_TYPE streamingType, UINT64 retention, UIN
     return retStatus;
 }
 
-STATUS createVideoStreamInfo(STREAMING_TYPE streamingType, PCHAR streamName, UINT64 retention, UINT64 bufferDuration, PStreamInfo* ppStreamInfo)
+STATUS createVideoStreamInfo(STREAMING_TYPE streamingType, VIDEO_CODEC_ID videoCodecId, PCHAR streamName, UINT64 retention, UINT64 bufferDuration, PStreamInfo* ppStreamInfo)
 {
     ENTERS();
 
@@ -141,10 +199,11 @@ STATUS createVideoStreamInfo(STREAMING_TYPE streamingType, PCHAR streamName, UIN
     PTrackInfo pTrackInfo = NULL;
     pTrackInfo = (PTrackInfo)(pStreamInfo + 1);
 
-    CHK_STATUS(createH264VideoTrackInfo(pTrackInfo));
+    CHK(pTrackInfo != NULL && pStreamInfo->streamCaps.contentType != NULL, STATUS_NULL_ARG);
+    
+    CHK_STATUS(createVideoTrackInfo(videoCodecId, pStreamInfo->streamCaps.contentType, pTrackInfo));
 
     STRCPY(pStreamInfo->name, streamName);
-    STRCPY(pStreamInfo->streamCaps.contentType, MKV_H264_CONTENT_TYPE);
     CHK_STATUS(setStreamInfoDefaults(streamingType, retention, bufferDuration, VIDEO_ONLY_TRACK_COUNT, pStreamInfo, pTrackInfo));
 
 CleanUp:
@@ -162,7 +221,7 @@ CleanUp:
     return retStatus;
 }
 
-STATUS createAudioVideoStreamInfo(STREAMING_TYPE streamingType, PCHAR streamName, UINT64 retention, UINT64 bufferDuration, PStreamInfo* ppStreamInfo)
+STATUS createAudioVideoStreamInfo(STREAMING_TYPE streamingType, VIDEO_CODEC_ID videoCodecId, AUDIO_CODEC_ID audioCodecId, PCHAR streamName, UINT64 retention, UINT64 bufferDuration, PStreamInfo* ppStreamInfo)
 {
     ENTERS();
 
@@ -181,11 +240,13 @@ STATUS createAudioVideoStreamInfo(STREAMING_TYPE streamingType, PCHAR streamName
 
     pTrackInfo = (PTrackInfo)(pStreamInfo + 1);
 
-    CHK_STATUS(createH264VideoTrackInfo(pTrackInfo));
-    CHK_STATUS(createAacAudioTrackInfo(pTrackInfo + 1));
+    CHK(pTrackInfo != NULL && pStreamInfo->streamCaps.contentType != NULL, STATUS_NULL_ARG);
+
+    CHK_STATUS(createVideoTrackInfo(videoCodecId, pStreamInfo->streamCaps.contentType, pTrackInfo));
+    STRCAT(pStreamInfo->streamCaps.contentType, ","); //concatenating audio content type to video content type
+    CHK_STATUS(createAudioTrackInfo(audioCodecId, pStreamInfo->streamCaps.contentType, pTrackInfo + 1));
 
     STRCPY(pStreamInfo->name, streamName);
-    STRCPY(pStreamInfo->streamCaps.contentType, MKV_H264_AAC_MULTI_CONTENT_TYPE);
     CHK_STATUS(setStreamInfoDefaults(streamingType, retention, bufferDuration, VIDEO_WITH_AUDIO_TRACK_COUNT, pStreamInfo, pTrackInfo));
 
 CleanUp:

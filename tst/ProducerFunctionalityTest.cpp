@@ -576,7 +576,7 @@ TEST_F(ProducerFunctionalityTest, fail_new_connection_at_token_rotation)
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
 
-TEST_F(ProducerFunctionalityTest, fail_old_connection_at_token_rotation)
+TEST_F(ProducerFunctionalityTest, DISABLED_fail_old_connection_at_token_rotation)
 {
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     UINT32 i, errCount;
