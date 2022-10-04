@@ -80,6 +80,66 @@ jobs:
           cd build
           ./tst/producer_test
 
+  mac-os-build-gcc-local-openssl:
+    runs-on: macos-10.15
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      CC: gcc
+      CXX: g++
+      AWS_KVS_LOG_LEVEL: 2
+      PKG_CONFIG_PATH: /usr/local/opt/openssl@1.1/lib/pkgconfig
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+      - name: Build repository
+        run: |
+          mkdir build && cd build
+          cmake .. -DBUILD_TEST=TRUE -DLOCAL_OPENSSL_BUILD=ON
+          make  
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-duration-seconds: 10800
+      - name: Run tests
+        run: |
+          cd build
+          ./tst/producer_test
+
+  mac-os-build-clang-local-openssl:
+    runs-on: macos-latest
+    env:
+      AWS_KVS_LOG_LEVEL: 2
+      LDFLAGS: -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib
+      CPATH: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/
+      PKG_CONFIG_PATH: /usr/local/opt/openssl@1.1/lib/pkgconfig
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+      - name: Build repository
+        run: |
+          mkdir build && cd build
+          cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DLOCAL_OPENSSL_BUILD=ON
+          make
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-duration-seconds: 10800
+      - name: Run tests
+        run: |
+          cd build
+          ./tst/producer_test
+
   linux-gcc-code-coverage:
     runs-on: ubuntu-18.04
     env:
