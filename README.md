@@ -82,23 +82,41 @@ To run the samples:
 export AWS_SECRET_ACCESS_KEY=<YourAWSSecretAccessKey>
 export AWS_ACCESS_KEY_ID=<YourAWSAccessKey>
 ```
-For audio+video, run `./kvsAudioVideoStreamingSample <channel-name> <streaming-duration-in-seconds> <sample-location> <audio-codec>`
+For audio+video, run `./kvsAudioVideoStreamingSample <channel-name> <streaming-duration-in-seconds> <sample-location> <audio-codec> <video-codec> <images-flag>`
 
-The last three arguments are optional. By default, 
+The last 5 arguments are optional. By default, 
 * the `streaming-duration-in-seconds` is 20 seconds
 * `sample-location` is `../samples`
 * `audio-codec` is `aac`
+* `video-codec` is `h264`
+* `images-flag` is `0`
+
+Valid inputs for `<audio-codec>` in these samples are:
+* aac
+* alaw
+
+Valid inputs for `<video-codec>` in these samples are:
+* h264
+* h265
 
 If you want to use the sample for `PCM_ALAW/G.711` frames, run 
-`./kvsAudioVideoStreamingSample <channel-name> <streaming_duration> <sample_location> alaw 0`
+`./kvsAudioVideoStreamingSample <channel-name> <streaming-duration> <sample-location> alaw h264 0`
 
-This will stream the video/audio files from the `samples/h264SampleFrames` and `samples/aacSampleFrames` or `samples/alawSampleFrames` (as per the choice of audio codec in the last argument) respectively. 
+This will stream the video/audio files from the `samples/h264SampleFrames` or `samples/h265SampleFrames` and `samples/aacSampleFrames` or `samples/alawSampleFrames` respectively. 
 
-If you want to enable KVS events in fragment metadata, change the 5th parameter from 0 -> 1. This feature is found only in the audio/video sample, but can be written into the video only sample as well.
+If you want to enable KVS events in fragment metadata, change the `<images-flag>` parameter from 0 -> 1. This feature is found only in the audio/video sample, but can be written into the video only sample as well.
 
-For video only, run `./kvsVideoOnlyStreamingSample <channel-name>`
+For video only, run `./kvsVideoOnlyStreamingSample <channel-name> <video-codec> <streaming-duration-in-seconds> <sample-location>`
+
+Example: `./kvsVideoOnlyStreamingSample myTest`
 
 This will stream the video files from the `samples/h264SampleFrames`. 
+
+OR you can run `./kvsVideoOnlyStreamingSample myTest h265`
+
+This will stream the video files from the `samples/h265SampleFrames`. 
+
+Note: The resulting sample video is the same.
 
 For audio only, run `./kvsAudioOnlyStreamingSample <channel-name> <streaming_duration> <sample_location> <audio-codec>`.
 
