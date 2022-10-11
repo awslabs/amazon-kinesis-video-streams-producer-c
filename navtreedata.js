@@ -31,7 +31,7 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "group__CallbackStructsVersion.html",
-"struct____ApiCallbacks.html#a6e421b1cb26651eb81b642cca00b96b0"
+"struct____AuthCallbacks.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
