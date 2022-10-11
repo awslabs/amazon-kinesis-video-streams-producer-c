@@ -52,16 +52,6 @@ extern "C" {
 #define STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_FORMAT STATUS_COMMON_PRODUCER_BASE + 0x00000024
 /*!@} */
 
-/**
- * Macro for checking whether the status code should be retried by the continuous retry logic
- */
-#define IS_RETRIABLE_COMMON_LIB_ERROR(error)                                                                                                         \
-    ((error) == STATUS_INVALID_API_CALL_RETURN_JSON || (error) == STATUS_CURL_INIT_FAILED || (error) == STATUS_CURL_LIBRARY_INIT_FAILED ||           \
-     (error) == STATUS_HMAC_GENERATION_ERROR || (error) == STATUS_CURL_PERFORM_FAILED || (error) == STATUS_IOT_INVALID_RESPONSE_LENGTH ||            \
-     (error) == STATUS_IOT_NULL_AWS_CREDS || (error) == STATUS_IOT_INVALID_URI_LEN || (error) == STATUS_IOT_EXPIRATION_OCCURS_IN_PAST ||                   \
-     (error) == STATUS_IOT_EXPIRATION_PARSING_FAILED || (error) == STATUS_IOT_CREATE_LWS_CONTEXT_FAILED ||                                           \
-     (error) == STATUS_FILE_CREDENTIAL_PROVIDER_OPEN_FILE_FAILED || (error) == STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_LENGTH ||                \
-     (error) == STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_FORMAT)
 
 ////////////////////////////////////////////////////
 /// New common base status code.
@@ -84,6 +74,18 @@ extern "C" {
 #define STATUS_TIMESTAMP_STRING_UNRECOGNIZED_FORMAT     STATUS_COMMON_BASE + 0x00000005
 /*!@} */
 
+/**
+ * Macro for checking whether the status code should be retried by the continuous retry logic
+ */
+#define IS_RETRIABLE_COMMON_LIB_ERROR(error)                                                                                                         \
+    ((error) == STATUS_INVALID_API_CALL_RETURN_JSON || (error) == STATUS_CURL_INIT_FAILED || (error) == STATUS_CURL_LIBRARY_INIT_FAILED ||           \
+     (error) == STATUS_HMAC_GENERATION_ERROR || (error) == STATUS_CURL_PERFORM_FAILED || (error) == STATUS_IOT_INVALID_RESPONSE_LENGTH ||            \
+     (error) == STATUS_IOT_NULL_AWS_CREDS || (error) == STATUS_IOT_INVALID_URI_LEN || (error) == STATUS_IOT_EXPIRATION_OCCURS_IN_PAST ||                   \
+     (error) == STATUS_IOT_EXPIRATION_PARSING_FAILED || (error) == STATUS_IOT_CREATE_LWS_CONTEXT_FAILED ||                                           \
+     (error) == STATUS_FILE_CREDENTIAL_PROVIDER_OPEN_FILE_FAILED || (error) == STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_LENGTH ||                \
+     (error) == STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_FORMAT)
+    
+    
 /////////////////////////////////////////////////////
 /// Lengths of different character arrays
 /////////////////////////////////////////////////////
