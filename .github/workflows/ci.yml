@@ -23,6 +23,7 @@ jobs:
           bash scripts/check-clang.sh
 
   mac-os-build-gcc:
+    environment: github-actions-ci
     runs-on: macos-10.15
     permissions:
       id-token: write
@@ -222,9 +223,9 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-            role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
-            role-session-name: ${{ env.AWS_ROLE_SESSION_NAME }}
-            aws-region: ${{ env.AWS_REGION }}
+            role-to-assume: ${{ environment.AWS_ROLE_TO_ASSUME }}
+            role-session-name: ${{ environment.AWS_ROLE_SESSION_NAME }}
+            aws-region: ${{ environment.AWS_REGION }}
             role-duration-seconds: 10800
       - name: Clone repository
         uses: actions/checkout@v2
