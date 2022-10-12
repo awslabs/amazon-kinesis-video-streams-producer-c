@@ -7,7 +7,7 @@ include(GNUInstallDirs)
 
 
 # User Flags
-option(ADD_MUCLIBC "Add -muclibc c flag" OFF)
+option(ADD_MUCLIBC "Add -muclibc c flag" OFF)  
 option(BUILD_STATIC "Static build" OFF)
 option(BUILD_DEPENDENCIES "Whether or not to build depending libraries from source" ON)
 option(USE_OPENSSL "Use openssl as crypto library" ON)
