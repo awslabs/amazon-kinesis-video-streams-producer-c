@@ -21,7 +21,6 @@ jobs:
       - name: Run clang format check
         run: |
           bash scripts/check-clang.sh
-
   mac-os-build-gcc:
     runs-on: macos-10.15
     permissions:
@@ -50,8 +49,8 @@ jobs:
         run: |
           cd build
           ./tst/producer_test
-
   mac-os-build-clang:
+    environment: github-actions-ci
     runs-on: macos-latest
     env:
       AWS_KVS_LOG_LEVEL: 2
@@ -79,8 +78,8 @@ jobs:
         run: |
           cd build
           ./tst/producer_test
-
   mac-os-build-gcc-local-openssl:
+    environment: github-actions-ci
     runs-on: macos-10.15
     permissions:
       id-token: write
@@ -109,8 +108,8 @@ jobs:
         run: |
           cd build
           ./tst/producer_test
-
   mac-os-build-clang-local-openssl:
+    environment: github-actions-ci
     runs-on: macos-latest
     env:
       AWS_KVS_LOG_LEVEL: 2
@@ -139,8 +138,8 @@ jobs:
         run: |
           cd build
           ./tst/producer_test
-
   linux-gcc-code-coverage:
+    environment: github-actions-ci
     runs-on: ubuntu-18.04
     env:
       AWS_KVS_LOG_LEVEL: 2
@@ -172,8 +171,8 @@ jobs:
           cd build
           for test_file in $(find cproducer.dir kvsCommonCurl.dir kvsCommonLws.dir -name '*.gcno'); do gcov $test_file; done
           bash <(curl -s https://codecov.io/bash)
-
   address-sanitizer:
+    environment: github-actions-ci
     runs-on: ubuntu-18.04
     permissions:
       id-token: write
@@ -202,8 +201,8 @@ jobs:
           cd build
           ulimit -c unlimited -S
           timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
-
   undefined-behavior-sanitizer:
+    environment: github-actions-ci
     runs-on: ubuntu-18.04
     permissions:
       id-token: write
@@ -232,7 +231,6 @@ jobs:
           cd build
           ulimit -c unlimited -S
           timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
-
   # memory-sanitizer:
   #   runs-on: ubuntu-18.04
   #   permissions:
@@ -286,6 +284,7 @@ jobs:
   #         timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
 
   linux-gcc-4_4:
+    environment: github-actions-ci
     runs-on: ubuntu-18.04
     env:
       AWS_KVS_LOG_LEVEL: 2
@@ -322,8 +321,8 @@ jobs:
           cd build
           ulimit -c unlimited -S
           timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure        
-
   windows-msvc:
+    environment: github-actions-ci
     runs-on: windows-2022
     env:
       AWS_KVS_LOG_LEVEL: 7
@@ -352,7 +351,6 @@ jobs:
         run: |
           $env:Path += ';C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;C:\Program Files\NASM;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\lib;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\bin'
           & "D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\build\tst\producer_test.exe" --gtest_filter="-ProducerFunctionalityTest.pressure_on_buffer_duration_fail_new_connection_at_token_rotation"  
-
   arm64-cross-compilation:
     runs-on: ubuntu-latest
     env:
@@ -410,7 +408,6 @@ jobs:
           cmake .. -DBUILD_TEST=TRUE -DBUILD_OPENSSL_PLATFORM=linux-generic32
           make
           file libcproducer.so
-
   linux-build-gcc-static:
     runs-on: ubuntu-latest
     steps:
