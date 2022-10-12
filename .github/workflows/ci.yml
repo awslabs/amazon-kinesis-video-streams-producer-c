@@ -52,6 +52,7 @@ jobs:
           ./tst/producer_test
 
   mac-os-build-clang:
+    environment: github-actions-ci
     runs-on: macos-latest
     env:
       AWS_KVS_LOG_LEVEL: 2
@@ -82,6 +83,7 @@ jobs:
 
   mac-os-build-gcc-local-openssl:
     runs-on: macos-10.15
+    environment: github-actions-ci
     permissions:
       id-token: write
       contents: read
@@ -111,6 +113,7 @@ jobs:
           ./tst/producer_test
 
   mac-os-build-clang-local-openssl:
+    environment: github-actions-ci
     runs-on: macos-latest
     env:
       AWS_KVS_LOG_LEVEL: 2
@@ -141,6 +144,7 @@ jobs:
           ./tst/producer_test
 
   linux-gcc-code-coverage:
+    environment: github-actions-ci
     runs-on: ubuntu-18.04
     env:
       AWS_KVS_LOG_LEVEL: 2
@@ -174,6 +178,7 @@ jobs:
           bash <(curl -s https://codecov.io/bash)
 
   address-sanitizer:
+    environment: github-actions-ci
     runs-on: ubuntu-18.04
     permissions:
       id-token: write
@@ -204,6 +209,7 @@ jobs:
           timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
 
   undefined-behavior-sanitizer:
+    environment: github-actions-ci
     runs-on: ubuntu-18.04
     permissions:
       id-token: write
@@ -286,6 +292,7 @@ jobs:
   #         timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
 
   linux-gcc-4_4:
+    environment: github-actions-ci
     runs-on: ubuntu-18.04
     env:
       AWS_KVS_LOG_LEVEL: 2
@@ -324,6 +331,7 @@ jobs:
           timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure        
 
   windows-msvc:
+    environment: github-actions-ci
     runs-on: windows-2022
     env:
       AWS_KVS_LOG_LEVEL: 7
