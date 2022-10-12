@@ -210,22 +210,18 @@ jobs:
           timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
 
   undefined-behavior-sanitizer:
-    environment: github-actions-ci
     runs-on: ubuntu-18.04
     permissions:
       id-token: write
       contents: read
-    env:
-      CC: clang
-      CXX: clang++
-      AWS_KVS_LOG_LEVEL: 2
+    environment: github-actions-ci
     steps:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-            role-to-assume: ${{ environment.AWS_ROLE_TO_ASSUME }}
-            role-session-name: ${{ environment.AWS_ROLE_SESSION_NAME }}
-            aws-region: ${{ environment.AWS_REGION }}
+            role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+            role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+            aws-region: ${{ secrets.AWS_REGION }}
             role-duration-seconds: 10800
       - name: Clone repository
         uses: actions/checkout@v2
