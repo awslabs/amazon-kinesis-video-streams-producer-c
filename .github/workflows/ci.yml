@@ -32,6 +32,13 @@ jobs:
       CXX: g++
       AWS_KVS_LOG_LEVEL: 2
     steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+            role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+            role-session-name: ${{ env.AWS_ROLE_SESSION_NAME }}
+            aws-region: ${{ env.AWS_REGION }}
+            role-duration-seconds: 10800
       - name: Clone repository
         uses: actions/checkout@v2
       - name: Build repository
@@ -39,13 +46,6 @@ jobs:
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE
           make  
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-          aws-region: ${{ secrets.AWS_REGION }}
-          role-duration-seconds: 10800
       - name: Run tests
         run: |
           cd build
@@ -62,6 +62,13 @@ jobs:
       id-token: write
       contents: read
     steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+            role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+            role-session-name: ${{ env.AWS_ROLE_SESSION_NAME }}
+            aws-region: ${{ env.AWS_REGION }}
+            role-duration-seconds: 10800
       - name: Clone repository
         uses: actions/checkout@v2
       - name: Build repository
@@ -69,13 +76,6 @@ jobs:
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE
           make
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-          aws-region: ${{ secrets.AWS_REGION }}
-          role-duration-seconds: 10800
       - name: Run tests
         run: |
           cd build
@@ -93,6 +93,13 @@ jobs:
       AWS_KVS_LOG_LEVEL: 2
       PKG_CONFIG_PATH: /usr/local/opt/openssl@1.1/lib/pkgconfig
     steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+            role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+            role-session-name: ${{ env.AWS_ROLE_SESSION_NAME }}
+            aws-region: ${{ env.AWS_REGION }}
+            role-duration-seconds: 10800
       - name: Clone repository
         uses: actions/checkout@v2
       - name: Build repository
@@ -100,13 +107,6 @@ jobs:
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DLOCAL_OPENSSL_BUILD=ON
           make  
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-          aws-region: ${{ secrets.AWS_REGION }}
-          role-duration-seconds: 10800
       - name: Run tests
         run: |
           cd build
@@ -124,6 +124,13 @@ jobs:
       id-token: write
       contents: read
     steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+            role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+            role-session-name: ${{ env.AWS_ROLE_SESSION_NAME }}
+            aws-region: ${{ env.AWS_REGION }}
+            role-duration-seconds: 10800
       - name: Clone repository
         uses: actions/checkout@v2
       - name: Build repository
@@ -131,13 +138,6 @@ jobs:
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DLOCAL_OPENSSL_BUILD=ON
           make
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-          aws-region: ${{ secrets.AWS_REGION }}
-          role-duration-seconds: 10800
       - name: Run tests
         run: |
           cd build
@@ -152,6 +152,13 @@ jobs:
       id-token: write
       contents: read
     steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+            role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+            role-session-name: ${{ env.AWS_ROLE_SESSION_NAME }}
+            aws-region: ${{ env.AWS_REGION }}
+            role-duration-seconds: 10800
       - name: Clone repository
         uses: actions/checkout@v2
       - name: Build repository
@@ -159,13 +166,6 @@ jobs:
           mkdir build && cd build
           cmake .. -DCODE_COVERAGE=TRUE -DBUILD_TEST=TRUE -DBUILD_COMMON_LWS=TRUE
           make
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-          aws-region: ${{ secrets.AWS_REGION }}
-          role-duration-seconds: 10800
       - name: Run tests
         run: |
           cd build
@@ -188,6 +188,13 @@ jobs:
       CXX: clang++
       AWS_KVS_LOG_LEVEL: 2
     steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+            role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+            role-session-name: ${{ env.AWS_ROLE_SESSION_NAME }}
+            aws-region: ${{ env.AWS_REGION }}
+            role-duration-seconds: 10800
       - name: Clone repository
         uses: actions/checkout@v2
       - name: Build repository
@@ -195,13 +202,6 @@ jobs:
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DADDRESS_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
           make
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-          aws-region: ${{ secrets.AWS_REGION }}
-          role-duration-seconds: 10800
       - name: Run tests
         run: |
           cd build
@@ -219,6 +219,13 @@ jobs:
       CXX: clang++
       AWS_KVS_LOG_LEVEL: 2
     steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+            role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+            role-session-name: ${{ env.AWS_ROLE_SESSION_NAME }}
+            aws-region: ${{ env.AWS_REGION }}
+            role-duration-seconds: 10800
       - name: Clone repository
         uses: actions/checkout@v2
       - name: Build repository
@@ -226,13 +233,6 @@ jobs:
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DUNDEFINED_BEHAVIOR_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
           make
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-          aws-region: ${{ secrets.AWS_REGION }}
-          role-duration-seconds: 10800
       - name: Run tests
         run: |
           cd build
@@ -301,6 +301,13 @@ jobs:
       id-token: write
       contents: read
     steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+            role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+            role-session-name: ${{ env.AWS_ROLE_SESSION_NAME }}
+            aws-region: ${{ env.AWS_REGION }}
+            role-duration-seconds: 10800
       - name: Clone repository
         uses: actions/checkout@v2
       - name: Install dependencies
@@ -317,13 +324,6 @@ jobs:
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DBUILD_COMMON_LWS=TRUE
           make
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-          aws-region: ${{ secrets.AWS_REGION }}
-          role-duration-seconds: 10800
       - name: Run tests
         run: |
           cd build
@@ -339,6 +339,13 @@ jobs:
       id-token: write
       contents: read
     steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+            role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+            role-session-name: ${{ env.AWS_ROLE_SESSION_NAME }}
+            aws-region: ${{ env.AWS_REGION }}
+            role-duration-seconds: 10800
       - name: Clone repository
         uses: actions/checkout@v2
       - name: Install dependencies
@@ -349,13 +356,6 @@ jobs:
           $env:Path += ';C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;C:\Program Files\NASM;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\lib;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\bin'
           git config --system core.longpaths true
           .github/build_windows.bat
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-          aws-region: ${{ secrets.AWS_REGION }}
-          role-duration-seconds: 10800
       - name: Run tests
         run: |
           $env:Path += ';C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;C:\Program Files\NASM;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\lib;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\bin'
