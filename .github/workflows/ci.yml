@@ -22,6 +22,7 @@ jobs:
         run: |
           bash scripts/check-clang.sh
   mac-os-build-gcc:
+    environment: github-actions-ci
     runs-on: macos-10.15
     permissions:
       id-token: write
@@ -31,6 +32,13 @@ jobs:
       CXX: g++
       AWS_KVS_LOG_LEVEL: 2
     steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.ENV_AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.ENV_AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.ENV_AWS_REGION }}
+          role-duration-seconds: 10800
       - name: Clone repository
         uses: actions/checkout@v2
       - name: Build repository
@@ -38,13 +46,6 @@ jobs:
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE
           make  
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-          aws-region: ${{ secrets.AWS_REGION }}
-          role-duration-seconds: 10800
       - name: Run tests
         run: |
           cd build
@@ -70,9 +71,9 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: ${{ secrets.ENV_AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.ENV_AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.ENV_AWS_REGION }}
           role-duration-seconds: 10800
       - name: Run tests
         run: |
@@ -100,9 +101,9 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: ${{ secrets.ENV_AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.ENV_AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.ENV_AWS_REGION }}
           role-duration-seconds: 10800
       - name: Run tests
         run: |
@@ -130,9 +131,9 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: ${{ secrets.ENV_AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.ENV_AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.ENV_AWS_REGION }}
           role-duration-seconds: 10800
       - name: Run tests
         run: |
@@ -157,9 +158,9 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: ${{ secrets.ENV_AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.ENV_AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.ENV_AWS_REGION }}
           role-duration-seconds: 10800
       - name: Run tests
         run: |
@@ -192,9 +193,9 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: ${{ secrets.ENV_AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.ENV_AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.ENV_AWS_REGION }}
           role-duration-seconds: 10800
       - name: Run tests
         run: |
@@ -222,9 +223,9 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: ${{ secrets.ENV_AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.ENV_AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.ENV_AWS_REGION }}
           role-duration-seconds: 10800
       - name: Run tests
         run: |
@@ -312,9 +313,9 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: ${{ secrets.ENV_AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.ENV_AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.ENV_AWS_REGION }}
           role-duration-seconds: 10800
       - name: Run tests
         run: |
@@ -343,9 +344,9 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: ${{ secrets.ENV_AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.ENV_AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.ENV_AWS_REGION }}
           role-duration-seconds: 10800
       - name: Run tests
         run: |
