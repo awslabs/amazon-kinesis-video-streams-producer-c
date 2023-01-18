@@ -22,7 +22,7 @@ var searchData=
   ['getiotcredentials_255',['getIotCredentials',['../IotCredentialProvider_8c.html#a1fc8c2f583060ffb94d647bd1116a7df',1,'IotCredentialProvider.c']]],
   ['getrandomnumberaggregate_256',['getRandomNumberAggregate',['../CallbacksProvider_8c.html#a3c2aae771e35c0873f21f027274dea11',1,'CallbacksProvider.c']]],
   ['getrandomnumberfn_257',['getRandomNumberFn',['../struct____PlatformCallbacks.html#a80dbf52dd62e3ba7f784bd2c2b2ca3ec',1,'__PlatformCallbacks']]],
-  ['getrequesthost_258',['getRequestHost',['../group__PublicMemberFunctions.html#ga848d2d791114303aabea0c784ac5c144',1,'getRequestHost(PCHAR, PCHAR *, PCHAR *):&#160;AwsV4Signer.c'],['../group__PublicMemberFunctions.html#ga848d2d791114303aabea0c784ac5c144',1,'getRequestHost(PCHAR pUrl, PCHAR *ppStart, PCHAR *ppEnd):&#160;AwsV4Signer.c']]],
+  ['getrequesthost_258',['getRequestHost',['../group__PublicMemberFunctions.html#ga848d2d791114303aabea0c784ac5c144',1,'getRequestHost(PCHAR pUrl, PCHAR *ppStart, PCHAR *ppEnd):&#160;AwsV4Signer.c'],['../group__PublicMemberFunctions.html#ga848d2d791114303aabea0c784ac5c144',1,'getRequestHost(PCHAR, PCHAR *, PCHAR *):&#160;AwsV4Signer.c']]],
   ['getrequestverbstring_259',['getRequestVerbString',['../AwsV4Signer_8c.html#a712ec4f93fdd8f80a848bf99ca6abe34',1,'AwsV4Signer.c']]],
   ['getsecuritytokenaggregate_260',['getSecurityTokenAggregate',['../CallbacksProvider_8c.html#add9bf6e3a774069651a149f299c9cd0e',1,'CallbacksProvider.c']]],
   ['getsecuritytokencredentialproviderfunc_261',['getSecurityTokenCredentialProviderFunc',['../CredentialProviderAuthCallbacks_8c.html#a5ff17d5407940807a20ab2d34454f6e1',1,'CredentialProviderAuthCallbacks.c']]],
