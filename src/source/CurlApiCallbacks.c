@@ -82,6 +82,10 @@ STATUS createCurlApiCallbacks(PCallbacksProvider pCallbacksProvider, PCHAR regio
         // Create a fully qualified URI
         SNPRINTF(pCurlApiCallbacks->controlPlaneUrl, MAX_URI_CHAR_LEN, "%s%s.%s%s", CONTROL_PLANE_URI_PREFIX, KINESIS_VIDEO_SERVICE_NAME,
                  pCurlApiCallbacks->region, CONTROL_PLANE_URI_POSTFIX);
+        // If region is in CN, add CN region uri postfix
+        if (STRSTR(pCurlApiCallbacks->region, "cn-")) {
+            STRCAT(pCurlApiCallbacks->controlPlaneUrl, ".cn");
+        }
     } else {
         STRNCPY(pCurlApiCallbacks->controlPlaneUrl, controlPlaneUrl, MAX_URI_CHAR_LEN);
     }
