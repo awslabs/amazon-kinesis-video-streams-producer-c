@@ -10,7 +10,10 @@ on:
       - develop
       - master
   pull_request_target:
-    - opened
+    types: [assigned, opened, synchronize, reopened]
+    branches:
+      - develop
+      - master
 jobs:
   clang-format-check:
     runs-on: macos-latest
