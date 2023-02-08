@@ -6,11 +6,13 @@ on:
     branches:
       - develop
       - master
+      - fix-fork
   pull_request_target:
     types: [assigned, opened, synchronize, reopened]
     branches:
       - develop
       - master
+      - fix-fork
 jobs:
   clang-format-check:
     runs-on: macos-latest
