@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.6.3)
 
 project(KinesisVideoProducerC LANGUAGES C)
       
-file(GLOB_RECURSE HEADERS "include/*.h")
 file(GLOB_RECURSE SOURCE "source/*.cpp")
 file(GLOB SOURCE "source/*.c")
 file(GLOB SOURCE_COMMON "source/Common/*.c")
