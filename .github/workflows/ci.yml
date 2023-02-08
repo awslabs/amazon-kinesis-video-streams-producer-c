@@ -1,6 +1,11 @@
 name: Producer C SDK CI
 
 on:
+  pull_request:
+    types: [edited]
+    branches:
+      - develop
+      - master
   pull_request_target:
     types: [assigned, opened, synchronize, reopened]
     branches:
