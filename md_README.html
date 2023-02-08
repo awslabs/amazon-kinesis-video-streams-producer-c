@@ -133,12 +133,14 @@ CMake Arguments</h4>
 <li><code>-DTHREAD_SANITIZER</code> &ndash; Build with ThreadSanitizer</li>
 <li><code>-DUNDEFINED_BEHAVIOR_SANITIZER</code> Build with UndefinedBehaviorSanitizer</li>
 <li><code>-DALIGNED_MEMORY_MODEL</code> Build for aligned memory model only devices. Default is OFF.</li>
+<li><code>-DLOCAL_OPENSSL_BUILD</code> Whether or not to use local OpenSSL build. Default is OFF.</li>
 </ul>
 <p>DMEMORY_SANITIZER, DTHREAD_SANITIZER etc. flags works only with clang compiler and not with gcc compiler. For using clang (on Ubuntu), do the following - </p><div class="fragment"><div class="line">sudo apt-get install clang</div>
 <div class="line">export CC=/usr/bin/clang</div>
 <div class="line">export CXX=/usr/bin/clang++</div>
 <div class="line">cmake .. -DMEMORY_SANITIZER=TRUE</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md6"></a>
+</div><!-- fragment --><p> DLOCAL_OPENSSL_BUILD requires first installing OpenSSL 1.1 (<code>brew install openssl@1.1</code> for Mac) and then running <code>export PKG_CONFIG_PATH="&lt;YOUR-PATH&gt;/openssl@1.1/lib/pkgconfig"</code> (your path can be printed to terminal using <code>which openssl</code> on Linux/Mac).</p>
+<h3><a class="anchor" id="autotoc_md6"></a>
 Build</h3>
 <p>To build the library run make in the build directory you executed CMake.</p>
 <p><code>make</code></p>
@@ -147,17 +149,33 @@ Run samples</h3>
 <p>To run the samples:</p>
 <div class="fragment"><div class="line">export AWS_SECRET_ACCESS_KEY=&lt;YourAWSSecretAccessKey&gt;</div>
 <div class="line">export AWS_ACCESS_KEY_ID=&lt;YourAWSAccessKey&gt;</div>
-</div><!-- fragment --><p> For audio+video, run <code>./kvsAudioVideoStreamingSample &lt;channel-name&gt; &lt;streaming-duration-in-seconds&gt; &lt;sample-location&gt; &lt;audio-codec&gt;</code></p>
-<p>The last three arguments are optional. By default,</p><ul>
+</div><!-- fragment --><p> For audio+video, run <code>./kvsAudioVideoStreamingSample &lt;channel-name&gt; &lt;streaming-duration-in-seconds&gt; &lt;sample-location&gt; &lt;audio-codec&gt; &lt;video-codec&gt; &lt;images-flag&gt;</code></p>
+<p>The last 5 arguments are optional. By default,</p><ul>
 <li>the <code>streaming-duration-in-seconds</code> is 20 seconds</li>
 <li><code>sample-location</code> is <code>../samples</code></li>
 <li><code>audio-codec</code> is <code>aac</code></li>
+<li><code>video-codec</code> is <code>h264</code></li>
+<li><code>images-flag</code> is <code>0</code></li>
 </ul>
-<p>If you want to use the sample for <code>PCM_ALAW/G.711</code> frames, run <code>./kvsAudioVideoStreamingSample &lt;channel-name&gt; &lt;streaming_duration&gt; &lt;sample_location&gt; alaw 0</code></p>
-<p>This will stream the video/audio files from the <code>samples/h264SampleFrames</code> and <code>samples/aacSampleFrames</code> or <code>samples/alawSampleFrames</code> (as per the choice of audio codec in the last argument) respectively.</p>
-<p>If you want to enable KVS events in fragment metadata and automatically add an event on every key frame, add a 5th input. "notification" for a notification event. "image" for an image generation event. "both" for both. Otherwise leave it blank This feature is found only in the audio/video sample, but can be written into the video only sample as well.</p>
-<p>For video only, run <code>./kvsVideoOnlyStreamingSample &lt;channel-name&gt;</code></p>
+<p>Valid inputs for <code>&lt;audio-codec&gt;</code> in these samples are:</p><ul>
+<li>aac</li>
+<li>alaw</li>
+</ul>
+<p>Valid inputs for <code>&lt;video-codec&gt;</code> in these samples are:</p><ul>
+<li>h264</li>
+<li>h265</li>
+</ul>
+<p>If you want to use the sample for <code>PCM_ALAW/G.711</code> frames, run <code>./kvsAudioVideoStreamingSample &lt;channel-name&gt; &lt;streaming-duration&gt; &lt;sample-location&gt; alaw h264 0</code></p>
+<p>This will stream the video/audio files from the <code>samples/h264SampleFrames</code> or <code>samples/h265SampleFrames</code> and <code>samples/aacSampleFrames</code> or <code>samples/alawSampleFrames</code> respectively.</p>
+<p>If you want to enable KVS events in fragment metadata, change the <code>&lt;images-flag&gt;</code> parameter from 0 -&gt; 1. This feature is found only in the audio/video sample, but can be written into the video only sample as well.</p>
+<p>For video only, run <code>./kvsVideoOnlyStreamingSample &lt;channel-name&gt; &lt;video-codec&gt; &lt;streaming-duration-in-seconds&gt; &lt;sample-location&gt;</code></p>
+<p>Example: <code>./kvsVideoOnlyStreamingSample myTest</code></p>
 <p>This will stream the video files from the <code>samples/h264SampleFrames</code>.</p>
+<p>OR you can run <code>./kvsVideoOnlyStreamingSample myTest h265</code></p>
+<p>This will stream the video files from the <code>samples/h265SampleFrames</code>.</p>
+<p>Note: The resulting sample video is the same.</p>
+<p>For audio only, run <code>./kvsAudioOnlyStreamingSample &lt;channel-name&gt; &lt;streaming_duration&gt; &lt;sample_location&gt; &lt;audio-codec&gt;</code>.</p>
+<p>This will stream the audio files from the <code>samples/aacSampleFrames</code> or <code>samples/alawSampleFrames</code> (as per the choice of audio codec in the last argument) respectively.</p>
 <h3><a class="anchor" id="autotoc_md8"></a>
 Run unit tests</h3>
 <p>Since these tests exercise networking you need to have AWS credentials specified, specifically you need to:</p>
@@ -170,28 +188,38 @@ Offline mode</h3>
 <p>For video only: <code><a class="el" href="group__PublicMemberFunctions.html#ga6e083dfc57516c4efaa9951df09c6848">createOfflineVideoStreamInfoProviderWithCodecs()</a></code> For video and audio: <code><a class="el" href="group__PublicMemberFunctions.html#ga70f651dfddea8ff8e60c89571204be15">createOfflineAudioVideoStreamInfoProviderWithCodecs()</a></code></p>
 <p>The 2 APIs are available in <a href="https://github.com/awslabs/amazon-kinesis-video-streams-producer-c/blob/412aab82c99a72f9dbde975f5fea81ffdc844ae5/src/include/com/amazonaws/kinesis/video/cproducer/Include.h">this</a> header file.</p>
 <h2><a class="anchor" id="autotoc_md10"></a>
+DEBUG</h2>
+<ul>
+<li>When building OpenSSL during <code>cmake ..</code>, if you encounter an architecture error such as <code>ld: symbol(s) not found for architecture i386</code>, building with a local OpenSSL build may help. First install OpenSSL 1.1 (for Mac: <code>brew install openssl@1.1</code>). Next set <code>export PKG_CONFIG_PATH="&lt;YOUR-PATH&gt;/openssl@1.1/lib/pkgconfig"</code> (your path can be printed to terminal using <code>which openssl</code> on Linux/Mac). Now set the following flag to ON when building: <code>cmake .. -DLOCAL_OPENSSL_BUILD=ON</code>. If there are still errors regarding locating the local OpenSSL library:<ul>
+<li>The following environment variables may need to be set to export: <code>export LDFLAGS="-L&lt;YOUR-PATH&gt;/openssl@1.1/lib"</code> and <code>export CPPFLAGS="-I&lt;YOUR-PATH&gt;/openssl@1.1/include"</code></li>
+<li>The path to OpenSSL’s root directory may need to be specified when running <code>cmake</code>: <code>-DOPENSSL_ROOT_DIR="&lt;YOUR-PATH&gt;/openssl@1.1/include/openssl"</code></li>
+<li>If you need to have openssl@1.1 first in your PATH, run: &lsquo;echo 'export PATH="&lt;YOUR-PATH&gt;/openssl@1.1/bin:$PATH"&rsquo; &gt;&gt; ~/.zshrc`</li>
+</ul>
+</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md11"></a>
 Development</h2>
 <p>The repository is using <code>develop</code> branch as the aggregation and all of the feature development is done in appropriate feature branches. The PRs (Pull Requests) are cut on a feature branch and once approved with all the checks passed they can be merged by a click of a button on the PR tool. The master branch should always be build-able and all the tests should be passing. We are welcoming any contribution to the code base. The master branch contains our most recent release cycle from <code>develop</code>.</p>
-<h3><a class="anchor" id="autotoc_md11"></a>
+<h3><a class="anchor" id="autotoc_md12"></a>
 Release</h3>
 <p>The repository is under active development and even with incremental unit test coverage where some of the tests are actually full integration tests, we require more rigorous internal testing in order to 'cut' release versions. The release is cut against a particular commit that gets approved. The general philosophy is to cut a release when a set of commits contribute to a self-containing feature or when we add major internal functionality improvements.</p>
-<h3><a class="anchor" id="autotoc_md12"></a>
+<h3><a class="anchor" id="autotoc_md13"></a>
 Versioning</h3>
 <p>We deploy 3 digit version strings in a form of 'Major.Minor.Revision' scheme.</p><ul>
 <li>Major version update - Major functionality changes. Might not have direct backward compatibility. For example, multiple public API parameter changes.</li>
 <li>Minor version update - Additional features. Major bug fixes. Might have some minor backward compatibility issues. For example, an extra parameter on a callback function.</li>
 <li>Revision version update - Minor features. Bug fixes. Full backward compatibility. For example, an extra fields added to the public structures with version bump.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md13"></a>
-Documentation</h2>
 <h2><a class="anchor" id="autotoc_md14"></a>
+Documentation</h2>
+<h2><a class="anchor" id="autotoc_md15"></a>
 Related</h2>
 <ul>
 <li><a href="https://github.com/awslabs/amazon-kinesis-video-streams-producer-sdk-cpp/">CPP SDK</a></li>
 <li><a href="https://github.com/awslabs/amazon-kinesis-video-streams-producer-sdk-java/">Java SDK</a></li>
 <li><a href="https://github.com/awslabs/amazon-kinesis-video-streams-pic/">PIC</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md15"></a>
+<h2><a class="anchor" id="autotoc_md16"></a>
 License</h2>
 <p>This library is licensed under the Apache 2.0 License. </p>
 </div></div><!-- contents -->
@@ -200,7 +228,7 @@ License</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Wed Jan 18 2023 16:48:22 for Amazon Kinesis Producer C SDK by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+    <li class="footer">Generated on Wed Feb 8 2023 23:41:07 for Amazon Kinesis Producer C SDK by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
 </body>

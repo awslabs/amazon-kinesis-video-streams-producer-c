@@ -12,13 +12,14 @@ var group__CommonProducerBaseStatusCodes =
       [ "Run unit tests", "md_README.html#autotoc_md8", null ],
       [ "Offline mode", "md_README.html#autotoc_md9", null ]
     ] ],
-    [ "Development", "md_README.html#autotoc_md10", [
-      [ "Release", "md_README.html#autotoc_md11", null ],
-      [ "Versioning", "md_README.html#autotoc_md12", null ]
+    [ "DEBUG", "md_README.html#autotoc_md10", null ],
+    [ "Development", "md_README.html#autotoc_md11", [
+      [ "Release", "md_README.html#autotoc_md12", null ],
+      [ "Versioning", "md_README.html#autotoc_md13", null ]
     ] ],
-    [ "Documentation", "md_README.html#autotoc_md13", null ],
-    [ "Related", "md_README.html#autotoc_md14", null ],
-    [ "License", "md_README.html#autotoc_md15", null ],
+    [ "Documentation", "md_README.html#autotoc_md14", null ],
+    [ "Related", "md_README.html#autotoc_md15", null ],
+    [ "License", "md_README.html#autotoc_md16", null ],
     [ "STATUS_COMMON_PRODUCER_BASE", "group__CommonProducerBaseStatusCodes.html#ga0fe4fa6f2d83497c330f56ad68bc5b53", null ],
     [ "STATUS_CURL_INIT_FAILED", "group__CommonProducerBaseStatusCodes.html#ga8727c261de1f7b71fc13bd2a602a44b9", null ],
     [ "STATUS_CURL_LIBRARY_INIT_FAILED", "group__CommonProducerBaseStatusCodes.html#ga49b555e4dc0172bb25842b6743aa68d8", null ],
