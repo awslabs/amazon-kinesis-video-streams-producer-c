@@ -89,7 +89,7 @@ jobs:
       CC: gcc
       CXX: g++
       AWS_KVS_LOG_LEVEL: 2
-      PKG_CONFIG_PATH: /usr/local/opt/openssl@1.1/lib/pkgconfig
+      PKG_CONFIG_PATH: /opt/homebrew/opt/openssl@1.1/lib/pkgconfig
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
@@ -116,7 +116,7 @@ jobs:
       AWS_KVS_LOG_LEVEL: 2
       LDFLAGS: -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib
       CPATH: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/
-      PKG_CONFIG_PATH: /usr/local/opt/openssl@1.1/lib/pkgconfig
+      PKG_CONFIG_PATH: /opt/homebrew/opt/openssl@1.1/lib/pkgconfig
     permissions:
       id-token: write
       contents: read
