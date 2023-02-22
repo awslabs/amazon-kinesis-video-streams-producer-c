@@ -36,6 +36,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Build repository
         run: |
+          brew install openssl pkg-config
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE
           make  
@@ -65,6 +66,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Build repository
         run: |
+          brew install openssl pkg-config
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE
           make
@@ -95,6 +97,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Build repository
         run: |
+          brew install openssl
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DLOCAL_OPENSSL_BUILD=ON
           make  
@@ -125,6 +128,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Build repository
         run: |
+          brew install openssl
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DLOCAL_OPENSSL_BUILD=ON
           make
