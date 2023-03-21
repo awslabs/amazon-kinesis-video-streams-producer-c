@@ -169,7 +169,7 @@ STATUS parseIotResponse(PIotCredentialProvider pIotCredentialProvider, PCallInfo
 
     currentTime = pIotCredentialProvider->getCurrentTimeFn(pIotCredentialProvider->customData);
     CHK_STATUS(convertTimestampToEpoch(expirationTimestampStr, currentTime / HUNDREDS_OF_NANOS_IN_A_SECOND, &expiration));
-    DLOGD("Iot credential expiration time %" PRIu64, expiration / HUNDREDS_OF_NANOS_IN_A_SECOND);
+    DLOGD("[%s] Iot credential expiration time %" PRIu64, pIotCredentialProvider->thingName, expiration / HUNDREDS_OF_NANOS_IN_A_SECOND);
 
     if (pIotCredentialProvider->pAwsCredentials != NULL) {
         freeAwsCredentials(&pIotCredentialProvider->pAwsCredentials);
