@@ -91,13 +91,12 @@ jobs:
       CC: gcc
       CXX: g++
       AWS_KVS_LOG_LEVEL: 2
-      PKG_CONFIG_PATH: /opt/homebrew/opt/openssl@1.1/lib/pkgconfig
+      PKG_CONFIG_PATH: /usr/local/opt/openssl@1.1/lib/pkgconfig
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
       - name: Build repository
         run: |
-          brew install openssl
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DLOCAL_OPENSSL_BUILD=ON
           make  
@@ -119,7 +118,7 @@ jobs:
       AWS_KVS_LOG_LEVEL: 2
       LDFLAGS: -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib
       CPATH: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/
-      PKG_CONFIG_PATH: /opt/homebrew/opt/openssl@1.1/lib/pkgconfig
+      PKG_CONFIG_PATH: /usr/local/opt/openssl@1.1/lib/pkgconfig
     permissions:
       id-token: write
       contents: read
@@ -128,7 +127,6 @@ jobs:
         uses: actions/checkout@v3
       - name: Build repository
         run: |
-          brew install openssl
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DLOCAL_OPENSSL_BUILD=ON
           make
