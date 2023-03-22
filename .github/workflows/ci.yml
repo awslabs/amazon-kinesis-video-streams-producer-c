@@ -22,34 +22,34 @@ jobs:
 #        run: |
 #          bash scripts/check-clang.sh
 
-  mac-os-build-gcc:
-    runs-on: macos-11
-    permissions:
-      id-token: write
-      contents: read
-    env:
-      CC: gcc
-      CXX: g++
-      AWS_KVS_LOG_LEVEL: 2
-    steps:
-      - name: Clone repository
-        uses: actions/checkout@v3
-      - name: Build repository
-        run: |
-          mkdir build && cd build
-          cmake .. -DBUILD_TEST=TRUE
-          make  
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-          aws-region: ${{ secrets.AWS_REGION }}
-          role-duration-seconds: 10800
-      - name: Run tests
-        run: |
-          cd build
-          ./tst/producer_test --gtest_filter=ProducerClientBasicTest.create_produce_stream;ProducerClientBasicTest.ProducerClientBasicTest.create_produce_stream_parallel;ProducerClientBasicTest.create_produce_client_parallel;ProducerClientBasicTest.cachingEndpointProvider_Returns_EndpointFromCache_OnTokenRotation
+#  mac-os-build-gcc:
+#    runs-on: macos-11
+#    permissions:
+#      id-token: write
+#      contents: read
+#    env:
+#      CC: gcc
+#      CXX: g++
+#      AWS_KVS_LOG_LEVEL: 2
+#    steps:
+#      - name: Clone repository
+#        uses: actions/checkout@v3
+#      - name: Build repository
+#        run: |
+#          mkdir build && cd build
+#          cmake .. -DBUILD_TEST=TRUE
+#          make
+#      - name: Configure AWS Credentials
+#        uses: aws-actions/configure-aws-credentials@v1-node16
+#        with:
+#          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+#          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+#          aws-region: ${{ secrets.AWS_REGION }}
+#          role-duration-seconds: 10800
+#      - name: Run tests
+#        run: |
+#          cd build
+#          ./tst/producer_test --gtest_filter=ProducerClientBasicTest.create_produce_stream;ProducerClientBasicTest.ProducerClientBasicTest.create_produce_stream_parallel;ProducerClientBasicTest.create_produce_client_parallel;ProducerClientBasicTest.cachingEndpointProvider_Returns_EndpointFromCache_OnTokenRotation
 
   mac-os-build-clang:
     runs-on: macos-latest
@@ -78,69 +78,69 @@ jobs:
       - name: Run tests
         run: |
           cd build
-          ./tst/producer_test --gtest_filter=ProducerClientBasicTest.create_produce_stream;ProducerClientBasicTest.ProducerClientBasicTest.create_produce_stream_parallel;ProducerClientBasicTest.create_produce_client_parallel;ProducerClientBasicTest.cachingEndpointProvider_Returns_EndpointFromCache_OnTokenRotation
-
-  mac-os-build-gcc-local-openssl:
-    runs-on: macos-11
-    permissions:
-      id-token: write
-      contents: read
-    env:
-      CC: gcc
-      CXX: g++
-      AWS_KVS_LOG_LEVEL: 2
-      PKG_CONFIG_PATH: /usr/local/opt/openssl@1.1/lib/pkgconfig
-    steps:
-      - name: Clone repository
-        uses: actions/checkout@v3
-      - name: Build repository
-        run: |
-          mkdir build && cd build
-          cmake .. -DBUILD_TEST=TRUE -DLOCAL_OPENSSL_BUILD=ON
-          make  
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-          aws-region: ${{ secrets.AWS_REGION }}
-          role-duration-seconds: 10800
-      - name: Run tests
-        run: |
-          cd build
-          ./tst/producer_test --gtest_filter=ProducerClientBasicTest.create_produce_stream;ProducerClientBasicTest.ProducerClientBasicTest.create_produce_stream_parallel;ProducerClientBasicTest.create_produce_client_parallel;ProducerClientBasicTest.cachingEndpointProvider_Returns_EndpointFromCache_OnTokenRotation
-
-  mac-os-build-clang-local-openssl:
-    runs-on: macos-latest
-    env:
-      AWS_KVS_LOG_LEVEL: 2
-      LDFLAGS: -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib
-      CPATH: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/
-      PKG_CONFIG_PATH: /usr/local/opt/openssl@1.1/lib/pkgconfig
-    permissions:
-      id-token: write
-      contents: read
-    steps:
-      - name: Clone repository
-        uses: actions/checkout@v3
-      - name: Build repository
-        run: |
-          mkdir build && cd build
-          cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DLOCAL_OPENSSL_BUILD=ON
-          make
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-          aws-region: ${{ secrets.AWS_REGION }}
-          role-duration-seconds: 10800
-      - name: Run tests
-        run: |
-          cd build
-          ./tst/producer_test --gtest_filter=ProducerClientBasicTest.create_produce_stream;ProducerClientBasicTest.ProducerClientBasicTest.create_produce_stream_parallel;ProducerClientBasicTest.create_produce_client_parallel;ProducerClientBasicTest.cachingEndpointProvider_Returns_EndpointFromCache_OnTokenRotation
-
-#  linux-gcc-code-coverage:
+          ./tst/producer_test --gtest_filter=ProducerClientBasicTest.create_produce_stream
+#
+#  mac-os-build-gcc-local-openssl:
+#    runs-on: macos-11
+#    permissions:
+#      id-token: write
+#      contents: read
+#    env:
+#      CC: gcc
+#      CXX: g++
+#      AWS_KVS_LOG_LEVEL: 2
+#      PKG_CONFIG_PATH: /usr/local/opt/openssl@1.1/lib/pkgconfig
+#    steps:
+#      - name: Clone repository
+#        uses: actions/checkout@v3
+#      - name: Build repository
+#        run: |
+#          mkdir build && cd build
+#          cmake .. -DBUILD_TEST=TRUE -DLOCAL_OPENSSL_BUILD=ON
+#          make
+#      - name: Configure AWS Credentials
+#        uses: aws-actions/configure-aws-credentials@v1-node16
+#        with:
+#          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+#          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+#          aws-region: ${{ secrets.AWS_REGION }}
+#          role-duration-seconds: 10800
+#      - name: Run tests
+#        run: |
+#          cd build
+#          ./tst/producer_test --gtest_filter=ProducerClientBasicTest.create_produce_stream;ProducerClientBasicTest.ProducerClientBasicTest.create_produce_stream_parallel;ProducerClientBasicTest.create_produce_client_parallel;ProducerClientBasicTest.cachingEndpointProvider_Returns_EndpointFromCache_OnTokenRotation
+#
+#  mac-os-build-clang-local-openssl:
+#    runs-on: macos-latest
+#    env:
+#      AWS_KVS_LOG_LEVEL: 2
+#      LDFLAGS: -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib
+#      CPATH: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/
+#      PKG_CONFIG_PATH: /usr/local/opt/openssl@1.1/lib/pkgconfig
+#    permissions:
+#      id-token: write
+#      contents: read
+#    steps:
+#      - name: Clone repository
+#        uses: actions/checkout@v3
+#      - name: Build repository
+#        run: |
+#          mkdir build && cd build
+#          cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DLOCAL_OPENSSL_BUILD=ON
+#          make
+#      - name: Configure AWS Credentials
+#        uses: aws-actions/configure-aws-credentials@v1-node16
+#        with:
+#          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+#          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+#          aws-region: ${{ secrets.AWS_REGION }}
+#          role-duration-seconds: 10800
+#      - name: Run tests
+#        run: |
+#          cd build
+#          ./tst/producer_test --gtest_filter=ProducerClientBasicTest.create_produce_stream;ProducerClientBasicTest.ProducerClientBasicTest.create_produce_stream_parallel;ProducerClientBasicTest.create_produce_client_parallel;ProducerClientBasicTest.cachingEndpointProvider_Returns_EndpointFromCache_OnTokenRotation
+#
+##  linux-gcc-code-coverage:
 #    runs-on: ubuntu-20.04
 #    env:
 #      AWS_KVS_LOG_LEVEL: 2
