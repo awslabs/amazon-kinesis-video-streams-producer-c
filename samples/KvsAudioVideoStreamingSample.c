@@ -74,11 +74,16 @@ PVOID putVideoFrameRoutine(PVOID args)
             startUpLatency = (DOUBLE) (GETTIME() - data->startTime) / (DOUBLE) HUNDREDS_OF_NANOS_IN_A_MILLISECOND;
             DLOGD("Start up latency: %lf ms", startUpLatency);
             data->firstFrame = FALSE;
-            if (gEventsEnabled) {
-                // generate an image and notification event at the start of the video stream.
-                putKinesisVideoEventMetadata(data->streamHandle, STREAM_EVENT_TYPE_NOTIFICATION | STREAM_EVENT_TYPE_IMAGE_GENERATION, NULL);
-            }
+            //if (gEventsEnabled) {
+            //}
         }
+        else if(frame.flags == FRAME_FLAG_KEY_FRAME && gEventsEnabled) {
+            // generate an image and notification event at the start of the video stream.
+            putKinesisVideoEventMetadata(data->streamHandle, STREAM_EVENT_TYPE_NOTIFICATION | STREAM_EVENT_TYPE_IMAGE_GENERATION, NULL);
+            //only push this once in this sample. A customer may use this whenever it is necessary though
+            gEventsEnabled = 0;
+        }
+
 
         ATOMIC_STORE_BOOL(&data->firstVideoFramePut, TRUE);
         if (STATUS_FAILED(status)) {
@@ -195,7 +200,7 @@ INT32 main(INT32 argc, CHAR* argv[])
     STRNCPY(videoCodec, VIDEO_CODEC_NAME_H264, STRLEN(VIDEO_CODEC_NAME_H264)); // h264 video by default
 
     if (argc == 7) {
-        if (STRCMP(argv[6], "1")) {
+        if (!STRCMP(argv[6], "1")) {
             gEventsEnabled = 1;
         }
     }
