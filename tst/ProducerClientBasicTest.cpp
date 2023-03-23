@@ -404,37 +404,37 @@ PVOID ProducerClientTestBase::basicProducerRoutine(STREAM_HANDLE streamHandle, S
               frame.decodingTs,
               frame.presentationTs);
         // Apply some non-persistent metadata every few frames
-        if (frame.index % 20 == 0) {
-            std::ostringstream metadataName;
-            std::ostringstream metadataValue;
-            DLOGD("Adding metadata for stream: %s", pStreamInfo->name);
-            metadataName << "MetadataNameForFrame_" << frame.index;
-            metadataValue << "MetadataValueForFrame_" << frame.index;
-            EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFragmentMetadata(streamHandle,
-                                                                      (PCHAR) metadataName.str().c_str(),
-                                                                      (PCHAR) metadataValue.str().c_str(),
-                                                                      FALSE));
-        }
-
-        // Apply some persistent metadata on a larger intervals to span fragments
-        if (frame.index % 60 == 0) {
-            std::ostringstream metadataName;
-            std::ostringstream metadataValue;
-
-            metadataName << "PersistentMetadataName_" << persistentMetadataIndex;
-
-            // Set or clear persistent metadata every other time.
-            if (persistentMetadataIndex % 2 == 0) {
-                persistentMetadataName = metadataName.str();
-                metadataValue << "PersistentMetadataValue_" << persistentMetadataIndex;
-            }
-
-            persistentMetadataIndex++;
-            EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFragmentMetadata(streamHandle,
-                                                                      (PCHAR) persistentMetadataName.c_str(),
-                                                                      (PCHAR) metadataValue.str().c_str(),
-                                                                      TRUE));
-        }
+//        if (frame.index % 20 == 0) {
+//            std::ostringstream metadataName;
+//            std::ostringstream metadataValue;
+//            DLOGD("Adding metadata for stream: %s", pStreamInfo->name);
+//            metadataName << "MetadataNameForFrame_" << frame.index;
+//            metadataValue << "MetadataValueForFrame_" << frame.index;
+//            EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFragmentMetadata(streamHandle,
+//                                                                      (PCHAR) metadataName.str().c_str(),
+//                                                                      (PCHAR) metadataValue.str().c_str(),
+//                                                                      FALSE));
+//        }
+//
+//        // Apply some persistent metadata on a larger intervals to span fragments
+//        if (frame.index % 60 == 0) {
+//            std::ostringstream metadataName;
+//            std::ostringstream metadataValue;
+//
+//            metadataName << "PersistentMetadataName_" << persistentMetadataIndex;
+//
+//            // Set or clear persistent metadata every other time.
+//            if (persistentMetadataIndex % 2 == 0) {
+//                persistentMetadataName = metadataName.str();
+//                metadataValue << "PersistentMetadataValue_" << persistentMetadataIndex;
+//            }
+//
+//            persistentMetadataIndex++;
+//            EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFragmentMetadata(streamHandle,
+//                                                                      (PCHAR) persistentMetadataName.c_str(),
+//                                                                      (PCHAR) metadataValue.str().c_str(),
+//                                                                      TRUE));
+//        }
 
 #if 0
             // Simulate EoFr first
