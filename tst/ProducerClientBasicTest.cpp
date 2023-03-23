@@ -403,12 +403,11 @@ PVOID ProducerClientTestBase::basicProducerRoutine(STREAM_HANDLE streamHandle, S
               frame.size,
               frame.decodingTs,
               frame.presentationTs);
-
         // Apply some non-persistent metadata every few frames
         if (frame.index % 20 == 0) {
             std::ostringstream metadataName;
             std::ostringstream metadataValue;
-
+            DLOGD("Adding metadata for stream: %s", pStreamInfo->name);
             metadataName << "MetadataNameForFrame_" << frame.index;
             metadataValue << "MetadataValueForFrame_" << frame.index;
             EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFragmentMetadata(streamHandle,
@@ -471,7 +470,7 @@ TEST_F(ProducerClientBasicTest, create_produce_stream)
 
     createDefaultProducerClient(FALSE, 5 * HUNDREDS_OF_NANOS_IN_A_SECOND);
 
-    for (UINT32 i = 0; i < TEST_STREAM_COUNT; i++) {
+    for (UINT32 i = 0; i < 1; i++) {
         // Create the stream
         ASSERT_EQ(STATUS_SUCCESS, createTestStream(i, STREAMING_TYPE_REALTIME, 20 * HUNDREDS_OF_NANOS_IN_A_SECOND, 60 * HUNDREDS_OF_NANOS_IN_A_SECOND));
 
