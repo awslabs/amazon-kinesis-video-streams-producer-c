@@ -314,6 +314,7 @@ ProducerClientTestBase::ProducerClientTestBase() :
     mStreamInfo.streamCaps.frameTimecodes = TRUE;
     mStreamInfo.streamCaps.recalculateMetrics = TRUE;
     mStreamInfo.streamCaps.recoverOnError = TRUE;
+    mStreamInfo.streamCaps.allowStreamCreation = TRUE;
     mStreamInfo.streamCaps.avgBandwidthBps = 4 * 1024 * 1024;
     mStreamInfo.streamCaps.bufferDuration = TEST_STREAM_BUFFER_DURATION;
     mStreamInfo.streamCaps.replayDuration = 10 * HUNDREDS_OF_NANOS_IN_A_SECOND;
