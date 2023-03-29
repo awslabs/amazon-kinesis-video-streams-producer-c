@@ -36,7 +36,7 @@ STATUS readFrameData(PFrame pFrame, PCHAR frameFilePath, PCHAR videoCodec)
     pFrame->size = (UINT32) size;
 
     if (pFrame->flags == FRAME_FLAG_KEY_FRAME) {
-        defaultLogPrint(LOG_LEVEL_DEBUG, "", "Key frame file %s, size %" PRIu64, filePath, pFrame->size);
+        DLOGD("Key frame file %s, size %" PRIu64, filePath, pFrame->size);
     }
 
 CleanUp:
@@ -70,15 +70,14 @@ INT32 main(INT32 argc, CHAR* argv[])
     VIDEO_CODEC_ID videoCodecID = VIDEO_CODEC_ID_H264;
 
     if (argc < 2) {
-        defaultLogPrint(
-            LOG_LEVEL_ERROR, "",
+        DLOGE(
             "Usage: AWS_ACCESS_KEY_ID=SAMPLEKEY AWS_SECRET_ACCESS_KEY=SAMPLESECRET %s <stream_name> <duration_in_seconds> <frame_files_path>\n",
             argv[0]);
         CHK(FALSE, STATUS_INVALID_ARG);
     }
 
     if ((accessKey = getenv(ACCESS_KEY_ENV_VAR)) == NULL || (secretKey = getenv(SECRET_KEY_ENV_VAR)) == NULL) {
-        defaultLogPrint(LOG_LEVEL_ERROR, "", "Error missing credentials");
+        DLOGE("Error missing credentials");
         CHK(FALSE, STATUS_INVALID_ARG);
     }
 
@@ -109,7 +108,7 @@ INT32 main(INT32 argc, CHAR* argv[])
         streamingDuration *= HUNDREDS_OF_NANOS_IN_A_SECOND;
     }
 
-    streamStopTime = defaultGetTime() + streamingDuration;
+    streamStopTime = GETTIME() + streamingDuration;
 
     // default storage size is 128MB. Use setDeviceInfoStorageSize after create to change storage size.
     CHK_STATUS(createDefaultDeviceInfo(&pDeviceInfo));
@@ -145,10 +144,10 @@ INT32 main(INT32 argc, CHAR* argv[])
     frame.version = FRAME_CURRENT_VERSION;
     frame.trackId = DEFAULT_VIDEO_TRACK_ID;
     frame.duration = HUNDREDS_OF_NANOS_IN_A_SECOND / DEFAULT_FPS_VALUE;
-    frame.decodingTs = defaultGetTime(); // current time
+    frame.decodingTs = GETTIME(); // current time
     frame.presentationTs = frame.decodingTs;
 
-    while (defaultGetTime() < streamStopTime) {
+    while (GETTIME() < streamStopTime) {
         frame.index = frameIndex;
         frame.flags = fileIndex % DEFAULT_KEY_FRAME_INTERVAL == 0 ? FRAME_FLAG_KEY_FRAME : FRAME_FLAG_NONE;
         frame.size = SIZEOF(frameBuffer);
@@ -177,7 +176,7 @@ INT32 main(INT32 argc, CHAR* argv[])
 CleanUp:
 
     if (STATUS_FAILED(retStatus)) {
-        defaultLogPrint(LOG_LEVEL_ERROR, "", "Failed with status 0x%08x\n", retStatus);
+        DLOGE("Failed with status 0x%08x", retStatus);
     }
 
     if (pDeviceInfo != NULL) {

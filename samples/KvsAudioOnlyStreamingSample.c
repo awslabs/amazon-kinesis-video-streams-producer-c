@@ -54,7 +54,7 @@ PVOID putAudioFrameRoutine(PVOID args)
     frame.index = 0;
     frame.flags = fileIndex % DEFAULT_KEY_FRAME_INTERVAL == 0 ? FRAME_FLAG_KEY_FRAME : FRAME_FLAG_NONE;
 
-    while (defaultGetTime() < data->streamStopTime) {
+    while (GETTIME() < data->streamStopTime) {
         status = putKinesisVideoFrame(data->streamHandle, &frame);            
         if (STATUS_FAILED(status)) {
             printf("putKinesisVideoFrame for audio failed with 0x%08x\n", status);
@@ -71,7 +71,7 @@ PVOID putAudioFrameRoutine(PVOID args)
         frame.size = data->audioFrames[fileIndex].size;
 
         // synchronize putKinesisVideoFrame to running time
-        runningTime = defaultGetTime() - data->streamStartTime;
+        runningTime = GETTIME() - data->streamStartTime;
         if (runningTime < frame.presentationTs) {
             THREAD_SLEEP(frame.presentationTs - runningTime);
         }
@@ -160,7 +160,7 @@ INT32 main(INT32 argc, CHAR* argv[])
         streamingDuration *= HUNDREDS_OF_NANOS_IN_A_SECOND;
     }
 
-    streamStopTime = defaultGetTime() + streamingDuration;
+    streamStopTime = GETTIME() + streamingDuration;
 
     // default storage size is 128MB. Use setDeviceInfoStorageSize after create to change storage size.
     CHK_STATUS(createDefaultDeviceInfo(&pDeviceInfo));
@@ -218,7 +218,7 @@ INT32 main(INT32 argc, CHAR* argv[])
 
     data.streamStopTime = streamStopTime;
     data.streamHandle = streamHandle;
-    data.streamStartTime = defaultGetTime();
+    data.streamStartTime = GETTIME();
 
     THREAD_CREATE(&audioSendTid, putAudioFrameRoutine, (PVOID) &data);
 
