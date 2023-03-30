@@ -133,7 +133,7 @@ PVOID ProducerClientBasicTest::staticCreateProducerClientRoutine(PVOID arg)
     streamInfo.streamCaps.trackInfoCount = 1;
     streamInfo.streamCaps.trackInfoList = &trackInfo;
     streamInfo.streamCaps.frameOrderingMode = FRAME_ORDER_MODE_PASS_THROUGH;
-    SPRINTF(streamInfo.name, "ScaryTestStream_%u", (UINT32) index);
+    SNPRINTF(streamInfo.name, MAX_STREAM_NAME_LEN + 1, "ScaryTestStream_%u", (UINT32) index);
 	
     EXPECT_EQ(STATUS_SUCCESS, retStatus = createKinesisVideoStreamSync(pTest->mClients[index], &streamInfo, &pTest->mStreams[index]));
 
@@ -192,7 +192,7 @@ PVOID ProducerClientBasicTest::staticCreateProducerRoutine(PVOID arg)
     streamInfo.streamCaps.trackInfoCount = 1;
     streamInfo.streamCaps.trackInfoList = &trackInfo;
     streamInfo.streamCaps.frameOrderingMode = FRAME_ORDER_MODE_PASS_THROUGH;
-    SPRINTF(streamInfo.name, "ScaryTestStream_%u", (UINT32) index);
+    SNPRINTF(streamInfo.name, MAX_STREAM_NAME_LEN + 1, "ScaryTestStream_%u", (UINT32) index);
 
     retStatus = createKinesisVideoStreamSync(pTest->mClientHandle, &streamInfo, &pTest->mStreams[index]);
 

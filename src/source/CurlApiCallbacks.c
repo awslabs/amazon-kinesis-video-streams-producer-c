@@ -73,7 +73,6 @@ STATUS createCurlApiCallbacks(PCallbacksProvider pCallbacksProvider, PCHAR regio
 
     status = getUserAgentString(userAgentNamePostfix, customUserAgent, MAX_USER_AGENT_LEN, pCurlApiCallbacks->userAgent);
     pCurlApiCallbacks->userAgent[MAX_USER_AGENT_LEN] = '\0';
-    printf("User agent name for curl calls: %s\n", pCurlApiCallbacks->userAgent);
     if (STATUS_FAILED(status)) {
         DLOGW("Failed to generate user agent string with error 0x%08x.", status);
     }

@@ -507,12 +507,12 @@ STATUS ProducerClientTestBase::createTestStream(UINT32 index, STREAMING_TYPE str
     for (UINT32 i = 0; i < tagCount; i++) {
         tags[i].name = (PCHAR) MEMALLOC(SIZEOF(CHAR) * (MAX_TAG_NAME_LEN + 1));
         tags[i].value = (PCHAR) MEMALLOC(SIZEOF(CHAR) * (MAX_TAG_VALUE_LEN + 1));
-        SPRINTF(tags[i].name, "testTag_%d_%d", index, i);
-        SPRINTF(tags[i].value, "testTag_%d_%d_Value", index, i);
+        SNPRINTF(tags[i].name, MAX_TAG_NAME_LEN, "testTag_%d_%d", index, i);
+        SNPRINTF(tags[i].value, MAX_TAG_VALUE_LEN, "testTag_%d_%d_Value", index, i);
         tags[i].version = TAG_CURRENT_VERSION;
     }
 
-    SPRINTF(mStreamInfo.name, "ScaryTestStream_%d", index);
+    SNPRINTF(mStreamInfo.name, MAX_STREAM_NAME_LEN + 1, "ScaryTestStream_%d", index);
     mStreamInfo.tagCount = tagCount;
     mStreamInfo.tags = tags;
     mStreamInfo.streamCaps.streamingType = streamingType;

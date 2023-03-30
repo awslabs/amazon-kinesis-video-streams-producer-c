@@ -166,6 +166,193 @@ TEST_F(CallbacksProviderPublicApiTest, createDefaultCallbacksProviderWithIotCert
             &pClientCallbacks));
 }
 
+TEST_F(CallbacksProviderPublicApiTest, createDefaultCallbacksProviderWithIotCertificateAndTimeouts)
+{
+    PClientCallbacks pClientCallbacks;
+
+    EXPECT_EQ(STATUS_DIRECTORY_ENTRY_STAT_ERROR, createDefaultCallbacksProviderWithIotCertificateAndTimeouts(
+            TEST_IOT_ENDPOINT,
+            TEST_IOT_CERT_PATH,
+            TEST_IOT_CERT_PRIVATE_KEY_PATH,
+            TEST_CA_CERT_PATH,
+            TEST_IOT_ROLE_ALIAS,
+            TEST_IOT_THING_NAME,
+            (PCHAR) DEFAULT_AWS_REGION,
+            NULL,
+            NULL,
+            1,
+            2,
+            &pClientCallbacks));
+
+    EXPECT_EQ(STATUS_DIRECTORY_ENTRY_STAT_ERROR, createDefaultCallbacksProviderWithIotCertificateAndTimeouts(
+            TEST_IOT_ENDPOINT,
+            TEST_IOT_CERT_PATH,
+            TEST_IOT_CERT_PRIVATE_KEY_PATH,
+            TEST_CA_CERT_PATH,
+            TEST_IOT_ROLE_ALIAS,
+            TEST_IOT_THING_NAME,
+            (PCHAR) DEFAULT_AWS_REGION,
+            TEST_USER_AGENT_POSTFIX,
+            TEST_USER_AGENT,
+            1,
+            2,
+            &pClientCallbacks));
+
+    EXPECT_EQ(STATUS_NULL_ARG, createDefaultCallbacksProviderWithIotCertificateAndTimeouts(
+            TEST_IOT_ENDPOINT,
+            TEST_IOT_CERT_PATH,
+            TEST_IOT_CERT_PRIVATE_KEY_PATH,
+            TEST_CA_CERT_PATH,
+            TEST_IOT_ROLE_ALIAS,
+            TEST_IOT_THING_NAME,
+            (PCHAR) DEFAULT_AWS_REGION,
+            NULL,
+            NULL,
+            1,
+            2,
+            NULL));
+
+    EXPECT_EQ(STATUS_NULL_ARG, createDefaultCallbacksProviderWithIotCertificateAndTimeouts(
+            NULL,
+            TEST_IOT_CERT_PATH,
+            TEST_IOT_CERT_PRIVATE_KEY_PATH,
+            TEST_CA_CERT_PATH,
+            TEST_IOT_ROLE_ALIAS,
+            TEST_IOT_THING_NAME,
+            (PCHAR) DEFAULT_AWS_REGION,
+            NULL,
+            NULL,
+            1,
+            2,
+            &pClientCallbacks));
+
+    EXPECT_EQ(STATUS_NULL_ARG, createDefaultCallbacksProviderWithIotCertificateAndTimeouts(
+            TEST_IOT_ENDPOINT,
+            NULL,
+            TEST_IOT_CERT_PRIVATE_KEY_PATH,
+            TEST_CA_CERT_PATH,
+            TEST_IOT_ROLE_ALIAS,
+            TEST_IOT_THING_NAME,
+            (PCHAR) DEFAULT_AWS_REGION,
+            NULL,
+            NULL,
+            1,
+            2,
+            &pClientCallbacks));
+
+    EXPECT_EQ(STATUS_NULL_ARG, createDefaultCallbacksProviderWithIotCertificateAndTimeouts(
+            TEST_IOT_ENDPOINT,
+            TEST_IOT_CERT_PATH,
+            NULL,
+            TEST_CA_CERT_PATH,
+            TEST_IOT_ROLE_ALIAS,
+            TEST_IOT_THING_NAME,
+            (PCHAR) DEFAULT_AWS_REGION,
+            NULL,
+            NULL,
+            1,
+            2,
+            &pClientCallbacks));
+
+    EXPECT_EQ(STATUS_CURL_PERFORM_FAILED, createDefaultCallbacksProviderWithIotCertificateAndTimeouts(
+            TEST_IOT_ENDPOINT,
+            TEST_IOT_CERT_PATH,
+            TEST_IOT_ROLE_ALIAS,
+            NULL,
+            TEST_IOT_ROLE_ALIAS,
+            TEST_IOT_THING_NAME,
+            (PCHAR) DEFAULT_AWS_REGION,
+            NULL,
+            NULL,
+            1,
+            2,
+            &pClientCallbacks));
+
+    EXPECT_EQ(STATUS_NULL_ARG, createDefaultCallbacksProviderWithIotCertificateAndTimeouts(
+            TEST_IOT_ENDPOINT,
+            TEST_IOT_CERT_PATH,
+            TEST_IOT_ROLE_ALIAS,
+            TEST_CA_CERT_PATH,
+            NULL,
+            TEST_IOT_THING_NAME,
+            (PCHAR) DEFAULT_AWS_REGION,
+            NULL,
+            NULL,
+            1,
+            2,
+            &pClientCallbacks));
+
+    EXPECT_EQ(STATUS_NULL_ARG, createDefaultCallbacksProviderWithIotCertificateAndTimeouts(
+            TEST_IOT_ENDPOINT,
+            TEST_IOT_CERT_PATH,
+            TEST_IOT_ROLE_ALIAS,
+            TEST_CA_CERT_PATH,
+            TEST_IOT_ROLE_ALIAS,
+            NULL,
+            (PCHAR) DEFAULT_AWS_REGION,
+            NULL,
+            NULL,
+            1,
+            2,
+            &pClientCallbacks));
+
+    EXPECT_EQ(STATUS_DIRECTORY_ENTRY_STAT_ERROR, createDefaultCallbacksProviderWithIotCertificateAndTimeouts(
+            EMPTY_STRING,
+            TEST_IOT_CERT_PATH,
+            TEST_IOT_CERT_PRIVATE_KEY_PATH,
+            TEST_CA_CERT_PATH,
+            TEST_IOT_ROLE_ALIAS,
+            TEST_IOT_THING_NAME,
+            (PCHAR) DEFAULT_AWS_REGION,
+            NULL,
+            NULL,
+            1,
+            2,
+            &pClientCallbacks));
+
+    EXPECT_EQ(STATUS_DIRECTORY_ENTRY_STAT_ERROR, createDefaultCallbacksProviderWithIotCertificateAndTimeouts(
+            TEST_IOT_ENDPOINT,
+            EMPTY_STRING,
+            TEST_IOT_CERT_PRIVATE_KEY_PATH,
+            TEST_CA_CERT_PATH,
+            TEST_IOT_ROLE_ALIAS,
+            TEST_IOT_THING_NAME,
+            (PCHAR) DEFAULT_AWS_REGION,
+            NULL,
+            NULL,
+            1,
+            2,
+            &pClientCallbacks));
+
+    EXPECT_EQ(STATUS_DIRECTORY_ENTRY_STAT_ERROR, createDefaultCallbacksProviderWithIotCertificateAndTimeouts(
+            TEST_IOT_ENDPOINT,
+            TEST_IOT_CERT_PATH,
+            EMPTY_STRING,
+            TEST_CA_CERT_PATH,
+            TEST_IOT_ROLE_ALIAS,
+            TEST_IOT_THING_NAME,
+            (PCHAR) DEFAULT_AWS_REGION,
+            NULL,
+            NULL,
+            1,
+            2,
+            &pClientCallbacks));
+
+    EXPECT_EQ(STATUS_CURL_PERFORM_FAILED, createDefaultCallbacksProviderWithIotCertificateAndTimeouts(
+            TEST_IOT_ENDPOINT,
+            TEST_IOT_CERT_PATH,
+            TEST_IOT_CERT_PRIVATE_KEY_PATH,
+            EMPTY_STRING,
+            TEST_IOT_ROLE_ALIAS,
+            TEST_IOT_THING_NAME,
+            (PCHAR) DEFAULT_AWS_REGION,
+            NULL,
+            NULL,
+            1,
+            2,
+            &pClientCallbacks));
+}
+
 TEST_F(CallbacksProviderPublicApiTest, createDefaultCallbacksProviderWithAwsCredentials)
 {
     PClientCallbacks pClientCallbacks = NULL;
