@@ -1,0 +1,5 @@
+<map id="createCurlIotCredentialProviderWithTimeAndTimeout" name="createCurlIotCredentialProviderWithTimeAndTimeout">
+<area shape="rect" id="node1" title="Creates an IoT based AWS credential provider object with time function which is based on libCurl." alt="" coords="532,5,759,47"/>
+<area shape="rect" id="node2" href="$group__PublicMemberFunctions.html#ga4235d1df60b4f123b7b55570f78f1087" title=" " alt="" coords="281,5,484,47"/>
+<area shape="rect" id="node3" href="$group__PublicMemberFunctions.html#gacab2eb7cb8bc4a0337c9e257b5933688" title=" " alt="" coords="5,5,233,47"/>
+</map>

@@ -3,7 +3,7 @@
 <area shape="rect" id="node2" href="$Util_8c.html#a479029902f6c9e304dc9432451ac7312" title=" " alt="" coords="804,81,1065,108"/>
 <area shape="rect" id="node3" href="$group__PublicMemberFunctions.html#ga614ff0bb778c3c1fb27e66d4429327fa" title="Creates an IoT based AWS credential provider object with time function which is based on libCurl." alt="" coords="280,165,507,206"/>
 <area shape="rect" id="node4" href="$CurlCall_8c.html#ab70b26a9640d5350ce72429cfe799b54" title=" " alt="" coords="591,335,719,361"/>
-<area shape="rect" id="node9" href="$IotCredentialProvider_8c.html#a58036c0db42789a564f44316d13013ac" title=" " alt="" coords="555,165,756,206"/>
+<area shape="rect" id="node9" href="$IotCredentialProvider_8c.html#aa723d7931db2d162faeafea647dec5a6" title=" " alt="" coords="555,165,756,206"/>
 <area shape="rect" id="node5" href="$CurlCall_8c.html#a2d3ad015231b4c7cbd36007e36c42c10" title=" " alt="" coords="855,335,1014,361"/>
 <area shape="rect" id="node6" href="$Util_8c.html#a94b854e99ce8a65db46338c9dd12c5d1" title=" " alt="" coords="839,385,1030,412"/>
 <area shape="rect" id="node7" href="$group__PublicMemberFunctions.html#ga32ae8a6f5f3ec7fae0d7840e74203053" title="Checks whether the request URL requires a secure connection." alt="" coords="812,436,1057,463"/>

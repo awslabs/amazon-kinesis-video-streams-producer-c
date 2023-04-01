@@ -382,6 +382,9 @@ Functions</h2></td></tr>
 <tr class="memitem:ga3f966d72311ebdfc66dfcf77aaf41684"><td class="memItemLeft" align="right" valign="top">PUBLIC_API STATUS&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PublicMemberFunctions.html#ga3f966d72311ebdfc66dfcf77aaf41684">createLwsIotCredentialProvider</a> (PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, <a class="el" href="group__PublicStructures.html#ga70d8fd7fc63e35e7e3c391cb09a1fb21">PAwsCredentialProvider</a> *)</td></tr>
 <tr class="memdesc:ga3f966d72311ebdfc66dfcf77aaf41684"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates an IoT based AWS credential provider object using libWebSockets.  <a href="group__PublicMemberFunctions.html#ga3f966d72311ebdfc66dfcf77aaf41684">More...</a><br /></td></tr>
 <tr class="separator:ga3f966d72311ebdfc66dfcf77aaf41684"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gacc88aa81762b337b7156cb587abb5dfe"><td class="memItemLeft" align="right" valign="top">PUBLIC_API STATUS&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PublicMemberFunctions.html#gacc88aa81762b337b7156cb587abb5dfe">createCurlIotCredentialProviderWithTimeAndTimeout</a> (PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, UINT64, UINT64, GetCurrentTimeFunc, UINT64, <a class="el" href="group__PublicStructures.html#ga70d8fd7fc63e35e7e3c391cb09a1fb21">PAwsCredentialProvider</a> *)</td></tr>
+<tr class="memdesc:gacc88aa81762b337b7156cb587abb5dfe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates an IoT based AWS credential provider object with time function which is based on libCurl.  <a href="group__PublicMemberFunctions.html#gacc88aa81762b337b7156cb587abb5dfe">More...</a><br /></td></tr>
+<tr class="separator:gacc88aa81762b337b7156cb587abb5dfe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga614ff0bb778c3c1fb27e66d4429327fa"><td class="memItemLeft" align="right" valign="top">PUBLIC_API STATUS&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PublicMemberFunctions.html#ga614ff0bb778c3c1fb27e66d4429327fa">createCurlIotCredentialProviderWithTime</a> (PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, GetCurrentTimeFunc, UINT64, <a class="el" href="group__PublicStructures.html#ga70d8fd7fc63e35e7e3c391cb09a1fb21">PAwsCredentialProvider</a> *)</td></tr>
 <tr class="memdesc:ga614ff0bb778c3c1fb27e66d4429327fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates an IoT based AWS credential provider object with time function which is based on libCurl.  <a href="group__PublicMemberFunctions.html#ga614ff0bb778c3c1fb27e66d4429327fa">More...</a><br /></td></tr>
 <tr class="separator:ga614ff0bb778c3c1fb27e66d4429327fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -672,14 +675,15 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="common_2Include_8h_acf13ac9f766763993252a14b512c9f0d_icgraph.png" border="0" usemap="#acommon_2Include_8h_acf13ac9f766763993252a14b512c9f0d_icgraph" alt=""/></div>
 <map name="acommon_2Include_8h_acf13ac9f766763993252a14b512c9f0d_icgraph" id="acommon_2Include_8h_acf13ac9f766763993252a14b512c9f0d_icgraph">
-<area shape="rect" title=" " alt="" coords="779,129,939,156"/>
-<area shape="rect" href="CurlApiCallbacks_8c.html#a130e64adf86a4615c3e31fe7044c014a" title=" " alt="" coords="557,129,731,156"/>
-<area shape="rect" href="group__PublicMemberFunctions.html#ga6c195173d4fd6f942260e2b81c0d4e83" title=" " alt="" coords="281,122,509,163"/>
+<area shape="rect" title=" " alt="" coords="779,163,939,189"/>
+<area shape="rect" href="CurlApiCallbacks_8c.html#a130e64adf86a4615c3e31fe7044c014a" title=" " alt="" coords="557,163,731,189"/>
+<area shape="rect" href="group__PublicMemberFunctions.html#ga6c195173d4fd6f942260e2b81c0d4e83" title=" " alt="" coords="281,155,509,197"/>
 <area shape="rect" href="CallbacksProvider_8c.html#a020c62e1ff193d474681bef1c94bdcee" title=" " alt="" coords="5,5,233,32"/>
 <area shape="rect" href="group__PublicMemberFunctions.html#ga42ffcf860b92e764b2ba56bc5d72fd71" title=" " alt="" coords="5,57,233,98"/>
 <area shape="rect" href="group__PublicMemberFunctions.html#gabace8323412b6bd8019502f1f7d13c6a" title=" " alt="" coords="5,122,233,163"/>
 <area shape="rect" href="group__PublicMemberFunctions.html#gafcd18610ba9ef3d8a4ce62539ddfc2e9" title=" " alt="" coords="5,187,233,229"/>
 <area shape="rect" href="group__PublicMemberFunctions.html#ga750983add758649af12b8317d8483c3e" title=" " alt="" coords="5,253,233,294"/>
+<area shape="rect" href="group__PublicMemberFunctions.html#gacab2eb7cb8bc4a0337c9e257b5933688" title=" " alt="" coords="5,318,233,359"/>
 </map>
 </div>
 
@@ -706,16 +710,17 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="common_2Include_8h_ab3f57e718242495d70c73269568b89ca_icgraph.png" border="0" usemap="#acommon_2Include_8h_ab3f57e718242495d70c73269568b89ca_icgraph" alt=""/></div>
 <map name="acommon_2Include_8h_ab3f57e718242495d70c73269568b89ca_icgraph" id="acommon_2Include_8h_ab3f57e718242495d70c73269568b89ca_icgraph">
-<area shape="rect" title=" " alt="" coords="1192,155,1344,181"/>
-<area shape="rect" href="CurlApiCallbacks_8c.html#a10e534d63b733b314d9f997bbfd0b7e2" title=" " alt="" coords="985,155,1144,181"/>
-<area shape="rect" href="group__PublicMemberFunctions.html#ga6c195173d4fd6f942260e2b81c0d4e83" title=" " alt="" coords="281,122,509,163"/>
-<area shape="rect" href="CurlApiCallbacks_8c.html#a130e64adf86a4615c3e31fe7044c014a" title=" " alt="" coords="557,155,731,181"/>
-<area shape="rect" href="CurlApiCallbacks_8c.html#af4cf7130463f33140b7643b9f61b7cba" title=" " alt="" coords="779,205,937,232"/>
+<area shape="rect" title=" " alt="" coords="1192,188,1344,215"/>
+<area shape="rect" href="CurlApiCallbacks_8c.html#a10e534d63b733b314d9f997bbfd0b7e2" title=" " alt="" coords="985,188,1144,215"/>
+<area shape="rect" href="group__PublicMemberFunctions.html#ga6c195173d4fd6f942260e2b81c0d4e83" title=" " alt="" coords="281,155,509,197"/>
+<area shape="rect" href="CurlApiCallbacks_8c.html#a130e64adf86a4615c3e31fe7044c014a" title=" " alt="" coords="557,188,731,215"/>
+<area shape="rect" href="CurlApiCallbacks_8c.html#af4cf7130463f33140b7643b9f61b7cba" title=" " alt="" coords="779,239,937,265"/>
 <area shape="rect" href="CallbacksProvider_8c.html#a020c62e1ff193d474681bef1c94bdcee" title=" " alt="" coords="5,5,233,32"/>
 <area shape="rect" href="group__PublicMemberFunctions.html#ga42ffcf860b92e764b2ba56bc5d72fd71" title=" " alt="" coords="5,57,233,98"/>
 <area shape="rect" href="group__PublicMemberFunctions.html#gabace8323412b6bd8019502f1f7d13c6a" title=" " alt="" coords="5,122,233,163"/>
 <area shape="rect" href="group__PublicMemberFunctions.html#gafcd18610ba9ef3d8a4ce62539ddfc2e9" title=" " alt="" coords="5,187,233,229"/>
 <area shape="rect" href="group__PublicMemberFunctions.html#ga750983add758649af12b8317d8483c3e" title=" " alt="" coords="5,253,233,294"/>
+<area shape="rect" href="group__PublicMemberFunctions.html#gacab2eb7cb8bc4a0337c9e257b5933688" title=" " alt="" coords="5,318,233,359"/>
 </map>
 </div>
 
@@ -727,7 +732,7 @@ Here is the caller graph for this function:</div>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_b0856f6b0d80ccb263b2f415c91f9e17.html">include</a></li><li class="navelem"><a class="el" href="dir_8f5ac45a6ada111b95e80af22bb6017d.html">com</a></li><li class="navelem"><a class="el" href="dir_6eddcaa8cb3f84b1b7290fa7880ed0c5.html">amazonaws</a></li><li class="navelem"><a class="el" href="dir_ffe25b375dd9c47f978782781b252738.html">kinesis</a></li><li class="navelem"><a class="el" href="dir_40be0bfe93e499fae0ac3fc2c0b3ca29.html">video</a></li><li class="navelem"><a class="el" href="dir_05b9be403b0a47e6d1d55a603788602b.html">common</a></li><li class="navelem"><a class="el" href="common_2Include_8h.html">Include.h</a></li>
-    <li class="footer">Generated on Fri Mar 24 2023 00:52:47 for Amazon Kinesis Producer C SDK by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+    <li class="footer">Generated on Sat Apr 1 2023 00:56:12 for Amazon Kinesis Producer C SDK by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
 </body>

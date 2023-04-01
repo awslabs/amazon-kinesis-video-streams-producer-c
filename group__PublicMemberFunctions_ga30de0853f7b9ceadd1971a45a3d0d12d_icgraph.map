@@ -1,13 +1,16 @@
 <map id="freeIotCredentialProvider" name="freeIotCredentialProvider">
-<area shape="rect" id="node1" title="Frees an IoT based Aws credential provider object." alt="" coords="1081,141,1268,167"/>
-<area shape="rect" id="node2" href="$IotCredentialProvider_8c.html#a58036c0db42789a564f44316d13013ac" title=" " alt="" coords="832,71,1033,112"/>
-<area shape="rect" id="node9" href="$group__PublicMemberFunctions.html#gaefb55592d3e82672a97d95005e9510ea" title=" " alt="" coords="853,202,1012,229"/>
-<area shape="rect" id="node3" href="$group__PublicMemberFunctions.html#ga614ff0bb778c3c1fb27e66d4429327fa" title="Creates an IoT based AWS credential provider object with time function which is based on libCurl." alt="" coords="557,71,783,112"/>
-<area shape="rect" id="node7" href="$group__PublicMemberFunctions.html#gae28f29d61cd81a083bd475601ace42e8" title="Creates an IoT based AWS credential provider object with time function which is based on libWebSocket..." alt="" coords="557,5,783,47"/>
-<area shape="rect" id="node4" href="$group__PublicMemberFunctions.html#gab4a9b009056672dbeeea6c79bfc6a797" title="Creates an IoT based AWS credential provider object using libCurl." alt="" coords="281,78,508,105"/>
-<area shape="rect" id="node5" href="$group__PublicMemberFunctions.html#ga8a84bd94812cefeab5b52176e5d7401c" title=" " alt="" coords="308,227,481,254"/>
-<area shape="rect" id="node6" href="$group__PublicMemberFunctions.html#ga750983add758649af12b8317d8483c3e" title=" " alt="" coords="5,245,233,287"/>
-<area shape="rect" id="node8" href="$group__PublicMemberFunctions.html#ga3f966d72311ebdfc66dfcf77aaf41684" title="Creates an IoT based AWS credential provider object using libWebSockets." alt="" coords="281,13,508,39"/>
-<area shape="rect" id="node10" href="$group__PublicMemberFunctions.html#gafcd18610ba9ef3d8a4ce62539ddfc2e9" title=" " alt="" coords="556,136,784,177"/>
-<area shape="rect" id="node11" href="$IotAuthCallback_8c.html#a00b2b8c4aa2fc9deaa8ceec2dce32c06" title=" " alt="" coords="576,202,764,229"/>
+<area shape="rect" id="node1" title="Frees an IoT based Aws credential provider object." alt="" coords="1081,231,1268,258"/>
+<area shape="rect" id="node2" href="$IotCredentialProvider_8c.html#aa723d7931db2d162faeafea647dec5a6" title=" " alt="" coords="832,104,1033,145"/>
+<area shape="rect" id="node12" href="$group__PublicMemberFunctions.html#gaefb55592d3e82672a97d95005e9510ea" title=" " alt="" coords="853,319,1012,346"/>
+<area shape="rect" id="node3" href="$group__PublicMemberFunctions.html#ga614ff0bb778c3c1fb27e66d4429327fa" title="Creates an IoT based AWS credential provider object with time function which is based on libCurl." alt="" coords="557,136,783,177"/>
+<area shape="rect" id="node7" href="$group__PublicMemberFunctions.html#gacc88aa81762b337b7156cb587abb5dfe" title="Creates an IoT based AWS credential provider object with time function which is based on libCurl." alt="" coords="557,71,783,112"/>
+<area shape="rect" id="node10" href="$group__PublicMemberFunctions.html#gae28f29d61cd81a083bd475601ace42e8" title="Creates an IoT based AWS credential provider object with time function which is based on libWebSocket..." alt="" coords="557,5,783,47"/>
+<area shape="rect" id="node4" href="$group__PublicMemberFunctions.html#gab4a9b009056672dbeeea6c79bfc6a797" title="Creates an IoT based AWS credential provider object using libCurl." alt="" coords="281,143,508,170"/>
+<area shape="rect" id="node5" href="$group__PublicMemberFunctions.html#ga8a84bd94812cefeab5b52176e5d7401c" title=" " alt="" coords="308,345,481,371"/>
+<area shape="rect" id="node6" href="$group__PublicMemberFunctions.html#ga750983add758649af12b8317d8483c3e" title=" " alt="" coords="5,388,233,429"/>
+<area shape="rect" id="node8" href="$group__PublicMemberFunctions.html#ga4235d1df60b4f123b7b55570f78f1087" title=" " alt="" coords="293,227,496,268"/>
+<area shape="rect" id="node9" href="$group__PublicMemberFunctions.html#gacab2eb7cb8bc4a0337c9e257b5933688" title=" " alt="" coords="5,259,233,300"/>
+<area shape="rect" id="node11" href="$group__PublicMemberFunctions.html#ga3f966d72311ebdfc66dfcf77aaf41684" title="Creates an IoT based AWS credential provider object using libWebSockets." alt="" coords="281,13,508,39"/>
+<area shape="rect" id="node13" href="$group__PublicMemberFunctions.html#gafcd18610ba9ef3d8a4ce62539ddfc2e9" title=" " alt="" coords="556,253,784,295"/>
+<area shape="rect" id="node14" href="$IotAuthCallback_8c.html#a00b2b8c4aa2fc9deaa8ceec2dce32c06" title=" " alt="" coords="576,319,764,346"/>
 </map>

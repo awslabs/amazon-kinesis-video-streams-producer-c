@@ -1,7 +1,7 @@
 <map id="createCurlIotCredentialProviderWithTime" name="createCurlIotCredentialProviderWithTime">
 <area shape="rect" id="node1" title="Creates an IoT based AWS credential provider object with time function which is based on libCurl." alt="" coords="5,175,232,217"/>
 <area shape="rect" id="node2" href="$CurlCall_8c.html#ab70b26a9640d5350ce72429cfe799b54" title=" " alt="" coords="317,107,445,133"/>
-<area shape="rect" id="node7" href="$IotCredentialProvider_8c.html#a58036c0db42789a564f44316d13013ac" title=" " alt="" coords="280,251,481,293"/>
+<area shape="rect" id="node7" href="$IotCredentialProvider_8c.html#aa723d7931db2d162faeafea647dec5a6" title=" " alt="" coords="280,251,481,293"/>
 <area shape="rect" id="node3" href="$CurlCall_8c.html#a2d3ad015231b4c7cbd36007e36c42c10" title=" " alt="" coords="581,5,739,32"/>
 <area shape="rect" id="node4" href="$Util_8c.html#a94b854e99ce8a65db46338c9dd12c5d1" title=" " alt="" coords="565,56,755,83"/>
 <area shape="rect" id="node5" href="$group__PublicMemberFunctions.html#ga32ae8a6f5f3ec7fae0d7840e74203053" title="Checks whether the request URL requires a secure connection." alt="" coords="537,107,783,133"/>

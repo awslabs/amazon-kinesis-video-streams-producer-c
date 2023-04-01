@@ -1,11 +1,12 @@
 <map id="connectionStaleStateMachineSetResetConnectionState" name="connectionStaleStateMachineSetResetConnectionState">
-<area shape="rect" id="node1" title=" " alt="" coords="1107,122,1321,163"/>
-<area shape="rect" id="node2" href="$ConnectionStaleStateMachine_8c.html#aac4809b9a39959082e4c5ab413670180" title=" " alt="" coords="844,122,1059,163"/>
-<area shape="rect" id="node3" href="$ContinuousRetryStreamCallbacks_8c.html#a06402d7452dbaa80d1e8c81a966de2c5" title=" " alt="" coords="548,122,796,163"/>
-<area shape="rect" id="node4" href="$group__PublicMemberFunctions.html#ga769a5282a044b423310983b1550694d9" title=" " alt="" coords="281,122,500,163"/>
+<area shape="rect" id="node1" title=" " alt="" coords="1107,155,1321,197"/>
+<area shape="rect" id="node2" href="$ConnectionStaleStateMachine_8c.html#aac4809b9a39959082e4c5ab413670180" title=" " alt="" coords="844,155,1059,197"/>
+<area shape="rect" id="node3" href="$ContinuousRetryStreamCallbacks_8c.html#a06402d7452dbaa80d1e8c81a966de2c5" title=" " alt="" coords="548,155,796,197"/>
+<area shape="rect" id="node4" href="$group__PublicMemberFunctions.html#ga769a5282a044b423310983b1550694d9" title=" " alt="" coords="281,155,500,197"/>
 <area shape="rect" id="node5" href="$CallbacksProvider_8c.html#a020c62e1ff193d474681bef1c94bdcee" title=" " alt="" coords="5,5,233,32"/>
 <area shape="rect" id="node6" href="$group__PublicMemberFunctions.html#ga42ffcf860b92e764b2ba56bc5d72fd71" title=" " alt="" coords="5,57,233,98"/>
 <area shape="rect" id="node7" href="$group__PublicMemberFunctions.html#gabace8323412b6bd8019502f1f7d13c6a" title=" " alt="" coords="5,122,233,163"/>
 <area shape="rect" id="node8" href="$group__PublicMemberFunctions.html#gafcd18610ba9ef3d8a4ce62539ddfc2e9" title=" " alt="" coords="5,187,233,229"/>
 <area shape="rect" id="node9" href="$group__PublicMemberFunctions.html#ga750983add758649af12b8317d8483c3e" title=" " alt="" coords="5,253,233,294"/>
+<area shape="rect" id="node10" href="$group__PublicMemberFunctions.html#gacab2eb7cb8bc4a0337c9e257b5933688" title=" " alt="" coords="5,318,233,359"/>
 </map>

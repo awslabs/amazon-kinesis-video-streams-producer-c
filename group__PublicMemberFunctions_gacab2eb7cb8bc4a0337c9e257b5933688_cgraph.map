@@ -1,0 +1,52 @@
+<map id="createDefaultCallbacksProviderWithIotCertificateAndTimeouts" name="createDefaultCallbacksProviderWithIotCertificateAndTimeouts">
+<area shape="rect" id="node1" title=" " alt="" coords="5,814,233,855"/>
+<area shape="rect" id="node2" href="$group__PublicMemberFunctions.html#ga6c195173d4fd6f942260e2b81c0d4e83" title=" " alt="" coords="281,772,509,814"/>
+<area shape="rect" id="node30" href="$group__PublicMemberFunctions.html#ga94409ce8098c602112f4bb5cb485b6b1" title=" " alt="" coords="599,1026,764,1053"/>
+<area shape="rect" id="node33" href="$group__PublicMemberFunctions.html#ga769a5282a044b423310983b1550694d9" title=" " alt="" coords="286,318,505,359"/>
+<area shape="rect" id="node38" href="$group__PublicMemberFunctions.html#ga99c0565d394e4916abf5f2783c1d9799" title=" " alt="" coords="875,30,1077,71"/>
+<area shape="rect" id="node43" href="$group__PublicMemberFunctions.html#ga4235d1df60b4f123b7b55570f78f1087" title=" " alt="" coords="294,1222,497,1263"/>
+<area shape="rect" id="node46" href="$group__PublicMemberFunctions.html#gaefb55592d3e82672a97d95005e9510ea" title=" " alt="" coords="897,1153,1055,1180"/>
+<area shape="rect" id="node3" href="$CurlApiCallbacks_8c.html#a130e64adf86a4615c3e31fe7044c014a" title=" " alt="" coords="595,698,768,725"/>
+<area shape="rect" id="node21" href="$CurlApiCallbacks_8c.html#a10e534d63b733b314d9f997bbfd0b7e2" title=" " alt="" coords="1191,640,1349,666"/>
+<area shape="rect" id="node31" href="$group__PublicMemberFunctions.html#gafc9985a8cd0c6a9e3628fea648618cf2" title=" " alt="" coords="602,597,761,624"/>
+<area shape="rect" id="node32" href="$CallbacksProvider_8c.html#ab921bc3782b61af01aeedd218fa5192e" title=" " alt="" coords="577,648,786,674"/>
+<area shape="rect" id="node4" href="$group__PublicMemberFunctions.html#gafa4978a7591a9b94f6b3ae83718ef47d" title=" " alt="" coords="911,444,1041,470"/>
+<area shape="rect" id="node5" href="$group__PublicMemberFunctions.html#gabcbc4ced09693c07d1162a4b82d19ae5" title=" " alt="" coords="893,494,1059,521"/>
+<area shape="rect" id="node6" href="$group__PublicMemberFunctions.html#ga7c6d83d21ff7aede4391a52df20f4ff6" title=" " alt="" coords="898,190,1054,217"/>
+<area shape="rect" id="node13" href="$CurlApiCallbacks_8c.html#a6448ee57c3dfd1ea8050a6bfe3fee5fc" title=" " alt="" coords="1196,552,1344,578"/>
+<area shape="rect" id="node15" href="$CurlApiCallbacks_8c.html#a87c1fa56b986bd8f1a81dc9dff1ed298" title=" " alt="" coords="909,697,1043,724"/>
+<area shape="rect" id="node16" href="$CurlApiCallbacks_8c.html#ae625942029492c5222a76c99a93692d2" title=" " alt="" coords="882,748,1070,774"/>
+<area shape="rect" id="node17" href="$CurlApiCallbacks_8c.html#a67ad0be1e07b676a939ced486fe5424e" title=" " alt="" coords="907,798,1045,825"/>
+<area shape="rect" id="node18" href="$CurlApiCallbacks_8c.html#a04ab4aae7ba1f0b0be9d009beb7d7eb2" title=" " alt="" coords="875,849,1077,876"/>
+<area shape="rect" id="node19" href="$CurlApiCallbacks_8c.html#a875a1ade6f5260815397bd24bd55f411" title=" " alt="" coords="880,900,1072,926"/>
+<area shape="rect" id="node20" href="$CurlApiCallbacks_8c.html#af4cf7130463f33140b7643b9f61b7cba" title=" " alt="" coords="897,646,1055,673"/>
+<area shape="rect" id="node23" href="$CurlApiCallbacks_8c.html#a7f57a0cc68e64ec20ffa294d4e0bd0f5" title=" " alt="" coords="853,950,1099,977"/>
+<area shape="rect" id="node24" href="$group__PublicMemberFunctions.html#ga30d52b573e074f5a4b59fe5acfefb290" title="Creates a user agent string." alt="" coords="901,1001,1051,1028"/>
+<area shape="rect" id="node25" href="$common_2Include_8h.html#acf13ac9f766763993252a14b512c9f0d" title=" " alt="" coords="896,1052,1056,1078"/>
+<area shape="rect" id="node26" href="$CurlApiCallbacks_8c.html#a7f8ceaabce616c9c2eb4f8656319e6f3" title=" " alt="" coords="918,241,1034,268"/>
+<area shape="rect" id="node27" href="$CurlApiCallbacks_8c.html#a54eeb7b2833819eb844cc2c581c51cfd" title=" " alt="" coords="897,292,1055,318"/>
+<area shape="rect" id="node28" href="$CurlApiCallbacks_8c.html#ae1a894ff85c0479d831251134ac2d624" title=" " alt="" coords="907,342,1045,369"/>
+<area shape="rect" id="node29" href="$CurlApiCallbacks_8c.html#a68d690aafbaab0598ee193006d9189e0" title=" " alt="" coords="885,393,1067,420"/>
+<area shape="rect" id="node7" href="$CallbacksProvider_8c.html#a13f5f8dc42637b273925c635d45498d4" title=" " alt="" coords="1155,242,1385,283"/>
+<area shape="rect" id="node8" href="$CallbacksProvider_8c.html#a42ba4d2ba593715d0f5e7693bf85e626" title=" " alt="" coords="1147,308,1393,334"/>
+<area shape="rect" id="node9" href="$CallbacksProvider_8c.html#a3ef0c33a3ad6467612417fb6c8899f5d" title=" " alt="" coords="1157,358,1383,385"/>
+<area shape="rect" id="node10" href="$CallbacksProvider_8c.html#ac32242e6ab64ad9f572775ce3c61a5c7" title=" " alt="" coords="1153,89,1387,116"/>
+<area shape="rect" id="node11" href="$CallbacksProvider_8c.html#a5a0521281a8cb9a39ea11bfad7a9f5eb" title=" " alt="" coords="1181,140,1359,166"/>
+<area shape="rect" id="node12" href="$CallbacksProvider_8c.html#a18865fb052450938938f4c617a49e9b0" title=" " alt="" coords="1149,190,1391,217"/>
+<area shape="rect" id="node14" href="$CurlApiCallbacks_8c.html#a2f0510dbf519a786a4c8418418983ac1" title=" " alt="" coords="1441,564,1636,590"/>
+<area shape="rect" id="node22" href="$common_2Include_8h.html#ab3f57e718242495d70c73269568b89ca" title=" " alt="" coords="1463,640,1615,666"/>
+<area shape="rect" id="node34" href="$ContinuousRetryStreamCallbacks_8c.html#ae297e1913bfa318910eb0c3d7e5d68ef" title=" " alt="" coords="572,350,791,391"/>
+<area shape="rect" id="node35" href="$ContinuousRetryStreamCallbacks_8c.html#a06402d7452dbaa80d1e8c81a966de2c5" title=" " alt="" coords="557,415,805,456"/>
+<area shape="rect" id="node36" href="$ContinuousRetryStreamCallbacks_8c.html#aacc5bf5c8a9993de5a7384d68f4d2c7f" title=" " alt="" coords="578,480,785,522"/>
+<area shape="rect" id="node37" href="$ContinuousRetryStreamCallbacks_8c.html#a8d3708af4b12cbac177b0e03c1e80ff7" title=" " alt="" coords="580,219,783,260"/>
+<area shape="rect" id="node40" href="$ContinuousRetryStreamCallbacks_8c.html#ac84d4452452b2fe316532650776584b5" title=" " alt="" coords="568,88,795,130"/>
+<area shape="rect" id="node41" href="$ContinuousRetryStreamCallbacks_8c.html#aaaf77b8bab0917abbad83093298025e6" title=" " alt="" coords="573,154,789,195"/>
+<area shape="rect" id="node42" href="$ContinuousRetryStreamCallbacks_8c.html#ae7cd262cbf2fda4d2e8d70e280b22fa1" title=" " alt="" coords="562,284,801,326"/>
+<area shape="rect" id="node39" href="$ContinuousRetryStreamCallbacks_8c.html#a4d3d81a4628f84b0c4a672ba59166dfa" title=" " alt="" coords="1161,37,1379,64"/>
+<area shape="rect" id="node44" href="$group__PublicMemberFunctions.html#ga6b3d5c98d6dc8b6060fa8a8a2c9669c7" title=" " alt="" coords="612,1330,751,1357"/>
+<area shape="rect" id="node45" href="$group__PublicMemberFunctions.html#gacc88aa81762b337b7156cb587abb5dfe" title="Creates an IoT based AWS credential provider object with time function which is based on libCurl." alt="" coords="568,1382,795,1423"/>
+<area shape="rect" id="node48" href="$IotAuthCallback_8c.html#a00b2b8c4aa2fc9deaa8ceec2dce32c06" title=" " alt="" coords="587,1128,775,1154"/>
+<area shape="rect" id="node49" href="$IotAuthCallback_8c.html#a878b8105f7b05b6575a49ecad0f59f2a" title=" " alt="" coords="591,1229,771,1256"/>
+<area shape="rect" id="node50" href="$IotAuthCallback_8c.html#abe4ebd53d9d646684f5bb74d7703c8be" title=" " alt="" coords="584,1280,779,1306"/>
+<area shape="rect" id="node47" href="$group__PublicMemberFunctions.html#ga30de0853f7b9ceadd1971a45a3d0d12d" title="Frees an IoT based Aws credential provider object." alt="" coords="1177,1153,1363,1180"/>
+</map>

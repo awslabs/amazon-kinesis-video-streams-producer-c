@@ -1,7 +1,7 @@
 <map id="createLwsIotCredentialProviderWithTime" name="createLwsIotCredentialProviderWithTime">
 <area shape="rect" id="node1" title="Creates an IoT based AWS credential provider object with time function which is based on libWebSocket..." alt="" coords="5,122,232,163"/>
 <area shape="rect" id="node2" href="$LwsCall_8c.html#a8705286265a9091eddf08dcbfd4b89c4" title=" " alt="" coords="317,75,444,101"/>
-<area shape="rect" id="node6" href="$IotCredentialProvider_8c.html#a58036c0db42789a564f44316d13013ac" title=" " alt="" coords="280,173,481,214"/>
+<area shape="rect" id="node6" href="$IotCredentialProvider_8c.html#aa723d7931db2d162faeafea647dec5a6" title=" " alt="" coords="280,173,481,214"/>
 <area shape="rect" id="node3" href="$group__PublicMemberFunctions.html#ga848d2d791114303aabea0c784ac5c144" title="Gets a request host string." alt="" coords="597,24,723,51"/>
 <area shape="rect" id="node4" href="$LwsCall_8c.html#ab52935f5f34b082652b563e77bded2b5" title=" " alt="" coords="577,75,743,101"/>
 <area shape="rect" id="node5" href="$group__PublicMemberFunctions.html#ga0ca638859f728108fa47b2db3729907b" title="Convenience method to convert HTTP statuses to SERVICE_CALL_RESULT status." alt="" coords="839,66,1029,107"/>
