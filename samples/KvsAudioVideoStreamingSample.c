@@ -68,7 +68,7 @@ PVOID putVideoFrameRoutine(PVOID args)
     // video track is used to mark new fragment. A new fragment is generated for every frame with FRAME_FLAG_KEY_FRAME
     frame.flags = fileIndex % DEFAULT_KEY_FRAME_INTERVAL == 0 ? FRAME_FLAG_KEY_FRAME : FRAME_FLAG_NONE;
 
-    while (defaultGetTime() < data->streamStopTime) {
+    while (GETTIME() < data->streamStopTime) {
         status = putKinesisVideoFrame(data->streamHandle, &frame);
         if (data->firstFrame) {
             startUpLatency = (DOUBLE) (GETTIME() - data->startTime) / (DOUBLE) HUNDREDS_OF_NANOS_IN_A_MILLISECOND;
@@ -99,7 +99,7 @@ PVOID putVideoFrameRoutine(PVOID args)
         frame.size = data->videoFrames[fileIndex].size;
 
         // synchronize putKinesisVideoFrame to running time
-        runningTime = defaultGetTime() - data->streamStartTime;
+        runningTime = GETTIME() - data->streamStartTime;
         if (runningTime < frame.presentationTs) {
             // reduce sleep time a little for smoother video
             THREAD_SLEEP((frame.presentationTs - runningTime) * 0.9);
@@ -136,7 +136,7 @@ PVOID putAudioFrameRoutine(PVOID args)
     frame.index = 0;
     frame.flags = FRAME_FLAG_NONE; // audio track is not used to cut fragment
 
-    while (defaultGetTime() < data->streamStopTime) {
+    while (GETTIME() < data->streamStopTime) {
         // no audio can be put until first video frame is put
         if (ATOMIC_LOAD_BOOL(&data->firstVideoFramePut)) {
             status = putKinesisVideoFrame(data->streamHandle, &frame);
@@ -154,7 +154,7 @@ PVOID putAudioFrameRoutine(PVOID args)
             frame.size = data->audioFrames[fileIndex].size;
 
             // synchronize putKinesisVideoFrame to running time
-            runningTime = defaultGetTime() - data->streamStartTime;
+            runningTime = GETTIME() - data->streamStartTime;
             if (runningTime < frame.presentationTs) {
                 THREAD_SLEEP(frame.presentationTs - runningTime);
             }
@@ -266,7 +266,7 @@ INT32 main(INT32 argc, CHAR* argv[])
         streamingDuration *= HUNDREDS_OF_NANOS_IN_A_SECOND;
     }
 
-    streamStopTime = defaultGetTime() + streamingDuration;
+    streamStopTime = GETTIME() + streamingDuration;
 
     // default storage size is 128MB. Use setDeviceInfoStorageSize after create to change storage size.
     CHK_STATUS(createDefaultDeviceInfo(&pDeviceInfo));
@@ -328,7 +328,7 @@ INT32 main(INT32 argc, CHAR* argv[])
 
     data.streamStopTime = streamStopTime;
     data.streamHandle = streamHandle;
-    data.streamStartTime = defaultGetTime();
+    data.streamStartTime = GETTIME();
     ATOMIC_STORE_BOOL(&data.firstVideoFramePut, FALSE);
 
     THREAD_CREATE(&videoSendTid, putVideoFrameRoutine, (PVOID) &data);

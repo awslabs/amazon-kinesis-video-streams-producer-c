@@ -644,6 +644,26 @@ PUBLIC_API STATUS createLwsIotCredentialProvider(PCHAR, PCHAR, PCHAR, PCHAR, PCH
  * @param[in] PCHAR CA cert file path
  * @param[in] PCHAR Role alias
  * @param[in] PCHAR IoT thing name
+ * @param[in] UINT64 connection timeout
+ * @param[in] UINT64 completion timeout
+ * @param[in] GetCurrentTimeFunc Custom current time function
+ * @param[in] UINT64 Time function custom data
+ * @param[out] PAwsCredentialProvider* Constructed AWS credentials provider object
+ *
+ * @return STATUS code of the execution. STATUS_SUCCESS on success
+ */
+PUBLIC_API STATUS createCurlIotCredentialProviderWithTimeAndTimeout(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, UINT64, UINT64, GetCurrentTimeFunc, UINT64,
+                                                          PAwsCredentialProvider*);
+
+/**
+ * @brief Creates an IoT based AWS credential provider object with time function which is based on libCurl
+ *
+ * @param[in] PCHAR IoT endpoint
+ * @param[in] PCHAR Cert file path
+ * @param[in] PCHAR Private key file path
+ * @param[in] PCHAR CA cert file path
+ * @param[in] PCHAR Role alias
+ * @param[in] PCHAR IoT thing name
  * @param[in] GetCurrentTimeFunc Custom current time function
  * @param[in] UINT64 Time function custom data
  * @param[out] PAwsCredentialProvider* Constructed AWS credentials provider object
@@ -651,7 +671,7 @@ PUBLIC_API STATUS createLwsIotCredentialProvider(PCHAR, PCHAR, PCHAR, PCHAR, PCH
  * @return STATUS code of the execution. STATUS_SUCCESS on success
  */
 PUBLIC_API STATUS createCurlIotCredentialProviderWithTime(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, GetCurrentTimeFunc, UINT64,
-                                                          PAwsCredentialProvider*);
+        PAwsCredentialProvider*);
 
 /**
  * @brief Creates an IoT based AWS credential provider object with time function which is based on libWebSockets

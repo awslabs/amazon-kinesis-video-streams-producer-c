@@ -5,7 +5,7 @@
 #include "Include_i.h"
 
 STATUS createIotCredentialProviderWithTime(PCHAR iotGetCredentialEndpoint, PCHAR certPath, PCHAR privateKeyPath, PCHAR caCertPath, PCHAR roleAlias,
-                                           PCHAR thingName, GetCurrentTimeFunc getCurrentTimeFn, UINT64 customData,
+                                           PCHAR thingName, UINT64 connectionTimeout, UINT64 completionTimeout, GetCurrentTimeFunc getCurrentTimeFn, UINT64 customData,
                                            BlockingServiceCallFunc serviceCallFn, PAwsCredentialProvider* ppCredentialProvider)
 {
     ENTERS();
@@ -46,6 +46,21 @@ STATUS createIotCredentialProviderWithTime(PCHAR iotGetCredentialEndpoint, PCHAR
     STRNCPY(pIotCredentialProvider->thingName, thingName, MAX_IOT_THING_NAME_LEN);
 
     pIotCredentialProvider->serviceCallFn = serviceCallFn;
+
+    if(completionTimeout < connectionTimeout) {
+        DLOGW("Setting defaults for connection and completion timeout since completion timeout is less than connection timeout");
+        connectionTimeout = IOT_REQUEST_CONNECTION_TIMEOUT;
+        completionTimeout = IOT_REQUEST_COMPLETION_TIMEOUT;
+    }
+    if(connectionTimeout == 0) {
+        connectionTimeout = IOT_REQUEST_CONNECTION_TIMEOUT;
+    }
+    pIotCredentialProvider->connectionTimeout = connectionTimeout;
+
+    if(completionTimeout == 0) {
+        completionTimeout = IOT_REQUEST_COMPLETION_TIMEOUT;
+    }
+    pIotCredentialProvider->completionTimeout = completionTimeout;
 
     CHK_STATUS(iotCurlHandler(pIotCredentialProvider));
 
@@ -216,7 +231,7 @@ STATUS iotCurlHandler(PIotCredentialProvider pIotCredentialProvider)
     // Form a new request info based on the params
     CHK_STATUS(createRequestInfo(serviceUrl, NULL, DEFAULT_AWS_REGION, pIotCredentialProvider->caCertPath, pIotCredentialProvider->certPath,
                                  pIotCredentialProvider->privateKeyPath, SSL_CERTIFICATE_TYPE_PEM, DEFAULT_USER_AGENT_NAME,
-                                 IOT_REQUEST_CONNECTION_TIMEOUT, IOT_REQUEST_COMPLETION_TIMEOUT, DEFAULT_LOW_SPEED_LIMIT,
+                                 pIotCredentialProvider->connectionTimeout, pIotCredentialProvider->completionTimeout, DEFAULT_LOW_SPEED_LIMIT,
                                  DEFAULT_LOW_SPEED_TIME_LIMIT, pIotCredentialProvider->pAwsCredentials, &pRequestInfo));
 
     callInfo.pRequestInfo = pRequestInfo;

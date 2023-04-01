@@ -54,6 +54,7 @@
 
 #define TEST_IOT_ENDPOINT              (PCHAR) "Test.iot.endpoint"
 #define TEST_IOT_CERT_PATH             (PCHAR) "/Test/credentials/cert/path"
+#define TEST_IOT_VALID_CERT_PATH       (PCHAR) "../"
 #define TEST_IOT_CERT_PRIVATE_KEY_PATH (PCHAR) "/Test/private/key/path"
 #define TEST_CA_CERT_PATH              (PCHAR) "/Test/private/ca_cert/path"
 #define TEST_IOT_ROLE_ALIAS            (PCHAR) "TestRoleAlias"

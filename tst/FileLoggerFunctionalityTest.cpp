@@ -111,7 +111,7 @@ namespace com { namespace amazonaws { namespace kinesis { namespace video {
         // make sure the files dont exist
         FREMOVE(TEST_TEMP_DIR_PATH FILE_LOGGER_LAST_INDEX_FILE_NAME);
         for(; i < logIterationCount; ++i) {
-            SPRINTF(filePath, TEST_TEMP_DIR_PATH FILE_LOGGER_LOG_FILE_NAME ".%u", i);
+            SNPRINTF(filePath, MAX_PATH_LEN, TEST_TEMP_DIR_PATH FILE_LOGGER_LOG_FILE_NAME ".%u", i);
             FREMOVE(filePath);
         }
 
@@ -126,7 +126,7 @@ namespace com { namespace amazonaws { namespace kinesis { namespace video {
         EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks));
 
         for(i = 0; i < logIterationCount; ++i) {
-            SPRINTF(filePath, TEST_TEMP_DIR_PATH FILE_LOGGER_LOG_FILE_NAME ".%u", i);
+            SNPRINTF(filePath, MAX_PATH_LEN, TEST_TEMP_DIR_PATH FILE_LOGGER_LOG_FILE_NAME ".%u", i);
             EXPECT_EQ(STATUS_SUCCESS, fileExists(filePath, &fileFound));
             // only log file with index from 6 to 11 should remain. The rest are rotated out.
             if (i < logIterationCount && i >= (logIterationCount - maxLogFileCount)) {

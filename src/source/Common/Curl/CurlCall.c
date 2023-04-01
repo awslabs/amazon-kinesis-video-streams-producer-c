@@ -63,6 +63,7 @@ STATUS blockingCurlCall(PRequestInfo pRequestInfo, PCallInfo pCallInfo)
     curl_easy_setopt(curl, CURLOPT_SSLKEY, pRequestInfo->sslPrivateKeyPath);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCurlResponseCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, pCallInfo);
+
     curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, pRequestInfo->connectionTimeout / HUNDREDS_OF_NANOS_IN_A_MILLISECOND);
     if (pRequestInfo->completionTimeout != SERVICE_CALL_INFINITE_TIMEOUT) {
         curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, pRequestInfo->completionTimeout / HUNDREDS_OF_NANOS_IN_A_MILLISECOND);

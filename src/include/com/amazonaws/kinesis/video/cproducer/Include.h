@@ -343,6 +343,29 @@ PUBLIC_API STATUS createDefaultCallbacksProviderWithAwsCredentials(PCHAR, PCHAR,
 PUBLIC_API STATUS createDefaultCallbacksProviderWithIotCertificate(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PClientCallbacks*);
 
 /**
+ * Creates a default callbacks provider that uses iot certificate as auth method.
+ *
+ * NOTE: The caller is responsible for releasing the structure by calling
+ * the corresponding {@link freeCallbackProvider} API.
+ *
+ * @param[in] PCHAR IoT endpoint to use for the auth
+ * @param[in] PCHAR Credential cert path
+ * @param[in] PCHAR Private key path
+ * @param[in,opt] PCHAR CA Cert path
+ * @param[in] PCHAR Role alias name
+ * @param[in] PCHAR IoT Thing name
+ * @param[in,opt] PCHAR AWS region
+ * @param[in,opt] PCHAR User agent name (Use NULL)
+ * @param[in,opt] PCHAR Custom user agent to be used in the API calls
+ * @param[in] UINT64 connection timeout
+ * @param[in] UINT64 completion timeout
+ * @param[out] PClientCallbacks* Returned pointer to callbacks provider
+ *
+ * @return STATUS code of the execution
+ */
+PUBLIC_API STATUS createDefaultCallbacksProviderWithIotCertificateAndTimeouts(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, UINT64, UINT64, PClientCallbacks*);
+
+/**
  * Creates a default callbacks provider that uses file-based certificate as auth method.
  *
  * NOTE: The caller is responsible for releasing the structure by calling
@@ -688,6 +711,28 @@ PUBLIC_API STATUS setDeviceInfoStorageSizeBasedOnBitrateAndBufferDuration(PDevic
  * @return STATUS status of operation
  */
 PUBLIC_API STATUS createIotAuthCallbacks(PClientCallbacks, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PAuthCallbacks*);
+
+/**
+ * Creates the Iot Credentials auth callbacks
+ *
+ * NOTE: The caller is responsible for releasing the structure by calling
+ * the corresponding free API.
+ *
+ * @param[in] PCallbacksProvider Pointer to callback provider
+ * @param[in] PCHAR iot credentials endpoint
+ * @param[in] PCHAR kvs iot certificate file path
+ * @param[in] PCHAR private key file path
+ * @param[in] PCHAR CA cert path
+ * @param[in] PCHAR iot role alias
+ * @param[in] PCHAR IoT thing name
+ * @param[in] UINT64 connection timeout
+ * @param[in] UINT64 completion timeout
+ *
+ * @param[in,out] PAuthCallbacks* Pointer to pointer to AuthCallback struct
+ *
+ * @return STATUS status of operation
+ */
+PUBLIC_API STATUS createIotAuthCallbacksWithTimeouts(PClientCallbacks, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, UINT64, UINT64, PAuthCallbacks*);
 
 /**
  * Frees the Iot Credential auth callbacks

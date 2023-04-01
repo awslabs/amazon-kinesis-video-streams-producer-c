@@ -957,7 +957,7 @@ STATUS createStreamCurl(UINT64 customData, PCHAR deviceName, PCHAR streamName, P
     // Create a request object
     currentTime = pCallbacksProvider->clientCallbacks.getCurrentTimeFn(pCallbacksProvider->clientCallbacks.customData);
     CHK_STATUS(createCurlRequest(HTTP_REQUEST_VERB_POST, url, paramsJson, streamHandle, pCurlApiCallbacks->region, currentTime,
-                                 CURL_API_DEFAULT_CONNECTION_TIMEOUT, pServiceCallContext->timeout, pServiceCallContext->callAfter,
+                                 pServiceCallContext->connectionTimeout, pServiceCallContext->timeout, pServiceCallContext->callAfter,
                                  pCurlApiCallbacks->certPath, pCredentials, pCurlApiCallbacks, &pCurlRequest));
 
     // Set the necessary headers
@@ -1190,7 +1190,7 @@ STATUS describeStreamCurl(UINT64 customData, PCHAR streamName, PServiceCallConte
     // Create a request object
     currentTime = pCallbacksProvider->clientCallbacks.getCurrentTimeFn(pCallbacksProvider->clientCallbacks.customData);
     CHK_STATUS(createCurlRequest(HTTP_REQUEST_VERB_POST, url, paramsJson, streamHandle, pCurlApiCallbacks->region, currentTime,
-                                 CURL_API_DEFAULT_CONNECTION_TIMEOUT, pServiceCallContext->timeout, pServiceCallContext->callAfter,
+                                 pServiceCallContext->connectionTimeout, pServiceCallContext->timeout, pServiceCallContext->callAfter,
                                  pCurlApiCallbacks->certPath, pCredentials, pCurlApiCallbacks, &pCurlRequest));
 
     // Set the necessary headers
@@ -1498,7 +1498,7 @@ STATUS getStreamingEndpointCurl(UINT64 customData, PCHAR streamName, PCHAR apiNa
     // Create a request object
     currentTime = pCallbacksProvider->clientCallbacks.getCurrentTimeFn(pCallbacksProvider->clientCallbacks.customData);
     CHK_STATUS(createCurlRequest(HTTP_REQUEST_VERB_POST, url, paramsJson, streamHandle, pCurlApiCallbacks->region, currentTime,
-                                 CURL_API_DEFAULT_CONNECTION_TIMEOUT, pServiceCallContext->timeout, pServiceCallContext->callAfter,
+                                 pServiceCallContext->connectionTimeout, pServiceCallContext->timeout, pServiceCallContext->callAfter,
                                  pCurlApiCallbacks->certPath, pCredentials, pCurlApiCallbacks, &pCurlRequest));
 
     // Set the necessary headers
@@ -1827,7 +1827,7 @@ STATUS tagResourceCurl(UINT64 customData, PCHAR streamArn, UINT32 tagCount, PTag
     // Create a request object
     currentTime = pCallbacksProvider->clientCallbacks.getCurrentTimeFn(pCallbacksProvider->clientCallbacks.customData);
     CHK_STATUS(createCurlRequest(HTTP_REQUEST_VERB_POST, url, paramsJson, streamHandle, pCurlApiCallbacks->region, currentTime,
-                                 CURL_API_DEFAULT_CONNECTION_TIMEOUT, pServiceCallContext->timeout, pServiceCallContext->callAfter,
+                                 pServiceCallContext->connectionTimeout, pServiceCallContext->timeout, pServiceCallContext->callAfter,
                                  pCurlApiCallbacks->certPath, pCredentials, pCurlApiCallbacks, &pCurlRequest));
 
     // Set the necessary headers
@@ -2041,7 +2041,7 @@ STATUS putStreamCurl(UINT64 customData, PCHAR streamName, PCHAR containerType, U
     // Create a request object
     currentTime = pCallbacksProvider->clientCallbacks.getCurrentTimeFn(pCallbacksProvider->clientCallbacks.customData);
     CHK_STATUS(createCurlRequest(HTTP_REQUEST_VERB_POST, url, NULL, (STREAM_HANDLE) pServiceCallContext->customData, pCurlApiCallbacks->region,
-                                 currentTime, CURL_API_DEFAULT_CONNECTION_TIMEOUT, pServiceCallContext->timeout, pServiceCallContext->callAfter,
+                                 currentTime, pServiceCallContext->connectionTimeout, pServiceCallContext->timeout, pServiceCallContext->callAfter,
                                  pCurlApiCallbacks->certPath, pCredentials, pCurlApiCallbacks, &pCurlRequest));
 
     // Set the necessary headers
