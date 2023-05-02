@@ -121,6 +121,9 @@ INT32 main(INT32 argc, CHAR* argv[])
     CHK_STATUS(setStreamInfoBasedOnStorageSize(DEFAULT_STORAGE_SIZE, RECORDED_FRAME_AVG_BITRATE_BIT_PS, 1, pStreamInfo));
     // adjust members of pStreamInfo here if needed
 
+    // enable e2ee
+    pStreamInfo->streamCaps.e2ee = TRUE;
+
     startTime = GETTIME();
     CHK_STATUS(createDefaultCallbacksProviderWithAwsCredentials(accessKey, secretKey, sessionToken, MAX_UINT64, region, cacertPath, NULL, NULL,
                                                                 &pClientCallbacks));

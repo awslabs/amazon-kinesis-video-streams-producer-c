@@ -308,6 +308,9 @@ INT32 main(INT32 argc, CHAR* argv[])
     // use relative time mode. Buffer timestamps start from 0
     pStreamInfo->streamCaps.absoluteFragmentTimes = FALSE;
 
+    // enable e2ee
+    pStreamInfo->streamCaps.e2ee = TRUE;
+
     data.startTime = GETTIME();
     data.firstFrame = TRUE;
     CHK_STATUS(createDefaultCallbacksProviderWithAwsCredentials(accessKey, secretKey, sessionToken, MAX_UINT64, region, cacertPath, NULL, NULL,
