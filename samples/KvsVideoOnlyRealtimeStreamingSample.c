@@ -63,7 +63,7 @@ INT32 main(INT32 argc, CHAR* argv[])
     UINT32 frameSize = SIZEOF(frameBuffer), frameIndex = 0, fileIndex = 0;
     UINT64 streamStopTime, streamingDuration = DEFAULT_STREAM_DURATION;
     DOUBLE startUpLatency;
-    BOOL firstFrame = TRUE, isOfflineMode = FALSE;
+    BOOL firstFrame = TRUE;
     UINT64 startTime;
     CHAR videoCodec[VIDEO_CODEC_NAME_MAX_LENGTH];
     STRNCPY(videoCodec, VIDEO_CODEC_NAME_H264, STRLEN(VIDEO_CODEC_NAME_H264)); // h264 video by default
@@ -71,7 +71,7 @@ INT32 main(INT32 argc, CHAR* argv[])
 
     if (argc < 2) {
         DLOGE(
-            "Usage: AWS_ACCESS_KEY_ID=SAMPLEKEY AWS_SECRET_ACCESS_KEY=SAMPLESECRET %s <stream_name> <video-codec> <duration_in_seconds> <frame_files_path> <streaming-type>\n",
+            "Usage: AWS_ACCESS_KEY_ID=SAMPLEKEY AWS_SECRET_ACCESS_KEY=SAMPLESECRET %s <stream_name> <duration_in_seconds> <frame_files_path>\n",
             argv[0]);
         CHK(FALSE, STATUS_INVALID_ARG);
     }
@@ -82,7 +82,7 @@ INT32 main(INT32 argc, CHAR* argv[])
     }
 
     MEMSET(frameFilePath, 0x00, MAX_PATH_LEN + 1);
-    if (argc < 6) {
+    if (argc < 5) {
         STRCPY(frameFilePath, (PCHAR) "../samples/");
     } else {
         STRNCPY(frameFilePath, argv[4], MAX_PATH_LEN);
@@ -108,11 +108,7 @@ INT32 main(INT32 argc, CHAR* argv[])
         streamingDuration *= HUNDREDS_OF_NANOS_IN_A_SECOND;
     }
 
-    if (argc >= 6) {
-        if(STRCMP(argv[5], "offline-mode") == 0) {
-            isOfflineMode = TRUE;
-        }
-    }
+    streamStopTime = GETTIME() + streamingDuration;
 
     // default storage size is 128MB. Use setDeviceInfoStorageSize after create to change storage size.
     CHK_STATUS(createDefaultDeviceInfo(&pDeviceInfo));
@@ -120,13 +116,8 @@ INT32 main(INT32 argc, CHAR* argv[])
     pDeviceInfo->clientInfo.loggerLogLevel = LOG_LEVEL_DEBUG;
     pDeviceInfo->storageInfo.storageSize = DEFAULT_STORAGE_SIZE;
 
-    if (isOfflineMode) {
-        CHK_STATUS(
-            createOfflineVideoStreamInfoProviderWithCodecs(streamName, DEFAULT_RETENTION_PERIOD, DEFAULT_BUFFER_DURATION, videoCodecID, &pStreamInfo));
-    } else {
-        CHK_STATUS(
-            createRealtimeVideoStreamInfoProviderWithCodecs(streamName, DEFAULT_RETENTION_PERIOD, DEFAULT_BUFFER_DURATION, videoCodecID, &pStreamInfo));
-    }
+    CHK_STATUS(
+        createRealtimeVideoStreamInfoProviderWithCodecs(streamName, DEFAULT_RETENTION_PERIOD, DEFAULT_BUFFER_DURATION, videoCodecID, &pStreamInfo));
     CHK_STATUS(setStreamInfoBasedOnStorageSize(DEFAULT_STORAGE_SIZE, RECORDED_FRAME_AVG_BITRATE_BIT_PS, 1, pStreamInfo));
     // adjust members of pStreamInfo here if needed
 
@@ -153,52 +144,29 @@ INT32 main(INT32 argc, CHAR* argv[])
     frame.version = FRAME_CURRENT_VERSION;
     frame.trackId = DEFAULT_VIDEO_TRACK_ID;
     frame.duration = HUNDREDS_OF_NANOS_IN_A_SECOND / DEFAULT_FPS_VALUE;
-    
-    if (isOfflineMode) {
-        streamStopTime = GETTIME();
-        frame.decodingTs = streamStopTime - streamingDuration; // current time
-        frame.presentationTs = frame.decodingTs;
+    frame.decodingTs = GETTIME(); // current time
+    frame.presentationTs = frame.decodingTs;
 
-        while (frame.decodingTs < streamStopTime) {
-            frame.index = frameIndex;
-            frame.flags = fileIndex % DEFAULT_KEY_FRAME_INTERVAL == 0 ? FRAME_FLAG_KEY_FRAME : FRAME_FLAG_NONE;
-            frame.size = SIZEOF(frameBuffer);
+    while (GETTIME() < streamStopTime) {
+        frame.index = frameIndex;
+        frame.flags = fileIndex % DEFAULT_KEY_FRAME_INTERVAL == 0 ? FRAME_FLAG_KEY_FRAME : FRAME_FLAG_NONE;
+        frame.size = SIZEOF(frameBuffer);
 
-            CHK_STATUS(readFrameData(&frame, frameFilePath, videoCodec));
-            CHK_STATUS(putKinesisVideoFrame(streamHandle, &frame));
-    
-            frame.decodingTs += frame.duration;
-            frame.presentationTs = frame.decodingTs;
-            frameIndex++;
-            fileIndex++;
-            fileIndex = fileIndex % NUMBER_OF_FRAME_FILES;
+        CHK_STATUS(readFrameData(&frame, frameFilePath, videoCodec));
+
+        CHK_STATUS(putKinesisVideoFrame(streamHandle, &frame));
+        if (firstFrame) {
+            startUpLatency = (DOUBLE) (GETTIME() - startTime) / (DOUBLE) HUNDREDS_OF_NANOS_IN_A_MILLISECOND;
+            DLOGD("Start up latency: %lf ms", startUpLatency);
+            firstFrame = FALSE;
         }
-    } else {
-        streamStopTime = GETTIME() + streamingDuration;
-        frame.decodingTs = GETTIME(); // current time
+        defaultThreadSleep(frame.duration);
+
+        frame.decodingTs += frame.duration;
         frame.presentationTs = frame.decodingTs;
-
-        while (GETTIME() < streamStopTime) {
-            frame.index = frameIndex;
-            frame.flags = fileIndex % DEFAULT_KEY_FRAME_INTERVAL == 0 ? FRAME_FLAG_KEY_FRAME : FRAME_FLAG_NONE;
-            frame.size = SIZEOF(frameBuffer);
-
-            CHK_STATUS(readFrameData(&frame, frameFilePath, videoCodec));
-
-            CHK_STATUS(putKinesisVideoFrame(streamHandle, &frame));
-            if (firstFrame) {
-                startUpLatency = (DOUBLE) (GETTIME() - startTime) / (DOUBLE) HUNDREDS_OF_NANOS_IN_A_MILLISECOND;
-                DLOGD("Start up latency: %lf ms", startUpLatency);
-                firstFrame = FALSE;
-            }
-            defaultThreadSleep(frame.duration);
-
-            frame.decodingTs += frame.duration;
-            frame.presentationTs = frame.decodingTs;
-            frameIndex++;
-            fileIndex++;
-            fileIndex = fileIndex % NUMBER_OF_FRAME_FILES;
-        }
+        frameIndex++;
+        fileIndex++;
+        fileIndex = fileIndex % NUMBER_OF_FRAME_FILES;
     }
 
     CHK_STATUS(stopKinesisVideoStreamSync(streamHandle));

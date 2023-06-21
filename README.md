@@ -106,14 +106,13 @@ This will stream the video/audio files from the `samples/h264SampleFrames` or `s
 
 If you want to enable KVS events in fragment metadata, change the `<images-flag>` parameter from 0 -> 1. This feature is found only in the audio/video sample, but can be written into the video only sample as well.
 
-For video only, run `./kvsVideoOnlyStreamingSample <stream-name> <video-codec> <streaming-duration-in-seconds> <sample-location> <streaming-type>`
-Streaming-type is `offline-mode` or `realtime`
+For video only, run `./kvsVideoOnlyRealtimeStreamingSample <stream-name> <video-codec> <streaming-duration-in-seconds> <sample-location>` OR `./kvsVideoOnlyOfflineStreamingSample <stream-name> <video-codec> <streaming-duration-in-seconds> <sample-location>`
 
-Example: `./kvsVideoOnlyStreamingSample myTest`
+Example: `./kvsVideoOnlyRealtimeStreamingSample myTest` OR  `./kvsVideoOnlyOfflineStreamingSample myTest`
 
 This will stream the video files from the `samples/h264SampleFrames`. 
 
-OR you can run `./kvsVideoOnlyStreamingSample myTest h265`
+OR you can run `./kvsVideoOnlyRealtimeStreamingSample myTest h265` OR `./kvsVideoOnlyOfflineStreamingSample myTest h265`
 
 This will stream the video files from the `samples/h265SampleFrames`. 
 
