@@ -71,7 +71,7 @@ INT32 main(INT32 argc, CHAR* argv[])
 
     if (argc < 2) {
         DLOGE(
-            "Usage: AWS_ACCESS_KEY_ID=SAMPLEKEY AWS_SECRET_ACCESS_KEY=SAMPLESECRET %s <stream_name> <duration_in_seconds> <frame_files_path>\n",
+            "Usage: AWS_ACCESS_KEY_ID=SAMPLEKEY AWS_SECRET_ACCESS_KEY=SAMPLESECRET %s <stream_name> <video-codec> <duration_in_seconds> <frame_files_path> <streaming-type>\n",
             argv[0]);
         CHK(FALSE, STATUS_INVALID_ARG);
     }
@@ -108,8 +108,8 @@ INT32 main(INT32 argc, CHAR* argv[])
         streamingDuration *= HUNDREDS_OF_NANOS_IN_A_SECOND;
     }
 
-    if (argc >= 5) {
-        if(STRCMP(argv[4], "offline-mode") == 0) {
+    if (argc >= 6) {
+        if(STRCMP(argv[5], "offline-mode") == 0) {
             isOfflineMode = TRUE;
         }
     }

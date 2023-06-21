@@ -42,7 +42,7 @@ If you do wish to link to existing libraries you can use the following flags to 
 
 #### Cross-Compilation
 
-If you wish to cross-compile `CC` and `CXX` are respected when building the library and all its dependencies. See our [.travis.yml](.travis.yml) for an example of this. Every commit is cross compiled to ensure that it continues to work.
+If you wish to cross-compile `CC` and `CXX` are respected when building the library and all its dependencies. See our [ci.yml](.github/workflows/ci.yml) for an example of this. Every commit is cross compiled to ensure that it continues to work.
 
 
 #### CMake Arguments
@@ -82,7 +82,7 @@ To run the samples:
 export AWS_SECRET_ACCESS_KEY=<YourAWSSecretAccessKey>
 export AWS_ACCESS_KEY_ID=<YourAWSAccessKey>
 ```
-For audio+video, run `./kvsAudioVideoStreamingSample <channel-name> <streaming-duration-in-seconds> <sample-location> <audio-codec> <video-codec> <images-flag>`
+For audio+video, run `./kvsAudioVideoStreamingSample <stream-name> <streaming-duration-in-seconds> <sample-location> <audio-codec> <video-codec> <images-flag>`
 
 The last 5 arguments are optional. By default, 
 * the `streaming-duration-in-seconds` is 20 seconds
@@ -100,13 +100,14 @@ Valid inputs for `<video-codec>` in these samples are:
 * h265
 
 If you want to use the sample for `PCM_ALAW/G.711` frames, run 
-`./kvsAudioVideoStreamingSample <channel-name> <streaming-duration> <sample-location> alaw h264 0`
+`./kvsAudioVideoStreamingSample <stream-name> <streaming-duration> <sample-location> alaw h264 0`
 
 This will stream the video/audio files from the `samples/h264SampleFrames` or `samples/h265SampleFrames` and `samples/aacSampleFrames` or `samples/alawSampleFrames` respectively. 
 
 If you want to enable KVS events in fragment metadata, change the `<images-flag>` parameter from 0 -> 1. This feature is found only in the audio/video sample, but can be written into the video only sample as well.
 
-For video only, run `./kvsVideoOnlyStreamingSample <channel-name> <video-codec> <streaming-duration-in-seconds> <sample-location>`
+For video only, run `./kvsVideoOnlyStreamingSample <stream-name> <video-codec> <streaming-duration-in-seconds> <sample-location> <streaming-type>`
+Streaming-type is `offline-mode` or `realtime`
 
 Example: `./kvsVideoOnlyStreamingSample myTest`
 
@@ -118,7 +119,7 @@ This will stream the video files from the `samples/h265SampleFrames`.
 
 Note: The resulting sample video is the same.
 
-For audio only, run `./kvsAudioOnlyStreamingSample <channel-name> <streaming_duration> <sample_location> <audio-codec>`.
+For audio only, run `./kvsAudioOnlyStreamingSample <stream-name> <streaming_duration> <sample_location> <audio-codec>`.
 
 This will stream the audio files from the `samples/aacSampleFrames` or `samples/alawSampleFrames` (as per the choice of audio codec in the last argument) respectively. 
 
