@@ -44,9 +44,6 @@ CleanUp:
     return retStatus;
 }
 
-// Forward declaration of the default thread sleep function
-VOID defaultThreadSleep(UINT64);
-
 INT32 main(INT32 argc, CHAR* argv[])
 {
     PDeviceInfo pDeviceInfo = NULL;
