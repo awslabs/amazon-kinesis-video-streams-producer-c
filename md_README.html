@@ -119,7 +119,7 @@ Configure</h3>
 <p>By default we download all the libraries from GitHub and build them locally, so should require nothing to be installed ahead of time. If you do wish to link to existing libraries you can use the following flags to customize your build.</p>
 <h4><a class="anchor" id="autotoc_md4"></a>
 Cross-Compilation</h4>
-<p>If you wish to cross-compile <code>CC</code> and <code>CXX</code> are respected when building the library and all its dependencies. See our <a href=".travis.yml">.travis.yml</a> for an example of this. Every commit is cross compiled to ensure that it continues to work.</p>
+<p>If you wish to cross-compile <code>CC</code> and <code>CXX</code> are respected when building the library and all its dependencies. See our <a href=".github/workflows/ci.yml">ci.yml</a> for an example of this. Every commit is cross compiled to ensure that it continues to work.</p>
 <h4><a class="anchor" id="autotoc_md5"></a>
 CMake Arguments</h4>
 <p>You can pass the following options to <code>cmake ..</code>.</p>
@@ -149,7 +149,7 @@ Run samples</h3>
 <p>To run the samples:</p>
 <div class="fragment"><div class="line">export AWS_SECRET_ACCESS_KEY=&lt;YourAWSSecretAccessKey&gt;</div>
 <div class="line">export AWS_ACCESS_KEY_ID=&lt;YourAWSAccessKey&gt;</div>
-</div><!-- fragment --><p> For audio+video, run <code>./kvsAudioVideoStreamingSample &lt;channel-name&gt; &lt;streaming-duration-in-seconds&gt; &lt;sample-location&gt; &lt;audio-codec&gt; &lt;video-codec&gt; &lt;images-flag&gt;</code></p>
+</div><!-- fragment --><p> For audio+video, run <code>./kvsAudioVideoStreamingSample &lt;stream-name&gt; &lt;streaming-duration-in-seconds&gt; &lt;sample-location&gt; &lt;audio-codec&gt; &lt;video-codec&gt; &lt;images-flag&gt;</code></p>
 <p>The last 5 arguments are optional. By default,</p><ul>
 <li>the <code>streaming-duration-in-seconds</code> is 20 seconds</li>
 <li><code>sample-location</code> is <code>../samples</code></li>
@@ -165,16 +165,16 @@ Run samples</h3>
 <li>h264</li>
 <li>h265</li>
 </ul>
-<p>If you want to use the sample for <code>PCM_ALAW/G.711</code> frames, run <code>./kvsAudioVideoStreamingSample &lt;channel-name&gt; &lt;streaming-duration&gt; &lt;sample-location&gt; alaw h264 0</code></p>
+<p>If you want to use the sample for <code>PCM_ALAW/G.711</code> frames, run <code>./kvsAudioVideoStreamingSample &lt;stream-name&gt; &lt;streaming-duration&gt; &lt;sample-location&gt; alaw h264 0</code></p>
 <p>This will stream the video/audio files from the <code>samples/h264SampleFrames</code> or <code>samples/h265SampleFrames</code> and <code>samples/aacSampleFrames</code> or <code>samples/alawSampleFrames</code> respectively.</p>
 <p>If you want to enable KVS events in fragment metadata, change the <code>&lt;images-flag&gt;</code> parameter from 0 -&gt; 1. This feature is found only in the audio/video sample, but can be written into the video only sample as well.</p>
-<p>For video only, run <code>./kvsVideoOnlyStreamingSample &lt;channel-name&gt; &lt;video-codec&gt; &lt;streaming-duration-in-seconds&gt; &lt;sample-location&gt;</code></p>
-<p>Example: <code>./kvsVideoOnlyStreamingSample myTest</code></p>
+<p>For video only, run <code>./kvsVideoOnlyRealtimeStreamingSample &lt;stream-name&gt; &lt;video-codec&gt; &lt;streaming-duration-in-seconds&gt; &lt;sample-location&gt;</code> OR <code>./kvsVideoOnlyOfflineStreamingSample &lt;stream-name&gt; &lt;video-codec&gt; &lt;streaming-duration-in-seconds&gt; &lt;sample-location&gt;</code></p>
+<p>Example: <code>./kvsVideoOnlyRealtimeStreamingSample myTest</code> OR <code>./kvsVideoOnlyOfflineStreamingSample myTest</code></p>
 <p>This will stream the video files from the <code>samples/h264SampleFrames</code>.</p>
-<p>OR you can run <code>./kvsVideoOnlyStreamingSample myTest h265</code></p>
+<p>OR you can run <code>./kvsVideoOnlyRealtimeStreamingSample myTest h265</code> OR <code>./kvsVideoOnlyOfflineStreamingSample myTest h265</code></p>
 <p>This will stream the video files from the <code>samples/h265SampleFrames</code>.</p>
 <p>Note: The resulting sample video is the same.</p>
-<p>For audio only, run <code>./kvsAudioOnlyStreamingSample &lt;channel-name&gt; &lt;streaming_duration&gt; &lt;sample_location&gt; &lt;audio-codec&gt;</code>.</p>
+<p>For audio only, run <code>./kvsAudioOnlyStreamingSample &lt;stream-name&gt; &lt;streaming_duration&gt; &lt;sample_location&gt; &lt;audio-codec&gt;</code>.</p>
 <p>This will stream the audio files from the <code>samples/aacSampleFrames</code> or <code>samples/alawSampleFrames</code> (as per the choice of audio codec in the last argument) respectively.</p>
 <h3><a class="anchor" id="autotoc_md8"></a>
 Run unit tests</h3>
@@ -228,7 +228,7 @@ License</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Sat Apr 1 2023 00:56:12 for Amazon Kinesis Producer C SDK by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+    <li class="footer">Generated on Fri Jun 23 2023 16:18:28 for Amazon Kinesis Producer C SDK by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
 </body>
