@@ -185,7 +185,7 @@ INT32 lwsIotCallbackRoutine(struct lws* wsi, enum lws_callback_reasons reason, P
             break;
 
         case LWS_CALLBACK_CLIENT_APPEND_HANDSHAKE_HEADER:
-            DLOGD("Client append handshake header\n");
+            DLOGD("Client append handshake header");
             CHK_STATUS(singleListGetNodeCount(pRequestInfo->pRequestHeaders, &headerCount));
             ppStartPtr = (PBYTE*) pDataIn;
             pEndPtr = *ppStartPtr + dataSize - 1;
