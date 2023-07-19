@@ -892,8 +892,23 @@ PUBLIC_API STATUS createAbstractDefaultCallbacksProvider(UINT32, API_CALL_CACHE_
  * @return STATUS code of the execution
  */
 PUBLIC_API STATUS addFileLoggerPlatformCallbacksProvider(PClientCallbacks, UINT64, UINT64, PCHAR, BOOL);
-/*!@} */
 
+/**
+ * Use file logger with level filtering instead of default logger which log to stdout. The underlying objects are automatically freed
+ * when PClientCallbacks is freed.
+ *
+ * @param[in] PClientCallbacks The callback provider whose logPrintFn will be replaced with file logger log printing function
+ * @param[in] UINT64 Size of string buffer in file logger. When the string buffer is full the logger will flush everything into a new file
+ * @param[in] UINT64 Max number of log file. When exceeded, the oldest file will be deleted when new one is generated
+ * @param[in] PCHAR Directory in which the log file will be generated
+ * @param[in] BOOL Enable logging other log levels into a file
+ * @param[in] UINT32 Log level that needs to be filtered into another file
+ * @param[in] BOOL print log to std out too
+ *
+ * @return STATUS code of the execution
+ */
+STATUS addFileLoggerWithFilteringPlatformCallbacksProvider(PClientCallbacks, UINT64, UINT64, PCHAR, BOOL, BOOL, UINT32);
+/*!@} */
 #ifdef __cplusplus
 }
 #endif

@@ -1,7 +1,7 @@
 #include "ProducerTestFixture.h"
 
-// length of time and log level string in log: "2019-11-09 19:11:16 VERBOSE "
-#define TIMESTRING_OFFSET               28
+// length of time and log level string in log: "2019-11-09 19:11:16.xxxxxx VERBOSE "
+#define TIMESTRING_OFFSET               35
 
 namespace com { namespace amazonaws { namespace kinesis { namespace video {
 
@@ -197,6 +197,8 @@ namespace com { namespace amazonaws { namespace kinesis { namespace video {
         EXPECT_EQ(130, currentFileIndex); // index should be incremented 3 times
 
         MEMFREE(logMessage);
+        FREMOVE(TEST_TEMP_DIR_PATH FILE_LOGGER_LAST_INDEX_FILE_NAME ".128");
+        FREMOVE(TEST_TEMP_DIR_PATH FILE_LOGGER_LAST_INDEX_FILE_NAME ".129");
     }
 
     TEST_F(FileLoggerFunctionalityTest, logMessageLongerThanStringBuffer)
@@ -614,6 +616,127 @@ namespace com { namespace amazonaws { namespace kinesis { namespace video {
 
         // Ensure we can still log err
         DLOGE("Printout after reset");
+    }
+
+    TEST_F(FileLoggerFunctionalityTest, basicFilterFileLoggerUsage)
+    {
+        PClientCallbacks pClientCallbacks = NULL;
+        UINT32 logMessageSize = MIN_FILE_LOGGER_STRING_BUFFER_SIZE / 2;
+        PCHAR logMessage = (PCHAR) MEMALLOC(logMessageSize + 1);
+        BOOL fileFound = FALSE;
+        LogPrintFunc logFunc;
+        UINT64 currentFileIndex = 0;
+        CHAR fileIndexBuffer[256];
+        UINT64 fileIndexBufferSize = ARRAY_SIZE(fileIndexBuffer);
+
+        MEMSET(logMessage, 'a', logMessageSize);
+        logMessage[logMessageSize] = '\0';
+        EXPECT_EQ(STATUS_SUCCESS, createAbstractDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT,
+                                                                         API_CALL_CACHE_TYPE_NONE,
+                                                                         TEST_CACHING_ENDPOINT_PERIOD,
+                                                                         TEST_DEFAULT_REGION,
+                                                                         TEST_CONTROL_PLANE_URI,
+                                                                         EMPTY_STRING,
+                                                                         NULL,
+                                                                         TEST_USER_AGENT,
+                                                                         &pClientCallbacks));
+
+        // make sure the files dont exist
+        FREMOVE(TEST_TEMP_DIR_PATH FILE_LOGGER_LAST_INDEX_FILE_NAME);
+        FREMOVE(TEST_TEMP_DIR_PATH FILE_LOGGER_LOG_FILE_NAME ".0");
+        FREMOVE(TEST_TEMP_DIR_PATH FILE_LOGGER_LOG_FILE_NAME ".1");
+        FREMOVE(TEST_TEMP_DIR_PATH FILE_LOGGER_LOG_FILE_NAME ".2");
+
+        EXPECT_EQ(STATUS_SUCCESS, addFileLoggerWithFilteringPlatformCallbacksProvider(pClientCallbacks, MIN_FILE_LOGGER_STRING_BUFFER_SIZE, 5, TEST_TEMP_DIR_PATH_NO_ENDING_SEPARTOR, FALSE, TRUE, LOG_LEVEL_WARN));
+        logFunc = pClientCallbacks->logPrintFn;
+
+        logFunc(LOG_LEVEL_VERBOSE, NULL, (PCHAR) "%s", logMessage);
+        logFunc(LOG_LEVEL_VERBOSE, NULL, (PCHAR) "%s", logMessage);
+        // low log level logs have no effect
+        EXPECT_EQ(STATUS_SUCCESS, fileExists((PCHAR) (TEST_TEMP_DIR_PATH FILE_LOGGER_FILTER_LOG_FILE_NAME ".0"), &fileFound));
+        EXPECT_EQ(FALSE, fileFound);
+
+        EXPECT_EQ(STATUS_SUCCESS, fileExists((PCHAR) (TEST_TEMP_DIR_PATH FILE_LOGGER_LAST_FILTER_INDEX_FILE_NAME), &fileFound));
+        EXPECT_EQ(FALSE, fileFound);
+
+        logFunc(LOG_LEVEL_ERROR, NULL, (PCHAR) "%s", logMessage);
+        // log should not have been flushed because we havent fill out string buffer
+        EXPECT_EQ(STATUS_SUCCESS, fileExists((PCHAR) (TEST_TEMP_DIR_PATH FILE_LOGGER_LOG_FILE_NAME ".0"), &fileFound));
+        EXPECT_EQ(FALSE, fileFound);
+        EXPECT_EQ(STATUS_SUCCESS, fileExists((PCHAR) (TEST_TEMP_DIR_PATH FILE_LOGGER_LAST_INDEX_FILE_NAME), &fileFound));
+        EXPECT_EQ(FALSE, fileFound); // index file should not be there
+
+        logFunc(LOG_LEVEL_ERROR, NULL, (PCHAR) "%s", logMessage);
+        // log should have been flushed because the new message overflows string buffer
+        EXPECT_EQ(STATUS_SUCCESS, fileExists((PCHAR) (TEST_TEMP_DIR_PATH FILE_LOGGER_LOG_FILE_NAME ".0"), &fileFound));
+        EXPECT_EQ(TRUE, fileFound);
+        EXPECT_EQ(STATUS_SUCCESS, fileExists((PCHAR) (TEST_TEMP_DIR_PATH FILE_LOGGER_LAST_INDEX_FILE_NAME), &fileFound));
+        EXPECT_EQ(TRUE, fileFound); // index file should not be there
+
+        // second log is still in buffer. Thus this log will cause the second log to be flushed.
+        logFunc(LOG_LEVEL_ERROR, NULL, (PCHAR) "%s", logMessage);
+        // log should have been flushed
+        EXPECT_EQ(STATUS_SUCCESS, fileExists((PCHAR) (TEST_TEMP_DIR_PATH FILE_LOGGER_LOG_FILE_NAME ".1"), &fileFound));
+        EXPECT_EQ(TRUE, fileFound);
+
+        EXPECT_EQ(STATUS_SUCCESS, fileExists((PCHAR) (TEST_TEMP_DIR_PATH FILE_LOGGER_LAST_INDEX_FILE_NAME), &fileFound));
+        EXPECT_EQ(TRUE, fileFound); // index file should be there
+
+        EXPECT_EQ(STATUS_SUCCESS, readFile((PCHAR) (TEST_TEMP_DIR_PATH FILE_LOGGER_LAST_INDEX_FILE_NAME), TRUE, NULL, &fileIndexBufferSize));
+        EXPECT_EQ(STATUS_SUCCESS, readFile((PCHAR) (TEST_TEMP_DIR_PATH FILE_LOGGER_LAST_INDEX_FILE_NAME), TRUE, (PBYTE) fileIndexBuffer, &fileIndexBufferSize));
+        fileIndexBuffer[fileIndexBufferSize] = '\0';
+        STRTOUI64(fileIndexBuffer, NULL, 10, &currentFileIndex);
+        EXPECT_EQ(2, currentFileIndex); // index should be 2 since we flushed twice.
+
+        logFunc(LOG_LEVEL_WARN, NULL, (PCHAR) "%s", logMessage);
+
+        // We would still not see the log file flushed because the file is not filled
+        EXPECT_EQ(STATUS_SUCCESS, fileExists((PCHAR) (TEST_TEMP_DIR_PATH FILE_LOGGER_FILTER_LOG_FILE_NAME ".0"), &fileFound));
+        EXPECT_EQ(FALSE, fileFound);
+
+        EXPECT_EQ(STATUS_SUCCESS, fileExists((PCHAR) (TEST_TEMP_DIR_PATH FILE_LOGGER_LAST_FILTER_INDEX_FILE_NAME), &fileFound));
+        EXPECT_EQ(FALSE, fileFound);
+
+        logFunc(LOG_LEVEL_WARN, NULL, (PCHAR) "%s", logMessage);
+
+        EXPECT_EQ(STATUS_SUCCESS, fileExists((PCHAR) (TEST_TEMP_DIR_PATH FILE_LOGGER_FILTER_LOG_FILE_NAME ".0"), &fileFound));
+        EXPECT_EQ(TRUE, fileFound);
+
+        EXPECT_EQ(STATUS_SUCCESS, fileExists((PCHAR) (TEST_TEMP_DIR_PATH FILE_LOGGER_LAST_FILTER_INDEX_FILE_NAME), &fileFound));
+        EXPECT_EQ(TRUE, fileFound);
+
+        logFunc(LOG_LEVEL_WARN, NULL, (PCHAR) "%s", logMessage);
+
+        EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks));
+
+        // Expect new log filter file to be created despite log file not being filled because we release the file logger
+        EXPECT_EQ(STATUS_SUCCESS, fileExists((PCHAR) (TEST_TEMP_DIR_PATH FILE_LOGGER_FILTER_LOG_FILE_NAME ".1"), &fileFound));
+        EXPECT_EQ(TRUE, fileFound);
+
+        // remaining log get flushed when callbacks are freed.
+        EXPECT_EQ(STATUS_SUCCESS, fileExists((PCHAR) (TEST_TEMP_DIR_PATH FILE_LOGGER_LOG_FILE_NAME ".2"), &fileFound));
+        EXPECT_EQ(TRUE, fileFound);
+
+        EXPECT_EQ(STATUS_SUCCESS, fileExists((PCHAR) (TEST_TEMP_DIR_PATH FILE_LOGGER_LAST_FILTER_INDEX_FILE_NAME), &fileFound));
+        EXPECT_EQ(TRUE, fileFound);
+
+        EXPECT_EQ(STATUS_SUCCESS, readFile((PCHAR) (TEST_TEMP_DIR_PATH FILE_LOGGER_LAST_FILTER_INDEX_FILE_NAME), TRUE, NULL, &fileIndexBufferSize));
+        EXPECT_EQ(STATUS_SUCCESS, readFile((PCHAR) (TEST_TEMP_DIR_PATH FILE_LOGGER_LAST_FILTER_INDEX_FILE_NAME), TRUE, (PBYTE) fileIndexBuffer, &fileIndexBufferSize));
+        fileIndexBuffer[fileIndexBufferSize] = '\0';
+        STRTOUI64(fileIndexBuffer, NULL, 10, &currentFileIndex);
+        EXPECT_EQ(3, currentFileIndex); // index should be 3 since we flushed twice.
+
+        FREMOVE(TEST_TEMP_DIR_PATH FILE_LOGGER_LAST_INDEX_FILE_NAME);
+        FREMOVE(TEST_TEMP_DIR_PATH FILE_LOGGER_LAST_FILTER_INDEX_FILE_NAME);
+        FREMOVE(TEST_TEMP_DIR_PATH FILE_LOGGER_LOG_FILE_NAME ".0");
+        FREMOVE(TEST_TEMP_DIR_PATH FILE_LOGGER_LOG_FILE_NAME ".1");
+        FREMOVE(TEST_TEMP_DIR_PATH FILE_LOGGER_FILTER_LOG_FILE_NAME ".0");
+        FREMOVE(TEST_TEMP_DIR_PATH FILE_LOGGER_FILTER_LOG_FILE_NAME ".1");
+        FREMOVE(TEST_TEMP_DIR_PATH FILE_LOGGER_FILTER_LOG_FILE_NAME ".2");
+
+
+        EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks));
+        MEMFREE(logMessage);
     }
 }
 }
