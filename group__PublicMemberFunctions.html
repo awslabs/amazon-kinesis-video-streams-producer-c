@@ -279,6 +279,8 @@ Functions</h2></td></tr>
 <tr class="separator:ga6c195173d4fd6f942260e2b81c0d4e83"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga6c756db8510b65b24a817519b19e5ee2"><td class="memItemLeft" align="right" valign="top">PUBLIC_API STATUS&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PublicMemberFunctions.html#ga6c756db8510b65b24a817519b19e5ee2">addFileLoggerPlatformCallbacksProvider</a> (PClientCallbacks, UINT64, UINT64, PCHAR, BOOL)</td></tr>
 <tr class="separator:ga6c756db8510b65b24a817519b19e5ee2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga3699db3e21ea25c1efa068ab4f7f2f55"><td class="memItemLeft" align="right" valign="top">STATUS&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__PublicMemberFunctions.html#ga3699db3e21ea25c1efa068ab4f7f2f55">addFileLoggerWithFilteringPlatformCallbacksProvider</a> (PClientCallbacks, UINT64, UINT64, PCHAR, BOOL, BOOL, UINT32)</td></tr>
+<tr class="separator:ga3699db3e21ea25c1efa068ab4f7f2f55"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>Public functions. </p>
@@ -498,6 +500,101 @@ Here is the call graph for this function:</div>
 <area shape="rect" href="CallbacksProvider_8c.html#ad0f06085ed4c849d90f58783f4e6b76b" title=" " alt="" coords="631,579,809,605"/>
 <area shape="rect" href="CallbacksProvider_8c.html#a841230c6467e08c5e04e59bd941fbd39" title=" " alt="" coords="633,629,807,656"/>
 <area shape="rect" href="CallbacksProvider_8c.html#ab39eafe3e4f46b8e9b1a3227c0675ea3" title=" " alt="" coords="604,680,836,707"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="ga3699db3e21ea25c1efa068ab4f7f2f55"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga3699db3e21ea25c1efa068ab4f7f2f55">&#9670;&nbsp;</a></span>addFileLoggerWithFilteringPlatformCallbacksProvider()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">STATUS addFileLoggerWithFilteringPlatformCallbacksProvider </td>
+          <td>(</td>
+          <td class="paramtype">PClientCallbacks&#160;</td>
+          <td class="paramname"><em>pClientCallbacks</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UINT64&#160;</td>
+          <td class="paramname"><em>stringBufferSize</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UINT64&#160;</td>
+          <td class="paramname"><em>maxLogFileCount</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">PCHAR&#160;</td>
+          <td class="paramname"><em>logFileDir</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">BOOL&#160;</td>
+          <td class="paramname"><em>printLog</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">BOOL&#160;</td>
+          <td class="paramname"><em>enableAllLevels</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UINT32&#160;</td>
+          <td class="paramname"><em>level</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Use file logger with level filtering instead of default logger which log to stdout. The underlying objects are automatically freed when PClientCallbacks is freed.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">PClientCallbacks</td><td>The callback provider whose logPrintFn will be replaced with file logger log printing function </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">UINT64</td><td>Size of string buffer in file logger. When the string buffer is full the logger will flush everything into a new file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">UINT64</td><td>Max number of log file. When exceeded, the oldest file will be deleted when new one is generated </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">PCHAR</td><td>Directory in which the log file will be generated </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">BOOL</td><td>Enable logging other log levels into a file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">UINT32</td><td>Log level that needs to be filtered into another file </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">BOOL</td><td>print log to std out too</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>STATUS code of the execution </dd></dl>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="group__PublicMemberFunctions_ga3699db3e21ea25c1efa068ab4f7f2f55_cgraph.png" border="0" usemap="#agroup__PublicMemberFunctions_ga3699db3e21ea25c1efa068ab4f7f2f55_cgraph" alt=""/></div>
+<map name="agroup__PublicMemberFunctions_ga3699db3e21ea25c1efa068ab4f7f2f55_cgraph" id="agroup__PublicMemberFunctions_ga3699db3e21ea25c1efa068ab4f7f2f55_cgraph">
+<area shape="rect" title=" " alt="" coords="5,49,201,90"/>
+<area shape="rect" href="group__PublicMemberFunctions.html#gac0b619e03e3077d3fff0c1e93813f0f1" title="Frees the static file logger object and resets the global logging function if it was previously set b..." alt="" coords="627,5,741,32"/>
+<area shape="rect" href="FileLoggerPlatformCallbackProvider_8c.html#a8e9a96f80abeaf11869a3d095403df50" title=" " alt="" coords="249,56,513,83"/>
+<area shape="rect" href="group__PublicMemberFunctions.html#gaf84f4dacd79bfbd1ec32a68b635cf825" title=" " alt="" coords="301,325,462,352"/>
+<area shape="rect" href="CallbacksProvider_8c.html#a011d0b1f4ac5719842c5903aa3f292ee" title=" " alt="" coords="583,57,785,98"/>
+<area shape="rect" href="CallbacksProvider_8c.html#a8978faa06831db4467422ce4ddcfac78" title=" " alt="" coords="561,123,807,149"/>
+<area shape="rect" href="CallbacksProvider_8c.html#a49a419aaa35c2f278a7a625f810a9324" title=" " alt="" coords="599,173,769,200"/>
+<area shape="rect" href="CallbacksProvider_8c.html#a60225b462b12c52d2c4bd3e39772ad08" title=" " alt="" coords="569,224,799,251"/>
+<area shape="rect" href="CallbacksProvider_8c.html#a7acd6f4e9bec44e3ac80a20b5f9f4cb9" title=" " alt="" coords="606,275,762,301"/>
+<area shape="rect" href="CallbacksProvider_8c.html#afafaac5937e050839aec9efac5a5778c" title=" " alt="" coords="589,325,779,352"/>
+<area shape="rect" href="CallbacksProvider_8c.html#a3c2aae771e35c0873f21f027274dea11" title=" " alt="" coords="576,376,792,403"/>
+<area shape="rect" href="CallbacksProvider_8c.html#a2b645b0903a16a6821b7df89318ba075" title=" " alt="" coords="605,427,763,453"/>
+<area shape="rect" href="CallbacksProvider_8c.html#a20c7d90422cfa9a86c4ecf698aebae3c" title=" " alt="" coords="563,477,805,504"/>
+<area shape="rect" href="CallbacksProvider_8c.html#ad0f06085ed4c849d90f58783f4e6b76b" title=" " alt="" coords="595,528,773,555"/>
+<area shape="rect" href="CallbacksProvider_8c.html#a841230c6467e08c5e04e59bd941fbd39" title=" " alt="" coords="597,579,771,605"/>
+<area shape="rect" href="CallbacksProvider_8c.html#ab39eafe3e4f46b8e9b1a3227c0675ea3" title=" " alt="" coords="568,629,800,656"/>
 </map>
 </div>
 
@@ -4766,9 +4863,10 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="group__PublicMemberFunctions_gac0b619e03e3077d3fff0c1e93813f0f1_icgraph.png" border="0" usemap="#agroup__PublicMemberFunctions_gac0b619e03e3077d3fff0c1e93813f0f1_icgraph" alt=""/></div>
 <map name="agroup__PublicMemberFunctions_gac0b619e03e3077d3fff0c1e93813f0f1_icgraph" id="agroup__PublicMemberFunctions_gac0b619e03e3077d3fff0c1e93813f0f1_icgraph">
-<area shape="rect" title="Frees the static file logger object and resets the global logging function if it was previously set b..." alt="" coords="597,13,712,39"/>
+<area shape="rect" title="Frees the static file logger object and resets the global logging function if it was previously set b..." alt="" coords="597,54,712,81"/>
 <area shape="rect" href="group__PublicMemberFunctions.html#ga6c756db8510b65b24a817519b19e5ee2" title=" " alt="" coords="5,5,237,47"/>
-<area shape="rect" href="FileLoggerPlatformCallbackProvider_8c.html#a8e9a96f80abeaf11869a3d095403df50" title=" " alt="" coords="285,38,549,65"/>
+<area shape="rect" href="group__PublicMemberFunctions.html#ga3699db3e21ea25c1efa068ab4f7f2f55" title=" " alt="" coords="23,80,219,121"/>
+<area shape="rect" href="FileLoggerPlatformCallbackProvider_8c.html#a8e9a96f80abeaf11869a3d095403df50" title=" " alt="" coords="285,54,549,81"/>
 </map>
 </div>
 
@@ -5766,8 +5864,9 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="group__PublicMemberFunctions_gaf84f4dacd79bfbd1ec32a68b635cf825_icgraph.png" border="0" usemap="#agroup__PublicMemberFunctions_gaf84f4dacd79bfbd1ec32a68b635cf825_icgraph" alt=""/></div>
 <map name="agroup__PublicMemberFunctions_gaf84f4dacd79bfbd1ec32a68b635cf825_icgraph" id="agroup__PublicMemberFunctions_gaf84f4dacd79bfbd1ec32a68b635cf825_icgraph">
-<area shape="rect" title=" " alt="" coords="285,13,447,39"/>
+<area shape="rect" title=" " alt="" coords="285,46,447,73"/>
 <area shape="rect" href="group__PublicMemberFunctions.html#ga6c756db8510b65b24a817519b19e5ee2" title=" " alt="" coords="5,5,237,47"/>
+<area shape="rect" href="group__PublicMemberFunctions.html#ga3699db3e21ea25c1efa068ab4f7f2f55" title=" " alt="" coords="23,71,219,112"/>
 </map>
 </div>
 
@@ -6069,7 +6168,7 @@ Here is the call graph for this function:</div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Thu Jul 13 2023 17:58:17 for Amazon Kinesis Producer C SDK by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+    <li class="footer">Generated on Mon Jul 24 2023 22:19:06 for Amazon Kinesis Producer C SDK by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
 </body>

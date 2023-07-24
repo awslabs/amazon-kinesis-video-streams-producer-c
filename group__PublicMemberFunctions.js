@@ -3,6 +3,7 @@ var group__PublicMemberFunctions =
     [ "addApiCallbacks", "group__PublicMemberFunctions.html#gafa4978a7591a9b94f6b3ae83718ef47d", null ],
     [ "addAuthCallbacks", "group__PublicMemberFunctions.html#ga6b3d5c98d6dc8b6060fa8a8a2c9669c7", null ],
     [ "addFileLoggerPlatformCallbacksProvider", "group__PublicMemberFunctions.html#ga6c756db8510b65b24a817519b19e5ee2", null ],
+    [ "addFileLoggerWithFilteringPlatformCallbacksProvider", "group__PublicMemberFunctions.html#ga3699db3e21ea25c1efa068ab4f7f2f55", null ],
     [ "addProducerCallbacks", "group__PublicMemberFunctions.html#gabcbc4ced09693c07d1162a4b82d19ae5", null ],
     [ "addStreamCallbacks", "group__PublicMemberFunctions.html#ga7c6d83d21ff7aede4391a52df20f4ff6", null ],
     [ "compareJsonString", "group__PublicMemberFunctions.html#gae76a515dde6f743c03bbf77bf77a2979", null ],
