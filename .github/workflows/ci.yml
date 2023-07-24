@@ -23,7 +23,7 @@ jobs:
           bash scripts/check-clang.sh
 
   mac-os-build-gcc:
-    runs-on: macos-11
+    runs-on: macos-13
     permissions:
       id-token: write
       contents: read
@@ -36,6 +36,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Build repository
         run: |
+          brew install pkgconfig
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE
           make
@@ -52,7 +53,7 @@ jobs:
           ./tst/producer_test
 
   mac-os-build-clang:
-    runs-on: macos-latest
+    runs-on: macos-13
     env:
       AWS_KVS_LOG_LEVEL: 2
       LDFLAGS: -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib
@@ -65,6 +66,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Build repository
         run: |
+          brew install pkgconfig
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE
           make
@@ -78,7 +80,7 @@ jobs:
       - name: Run tests
         run: |
           cd build
-          ./tst/producer_test --gtest_filter
+          ./tst/producer_test
 
   mac-os-build-gcc-local-openssl:
     runs-on: macos-11
@@ -89,12 +91,15 @@ jobs:
       CC: gcc
       CXX: g++
       AWS_KVS_LOG_LEVEL: 2
-      PKG_CONFIG_PATH: /usr/local/opt/openssl@1.1/lib/pkgconfig
+      LDFLAGS: -L/usr/local/opt/openssl@3/lib
+      CPPFLAGS: -I/usr/local/opt/openssl@3/include
+      OPENSSL_ROOT_DIR: /usr/local/opt/openssl@3/
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
       - name: Build repository
         run: |
+          brew info openssl
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DLOCAL_OPENSSL_BUILD=ON
           make
@@ -114,9 +119,9 @@ jobs:
     runs-on: macos-latest
     env:
       AWS_KVS_LOG_LEVEL: 2
-      LDFLAGS: -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib
-      CPATH: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/
-      PKG_CONFIG_PATH: /usr/local/opt/openssl@1.1/lib/pkgconfig
+      LDFLAGS: -L/usr/local/opt/openssl@3/lib
+      CPPFLAGS: -I/usr/local/opt/openssl@3/include
+      OPENSSL_ROOT_DIR: /usr/local/opt/openssl@3/
     permissions:
       id-token: write
       contents: read
@@ -125,6 +130,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Build repository
         run: |
+          brew info openssl
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DLOCAL_OPENSSL_BUILD=ON
           make
