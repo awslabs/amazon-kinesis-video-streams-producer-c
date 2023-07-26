@@ -71,7 +71,7 @@ INT32 main(INT32 argc, CHAR* argv[])
 
     if (argc < 2) {
         DLOGE(
-            "Usage: AWS_ACCESS_KEY_ID=SAMPLEKEY AWS_SECRET_ACCESS_KEY=SAMPLESECRET %s <stream_name> <duration_in_seconds> <frame_files_path>\n",
+            "Usage: AWS_ACCESS_KEY_ID=SAMPLEKEY AWS_SECRET_ACCESS_KEY=SAMPLESECRET %s <stream_name> <codec> <duration_in_seconds> <frame_files_path>\n",
             argv[0]);
         CHK(FALSE, STATUS_INVALID_ARG);
     }

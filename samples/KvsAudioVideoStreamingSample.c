@@ -212,7 +212,7 @@ INT32 main(INT32 argc, CHAR* argv[])
         }
     }
     if (argc < 2) {
-        printf("Usage: AWS_ACCESS_KEY_ID=SAMPLEKEY AWS_SECRET_ACCESS_KEY=SAMPLESECRET %s <stream_name> <duration_in_seconds> <frame_files_path>\n",
+        printf("Usage: AWS_ACCESS_KEY_ID=SAMPLEKEY AWS_SECRET_ACCESS_KEY=SAMPLESECRET %s <stream_name> <duration_in_seconds> <frame_files_path> [audio_codec] [video_codec] [events_enabled]\n",
                argv[0]);
         CHK(FALSE, STATUS_INVALID_ARG);
     }
