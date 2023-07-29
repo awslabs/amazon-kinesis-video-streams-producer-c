@@ -52,7 +52,9 @@ TEST_F(AwsCredentialsTest, createAwsCredentials)
     EXPECT_EQ(STATUS_SUCCESS, freeAwsCredentials(&pAwsCredentials));
     EXPECT_EQ(STATUS_SUCCESS, freeAwsCredentials(&pAwsCredentials));
 
-    EXPECT_EQ(STATUS_SUCCESS, createAwsCredentials(
+    // Negative cases
+
+    EXPECT_EQ(STATUS_INVALID_ARG, createAwsCredentials(
             EMPTY_STRING,
             0,
             EMPTY_STRING,
@@ -64,9 +66,38 @@ TEST_F(AwsCredentialsTest, createAwsCredentials)
     EXPECT_EQ(STATUS_SUCCESS, freeAwsCredentials(&pAwsCredentials));
     EXPECT_EQ(STATUS_SUCCESS, freeAwsCredentials(&pAwsCredentials));
 
-    // Negative cases
+    EXPECT_EQ(STATUS_INVALID_ARG, createAwsCredentials(
+            EMPTY_STRING,
+            0,
+            TEST_SECRET_KEY,
+            0,
+            TEST_SESSION_TOKEN,
+            0,
+            0,
+            &pAwsCredentials));
 
     EXPECT_EQ(STATUS_INVALID_ARG, createAwsCredentials(
+            EMPTY_STRING,
+            0,
+            EMPTY_STRING,
+            0,
+            TEST_SESSION_TOKEN,
+            0,
+            0,
+            &pAwsCredentials));
+
+    EXPECT_EQ(STATUS_NULL_ARG, createAwsCredentials(
+            NULL,
+            0,
+            EMPTY_STRING,
+            0,
+            TEST_SESSION_TOKEN,
+            0,
+            0,
+            &pAwsCredentials));
+
+
+    EXPECT_EQ(STATUS_NULL_ARG, createAwsCredentials(
             NULL,
             0,
             TEST_SECRET_KEY,
@@ -77,7 +108,7 @@ TEST_F(AwsCredentialsTest, createAwsCredentials)
             &pAwsCredentials));
     EXPECT_EQ(NULL, pAwsCredentials);
 
-    EXPECT_EQ(STATUS_INVALID_ARG, createAwsCredentials(
+    EXPECT_EQ(STATUS_NULL_ARG, createAwsCredentials(
             TEST_ACCESS_KEY,
             0,
             NULL,
