@@ -14,7 +14,7 @@ STATUS createRequestInfo(PCHAR url, PCHAR body, PCHAR region, PCHAR certPath, PC
 
     // Add body to the size excluding NULL terminator
     if (body != NULL) {
-        bodySize = (UINT32)(STRLEN(body) * SIZEOF(CHAR));
+        bodySize = (UINT32) (STRLEN(body) * SIZEOF(CHAR));
         size += bodySize;
     }
 
@@ -51,7 +51,7 @@ STATUS createRequestInfo(PCHAR url, PCHAR body, PCHAR region, PCHAR certPath, PC
     // If the body is specified then it will be a request/response call
     // Otherwise we are streaming
     if (body != NULL) {
-        pRequestInfo->body = (PCHAR)(pRequestInfo + 1);
+        pRequestInfo->body = (PCHAR) (pRequestInfo + 1);
         MEMCPY(pRequestInfo->body, body, bodySize);
     }
 
@@ -155,7 +155,7 @@ STATUS createRequestHeader(PCHAR headerName, UINT32 headerNameLen, PCHAR headerV
     pRequestHeader->valueLen = valueLen;
 
     // Pointing after the structure
-    pRequestHeader->pName = (PCHAR)(pRequestHeader + 1);
+    pRequestHeader->pName = (PCHAR) (pRequestHeader + 1);
     pRequestHeader->pValue = pRequestHeader->pName + nameLen + 1;
 
     MEMCPY(pRequestHeader->pName, headerName, nameLen * SIZEOF(CHAR));

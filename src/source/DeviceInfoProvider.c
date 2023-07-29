@@ -100,8 +100,8 @@ STATUS setDeviceInfoStorageSizeBasedOnBitrateAndBufferDuration(PDeviceInfo pDevi
     CHK(averageBitsPerSecond > 0 && bufferDuration > 0, STATUS_INVALID_ARG);
 
     estimatedStorageSize =
-        (UINT64)(pDeviceInfo->streamCount * (((DOUBLE) averageBitsPerSecond / 8) * ((DOUBLE) bufferDuration / HUNDREDS_OF_NANOS_IN_A_SECOND)) *
-                 STORAGE_ALLOCATION_DEFRAGMENTATION_FACTOR);
+        (UINT64) (pDeviceInfo->streamCount * (((DOUBLE) averageBitsPerSecond / 8) * ((DOUBLE) bufferDuration / HUNDREDS_OF_NANOS_IN_A_SECOND)) *
+                  STORAGE_ALLOCATION_DEFRAGMENTATION_FACTOR);
 
     CHK_STATUS(setDeviceInfoStorageSize(pDeviceInfo, estimatedStorageSize));
 

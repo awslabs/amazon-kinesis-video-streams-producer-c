@@ -156,9 +156,10 @@ CleanUp:
     return retStatus;
 }
 
-STATUS createDefaultCallbacksProviderWithIotCertificateAndTimeouts(PCHAR endpoint, PCHAR iotCertPath, PCHAR privateKeyPath, PCHAR caCertPath, PCHAR roleAlias,
-                                                        PCHAR streamName, PCHAR region, PCHAR userAgentPostfix, PCHAR customUserAgent, UINT64 connectionTimeout,
-                                                        UINT64 completionTimeout, PClientCallbacks* ppClientCallbacks)
+STATUS createDefaultCallbacksProviderWithIotCertificateAndTimeouts(PCHAR endpoint, PCHAR iotCertPath, PCHAR privateKeyPath, PCHAR caCertPath,
+                                                                   PCHAR roleAlias, PCHAR streamName, PCHAR region, PCHAR userAgentPostfix,
+                                                                   PCHAR customUserAgent, UINT64 connectionTimeout, UINT64 completionTimeout,
+                                                                   PClientCallbacks* ppClientCallbacks)
 {
     ENTERS();
     STATUS retStatus = STATUS_SUCCESS;
@@ -176,7 +177,7 @@ STATUS createDefaultCallbacksProviderWithIotCertificateAndTimeouts(PCHAR endpoin
 
     CHK_STATUS(createContinuousRetryStreamCallbacks((PClientCallbacks) pCallbacksProvider, &pStreamCallbacks));
 
-    CleanUp:
+CleanUp:
 
     if (STATUS_FAILED(retStatus)) {
         if (pCallbacksProvider != NULL) {
@@ -316,10 +317,10 @@ STATUS createAbstractDefaultCallbacksProvider(UINT32 callbackChainCount, API_CAL
     pCallbacksProvider->clientCallbacks.customData = (UINT64) pCallbacksProvider;
 
     // Set callback chain pointers
-    pCallbacksProvider->pProducerCallbacks = (PProducerCallbacks)(pCallbacksProvider + 1);
-    pCallbacksProvider->pStreamCallbacks = (PStreamCallbacks)(pCallbacksProvider->pProducerCallbacks + callbackChainCount);
-    pCallbacksProvider->pAuthCallbacks = (PAuthCallbacks)(pCallbacksProvider->pStreamCallbacks + callbackChainCount);
-    pCallbacksProvider->pApiCallbacks = (PApiCallbacks)(pCallbacksProvider->pAuthCallbacks + callbackChainCount);
+    pCallbacksProvider->pProducerCallbacks = (PProducerCallbacks) (pCallbacksProvider + 1);
+    pCallbacksProvider->pStreamCallbacks = (PStreamCallbacks) (pCallbacksProvider->pProducerCallbacks + callbackChainCount);
+    pCallbacksProvider->pAuthCallbacks = (PAuthCallbacks) (pCallbacksProvider->pStreamCallbacks + callbackChainCount);
+    pCallbacksProvider->pApiCallbacks = (PApiCallbacks) (pCallbacksProvider->pAuthCallbacks + callbackChainCount);
 
     // Set the default Platform callbacks
     CHK_STATUS(setDefaultPlatformCallbacks(pCallbacksProvider));

@@ -1,19 +1,19 @@
 #include <com/amazonaws/kinesis/video/cproducer/Include.h>
 
-#define DEFAULT_RETENTION_PERIOD            2 * HUNDREDS_OF_NANOS_IN_AN_HOUR
-#define DEFAULT_BUFFER_DURATION             120 * HUNDREDS_OF_NANOS_IN_A_SECOND
-#define DEFAULT_KEY_FRAME_INTERVAL          100
-#define DEFAULT_STREAM_DURATION             20 * HUNDREDS_OF_NANOS_IN_A_SECOND
-#define SAMPLE_AUDIO_FRAME_DURATION         (20 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND)
-#define AAC_AUDIO_TRACK_SAMPLING_RATE       48000
-#define ALAW_AUDIO_TRACK_SAMPLING_RATE      8000
-#define AAC_AUDIO_TRACK_CHANNEL_CONFIG      2
-#define ALAW_AUDIO_TRACK_CHANNEL_CONFIG     1
-#define AUDIO_CODEC_NAME_MAX_LENGTH         5
-#define AUDIO_CODEC_NAME_ALAW               "alaw"
-#define AUDIO_CODEC_NAME_AAC                "aac"
+#define DEFAULT_RETENTION_PERIOD        2 * HUNDREDS_OF_NANOS_IN_AN_HOUR
+#define DEFAULT_BUFFER_DURATION         120 * HUNDREDS_OF_NANOS_IN_A_SECOND
+#define DEFAULT_KEY_FRAME_INTERVAL      100
+#define DEFAULT_STREAM_DURATION         20 * HUNDREDS_OF_NANOS_IN_A_SECOND
+#define SAMPLE_AUDIO_FRAME_DURATION     (20 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND)
+#define AAC_AUDIO_TRACK_SAMPLING_RATE   48000
+#define ALAW_AUDIO_TRACK_SAMPLING_RATE  8000
+#define AAC_AUDIO_TRACK_CHANNEL_CONFIG  2
+#define ALAW_AUDIO_TRACK_CHANNEL_CONFIG 1
+#define AUDIO_CODEC_NAME_MAX_LENGTH     5
+#define AUDIO_CODEC_NAME_ALAW           "alaw"
+#define AUDIO_CODEC_NAME_AAC            "aac"
 
-#define NUMBER_OF_AUDIO_FRAME_FILES  582
+#define NUMBER_OF_AUDIO_FRAME_FILES 582
 
 #define FILE_LOGGING_BUFFER_SIZE (100 * 1024)
 #define MAX_NUMBER_OF_LOG_FILES  5
@@ -55,7 +55,7 @@ PVOID putAudioFrameRoutine(PVOID args)
     frame.flags = fileIndex % DEFAULT_KEY_FRAME_INTERVAL == 0 ? FRAME_FLAG_KEY_FRAME : FRAME_FLAG_NONE;
 
     while (GETTIME() < data->streamStopTime) {
-        status = putKinesisVideoFrame(data->streamHandle, &frame);            
+        status = putKinesisVideoFrame(data->streamHandle, &frame);
         if (STATUS_FAILED(status)) {
             printf("putKinesisVideoFrame for audio failed with 0x%08x\n", status);
             status = STATUS_SUCCESS;
@@ -83,7 +83,7 @@ CleanUp:
         printf("putAudioFrameRoutine failed with 0x%08x", retStatus);
     }
 
-    return (PVOID)(ULONG_PTR) retStatus;
+    return (PVOID) (ULONG_PTR) retStatus;
 }
 
 INT32 main(INT32 argc, CHAR* argv[])
@@ -108,10 +108,10 @@ INT32 main(INT32 argc, CHAR* argv[])
 
     MEMSET(&data, 0x00, SIZEOF(SampleCustomData));
 
-    STRNCPY(audioCodec, AUDIO_CODEC_NAME_AAC, STRLEN(AUDIO_CODEC_NAME_AAC)); //aac audio by default
+    STRNCPY(audioCodec, AUDIO_CODEC_NAME_AAC, STRLEN(AUDIO_CODEC_NAME_AAC)); // aac audio by default
 
     if (argc >= 5) {
-        if (!STRCMP(argv[2], AUDIO_CODEC_NAME_ALAW)){
+        if (!STRCMP(argv[2], AUDIO_CODEC_NAME_ALAW)) {
             STRNCPY(audioCodec, AUDIO_CODEC_NAME_ALAW, STRLEN(AUDIO_CODEC_NAME_ALAW));
         }
     }
@@ -169,30 +169,32 @@ INT32 main(INT32 argc, CHAR* argv[])
 
     // generate audio cpd
     if (!STRCMP(audioCodec, AUDIO_CODEC_NAME_ALAW)) {
-        CHK_STATUS(createRealtimeAudioStreamInfoProviderWithCodecs(streamName, DEFAULT_RETENTION_PERIOD, DEFAULT_BUFFER_DURATION, AUDIO_CODEC_ID_PCM_ALAW, &pStreamInfo));
+        CHK_STATUS(createRealtimeAudioStreamInfoProviderWithCodecs(streamName, DEFAULT_RETENTION_PERIOD, DEFAULT_BUFFER_DURATION,
+                                                                   AUDIO_CODEC_ID_PCM_ALAW, &pStreamInfo));
 
         // adjust members of pStreamInfo here if needed
 
         // set up audio cpd.
         pAudioTrack = pStreamInfo->streamCaps.trackInfoList[0].trackId == 1 ? &pStreamInfo->streamCaps.trackInfoList[0]
-                                                                                             : &pStreamInfo->streamCaps.trackInfoList[1];
+                                                                            : &pStreamInfo->streamCaps.trackInfoList[1];
         pAudioTrack->codecPrivateData = alawAudioCpd;
         pAudioTrack->codecPrivateDataSize = KVS_PCM_CPD_SIZE_BYTE;
-        CHK_STATUS(mkvgenGeneratePcmCpd(KVS_PCM_FORMAT_CODE_ALAW, ALAW_AUDIO_TRACK_SAMPLING_RATE, ALAW_AUDIO_TRACK_CHANNEL_CONFIG, pAudioTrack->codecPrivateData,
-                                    pAudioTrack->codecPrivateDataSize));
+        CHK_STATUS(mkvgenGeneratePcmCpd(KVS_PCM_FORMAT_CODE_ALAW, ALAW_AUDIO_TRACK_SAMPLING_RATE, ALAW_AUDIO_TRACK_CHANNEL_CONFIG,
+                                        pAudioTrack->codecPrivateData, pAudioTrack->codecPrivateDataSize));
     } else {
-        CHK_STATUS(createRealtimeAudioStreamInfoProviderWithCodecs(streamName, DEFAULT_RETENTION_PERIOD, DEFAULT_BUFFER_DURATION, AUDIO_CODEC_ID_AAC, &pStreamInfo));
+        CHK_STATUS(createRealtimeAudioStreamInfoProviderWithCodecs(streamName, DEFAULT_RETENTION_PERIOD, DEFAULT_BUFFER_DURATION, AUDIO_CODEC_ID_AAC,
+                                                                   &pStreamInfo));
 
         // To specify PCM/G.711 use createRealtimeAudioStreamInfoProviderWithCodecs
         // adjust members of pStreamInfo here if needed
 
         // set up audio cpd.
         pAudioTrack = pStreamInfo->streamCaps.trackInfoList[0].trackId == 1 ? &pStreamInfo->streamCaps.trackInfoList[0]
-                                                                                             : &pStreamInfo->streamCaps.trackInfoList[1];
+                                                                            : &pStreamInfo->streamCaps.trackInfoList[1];
         pAudioTrack->codecPrivateData = aacAudioCpd;
         pAudioTrack->codecPrivateDataSize = KVS_AAC_CPD_SIZE_BYTE;
         CHK_STATUS(mkvgenGenerateAacCpd(AAC_LC, AAC_AUDIO_TRACK_SAMPLING_RATE, AAC_AUDIO_TRACK_CHANNEL_CONFIG, pAudioTrack->codecPrivateData,
-                                    pAudioTrack->codecPrivateDataSize));
+                                        pAudioTrack->codecPrivateDataSize));
     }
 
     // use relative time mode. Buffer timestamps start from 0

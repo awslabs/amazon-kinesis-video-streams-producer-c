@@ -21,7 +21,7 @@ extern "C" {
 #include <openssl/crypto.h>
 
 #define KVS_HMAC(k, klen, m, mlen, ob, plen)                                                                                                         \
-    CHK(NULL != HMAC(EVP_sha256(), (k), (INT32)(klen), (m), (mlen), (ob), (plen)), STATUS_HMAC_GENERATION_ERROR);
+    CHK(NULL != HMAC(EVP_sha256(), (k), (INT32) (klen), (m), (mlen), (ob), (plen)), STATUS_HMAC_GENERATION_ERROR);
 #define KVS_SHA256(m, mlen, ob) SHA256((m), (mlen), (ob));
 
 #elif defined(KVS_USE_MBEDTLS)

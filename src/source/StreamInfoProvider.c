@@ -17,45 +17,53 @@ STATUS createOfflineVideoStreamInfoProvider(PCHAR streamName, UINT64 retention, 
 // Creates audio video stream info for real time streaming mode
 STATUS createRealtimeAudioVideoStreamInfoProvider(PCHAR streamName, UINT64 retention, UINT64 bufferDuration, PStreamInfo* ppStreamInfo)
 {
-    return createAudioVideoStreamInfo(STREAMING_TYPE_REALTIME, VIDEO_CODEC_ID_H264, AUDIO_CODEC_ID_AAC, streamName, retention, bufferDuration, ppStreamInfo);
+    return createAudioVideoStreamInfo(STREAMING_TYPE_REALTIME, VIDEO_CODEC_ID_H264, AUDIO_CODEC_ID_AAC, streamName, retention, bufferDuration,
+                                      ppStreamInfo);
 }
 
 // Creates audio video stream info for offline streaming mode
 STATUS createOfflineAudioVideoStreamInfoProvider(PCHAR streamName, UINT64 retention, UINT64 bufferDuration, PStreamInfo* ppStreamInfo)
 {
-    return createAudioVideoStreamInfo(STREAMING_TYPE_OFFLINE, VIDEO_CODEC_ID_H264, AUDIO_CODEC_ID_AAC, streamName, retention, bufferDuration, ppStreamInfo);
+    return createAudioVideoStreamInfo(STREAMING_TYPE_OFFLINE, VIDEO_CODEC_ID_H264, AUDIO_CODEC_ID_AAC, streamName, retention, bufferDuration,
+                                      ppStreamInfo);
 }
 
 // Creates video stream info for real time streaming mode
-STATUS createRealtimeVideoStreamInfoProviderWithCodecs(PCHAR streamName, UINT64 retention, UINT64 bufferDuration, VIDEO_CODEC_ID videoCodecId, PStreamInfo* ppStreamInfo)
+STATUS createRealtimeVideoStreamInfoProviderWithCodecs(PCHAR streamName, UINT64 retention, UINT64 bufferDuration, VIDEO_CODEC_ID videoCodecId,
+                                                       PStreamInfo* ppStreamInfo)
 {
     return createVideoStreamInfo(STREAMING_TYPE_REALTIME, videoCodecId, streamName, retention, bufferDuration, ppStreamInfo);
 }
 // Creates video stream info for offline streaming mode
-STATUS createOfflineVideoStreamInfoProviderWithCodecs(PCHAR streamName, UINT64 retention, UINT64 bufferDuration, VIDEO_CODEC_ID videoCodecId, PStreamInfo* ppStreamInfo)
+STATUS createOfflineVideoStreamInfoProviderWithCodecs(PCHAR streamName, UINT64 retention, UINT64 bufferDuration, VIDEO_CODEC_ID videoCodecId,
+                                                      PStreamInfo* ppStreamInfo)
 {
     return createVideoStreamInfo(STREAMING_TYPE_OFFLINE, videoCodecId, streamName, retention, bufferDuration, ppStreamInfo);
 }
 // Creates audio video stream info for real time streaming mode
-STATUS createRealtimeAudioVideoStreamInfoProviderWithCodecs(PCHAR streamName, UINT64 retention, UINT64 bufferDuration, VIDEO_CODEC_ID videoCodecId, AUDIO_CODEC_ID audioCodecId, PStreamInfo* ppStreamInfo)
+STATUS createRealtimeAudioVideoStreamInfoProviderWithCodecs(PCHAR streamName, UINT64 retention, UINT64 bufferDuration, VIDEO_CODEC_ID videoCodecId,
+                                                            AUDIO_CODEC_ID audioCodecId, PStreamInfo* ppStreamInfo)
 {
     return createAudioVideoStreamInfo(STREAMING_TYPE_REALTIME, videoCodecId, audioCodecId, streamName, retention, bufferDuration, ppStreamInfo);
 }
 
 // Creates audio video stream info for offline streaming mode
-STATUS createOfflineAudioVideoStreamInfoProviderWithCodecs(PCHAR streamName, UINT64 retention, UINT64 bufferDuration, VIDEO_CODEC_ID videoCodecId, AUDIO_CODEC_ID audioCodecId, PStreamInfo* ppStreamInfo)
+STATUS createOfflineAudioVideoStreamInfoProviderWithCodecs(PCHAR streamName, UINT64 retention, UINT64 bufferDuration, VIDEO_CODEC_ID videoCodecId,
+                                                           AUDIO_CODEC_ID audioCodecId, PStreamInfo* ppStreamInfo)
 {
     return createAudioVideoStreamInfo(STREAMING_TYPE_OFFLINE, videoCodecId, audioCodecId, streamName, retention, bufferDuration, ppStreamInfo);
 }
 
 // Creates audio only stream info for real time streaming mode
-STATUS createRealtimeAudioStreamInfoProviderWithCodecs(PCHAR streamName, UINT64 retention, UINT64 bufferDuration, AUDIO_CODEC_ID audioCodecId, PStreamInfo* ppStreamInfo)
+STATUS createRealtimeAudioStreamInfoProviderWithCodecs(PCHAR streamName, UINT64 retention, UINT64 bufferDuration, AUDIO_CODEC_ID audioCodecId,
+                                                       PStreamInfo* ppStreamInfo)
 {
     return createAudioStreamInfo(STREAMING_TYPE_REALTIME, audioCodecId, streamName, retention, bufferDuration, ppStreamInfo);
 }
 
 // Creates audio only stream info for offline streaming mode
-STATUS createOfflineAudioStreamInfoProviderWithCodecs(PCHAR streamName, UINT64 retention, UINT64 bufferDuration, AUDIO_CODEC_ID audioCodecId, PStreamInfo* ppStreamInfo)
+STATUS createOfflineAudioStreamInfoProviderWithCodecs(PCHAR streamName, UINT64 retention, UINT64 bufferDuration, AUDIO_CODEC_ID audioCodecId,
+                                                      PStreamInfo* ppStreamInfo)
 {
     return createAudioStreamInfo(STREAMING_TYPE_OFFLINE, audioCodecId, streamName, retention, bufferDuration, ppStreamInfo);
 }
@@ -168,11 +176,11 @@ STATUS setStreamInfoDefaults(STREAMING_TYPE streamingType, UINT64 retention, UIN
     pStreamInfo->streamCaps.frameOrderingMode =
         trackCount == 1 ? FRAME_ORDER_MODE_PASS_THROUGH : FRAME_ORDERING_MODE_MULTI_TRACK_AV_COMPARE_PTS_ONE_MS_COMPENSATE_EOFR;
     pStreamInfo->streamCaps.keyFrameFragmentation = TRUE;
-    pStreamInfo->streamCaps.maxLatency = (UINT64)(LATENCY_PRESSURE_FACTOR * ((DOUBLE) bufferDuration));
+    pStreamInfo->streamCaps.maxLatency = (UINT64) (LATENCY_PRESSURE_FACTOR * ((DOUBLE) bufferDuration));
     pStreamInfo->streamCaps.nalAdaptationFlags = NAL_ADAPTATION_ANNEXB_CPD_NALS | NAL_ADAPTATION_ANNEXB_NALS;
     pStreamInfo->streamCaps.recalculateMetrics = TRUE;
     pStreamInfo->streamCaps.recoverOnError = TRUE;
-    pStreamInfo->streamCaps.replayDuration = (UINT64)(REPLAY_DURATION_FACTOR * ((DOUBLE) bufferDuration));
+    pStreamInfo->streamCaps.replayDuration = (UINT64) (REPLAY_DURATION_FACTOR * ((DOUBLE) bufferDuration));
     pStreamInfo->streamCaps.streamingType = streamingType;
     pStreamInfo->streamCaps.segmentUuid = NULL;
     pStreamInfo->streamCaps.timecodeScale = STREAM_INFO_DEFAULT_TIMESCALE;
@@ -193,7 +201,8 @@ STATUS setStreamInfoDefaults(STREAMING_TYPE streamingType, UINT64 retention, UIN
     return retStatus;
 }
 
-STATUS createVideoStreamInfo(STREAMING_TYPE streamingType, VIDEO_CODEC_ID videoCodecId, PCHAR streamName, UINT64 retention, UINT64 bufferDuration, PStreamInfo* ppStreamInfo)
+STATUS createVideoStreamInfo(STREAMING_TYPE streamingType, VIDEO_CODEC_ID videoCodecId, PCHAR streamName, UINT64 retention, UINT64 bufferDuration,
+                             PStreamInfo* ppStreamInfo)
 {
     ENTERS();
 
@@ -210,10 +219,10 @@ STATUS createVideoStreamInfo(STREAMING_TYPE streamingType, VIDEO_CODEC_ID videoC
     CHK(pStreamInfo != NULL, STATUS_NOT_ENOUGH_MEMORY);
 
     PTrackInfo pTrackInfo = NULL;
-    pTrackInfo = (PTrackInfo)(pStreamInfo + 1);
+    pTrackInfo = (PTrackInfo) (pStreamInfo + 1);
 
     CHK(pTrackInfo != NULL && pStreamInfo->streamCaps.contentType != NULL, STATUS_NULL_ARG);
-    
+
     CHK_STATUS(createVideoTrackInfo(videoCodecId, pStreamInfo->streamCaps.contentType, pTrackInfo));
 
     STRCPY(pStreamInfo->name, streamName);
@@ -234,7 +243,8 @@ CleanUp:
     return retStatus;
 }
 
-STATUS createAudioVideoStreamInfo(STREAMING_TYPE streamingType, VIDEO_CODEC_ID videoCodecId, AUDIO_CODEC_ID audioCodecId, PCHAR streamName, UINT64 retention, UINT64 bufferDuration, PStreamInfo* ppStreamInfo)
+STATUS createAudioVideoStreamInfo(STREAMING_TYPE streamingType, VIDEO_CODEC_ID videoCodecId, AUDIO_CODEC_ID audioCodecId, PCHAR streamName,
+                                  UINT64 retention, UINT64 bufferDuration, PStreamInfo* ppStreamInfo)
 {
     ENTERS();
 
@@ -251,12 +261,12 @@ STATUS createAudioVideoStreamInfo(STREAMING_TYPE streamingType, VIDEO_CODEC_ID v
     pStreamInfo = (PStreamInfo) MEMCALLOC(1, SIZEOF(StreamInfo) + VIDEO_WITH_AUDIO_TRACK_COUNT * SIZEOF(TrackInfo));
     CHK(pStreamInfo != NULL, STATUS_NOT_ENOUGH_MEMORY);
 
-    pTrackInfo = (PTrackInfo)(pStreamInfo + 1);
+    pTrackInfo = (PTrackInfo) (pStreamInfo + 1);
 
     CHK(pTrackInfo != NULL && pStreamInfo->streamCaps.contentType != NULL, STATUS_NULL_ARG);
 
     CHK_STATUS(createVideoTrackInfo(videoCodecId, pStreamInfo->streamCaps.contentType, pTrackInfo));
-    STRCAT(pStreamInfo->streamCaps.contentType, ","); //concatenating audio content type to video content type
+    STRCAT(pStreamInfo->streamCaps.contentType, ","); // concatenating audio content type to video content type
     CHK_STATUS(createAudioTrackInfo(audioCodecId, pStreamInfo->streamCaps.contentType, pTrackInfo + 1, DEFAULT_AUDIO_TRACK_ID));
 
     STRCPY(pStreamInfo->name, streamName);
@@ -276,7 +286,8 @@ CleanUp:
     return retStatus;
 }
 
-STATUS createAudioStreamInfo(STREAMING_TYPE streamingType, AUDIO_CODEC_ID audioCodecId, PCHAR streamName, UINT64 retention, UINT64 bufferDuration, PStreamInfo* ppStreamInfo)
+STATUS createAudioStreamInfo(STREAMING_TYPE streamingType, AUDIO_CODEC_ID audioCodecId, PCHAR streamName, UINT64 retention, UINT64 bufferDuration,
+                             PStreamInfo* ppStreamInfo)
 {
     ENTERS();
 
@@ -293,7 +304,7 @@ STATUS createAudioStreamInfo(STREAMING_TYPE streamingType, AUDIO_CODEC_ID audioC
     pStreamInfo = (PStreamInfo) MEMCALLOC(1, SIZEOF(StreamInfo) + AUDIO_ONLY_TRACK_COUNT * SIZEOF(TrackInfo));
     CHK(pStreamInfo != NULL, STATUS_NOT_ENOUGH_MEMORY);
 
-    pTrackInfo = (PTrackInfo)(pStreamInfo + 1);
+    pTrackInfo = (PTrackInfo) (pStreamInfo + 1);
 
     CHK(pTrackInfo != NULL && pStreamInfo->streamCaps.contentType != NULL, STATUS_NULL_ARG);
 
@@ -323,9 +334,9 @@ STATUS setStreamInfoBasedOnStorageSize(UINT32 storageSize, UINT64 avgBitrate, UI
     CHK(storageSize > 0 && avgBitrate > 0 && totalStreamCount > 0, STATUS_INVALID_ARG);
 
     pStreamInfo->streamCaps.bufferDuration =
-        (UINT64)((DOUBLE) storageSize * 8 / avgBitrate / totalStreamCount * PRODUCER_DEFRAGMENTATION_FACTOR) * HUNDREDS_OF_NANOS_IN_A_SECOND;
-    pStreamInfo->streamCaps.replayDuration = (UINT64)(REPLAY_DURATION_FACTOR * ((DOUBLE) pStreamInfo->streamCaps.bufferDuration));
-    pStreamInfo->streamCaps.maxLatency = (UINT64)(LATENCY_PRESSURE_FACTOR * ((DOUBLE) pStreamInfo->streamCaps.bufferDuration));
+        (UINT64) ((DOUBLE) storageSize * 8 / avgBitrate / totalStreamCount * PRODUCER_DEFRAGMENTATION_FACTOR) * HUNDREDS_OF_NANOS_IN_A_SECOND;
+    pStreamInfo->streamCaps.replayDuration = (UINT64) (REPLAY_DURATION_FACTOR * ((DOUBLE) pStreamInfo->streamCaps.bufferDuration));
+    pStreamInfo->streamCaps.maxLatency = (UINT64) (LATENCY_PRESSURE_FACTOR * ((DOUBLE) pStreamInfo->streamCaps.bufferDuration));
 
 CleanUp:
     CHK_LOG_ERR(retStatus);

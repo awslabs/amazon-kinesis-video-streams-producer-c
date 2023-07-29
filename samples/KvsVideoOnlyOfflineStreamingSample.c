@@ -67,9 +67,8 @@ INT32 main(INT32 argc, CHAR* argv[])
     VIDEO_CODEC_ID videoCodecID = VIDEO_CODEC_ID_H264;
 
     if (argc < 2) {
-        DLOGE(
-            "Usage: AWS_ACCESS_KEY_ID=SAMPLEKEY AWS_SECRET_ACCESS_KEY=SAMPLESECRET %s <stream_name> <duration_in_seconds> <frame_files_path>\n",
-            argv[0]);
+        DLOGE("Usage: AWS_ACCESS_KEY_ID=SAMPLEKEY AWS_SECRET_ACCESS_KEY=SAMPLESECRET %s <stream_name> <duration_in_seconds> <frame_files_path>\n",
+              argv[0]);
         CHK(FALSE, STATUS_INVALID_ARG);
     }
 
@@ -146,18 +145,18 @@ INT32 main(INT32 argc, CHAR* argv[])
     frame.presentationTs = frame.decodingTs;
 
     while (frame.decodingTs < streamStopTime) {
-            frame.index = frameIndex;
-            frame.flags = fileIndex % DEFAULT_KEY_FRAME_INTERVAL == 0 ? FRAME_FLAG_KEY_FRAME : FRAME_FLAG_NONE;
-            frame.size = SIZEOF(frameBuffer);
+        frame.index = frameIndex;
+        frame.flags = fileIndex % DEFAULT_KEY_FRAME_INTERVAL == 0 ? FRAME_FLAG_KEY_FRAME : FRAME_FLAG_NONE;
+        frame.size = SIZEOF(frameBuffer);
 
-            CHK_STATUS(readFrameData(&frame, frameFilePath, videoCodec));
-            CHK_STATUS(putKinesisVideoFrame(streamHandle, &frame));
+        CHK_STATUS(readFrameData(&frame, frameFilePath, videoCodec));
+        CHK_STATUS(putKinesisVideoFrame(streamHandle, &frame));
 
-            frame.decodingTs += frame.duration;
-            frame.presentationTs = frame.decodingTs;
-            frameIndex++;
-            fileIndex++;
-            fileIndex = fileIndex % NUMBER_OF_FRAME_FILES;
+        frame.decodingTs += frame.duration;
+        frame.presentationTs = frame.decodingTs;
+        frameIndex++;
+        fileIndex++;
+        fileIndex = fileIndex % NUMBER_OF_FRAME_FILES;
     }
 
     CHK_STATUS(stopKinesisVideoStreamSync(streamHandle));

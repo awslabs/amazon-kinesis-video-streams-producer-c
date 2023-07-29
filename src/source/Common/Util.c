@@ -10,7 +10,7 @@ STATUS convertTimestampToEpoch(PCHAR expirationTimestampStr, UINT64 nowTime, PUI
     STATUS retStatus = STATUS_SUCCESS;
     UINT64 iotExpirationInEpoch = 0, diff;
 
-    UINT64 currentTimeInEpoch = (UINT64)((MKTIME(GMTIME((time_t*) &nowTime))));
+    UINT64 currentTimeInEpoch = (UINT64) ((MKTIME(GMTIME((time_t*) &nowTime))));
     struct tm ioTExpiration;
 
     CHK(expirationTimestampStr != NULL && pExpiration != NULL, STATUS_NULL_ARG);
@@ -55,7 +55,7 @@ STATUS convertTimestampToEpoch(PCHAR expirationTimestampStr, UINT64 nowTime, PUI
 
     DLOGD("Difference between current time and iot expiration is %" PRIu64, diff);
 
-    *pExpiration = (UINT64)(nowTime + ((DOUBLE) diff * EARLY_EXPIRATION_FACTOR)) * HUNDREDS_OF_NANOS_IN_A_SECOND;
+    *pExpiration = (UINT64) (nowTime + ((DOUBLE) diff * EARLY_EXPIRATION_FACTOR)) * HUNDREDS_OF_NANOS_IN_A_SECOND;
 
 CleanUp:
 

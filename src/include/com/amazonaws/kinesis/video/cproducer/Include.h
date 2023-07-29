@@ -363,7 +363,8 @@ PUBLIC_API STATUS createDefaultCallbacksProviderWithIotCertificate(PCHAR, PCHAR,
  *
  * @return STATUS code of the execution
  */
-PUBLIC_API STATUS createDefaultCallbacksProviderWithIotCertificateAndTimeouts(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, UINT64, UINT64, PClientCallbacks*);
+PUBLIC_API STATUS createDefaultCallbacksProviderWithIotCertificateAndTimeouts(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, UINT64,
+                                                                              UINT64, PClientCallbacks*);
 
 /**
  * Creates a default callbacks provider that uses file-based certificate as auth method.

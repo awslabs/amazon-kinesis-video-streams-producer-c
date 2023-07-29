@@ -73,12 +73,9 @@ STATUS blockingLwsCall(PRequestInfo pRequestInfo, PCallInfo pCallInfo)
 
 CleanUp:
 
-    if(retStatus == STATUS_IOT_CREATE_LWS_CONTEXT_FAILED)
-    {
+    if (retStatus == STATUS_IOT_CREATE_LWS_CONTEXT_FAILED) {
         DLOGW("Unable to create LWS context or connect to Websocket server");
-    }
-    else
-    {
+    } else {
         CHK_LOG_ERR(retStatus);
     }
     if (lwsContext != NULL) {
