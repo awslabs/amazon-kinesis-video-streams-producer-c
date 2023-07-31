@@ -19,7 +19,12 @@ STATUS createAwsCredentials(PCHAR accessKeyId, UINT32 accessKeyIdLen, PCHAR secr
     CHK(ppAwsCredentials != NULL, STATUS_NULL_ARG);
 
     // Session token is optional. If NULL then the session token len should be 0
-    CHK(accessKeyId != NULL && secretKey != NULL && (sessionToken != NULL || sessionTokenLen == 0), STATUS_INVALID_ARG);
+    CHK(accessKeyId != NULL && secretKey != NULL && (sessionToken != NULL || sessionTokenLen == 0), STATUS_NULL_ARG);
+
+    CHK(!IS_EMPTY_STRING(accessKeyId) && !IS_EMPTY_STRING(secretKey), STATUS_INVALID_ARG);
+    if(sessionToken != NULL) {
+        CHK(!IS_EMPTY_STRING(sessionToken), STATUS_INVALID_ARG);
+    }
 
     // Calculate the length if not specified
     if (accessKeyIdLen == 0) {

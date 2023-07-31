@@ -390,7 +390,7 @@ TEST_F(CallbacksProviderPublicApiTest, createDefaultCallbacksProviderWithAwsCred
     EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks));
     EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks));
 
-    EXPECT_EQ(STATUS_SUCCESS, createDefaultCallbacksProviderWithAwsCredentials(
+    EXPECT_EQ(STATUS_INVALID_ARG, createDefaultCallbacksProviderWithAwsCredentials(
             TEST_ACCESS_KEY,
             TEST_SECRET_KEY,
             EMPTY_STRING,
@@ -455,7 +455,7 @@ TEST_F(CallbacksProviderPublicApiTest, createDefaultCallbacksProviderWithAwsCred
     EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks));
     EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks));
 
-    EXPECT_EQ(STATUS_SUCCESS, createDefaultCallbacksProviderWithAwsCredentials(
+    EXPECT_EQ(STATUS_INVALID_ARG, createDefaultCallbacksProviderWithAwsCredentials(
             EMPTY_STRING,
             TEST_SECRET_KEY,
             TEST_SESSION_TOKEN,
@@ -468,7 +468,7 @@ TEST_F(CallbacksProviderPublicApiTest, createDefaultCallbacksProviderWithAwsCred
     EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks));
     EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks));
 
-    EXPECT_EQ(STATUS_SUCCESS, createDefaultCallbacksProviderWithAwsCredentials(
+    EXPECT_EQ(STATUS_INVALID_ARG, createDefaultCallbacksProviderWithAwsCredentials(
             TEST_ACCESS_KEY,
             EMPTY_STRING,
             TEST_SESSION_TOKEN,
@@ -496,7 +496,7 @@ TEST_F(CallbacksProviderPublicApiTest, createDefaultCallbacksProviderWithAwsCred
 
     // Negative case permutations
 
-    EXPECT_EQ(STATUS_INVALID_ARG, createDefaultCallbacksProviderWithAwsCredentials(
+    EXPECT_EQ(STATUS_NULL_ARG, createDefaultCallbacksProviderWithAwsCredentials(
             NULL,
             TEST_SECRET_KEY,
             TEST_SESSION_TOKEN,
@@ -508,7 +508,7 @@ TEST_F(CallbacksProviderPublicApiTest, createDefaultCallbacksProviderWithAwsCred
             &pClientCallbacks));
     EXPECT_EQ(NULL, pClientCallbacks);
 
-    EXPECT_EQ(STATUS_INVALID_ARG, createDefaultCallbacksProviderWithAwsCredentials(
+    EXPECT_EQ(STATUS_NULL_ARG, createDefaultCallbacksProviderWithAwsCredentials(
             TEST_ACCESS_KEY,
             NULL,
             TEST_SESSION_TOKEN,
