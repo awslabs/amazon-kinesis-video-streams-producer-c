@@ -22,7 +22,7 @@ STATUS createAwsCredentials(PCHAR accessKeyId, UINT32 accessKeyIdLen, PCHAR secr
     CHK(accessKeyId != NULL && secretKey != NULL && (sessionToken != NULL || sessionTokenLen == 0), STATUS_NULL_ARG);
 
     CHK(!IS_EMPTY_STRING(accessKeyId) && !IS_EMPTY_STRING(secretKey), STATUS_INVALID_ARG);
-    if(sessionToken != NULL) {
+    if (sessionToken != NULL) {
         CHK(!IS_EMPTY_STRING(sessionToken), STATUS_INVALID_ARG);
     }
 
