@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.6.3)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake;${CMAKE_MODULE_PATH}")
 include(Utilities)
-project(KinesisVideoProducerC LANGUAGES C)
+project(KinesisVideoProducerC VERSION 1.4.1 LANGUAGES C)
 
 include(GNUInstallDirs)
 
@@ -31,6 +31,8 @@ option(SET_SSL_CALLBACKS "Set SSL thread and lock callbacks." OFF)
 set(CMAKE_MACOSX_RPATH TRUE)
 
 get_filename_component(ROOT "${CMAKE_CURRENT_SOURCE_DIR}" ABSOLUTE)
+
+add_definitions(-DVERSION_STRING=\"${PROJECT_VERSION}\")
 
 if(NOT KINESIS_VIDEO_PRODUCER_C_SRC)
     if(DEFINED ENV{KINESIS_VIDEO_PRODUCER_C_SRC})

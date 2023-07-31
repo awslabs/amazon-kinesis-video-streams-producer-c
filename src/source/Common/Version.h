@@ -10,15 +10,16 @@ Auth internal include file
 extern "C" {
 #endif
 
-/**
- * IMPORTANT!!! This is the current version of the SDK which needs to be maintained
- */
-#define AWS_SDK_KVS_PRODUCER_VERSION_STRING (PCHAR) "3.0.0"
+#ifdef VERSION_STRING
+#define AWS_SDK_KVS_PRODUCER_VERSION_STRING (PCHAR) VERSION_STRING
+#else
+#define AWS_SDK_KVS_PRODUCER_VERSION_STRING (PCHAR) "UNKNOWN"
+#endif
 
 /**
  * Default user agent string
  */
-#define USER_AGENT_NAME (PCHAR) "AWS-SDK-KVS"
+#define USER_AGENT_NAME (PCHAR) "AWS-PRODUCER-SDK-KVS"
 
 ////////////////////////////////////////////////////
 // Function definitions
