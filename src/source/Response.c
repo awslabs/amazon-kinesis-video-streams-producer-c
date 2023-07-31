@@ -413,7 +413,8 @@ STATUS curlCompleteSync(PCurlResponse pCurlResponse)
         pCurlResponse->callInfo.callResult = SERVICE_CALL_REQUEST_TIMEOUT;
     } else if (result != CURLE_OK) {
         curl_easy_getinfo(pCurlResponse->pCurl, CURLINFO_EFFECTIVE_URL, &url);
-        DLOGW("[%s] curl perform failed for url %s with result %s: %s", pCurlResponse->pCurlRequest->streamName, url, curl_easy_strerror(result), pCurlResponse->callInfo.errorBuffer);
+        DLOGW("[%s] curl perform failed for url %s with result %s: %s", pCurlResponse->pCurlRequest->streamName, url, curl_easy_strerror(result),
+              pCurlResponse->callInfo.errorBuffer);
 
         pCurlResponse->callInfo.callResult = getServiceCallResultFromCurlStatus(result);
     } else {
@@ -431,8 +432,8 @@ STATUS curlCompleteSync(PCurlResponse pCurlResponse)
             STRCAT(headers, header->data);
         }
 
-        DLOGW("[%s] HTTP Error %lu : Response: %s\nRequest URL: %s\nRequest Headers:%s", pCurlResponse->pCurlRequest->streamName, pCurlResponse->callInfo.httpStatus,
-              pCurlResponse->callInfo.responseData, url, headers);
+        DLOGW("[%s] HTTP Error %lu : Response: %s\nRequest URL: %s\nRequest Headers:%s", pCurlResponse->pCurlRequest->streamName,
+              pCurlResponse->callInfo.httpStatus, pCurlResponse->callInfo.responseData, url, headers);
     }
 
 CleanUp:
@@ -451,8 +452,8 @@ STATUS notifyDataAvailable(PCurlResponse pCurlResponse, UINT64 durationAvailable
 
     // pCurlResponse should be a putMedia session
     if (!ATOMIC_LOAD_BOOL(&pCurlResponse->terminated)) {
-        DLOGV("[%s] Note data received: duration(100ns): %" PRIu64 " bytes %" PRIu64 " for stream handle %" PRIu64, pCurlResponse->pCurlRequest->streamName, durationAvailable, sizeAvailable,
-              pCurlResponse->pCurlRequest->uploadHandle);
+        DLOGV("[%s] Note data received: duration(100ns): %" PRIu64 " bytes %" PRIu64 " for stream handle %" PRIu64,
+              pCurlResponse->pCurlRequest->streamName, durationAvailable, sizeAvailable, pCurlResponse->pCurlRequest->uploadHandle);
 
         if (pCurlResponse->paused && pCurlResponse->pCurl != NULL) {
             pCurlResponse->paused = FALSE;
@@ -461,7 +462,8 @@ STATUS notifyDataAvailable(PCurlResponse pCurlResponse, UINT64 durationAvailable
             // un-pause curl
             result = curl_easy_pause(pCurlResponse->pCurl, CURLPAUSE_SEND_CONT);
             if (result != CURLE_OK) {
-                DLOGW("[%s] Failed to un-pause curl with error: %u. Curl object %p", pCurlResponse->pCurlRequest->streamName, result, pCurlResponse->pCurl);
+                DLOGW("[%s] Failed to un-pause curl with error: %u. Curl object %p", pCurlResponse->pCurlRequest->streamName, result,
+                      pCurlResponse->pCurl);
             }
         }
     }
@@ -644,7 +646,7 @@ SIZE_T postReadCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID custo
         // 20 40 80 160 320 (ms)
         if (iter > 0) {
             THREAD_SLEEP(sleepTime);
-            sleepTime *=2;
+            sleepTime *= 2;
         }
         retStatus =
             getKinesisVideoStreamData(pCurlResponse->pCurlRequest->streamHandle, uploadHandle, (PBYTE) pBuffer, (UINT32) bufferSize, &retrievedSize);
@@ -657,9 +659,9 @@ SIZE_T postReadCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID custo
         bytesWritten = (SIZE_T) retrievedSize;
 
         DLOGV("[%s] Get Stream data returned: buffer size: %u written bytes: %u for upload handle: %" PRIu64 " current stream handle: %" PRIu64,
-                streamName, bufferSize, bytesWritten, uploadHandle, pCurlResponse->pCurlRequest->streamHandle);
+              streamName, bufferSize, bytesWritten, uploadHandle, pCurlResponse->pCurlRequest->streamHandle);
         iter++;
-    } while(iter < MAX_GET_DATA_ITER && bytesWritten == 0 && (retStatus == STATUS_SUCCESS || retStatus == STATUS_NO_MORE_DATA_AVAILABLE));
+    } while (iter < MAX_GET_DATA_ITER && bytesWritten == 0 && (retStatus == STATUS_SUCCESS || retStatus == STATUS_NO_MORE_DATA_AVAILABLE));
 
     // The return should be OK, no more data or an end of stream
     switch (retStatus) {

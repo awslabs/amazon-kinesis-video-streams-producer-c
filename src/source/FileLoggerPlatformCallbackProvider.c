@@ -49,8 +49,8 @@ CleanUp:
     return retStatus;
 }
 
-STATUS addFileLoggerWithFilteringPlatformCallbacksProvider(PClientCallbacks pClientCallbacks, UINT64 stringBufferSize, UINT64 maxLogFileCount, PCHAR logFileDir,
-                                              BOOL printLog, BOOL enableAllLevels, UINT32 level)
+STATUS addFileLoggerWithFilteringPlatformCallbacksProvider(PClientCallbacks pClientCallbacks, UINT64 stringBufferSize, UINT64 maxLogFileCount,
+                                                           PCHAR logFileDir, BOOL printLog, BOOL enableAllLevels, UINT32 level)
 {
     STATUS retStatus = STATUS_SUCCESS;
     PCallbacksProvider pCallbackProvider = (PCallbacksProvider) pClientCallbacks;
@@ -69,7 +69,7 @@ STATUS addFileLoggerWithFilteringPlatformCallbacksProvider(PClientCallbacks pCli
 
     CHK_STATUS(setPlatformCallbacks(pClientCallbacks, &fileLoggerPlatformCallbacks));
 
-    CleanUp:
+CleanUp:
 
     if (!STATUS_SUCCEEDED(retStatus)) {
         freeFileLogger();

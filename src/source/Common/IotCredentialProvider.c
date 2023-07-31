@@ -5,8 +5,8 @@
 #include "Include_i.h"
 
 STATUS createIotCredentialProviderWithTime(PCHAR iotGetCredentialEndpoint, PCHAR certPath, PCHAR privateKeyPath, PCHAR caCertPath, PCHAR roleAlias,
-                                           PCHAR thingName, UINT64 connectionTimeout, UINT64 completionTimeout, GetCurrentTimeFunc getCurrentTimeFn, UINT64 customData,
-                                           BlockingServiceCallFunc serviceCallFn, PAwsCredentialProvider* ppCredentialProvider)
+                                           PCHAR thingName, UINT64 connectionTimeout, UINT64 completionTimeout, GetCurrentTimeFunc getCurrentTimeFn,
+                                           UINT64 customData, BlockingServiceCallFunc serviceCallFn, PAwsCredentialProvider* ppCredentialProvider)
 {
     ENTERS();
     STATUS retStatus = STATUS_SUCCESS;
@@ -47,17 +47,17 @@ STATUS createIotCredentialProviderWithTime(PCHAR iotGetCredentialEndpoint, PCHAR
 
     pIotCredentialProvider->serviceCallFn = serviceCallFn;
 
-    if(completionTimeout < connectionTimeout) {
+    if (completionTimeout < connectionTimeout) {
         DLOGW("Setting defaults for connection and completion timeout since completion timeout is less than connection timeout");
         connectionTimeout = IOT_REQUEST_CONNECTION_TIMEOUT;
         completionTimeout = IOT_REQUEST_COMPLETION_TIMEOUT;
     }
-    if(connectionTimeout == 0) {
+    if (connectionTimeout == 0) {
         connectionTimeout = IOT_REQUEST_CONNECTION_TIMEOUT;
     }
     pIotCredentialProvider->connectionTimeout = connectionTimeout;
 
-    if(completionTimeout == 0) {
+    if (completionTimeout == 0) {
         completionTimeout = IOT_REQUEST_COMPLETION_TIMEOUT;
     }
     pIotCredentialProvider->completionTimeout = completionTimeout;
@@ -156,22 +156,22 @@ STATUS parseIotResponse(PIotCredentialProvider pIotCredentialProvider, PCallInfo
 
     for (i = 1; i < (UINT32) tokenCount; i++) {
         if (compareJsonString(pResponseStr, &tokens[i], JSMN_STRING, (PCHAR) "accessKeyId")) {
-            accessKeyIdLen = (UINT32)(tokens[i + 1].end - tokens[i + 1].start);
+            accessKeyIdLen = (UINT32) (tokens[i + 1].end - tokens[i + 1].start);
             CHK(accessKeyIdLen <= MAX_ACCESS_KEY_LEN, STATUS_INVALID_API_CALL_RETURN_JSON);
             accessKeyId = pResponseStr + tokens[i + 1].start;
             i++;
         } else if (compareJsonString(pResponseStr, &tokens[i], JSMN_STRING, (PCHAR) "secretAccessKey")) {
-            secretKeyLen = (UINT32)(tokens[i + 1].end - tokens[i + 1].start);
+            secretKeyLen = (UINT32) (tokens[i + 1].end - tokens[i + 1].start);
             CHK(secretKeyLen <= MAX_SECRET_KEY_LEN, STATUS_INVALID_API_CALL_RETURN_JSON);
             secretKey = pResponseStr + tokens[i + 1].start;
             i++;
         } else if (compareJsonString(pResponseStr, &tokens[i], JSMN_STRING, (PCHAR) "sessionToken")) {
-            sessionTokenLen = (UINT32)(tokens[i + 1].end - tokens[i + 1].start);
+            sessionTokenLen = (UINT32) (tokens[i + 1].end - tokens[i + 1].start);
             CHK(sessionTokenLen <= MAX_SESSION_TOKEN_LEN, STATUS_INVALID_API_CALL_RETURN_JSON);
             sessionToken = pResponseStr + tokens[i + 1].start;
             i++;
         } else if (compareJsonString(pResponseStr, &tokens[i], JSMN_STRING, "expiration")) {
-            expirationTimestampLen = (UINT32)(tokens[i + 1].end - tokens[i + 1].start);
+            expirationTimestampLen = (UINT32) (tokens[i + 1].end - tokens[i + 1].start);
             CHK(expirationTimestampLen <= MAX_EXPIRATION_LEN, STATUS_INVALID_API_CALL_RETURN_JSON);
             expirationTimestamp = pResponseStr + tokens[i + 1].start;
             MEMCPY(expirationTimestampStr, expirationTimestamp, expirationTimestampLen);

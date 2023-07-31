@@ -19,7 +19,12 @@ STATUS createAwsCredentials(PCHAR accessKeyId, UINT32 accessKeyIdLen, PCHAR secr
     CHK(ppAwsCredentials != NULL, STATUS_NULL_ARG);
 
     // Session token is optional. If NULL then the session token len should be 0
-    CHK(accessKeyId != NULL && secretKey != NULL && (sessionToken != NULL || sessionTokenLen == 0), STATUS_INVALID_ARG);
+    CHK(accessKeyId != NULL && secretKey != NULL && (sessionToken != NULL || sessionTokenLen == 0), STATUS_NULL_ARG);
+
+    CHK(!IS_EMPTY_STRING(accessKeyId) && !IS_EMPTY_STRING(secretKey), STATUS_INVALID_ARG);
+    if (sessionToken != NULL) {
+        CHK(!IS_EMPTY_STRING(sessionToken), STATUS_INVALID_ARG);
+    }
 
     // Calculate the length if not specified
     if (accessKeyIdLen == 0) {
@@ -59,7 +64,7 @@ STATUS createAwsCredentials(PCHAR accessKeyId, UINT32 accessKeyIdLen, PCHAR secr
     pAwsCredentials->size = size;
 
     // Set the fields to point to the bottom of the structure
-    pCurPtr = (PCHAR)(pAwsCredentials + 1);
+    pCurPtr = (PCHAR) (pAwsCredentials + 1);
 
     // Set the fields and copy the data forward excluding NULL terminator and then null terminate
     pAwsCredentials->accessKeyId = pCurPtr;
@@ -112,10 +117,10 @@ STATUS deserializeAwsCredentials(PBYTE token)
             (pAwsCredentials->sessionToken != NULL || pAwsCredentials->sessionTokenLen == 0),
         STATUS_INVALID_ARG);
 
-    pAwsCredentials->accessKeyId = (PCHAR)(pAwsCredentials + 1);
-    pAwsCredentials->secretKey = (PCHAR)(pAwsCredentials->accessKeyId + pAwsCredentials->accessKeyIdLen + 1);
+    pAwsCredentials->accessKeyId = (PCHAR) (pAwsCredentials + 1);
+    pAwsCredentials->secretKey = (PCHAR) (pAwsCredentials->accessKeyId + pAwsCredentials->accessKeyIdLen + 1);
     if (pAwsCredentials->sessionToken != NULL) {
-        pAwsCredentials->sessionToken = (PCHAR)(pAwsCredentials->secretKey + pAwsCredentials->secretKeyLen + 1);
+        pAwsCredentials->sessionToken = (PCHAR) (pAwsCredentials->secretKey + pAwsCredentials->secretKeyLen + 1);
     }
 
 CleanUp:

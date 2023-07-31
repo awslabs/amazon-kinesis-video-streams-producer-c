@@ -24,7 +24,7 @@ STATUS createCurlRequest(HTTP_REQUEST_VERB curlVerb, PCHAR url, PCHAR body, STRE
 
     // Add body to the size excluding NULL terminator
     if (body != NULL) {
-        bodySize = (UINT32)(STRLEN(body) * SIZEOF(CHAR));
+        bodySize = (UINT32) (STRLEN(body) * SIZEOF(CHAR));
         size += bodySize;
     }
 
@@ -54,7 +54,7 @@ STATUS createCurlRequest(HTTP_REQUEST_VERB curlVerb, PCHAR url, PCHAR body, STRE
     // If the body is specified then it will be a request/response call
     // Otherwise we are streaming
     if (body != NULL) {
-        pCurlRequest->requestInfo.body = (PCHAR)(pCurlRequest + 1);
+        pCurlRequest->requestInfo.body = (PCHAR) (pCurlRequest + 1);
         pCurlRequest->streaming = FALSE;
         MEMCPY(pCurlRequest->requestInfo.body, body, bodySize);
     } else {
