@@ -74,14 +74,12 @@ PVOID putVideoFrameRoutine(PVOID args)
             startUpLatency = (DOUBLE) (GETTIME() - data->startTime) / (DOUBLE) HUNDREDS_OF_NANOS_IN_A_MILLISECOND;
             DLOGD("Start up latency: %lf ms", startUpLatency);
             data->firstFrame = FALSE;
-        }
-        else if(frame.flags == FRAME_FLAG_KEY_FRAME && gEventsEnabled) {
+        } else if (frame.flags == FRAME_FLAG_KEY_FRAME && gEventsEnabled) {
             // generate an image and notification event at the start of the video stream.
             putKinesisVideoEventMetadata(data->streamHandle, STREAM_EVENT_TYPE_NOTIFICATION | STREAM_EVENT_TYPE_IMAGE_GENERATION, NULL);
-            //only push this once in this sample. A customer may use this whenever it is necessary though
+            // only push this once in this sample. A customer may use this whenever it is necessary though
             gEventsEnabled = 0;
         }
-
 
         ATOMIC_STORE_BOOL(&data->firstVideoFramePut, TRUE);
         if (STATUS_FAILED(status)) {
@@ -212,7 +210,8 @@ INT32 main(INT32 argc, CHAR* argv[])
         }
     }
     if (argc < 2) {
-        printf("Usage: AWS_ACCESS_KEY_ID=SAMPLEKEY AWS_SECRET_ACCESS_KEY=SAMPLESECRET %s <stream_name> <duration_in_seconds> <frame_files_path> [audio_codec] [video_codec] [events_enabled]\n",
+        printf("Usage: AWS_ACCESS_KEY_ID=SAMPLEKEY AWS_SECRET_ACCESS_KEY=SAMPLESECRET %s <stream_name> <duration_in_seconds> <frame_files_path> "
+               "[audio_codec] [video_codec] [events_enabled]\n",
                argv[0]);
         CHK(FALSE, STATUS_INVALID_ARG);
     }

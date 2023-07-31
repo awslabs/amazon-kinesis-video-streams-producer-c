@@ -62,7 +62,8 @@ CleanUp:
  * Create IoT credentials callback
  */
 STATUS createIotAuthCallbacksWithTimeouts(PClientCallbacks pCallbacksProvider, PCHAR iotGetCredentialEndpoint, PCHAR certPath, PCHAR privateKeyPath,
-                              PCHAR caCertPath, PCHAR roleAlias, PCHAR streamName, UINT64 connectionTimeout, UINT64 completionTimeout, PAuthCallbacks* ppIotAuthCallbacks)
+                                          PCHAR caCertPath, PCHAR roleAlias, PCHAR streamName, UINT64 connectionTimeout, UINT64 completionTimeout,
+                                          PAuthCallbacks* ppIotAuthCallbacks)
 {
     ENTERS();
     STATUS retStatus = STATUS_SUCCESS;
@@ -90,15 +91,14 @@ STATUS createIotAuthCallbacksWithTimeouts(PClientCallbacks pCallbacksProvider, P
     pIotAuthCallbacks->authCallbacks.deviceCertToTokenFn = NULL;
     pIotAuthCallbacks->authCallbacks.getDeviceFingerprintFn = NULL;
 
-    CHK_STATUS(createCurlIotCredentialProviderWithTimeAndTimeout(iotGetCredentialEndpoint, certPath, privateKeyPath, caCertPath, roleAlias, streamName,
-                                                       connectionTimeout, completionTimeout,
-                                                       pIotAuthCallbacks->pCallbacksProvider->clientCallbacks.getCurrentTimeFn,
-                                                       pIotAuthCallbacks->pCallbacksProvider->clientCallbacks.customData,
-                                                       (PAwsCredentialProvider*) &pIotAuthCallbacks->pCredentialProvider));
+    CHK_STATUS(createCurlIotCredentialProviderWithTimeAndTimeout(
+        iotGetCredentialEndpoint, certPath, privateKeyPath, caCertPath, roleAlias, streamName, connectionTimeout, completionTimeout,
+        pIotAuthCallbacks->pCallbacksProvider->clientCallbacks.getCurrentTimeFn, pIotAuthCallbacks->pCallbacksProvider->clientCallbacks.customData,
+        (PAwsCredentialProvider*) &pIotAuthCallbacks->pCredentialProvider));
 
     CHK_STATUS(addAuthCallbacks(pCallbacksProvider, (PAuthCallbacks) pIotAuthCallbacks));
 
-    CleanUp:
+CleanUp:
 
     if (STATUS_FAILED(retStatus)) {
         freeIotAuthCallbacks((PAuthCallbacks*) &pIotAuthCallbacks);

@@ -58,7 +58,7 @@ extern "C" {
 #define IS_RETRIABLE_COMMON_LIB_ERROR(error)                                                                                                         \
     ((error) == STATUS_INVALID_API_CALL_RETURN_JSON || (error) == STATUS_CURL_INIT_FAILED || (error) == STATUS_CURL_LIBRARY_INIT_FAILED ||           \
      (error) == STATUS_HMAC_GENERATION_ERROR || (error) == STATUS_CURL_PERFORM_FAILED || (error) == STATUS_IOT_INVALID_RESPONSE_LENGTH ||            \
-     (error) == STATUS_IOT_NULL_AWS_CREDS || (error) == STATUS_IOT_INVALID_URI_LEN || (error) == STATUS_IOT_EXPIRATION_OCCURS_IN_PAST ||                   \
+     (error) == STATUS_IOT_NULL_AWS_CREDS || (error) == STATUS_IOT_INVALID_URI_LEN || (error) == STATUS_IOT_EXPIRATION_OCCURS_IN_PAST ||             \
      (error) == STATUS_IOT_EXPIRATION_PARSING_FAILED || (error) == STATUS_IOT_CREATE_LWS_CONTEXT_FAILED ||                                           \
      (error) == STATUS_FILE_CREDENTIAL_PROVIDER_OPEN_FILE_FAILED || (error) == STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_LENGTH ||                \
      (error) == STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_FORMAT)
@@ -76,12 +76,12 @@ extern "C" {
 /**
  * Continue errors from the new common base
  */
-#define STATUS_COMMON_BASE 0x16000000
-#define STATUS_CURL_PERFORM_FAILED                      STATUS_COMMON_BASE + 0x00000001
-#define STATUS_IOT_INVALID_RESPONSE_LENGTH              STATUS_COMMON_BASE + 0x00000002
-#define STATUS_IOT_NULL_AWS_CREDS                       STATUS_COMMON_BASE + 0x00000003
-#define STATUS_IOT_INVALID_URI_LEN                      STATUS_COMMON_BASE + 0x00000004
-#define STATUS_TIMESTAMP_STRING_UNRECOGNIZED_FORMAT     STATUS_COMMON_BASE + 0x00000005
+#define STATUS_COMMON_BASE                          0x16000000
+#define STATUS_CURL_PERFORM_FAILED                  STATUS_COMMON_BASE + 0x00000001
+#define STATUS_IOT_INVALID_RESPONSE_LENGTH          STATUS_COMMON_BASE + 0x00000002
+#define STATUS_IOT_NULL_AWS_CREDS                   STATUS_COMMON_BASE + 0x00000003
+#define STATUS_IOT_INVALID_URI_LEN                  STATUS_COMMON_BASE + 0x00000004
+#define STATUS_TIMESTAMP_STRING_UNRECOGNIZED_FORMAT STATUS_COMMON_BASE + 0x00000005
 /*!@} */
 
 /////////////////////////////////////////////////////
@@ -652,8 +652,8 @@ PUBLIC_API STATUS createLwsIotCredentialProvider(PCHAR, PCHAR, PCHAR, PCHAR, PCH
  *
  * @return STATUS code of the execution. STATUS_SUCCESS on success
  */
-PUBLIC_API STATUS createCurlIotCredentialProviderWithTimeAndTimeout(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, UINT64, UINT64, GetCurrentTimeFunc, UINT64,
-                                                          PAwsCredentialProvider*);
+PUBLIC_API STATUS createCurlIotCredentialProviderWithTimeAndTimeout(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, UINT64, UINT64, GetCurrentTimeFunc,
+                                                                    UINT64, PAwsCredentialProvider*);
 
 /**
  * @brief Creates an IoT based AWS credential provider object with time function which is based on libCurl
@@ -671,7 +671,7 @@ PUBLIC_API STATUS createCurlIotCredentialProviderWithTimeAndTimeout(PCHAR, PCHAR
  * @return STATUS code of the execution. STATUS_SUCCESS on success
  */
 PUBLIC_API STATUS createCurlIotCredentialProviderWithTime(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, GetCurrentTimeFunc, UINT64,
-        PAwsCredentialProvider*);
+                                                          PAwsCredentialProvider*);
 
 /**
  * @brief Creates an IoT based AWS credential provider object with time function which is based on libWebSockets
