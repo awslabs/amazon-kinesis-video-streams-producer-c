@@ -24,7 +24,7 @@ jobs:
           bash scripts/check-clang.sh
 
   mac-os-build-gcc:
-    runs-on: macos-13
+    runs-on: macos-12
     permissions:
       id-token: write
       contents: read
@@ -38,8 +38,9 @@ jobs:
       - name: Build repository
         run: |
           brew install pkgconfig
+          brew unlink openssl # it seems the libcurl is trying to access this openssl despite explicitly setting it to our build
           mkdir build && cd build
-          cmake .. -DBUILD_TEST=TRUE
+          cmake .. --trace -DBUILD_TEST=TRUE
           make
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -54,7 +55,7 @@ jobs:
           ./tst/producer_test
 
   mac-os-build-clang:
-    runs-on: macos-13
+    runs-on: macos-11
     env:
       AWS_KVS_LOG_LEVEL: 2
       LDFLAGS: -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib
@@ -68,6 +69,7 @@ jobs:
       - name: Build repository
         run: |
           brew install pkgconfig
+          brew unlink openssl # it seems the libcurl is trying to access this openssl despite explicitly setting it to our build
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE
           make

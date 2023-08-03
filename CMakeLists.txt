@@ -93,6 +93,7 @@ if(BUILD_DEPENDENCIES)
                     -DUSE_OPENSSL=${USE_OPENSSL}
                     -DUSE_MBEDTLS=${USE_MBEDTLS})
     build_dependency(curl ${BUILD_ARGS})
+
   endif()
 
   if(BUILD_TEST)
