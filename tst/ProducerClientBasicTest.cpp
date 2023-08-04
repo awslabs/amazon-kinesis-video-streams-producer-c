@@ -347,6 +347,7 @@ PVOID ProducerClientTestBase::basicProducerRoutine(STREAM_HANDLE streamHandle, S
 
     UINT32 index = 0, persistentMetadataIndex = 0;
     UINT64 timestamp = GETTIME();
+    UINT64 diffTime;
     Frame frame;
     std::string persistentMetadataName;
     TID tid = GETTID();
@@ -447,7 +448,10 @@ EXPECT_TRUE(kinesis_video_stream->putFrame(eofr));
 
         // Sleep a while for non-offline modes
         if (streamingType != STREAMING_TYPE_OFFLINE) {
-            THREAD_SLEEP(TEST_FRAME_DURATION);
+            diffTime = GETTIME()-timestamp;
+            if (diffTime < TEST_FRAME_DURATION) {
+                THREAD_SLEEP(TEST_FRAME_DURATION-diffTime);
+            }
         }
     }
 
@@ -514,7 +518,7 @@ TEST_F(ProducerClientBasicTest, create_produce_stream)
 #endif
 
     // Wait for some time to produce
-    THREAD_SLEEP(TEST_EXECUTION_DURATION);
+    THREAD_SLEEP(2*TEST_EXECUTION_DURATION);
 
     // Indicate the cancel for the threads
     mStopProducer = TRUE;
@@ -569,7 +573,7 @@ TEST_F(ProducerClientBasicTest, create_produce_stream_parallel)
     }
 
     // Wait for some time to produce
-    THREAD_SLEEP(TEST_EXECUTION_DURATION);
+    THREAD_SLEEP(2*TEST_EXECUTION_DURATION);
 
     // Indicate the cancel for the threads
     mStopProducer = TRUE;
@@ -615,7 +619,7 @@ TEST_F(ProducerClientBasicTest, create_produce_client_parallel)
     }
 
     // Wait for some time to produce
-    THREAD_SLEEP(TEST_EXECUTION_DURATION);
+    THREAD_SLEEP(2*TEST_EXECUTION_DURATION);
 
     // Indicate the cancel for the threads
     mStopProducer = TRUE;
