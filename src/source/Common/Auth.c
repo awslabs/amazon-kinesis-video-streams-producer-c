@@ -21,7 +21,9 @@ STATUS createAwsCredentials(PCHAR accessKeyId, UINT32 accessKeyIdLen, PCHAR secr
     // Session token is optional. If NULL then the session token len should be 0
     CHK(accessKeyId != NULL && secretKey != NULL && (sessionToken != NULL || sessionTokenLen == 0), STATUS_NULL_ARG);
 
+    printf("Before check\n");
     CHK(!IS_EMPTY_STRING(accessKeyId) && !IS_EMPTY_STRING(secretKey), STATUS_INVALID_ARG);
+    printf("After check\n");
     if (sessionToken != NULL) {
         CHK(!IS_EMPTY_STRING(sessionToken), STATUS_INVALID_ARG);
     }
