@@ -62,6 +62,8 @@ INT32 main(INT32 argc, CHAR* argv[])
     DOUBLE startUpLatency;
     BOOL firstFrame = TRUE;
     UINT64 startTime;
+    int n, numMetadata = 0;
+    char key[200], value[200];
 
     if (argc < 2) {
         defaultLogPrint(
@@ -77,7 +79,7 @@ INT32 main(INT32 argc, CHAR* argv[])
     }
 
     MEMSET(frameFilePath, 0x00, MAX_PATH_LEN + 1);
-    if (argc < 4) {
+    if (argc < 4 || STRLEN(argv[3]) == 0) {
         STRCPY(frameFilePath, (PCHAR) "../samples/h264SampleFrames");
     } else {
         STRNCPY(frameFilePath, argv[3], MAX_PATH_LEN);
@@ -90,10 +92,14 @@ INT32 main(INT32 argc, CHAR* argv[])
         region = (PCHAR) DEFAULT_AWS_REGION;
     }
 
-    if (argc >= 3) {
+    if (argc >= 3 && STRLEN(argv[2]) > 0) {
         // Get the duration and convert to an integer
         CHK_STATUS(STRTOUI64(argv[2], NULL, 10, &streamingDuration));
         streamingDuration *= HUNDREDS_OF_NANOS_IN_A_SECOND;
+    }
+
+    if (argc >= 5 && STRLEN(argv[4]) > 0) {
+        numMetadata = STRTOUL(argv[4], NULL, 10);
     }
 
     streamStopTime = defaultGetTime() + streamingDuration;
@@ -140,6 +146,18 @@ INT32 main(INT32 argc, CHAR* argv[])
         frame.size = SIZEOF(frameBuffer);
 
         CHK_STATUS(readFrameData(&frame, frameFilePath));
+
+        if (frame.flags == FRAME_FLAG_KEY_FRAME) {
+            for (n=0; n<numMetadata; ++n) {
+                sprintf(key, "TEST_KEY_%d", n);
+                if (n % 2 == 0) {
+                    sprintf(value, "%d", frame.index + n);
+                } else {
+                    sprintf(value, "%d", frame.size + n);
+                }
+                CHK_STATUS(putKinesisVideoFragmentMetadata(streamHandle, key, value, n % 3 == 0));
+            }
+        }
 
         CHK_STATUS(putKinesisVideoFrame(streamHandle, &frame));
         if (firstFrame) {
