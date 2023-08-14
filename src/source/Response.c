@@ -197,7 +197,7 @@ STATUS initializeCurlSession(PRequestInfo pRequestInfo, PCallInfo pCallInfo, CUR
             break;
 
         case HTTP_REQUEST_VERB_PUT:
-            curl_easy_setopt(pCurl, CURLOPT_PUT, 1L);
+            curl_easy_setopt(pCurl, CURLOPT_UPLOAD, 1L);
             break;
 
         case HTTP_REQUEST_VERB_POST:
@@ -285,6 +285,7 @@ VOID terminateCurlSession(PCurlResponse pCurlResponse, UINT64 timeout)
 VOID dumpResponseCurlEasyInfo(PCurlResponse pCurlResponse)
 {
     DOUBLE time;
+    curl_off_t value;
     CURLcode ret;
 
     if (pCurlResponse != NULL) {
@@ -337,16 +338,16 @@ VOID dumpResponseCurlEasyInfo(PCurlResponse pCurlResponse)
             DLOGW("Unable to dump REDIRECT_TIME");
         }
 
-        ret = curl_easy_getinfo(pCurlResponse->pCurl, CURLINFO_SPEED_UPLOAD, &time);
+        ret = curl_easy_getinfo(pCurlResponse->pCurl, CURLINFO_SPEED_UPLOAD_T, &value);
         if (ret == CURLE_OK) {
-            DLOGI("CURLINFO_SPEED_UPLOAD: %f", time);
+            DLOGI("CURLINFO_SPEED_UPLOAD: %" CURL_FORMAT_CURL_OFF_T, value);
         } else {
             DLOGW("Unable to dump CURLINFO_SPEED_UPLOAD");
         }
 
-        ret = curl_easy_getinfo(pCurlResponse->pCurl, CURLINFO_SIZE_UPLOAD, &time);
+        ret = curl_easy_getinfo(pCurlResponse->pCurl, CURLINFO_SIZE_UPLOAD_T, &value);
         if (ret == CURLE_OK) {
-            DLOGI("CURLINFO_SIZE_UPLOAD: %f", time);
+            DLOGI("CURLINFO_SIZE_UPLOAD: %" CURL_FORMAT_CURL_OFF_T, value);
         } else {
             DLOGW("Unable to dump CURLINFO_SIZE_UPLOAD");
         }
