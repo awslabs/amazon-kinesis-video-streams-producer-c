@@ -17,6 +17,8 @@
 #define TEST_ACCESS_KEY    (PCHAR) "Test access key"
 #define TEST_SECRET_KEY    (PCHAR) "Test secret key"
 #define TEST_SESSION_TOKEN (PCHAR) "Test session token"
+#define TEST_FILE_CREDENTIALS_FILE_PATH (PCHAR) "producer_creds_file_test"
+
 
 #define TEST_FRAME_DURATION                                (50 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND)
 #define TEST_EXECUTION_DURATION                            (3 * HUNDREDS_OF_NANOS_IN_A_SECOND)

@@ -232,6 +232,36 @@ TEST_F(AwsCredentialsTest, deserializeAwsCredentials)
     pDeserialized->sessionToken = pStored;
 }
 
+TEST_F(AwsCredentialsTest, TestFileCredentialsWriteWithoutSession) {
+    PAwsCredentialProvider pAwsCredentialProvider = NULL;
+    CHAR fileContent[10000];
+    UINT32 length = ARRAY_SIZE(fileContent);
+
+    // Store the credentials in a file under the current dir
+    length = SNPRINTF(fileContent, length, "CREDENTIALS %s %s", mAccessKey, mSecretKey);
+    ASSERT_GT(ARRAY_SIZE(fileContent), length);
+    ASSERT_EQ(STATUS_SUCCESS, writeFile(TEST_FILE_CREDENTIALS_FILE_PATH, FALSE, FALSE, (PBYTE) fileContent, length));
+
+    // Create file creds provider from the file
+    EXPECT_EQ(STATUS_SUCCESS, createFileCredentialProvider(TEST_FILE_CREDENTIALS_FILE_PATH, &pAwsCredentialProvider));
+    EXPECT_EQ(STATUS_SUCCESS, freeFileCredentialProvider(&pAwsCredentialProvider));
+}
+
+TEST_F(AwsCredentialsTest, TestFileCredentialsWriteWithSession) {
+    PAwsCredentialProvider pAwsCredentialProvider = NULL;
+    CHAR fileContent[10000];
+    UINT32 length = ARRAY_SIZE(fileContent);
+
+    // Store the credentials in a file under the current dir
+    length = SNPRINTF(fileContent, length, "CREDENTIALS %s 1234567890 %s %s", mAccessKey, mSecretKey, mSessionToken);
+    ASSERT_GT(ARRAY_SIZE(fileContent), length);
+    ASSERT_EQ(STATUS_SUCCESS, writeFile(TEST_FILE_CREDENTIALS_FILE_PATH, FALSE, FALSE, (PBYTE) fileContent, length));
+
+    // Create file creds provider from the file
+    EXPECT_EQ(STATUS_SUCCESS, createFileCredentialProvider(TEST_FILE_CREDENTIALS_FILE_PATH, &pAwsCredentialProvider));
+    EXPECT_EQ(STATUS_SUCCESS, freeFileCredentialProvider(&pAwsCredentialProvider));
+}
+
 }  // namespace video
 }  // namespace kinesis
 }  // namespace amazonaws
