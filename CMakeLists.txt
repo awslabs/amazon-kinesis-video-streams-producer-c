@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.6.3)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake;${CMAKE_MODULE_PATH}")
 include(Utilities)
-project(KinesisVideoProducerC LANGUAGES C)
+project(KinesisVideoProducerC VERSION 1.5.0 LANGUAGES C)
 
 include(GNUInstallDirs)
 
@@ -15,6 +15,7 @@ option(USE_MBEDTLS "Use mbedtls as crypto library" OFF)
 option(BUILD_COMMON_LWS "Whether or not to build ProducerC libwebsockets common library" OFF)
 option(BUILD_COMMON_CURL "Whether or not to build ProducerC curl common library" ON)
 option(BUILD_OPENSSL_PLATFORM "If buildng OpenSSL what is the target platform" OFF)
+option(LOCAL_OPENSSL_BUILD "Whether or not to use local OpenSSL build" OFF)
 
 # Developer Flags
 option(BUILD_TEST "Build the testing tree." OFF)
@@ -30,6 +31,8 @@ option(SET_SSL_CALLBACKS "Set SSL thread and lock callbacks." OFF)
 set(CMAKE_MACOSX_RPATH TRUE)
 
 get_filename_component(ROOT "${CMAKE_CURRENT_SOURCE_DIR}" ABSOLUTE)
+
+add_definitions(-DVERSION_STRING=\"${PROJECT_VERSION}\")
 
 if(NOT KINESIS_VIDEO_PRODUCER_C_SRC)
     if(DEFINED ENV{KINESIS_VIDEO_PRODUCER_C_SRC})
@@ -63,15 +66,18 @@ if(BUILD_DEPENDENCIES)
     message(FATAL_ERROR "Only one of ${SSL_OPTIONS} can be enabled")
   endif()
 
-  if(USE_OPENSSL)
-    set(BUILD_ARGS -DBUILD_STATIC=${BUILD_STATIC}
-                   -DBUILD_OPENSSL_PLATFORM=${BUILD_OPENSSL_PLATFORM})
-    build_dependency(openssl ${BUILD_ARGS})
-  elseif(USE_MBEDTLS)
-    set(BUILD_ARGS -DBUILD_STATIC=${BUILD_STATIC})
-    build_dependency(mbedtls ${BUILD_ARGS})
-  else()
-    message(FATAL_ERROR "No crypto library selected.")
+  if(NOT LOCAL_OPENSSL_BUILD)
+    message(STATUS "Building non-local OpenSSL")
+    if(USE_OPENSSL)
+      set(BUILD_ARGS -DBUILD_STATIC=${BUILD_STATIC}
+                    -DBUILD_OPENSSL_PLATFORM=${BUILD_OPENSSL_PLATFORM})
+      build_dependency(openssl ${BUILD_ARGS})
+    elseif(USE_MBEDTLS)
+      set(BUILD_ARGS -DBUILD_STATIC=${BUILD_STATIC})
+      build_dependency(mbedtls ${BUILD_ARGS})
+    else()
+      message(FATAL_ERROR "No crypto library selected.")
+    endif()
   endif()
 
   if (BUILD_COMMON_LWS)
@@ -87,6 +93,7 @@ if(BUILD_DEPENDENCIES)
                     -DUSE_OPENSSL=${USE_OPENSSL}
                     -DUSE_MBEDTLS=${USE_MBEDTLS})
     build_dependency(curl ${BUILD_ARGS})
+
   endif()
 
   if(BUILD_TEST)
@@ -274,12 +281,21 @@ if(BUILD_COMMON_CURL)
       "${CMAKE_CURRENT_SOURCE_DIR}/libkvsCommonCurl.pc.cmake"
       "${CMAKE_CURRENT_BINARY_DIR}/libkvsCommonCurl.pc" @ONLY)
 
+    if(BUILD_STATIC)
+      # Curl will enable ZLIB as part of its build if it finds
+      # the package. We need to therefore link it for static builds. 
+      find_package(ZLIB)
+      if(ZLIB_FOUND)
+        list(APPEND CURL_LIBRARIES z)
+      endif()
+    endif()
+
     add_library(kvsCommonCurl STATIC ${KVS_COMMON_SOURCE_FILES_BASE} ${KVS_COMMON_SOURCE_FILES_CURL})
     target_compile_definitions(kvsCommonCurl PRIVATE KVS_BUILD_WITH_CURL ${CPRODUCER_COMMON_TLS_OPTION})
     target_link_libraries(kvsCommonCurl
-            ${PRODUCER_CRYPTO_LIBRARY}
             kvspicUtils
-            ${CURL_LIBRARIES})
+            ${CURL_LIBRARIES}
+            ${PRODUCER_CRYPTO_LIBRARY})
 
     install(
       TARGETS kvsCommonCurl
@@ -315,11 +331,17 @@ if(BUILD_COMMON_CURL)
       FILES ${CMAKE_CURRENT_BINARY_DIR}/libcproducer.pc
       DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 
-    add_executable(kvsVideoOnlyStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsVideoOnlyStreamingSample.c)
-    target_link_libraries(kvsVideoOnlyStreamingSample cproducer)
+    add_executable(kvsVideoOnlyRealtimeStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsVideoOnlyRealtimeStreamingSample.c)
+    target_link_libraries(kvsVideoOnlyRealtimeStreamingSample cproducer)
+
+    add_executable(kvsVideoOnlyOfflineStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsVideoOnlyOfflineStreamingSample.c)
+    target_link_libraries(kvsVideoOnlyOfflineStreamingSample cproducer)
 
     add_executable(kvsAudioVideoStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsAudioVideoStreamingSample.c)
     target_link_libraries(kvsAudioVideoStreamingSample cproducer)
+
+    add_executable(kvsAudioOnlyStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsAudioOnlyStreamingSample.c)
+    target_link_libraries(kvsAudioOnlyStreamingSample cproducer)
 
     if (BUILD_TEST)
         add_subdirectory(tst)

@@ -11,19 +11,20 @@ on:
       - master
 jobs:
   clang-format-check:
-    runs-on: macos-latest
+    runs-on: macos-11
     steps:
       - name: Clone repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Install clang-format
         run: |
-          brew install clang-format@8
+          brew install clang-format
+          clang-format --version
       - name: Run clang format check
         run: |
           bash scripts/check-clang.sh
 
   mac-os-build-gcc:
-    runs-on: macos-10.15
+    runs-on: macos-12
     permissions:
       id-token: write
       contents: read
@@ -33,14 +34,16 @@ jobs:
       AWS_KVS_LOG_LEVEL: 2
     steps:
       - name: Clone repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Build repository
         run: |
+          brew install pkgconfig
+          brew unlink openssl # it seems the libcurl is trying to access this openssl despite explicitly setting it to our build
           mkdir build && cd build
-          cmake .. -DBUILD_TEST=TRUE
-          make  
+          cmake .. --trace -DBUILD_TEST=TRUE
+          make
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
@@ -52,7 +55,7 @@ jobs:
           ./tst/producer_test
 
   mac-os-build-clang:
-    runs-on: macos-latest
+    runs-on: macos-11
     env:
       AWS_KVS_LOG_LEVEL: 2
       LDFLAGS: -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib
@@ -62,14 +65,80 @@ jobs:
       contents: read
     steps:
       - name: Clone repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Build repository
         run: |
+          brew install pkgconfig
+          brew unlink openssl # it seems the libcurl is trying to access this openssl despite explicitly setting it to our build
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE
           make
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-duration-seconds: 10800
+      - name: Run tests
+        run: |
+          cd build
+          ./tst/producer_test
+
+  mac-os-build-gcc-local-openssl:
+    runs-on: macos-11
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      CC: gcc
+      CXX: g++
+      AWS_KVS_LOG_LEVEL: 2
+      LDFLAGS: -L/usr/local/opt/openssl@3/lib
+      CPPFLAGS: -I/usr/local/opt/openssl@3/include
+      OPENSSL_ROOT_DIR: /usr/local/opt/openssl@3/
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+      - name: Build repository
+        run: |
+          brew info openssl
+          mkdir build && cd build
+          cmake .. -DBUILD_TEST=TRUE -DLOCAL_OPENSSL_BUILD=ON
+          make
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-duration-seconds: 10800
+      - name: Run tests
+        run: |
+          cd build
+          ./tst/producer_test
+
+  mac-os-build-clang-local-openssl:
+    runs-on: macos-latest
+    env:
+      AWS_KVS_LOG_LEVEL: 2
+      LDFLAGS: -L/usr/local/opt/openssl@3/lib
+      CPPFLAGS: -I/usr/local/opt/openssl@3/include
+      OPENSSL_ROOT_DIR: /usr/local/opt/openssl@3/
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+      - name: Build repository
+        run: |
+          brew info openssl
+          mkdir build && cd build
+          cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DLOCAL_OPENSSL_BUILD=ON
+          make
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
@@ -81,7 +150,7 @@ jobs:
           ./tst/producer_test
 
   linux-gcc-code-coverage:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     env:
       AWS_KVS_LOG_LEVEL: 2
     permissions:
@@ -89,14 +158,14 @@ jobs:
       contents: read
     steps:
       - name: Clone repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Build repository
         run: |
           mkdir build && cd build
           cmake .. -DCODE_COVERAGE=TRUE -DBUILD_TEST=TRUE -DBUILD_COMMON_LWS=TRUE
           make
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
@@ -114,7 +183,7 @@ jobs:
           bash <(curl -s https://codecov.io/bash)
 
   address-sanitizer:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     permissions:
       id-token: write
       contents: read
@@ -124,14 +193,14 @@ jobs:
       AWS_KVS_LOG_LEVEL: 2
     steps:
       - name: Clone repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Build repository
         run: |
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DADDRESS_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
           make
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
@@ -144,7 +213,7 @@ jobs:
           timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
 
   undefined-behavior-sanitizer:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     permissions:
       id-token: write
       contents: read
@@ -154,14 +223,14 @@ jobs:
       AWS_KVS_LOG_LEVEL: 2
     steps:
       - name: Clone repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Build repository
         run: |
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DUNDEFINED_BEHAVIOR_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
           make
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
@@ -174,7 +243,7 @@ jobs:
           timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
 
   # memory-sanitizer:
-  #   runs-on: ubuntu-18.04
+  #   runs-on: ubuntu-20.04
   #   permissions:
   #     id-token: write
   #     contents: read
@@ -184,9 +253,9 @@ jobs:
   #     AWS_KVS_LOG_LEVEL: 2
   #   steps:
   #     - name: Clone repository
-  #       uses: actions/checkout@v2
+  #       uses: actions/checkout@v3
   #     - name: Configure AWS Credentials
-  #       uses: aws-actions/configure-aws-credentials@v1
+  #       uses: aws-actions/configure-aws-credentials@v1-node16
   #       with:
   #         role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
   #         role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
@@ -200,7 +269,7 @@ jobs:
   #         timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
 
   # thread-sanitizer:
-  #   runs-on: ubuntu-18.04
+  #   runs-on: ubuntu-20.04
   #   permissions:
   #     id-token: write
   #     contents: read
@@ -210,9 +279,9 @@ jobs:
   #     AWS_KVS_LOG_LEVEL: 2
   #   steps:
   #     - name: Clone repository
-  #       uses: actions/checkout@v2
+  #       uses: actions/checkout@v3
   #     - name: Configure AWS Credentials
-  #       uses: aws-actions/configure-aws-credentials@v1
+  #       uses: aws-actions/configure-aws-credentials@v1-node16
   #       with:
   #         role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
   #         role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
@@ -225,33 +294,29 @@ jobs:
   #         ulimit -c unlimited -S
   #         timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
 
-  linux-gcc-4_4:
-    runs-on: ubuntu-18.04
+  ubuntu-gcc:
+    runs-on: ubuntu-20.04
     env:
       AWS_KVS_LOG_LEVEL: 2
-      CC: gcc-4.4
+      CC: gcc
+      CXX: g++
     permissions:
       id-token: write
       contents: read
     steps:
       - name: Clone repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Install dependencies
         run: |
+          sudo apt clean && sudo apt update
           sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'
-          sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-          sudo add-apt-repository 'deb http://archive.ubuntu.com/ubuntu/ trusty main'
-          sudo add-apt-repository 'deb http://archive.ubuntu.com/ubuntu/ trusty universe'
-          sudo apt-get -q update
-          sudo apt-get -y install gcc-4.4
-          sudo apt-get -y install gdb
       - name: Build repository
         run: |
           mkdir build && cd build
-          cmake .. -DBUILD_TEST=TRUE -DBUILD_COMMON_LWS=TRUE
+          cmake .. -DBUILD_TEST=TRUE
           make
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
@@ -261,7 +326,7 @@ jobs:
         run: |
           cd build
           ulimit -c unlimited -S
-          timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure        
+          timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
 
   windows-msvc:
     runs-on: windows-2022
@@ -272,7 +337,7 @@ jobs:
       contents: read
     steps:
       - name: Clone repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Install dependencies
         run: |
           choco install nasm strawberryperl
@@ -282,7 +347,7 @@ jobs:
           git config --system core.longpaths true
           .github/build_windows.bat
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v1-node16
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
@@ -291,64 +356,73 @@ jobs:
       - name: Run tests
         run: |
           $env:Path += ';C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;C:\Program Files\NASM;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\lib;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\bin'
-          & "D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\build\tst\producer_test.exe" --gtest_filter="-ProducerFunctionalityTest.pressure_on_buffer_duration_fail_new_connection_at_token_rotation"  
+          & "D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\build\tst\producer_test.exe" --gtest_filter="-ProducerFunctionalityTest.pressure_on_buffer_duration_fail_new_connection_at_token_rotation"
 
   arm64-cross-compilation:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       CC: aarch64-linux-gnu-gcc
       CXX: aarch64-linux-gnu-g++
     steps:
       - name: Install dependencies
         run: |
-          sudo apt update
+          sudo apt clean && sudo apt update
           sudo apt-get -y install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu
       - name: Clone repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Build Repository
         run: |
           sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DBUILD_OPENSSL_PLATFORM=linux-generic64
           make
-          file libKinesisVideoProducer.so
+          file libcproducer.so
   linux-aarch64-cross-compilation:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       CC: aarch64-linux-gnu-gcc
       CXX: aarch64-linux-gnu-g++
     steps:
       - name: Install dependencies
         run: |
-          sudo apt update
+          sudo apt clean && sudo apt update
           sudo apt-get -y install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu
       - name: Clone repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Build Repository
         run: |
           sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DBUILD_OPENSSL_PLATFORM=linux-aarch64
           make
-          file libKinesisVideoProducer.so
+          file libcproducer.so
   arm32-cross-compilation:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       CC: arm-linux-gnueabi-gcc
       CXX: arm-linux-gnueabi-g++
     steps:
       - name: Install dependencies
         run: |
-          sudo apt update
+          sudo apt clean && sudo apt update
           sudo apt-get -y install gcc-arm-linux-gnueabi g++-arm-linux-gnueabi binutils-arm-linux-gnueabi
       - name: Clone repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Build Repository
         run: |
           sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DBUILD_OPENSSL_PLATFORM=linux-generic32
           make
-          file libKinesisVideoProducer.so
+          file libcproducer.so
 
-          
+  linux-build-gcc-static:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+      - name: Build Repository
+        run: |
+          mkdir build && cd build
+          cmake .. -DBUILD_STATIC=ON
+          make

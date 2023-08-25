@@ -52,7 +52,9 @@ TEST_F(AwsCredentialsTest, createAwsCredentials)
     EXPECT_EQ(STATUS_SUCCESS, freeAwsCredentials(&pAwsCredentials));
     EXPECT_EQ(STATUS_SUCCESS, freeAwsCredentials(&pAwsCredentials));
 
-    EXPECT_EQ(STATUS_SUCCESS, createAwsCredentials(
+    // Negative cases
+
+    EXPECT_EQ(STATUS_INVALID_ARG, createAwsCredentials(
             EMPTY_STRING,
             0,
             EMPTY_STRING,
@@ -64,9 +66,38 @@ TEST_F(AwsCredentialsTest, createAwsCredentials)
     EXPECT_EQ(STATUS_SUCCESS, freeAwsCredentials(&pAwsCredentials));
     EXPECT_EQ(STATUS_SUCCESS, freeAwsCredentials(&pAwsCredentials));
 
-    // Negative cases
+    EXPECT_EQ(STATUS_INVALID_ARG, createAwsCredentials(
+            EMPTY_STRING,
+            0,
+            TEST_SECRET_KEY,
+            0,
+            TEST_SESSION_TOKEN,
+            0,
+            0,
+            &pAwsCredentials));
 
     EXPECT_EQ(STATUS_INVALID_ARG, createAwsCredentials(
+            EMPTY_STRING,
+            0,
+            EMPTY_STRING,
+            0,
+            TEST_SESSION_TOKEN,
+            0,
+            0,
+            &pAwsCredentials));
+
+    EXPECT_EQ(STATUS_NULL_ARG, createAwsCredentials(
+            NULL,
+            0,
+            EMPTY_STRING,
+            0,
+            TEST_SESSION_TOKEN,
+            0,
+            0,
+            &pAwsCredentials));
+
+
+    EXPECT_EQ(STATUS_NULL_ARG, createAwsCredentials(
             NULL,
             0,
             TEST_SECRET_KEY,
@@ -77,7 +108,7 @@ TEST_F(AwsCredentialsTest, createAwsCredentials)
             &pAwsCredentials));
     EXPECT_EQ(NULL, pAwsCredentials);
 
-    EXPECT_EQ(STATUS_INVALID_ARG, createAwsCredentials(
+    EXPECT_EQ(STATUS_NULL_ARG, createAwsCredentials(
             TEST_ACCESS_KEY,
             0,
             NULL,
@@ -199,6 +230,36 @@ TEST_F(AwsCredentialsTest, deserializeAwsCredentials)
     pDeserialized->sessionTokenLen = 1;
     EXPECT_EQ(STATUS_INVALID_ARG, deserializeAwsCredentials(tempBuff));
     pDeserialized->sessionToken = pStored;
+}
+
+TEST_F(AwsCredentialsTest, TestFileCredentialsWriteWithoutSession) {
+    PAwsCredentialProvider pAwsCredentialProvider = NULL;
+    CHAR fileContent[10000];
+    UINT32 length = ARRAY_SIZE(fileContent);
+
+    // Store the credentials in a file under the current dir
+    length = SNPRINTF(fileContent, length, "CREDENTIALS %s %s", mAccessKey, mSecretKey);
+    ASSERT_GT(ARRAY_SIZE(fileContent), length);
+    ASSERT_EQ(STATUS_SUCCESS, writeFile(TEST_FILE_CREDENTIALS_FILE_PATH, FALSE, FALSE, (PBYTE) fileContent, length));
+
+    // Create file creds provider from the file
+    EXPECT_EQ(STATUS_SUCCESS, createFileCredentialProvider(TEST_FILE_CREDENTIALS_FILE_PATH, &pAwsCredentialProvider));
+    EXPECT_EQ(STATUS_SUCCESS, freeFileCredentialProvider(&pAwsCredentialProvider));
+}
+
+TEST_F(AwsCredentialsTest, TestFileCredentialsWriteWithSession) {
+    PAwsCredentialProvider pAwsCredentialProvider = NULL;
+    CHAR fileContent[10000];
+    UINT32 length = ARRAY_SIZE(fileContent);
+
+    // Store the credentials in a file under the current dir
+    length = SNPRINTF(fileContent, length, "CREDENTIALS %s 1234567890 %s %s", mAccessKey, mSecretKey, mSessionToken);
+    ASSERT_GT(ARRAY_SIZE(fileContent), length);
+    ASSERT_EQ(STATUS_SUCCESS, writeFile(TEST_FILE_CREDENTIALS_FILE_PATH, FALSE, FALSE, (PBYTE) fileContent, length));
+
+    // Create file creds provider from the file
+    EXPECT_EQ(STATUS_SUCCESS, createFileCredentialProvider(TEST_FILE_CREDENTIALS_FILE_PATH, &pAwsCredentialProvider));
+    EXPECT_EQ(STATUS_SUCCESS, freeFileCredentialProvider(&pAwsCredentialProvider));
 }
 
 }  // namespace video

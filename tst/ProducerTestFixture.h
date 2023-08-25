@@ -14,10 +14,10 @@
 #define TEST_CERTIFICATE_PATH    EMPTY_STRING
 #define TEST_DEFAULT_CHAIN_COUNT DEFAULT_CALLBACK_CHAIN_COUNT
 
-
-#define TEST_ACCESS_KEY    (PCHAR) "Test access key"
-#define TEST_SECRET_KEY    (PCHAR) "Test secret key"
-#define TEST_SESSION_TOKEN (PCHAR) "Test session token"
+#define TEST_ACCESS_KEY                 (PCHAR) "Test access key"
+#define TEST_SECRET_KEY                 (PCHAR) "Test secret key"
+#define TEST_SESSION_TOKEN              (PCHAR) "Test session token"
+#define TEST_FILE_CREDENTIALS_FILE_PATH (PCHAR) "producer_creds_file_test"
 
 #define TEST_FRAME_DURATION                                (50 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND)
 #define TEST_EXECUTION_DURATION                            (3 * HUNDREDS_OF_NANOS_IN_A_SECOND)
@@ -38,7 +38,6 @@
 #define TEST_VIDEO_TRACK_ID                                1
 #define TEST_AUDIO_TRACK_ID                                2
 
-
 #define TEST_FPS                    20
 #define TEST_MEDIA_DURATION_SECONDS 60
 
@@ -54,6 +53,7 @@
 
 #define TEST_IOT_ENDPOINT              (PCHAR) "Test.iot.endpoint"
 #define TEST_IOT_CERT_PATH             (PCHAR) "/Test/credentials/cert/path"
+#define TEST_IOT_VALID_CERT_PATH       (PCHAR) "../"
 #define TEST_IOT_CERT_PRIVATE_KEY_PATH (PCHAR) "/Test/private/key/path"
 #define TEST_CA_CERT_PATH              (PCHAR) "/Test/private/ca_cert/path"
 #define TEST_IOT_ROLE_ALIAS            (PCHAR) "TestRoleAlias"
@@ -205,7 +205,8 @@ class ProducerClientTestBase : public ::testing::Test {
     };
 
     VOID createDefaultProducerClient(BOOL cachingEndpoint = FALSE, UINT64 createStreamTimeout = TEST_CREATE_STREAM_TIMEOUT,
-                                     UINT64 stopStreamTimeout = TEST_STOP_STREAM_TIMEOUT, BOOL continuousRetry = FALSE, UINT64 sessionRotationPeriod = TEST_CREDENTIAL_EXPIRATION);
+                                     UINT64 stopStreamTimeout = TEST_STOP_STREAM_TIMEOUT, BOOL continuousRetry = FALSE,
+                                     UINT64 sessionRotationPeriod = TEST_CREDENTIAL_EXPIRATION);
     VOID createDefaultProducerClient(API_CALL_CACHE_TYPE cacheType = API_CALL_CACHE_TYPE_NONE,
                                      UINT64 createStreamTimeout = TEST_CREATE_STREAM_TIMEOUT, UINT64 stopStreamTimeout = TEST_STOP_STREAM_TIMEOUT,
                                      BOOL continuousRetry = FALSE, UINT64 sessionRotationPeriod = TEST_CREDENTIAL_EXPIRATION);

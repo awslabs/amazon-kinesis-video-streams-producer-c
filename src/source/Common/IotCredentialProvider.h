@@ -54,6 +54,10 @@ struct __IotCredentialProvider {
     // String name is used as IoT thing-name
     CHAR thingName[MAX_STREAM_NAME_LEN + 1];
 
+    UINT64 connectionTimeout;
+
+    UINT64 completionTimeout;
+
     // Static Aws Credentials structure with the pointer following the main allocation
     PAwsCredentials pAwsCredentials;
 
@@ -65,8 +69,8 @@ typedef struct __IotCredentialProvider* PIotCredentialProvider;
 ////////////////////////////////////////////////////////////////////////
 // Callback function implementations
 ////////////////////////////////////////////////////////////////////////
-STATUS createIotCredentialProviderWithTime(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, GetCurrentTimeFunc, UINT64, BlockingServiceCallFunc,
-                                           PAwsCredentialProvider*);
+STATUS createIotCredentialProviderWithTime(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, UINT64, UINT64, GetCurrentTimeFunc, UINT64,
+                                           BlockingServiceCallFunc, PAwsCredentialProvider*);
 STATUS getIotCredentials(PAwsCredentialProvider, PAwsCredentials*);
 
 // internal functions

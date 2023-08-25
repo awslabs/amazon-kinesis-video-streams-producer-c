@@ -343,6 +343,30 @@ PUBLIC_API STATUS createDefaultCallbacksProviderWithAwsCredentials(PCHAR, PCHAR,
 PUBLIC_API STATUS createDefaultCallbacksProviderWithIotCertificate(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PClientCallbacks*);
 
 /**
+ * Creates a default callbacks provider that uses iot certificate as auth method.
+ *
+ * NOTE: The caller is responsible for releasing the structure by calling
+ * the corresponding {@link freeCallbackProvider} API.
+ *
+ * @param[in] PCHAR IoT endpoint to use for the auth
+ * @param[in] PCHAR Credential cert path
+ * @param[in] PCHAR Private key path
+ * @param[in,opt] PCHAR CA Cert path
+ * @param[in] PCHAR Role alias name
+ * @param[in] PCHAR IoT Thing name
+ * @param[in,opt] PCHAR AWS region
+ * @param[in,opt] PCHAR User agent name (Use NULL)
+ * @param[in,opt] PCHAR Custom user agent to be used in the API calls
+ * @param[in] UINT64 connection timeout
+ * @param[in] UINT64 completion timeout
+ * @param[out] PClientCallbacks* Returned pointer to callbacks provider
+ *
+ * @return STATUS code of the execution
+ */
+PUBLIC_API STATUS createDefaultCallbacksProviderWithIotCertificateAndTimeouts(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, UINT64,
+                                                                              UINT64, PClientCallbacks*);
+
+/**
  * Creates a default callbacks provider that uses file-based certificate as auth method.
  *
  * NOTE: The caller is responsible for releasing the structure by calling
@@ -574,6 +598,38 @@ PUBLIC_API STATUS createRealtimeAudioVideoStreamInfoProviderWithCodecs(PCHAR, UI
 PUBLIC_API STATUS createOfflineAudioVideoStreamInfoProviderWithCodecs(PCHAR, UINT64, UINT64, VIDEO_CODEC_ID, AUDIO_CODEC_ID, PStreamInfo*);
 
 /**
+ * Creates Stream Info for RealTime Audio only Streaming Scenario
+ *
+ * NOTE: The caller is responsible for releasing the structure by calling
+ * the corresponding free API.
+ *
+ * @param[in,opt] PCHAR stream name
+ * @param[in] UINT64 retention in 100ns time unit
+ * @param[in] UINT64 buffer duration in 100ns time unit
+ * @param[in] AUDIO_CODEC_ID Codec ID of the audio(AAC/PCM_ALAW/PCM_MULAW)
+ * @param[out] PStreamInfo* Constructed object
+ *
+ * @return STATUS code of the execution
+ */
+PUBLIC_API STATUS createRealtimeAudioStreamInfoProviderWithCodecs(PCHAR, UINT64, UINT64, AUDIO_CODEC_ID, PStreamInfo*);
+
+/**
+ * Creates Stream Info for Offline Audio only Streaming Scenario
+ *
+ * NOTE: The caller is responsible for releasing the structure by calling
+ * the corresponding free API.
+ *
+ * @param[in,opt] PCHAR stream name
+ * @param[in] UINT64 retention in 100ns time unit
+ * @param[in] UINT64 buffer duration in 100ns time unit
+ * @param[in] AUDIO_CODEC_ID Codec ID of the audio(AAC/PCM_ALAW/PCM_MULAW)
+ * @param[out] PStreamInfo* Constructed object
+ *
+ * @return STATUS code of the execution
+ */
+PUBLIC_API STATUS createOfflineAudioStreamInfoProviderWithCodecs(PCHAR, UINT64, UINT64, AUDIO_CODEC_ID, PStreamInfo*);
+
+/**
  * Configure streaminfo based on given storage size and average bitrate
  * Will change buffer duration, stream latency duration.
  *
@@ -656,6 +712,28 @@ PUBLIC_API STATUS setDeviceInfoStorageSizeBasedOnBitrateAndBufferDuration(PDevic
  * @return STATUS status of operation
  */
 PUBLIC_API STATUS createIotAuthCallbacks(PClientCallbacks, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PAuthCallbacks*);
+
+/**
+ * Creates the Iot Credentials auth callbacks
+ *
+ * NOTE: The caller is responsible for releasing the structure by calling
+ * the corresponding free API.
+ *
+ * @param[in] PCallbacksProvider Pointer to callback provider
+ * @param[in] PCHAR iot credentials endpoint
+ * @param[in] PCHAR kvs iot certificate file path
+ * @param[in] PCHAR private key file path
+ * @param[in] PCHAR CA cert path
+ * @param[in] PCHAR iot role alias
+ * @param[in] PCHAR IoT thing name
+ * @param[in] UINT64 connection timeout
+ * @param[in] UINT64 completion timeout
+ *
+ * @param[in,out] PAuthCallbacks* Pointer to pointer to AuthCallback struct
+ *
+ * @return STATUS status of operation
+ */
+PUBLIC_API STATUS createIotAuthCallbacksWithTimeouts(PClientCallbacks, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, UINT64, UINT64, PAuthCallbacks*);
 
 /**
  * Frees the Iot Credential auth callbacks
@@ -815,8 +893,23 @@ PUBLIC_API STATUS createAbstractDefaultCallbacksProvider(UINT32, API_CALL_CACHE_
  * @return STATUS code of the execution
  */
 PUBLIC_API STATUS addFileLoggerPlatformCallbacksProvider(PClientCallbacks, UINT64, UINT64, PCHAR, BOOL);
-/*!@} */
 
+/**
+ * Use file logger with level filtering instead of default logger which log to stdout. The underlying objects are automatically freed
+ * when PClientCallbacks is freed.
+ *
+ * @param[in] PClientCallbacks The callback provider whose logPrintFn will be replaced with file logger log printing function
+ * @param[in] UINT64 Size of string buffer in file logger. When the string buffer is full the logger will flush everything into a new file
+ * @param[in] UINT64 Max number of log file. When exceeded, the oldest file will be deleted when new one is generated
+ * @param[in] PCHAR Directory in which the log file will be generated
+ * @param[in] BOOL Enable logging other log levels into a file
+ * @param[in] UINT32 Log level that needs to be filtered into another file
+ * @param[in] BOOL print log to std out too
+ *
+ * @return STATUS code of the execution
+ */
+STATUS addFileLoggerWithFilteringPlatformCallbacksProvider(PClientCallbacks, UINT64, UINT64, PCHAR, BOOL, BOOL, UINT32);
+/*!@} */
 #ifdef __cplusplus
 }
 #endif

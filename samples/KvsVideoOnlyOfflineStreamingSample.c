@@ -8,12 +8,15 @@
 #define DEFAULT_STREAM_DURATION           20 * HUNDREDS_OF_NANOS_IN_A_SECOND
 #define DEFAULT_STORAGE_SIZE              20 * 1024 * 1024
 #define RECORDED_FRAME_AVG_BITRATE_BIT_PS 3800000
+#define VIDEO_CODEC_NAME_H264             "h264"
+#define VIDEO_CODEC_NAME_H265             "h265"
+#define VIDEO_CODEC_NAME_MAX_LENGTH       5
 
 #define NUMBER_OF_FRAME_FILES 403
 
 #define FILE_LOGGING_BUFFER_SIZE (100 * 1024)
 #define MAX_NUMBER_OF_LOG_FILES  5
-STATUS readFrameData(PFrame pFrame, PCHAR frameFilePath)
+STATUS readFrameData(PFrame pFrame, PCHAR frameFilePath, PCHAR videoCodec)
 {
     STATUS retStatus = STATUS_SUCCESS;
     CHAR filePath[MAX_PATH_LEN + 1];
@@ -23,7 +26,7 @@ STATUS readFrameData(PFrame pFrame, PCHAR frameFilePath)
     CHK(pFrame != NULL, STATUS_NULL_ARG);
 
     index = pFrame->index % NUMBER_OF_FRAME_FILES + 1;
-    SNPRINTF(filePath, MAX_PATH_LEN, "%s/frame-%03d.h264", frameFilePath, index);
+    SNPRINTF(filePath, MAX_PATH_LEN, "%s/%sSampleFrames/frame-%03d.%s", frameFilePath, videoCodec, index, videoCodec);
     size = pFrame->size;
 
     // Get the size and read into frame
@@ -33,16 +36,13 @@ STATUS readFrameData(PFrame pFrame, PCHAR frameFilePath)
     pFrame->size = (UINT32) size;
 
     if (pFrame->flags == FRAME_FLAG_KEY_FRAME) {
-        defaultLogPrint(LOG_LEVEL_DEBUG, "", "Key frame file %s, size %" PRIu64, filePath, pFrame->size);
+        DLOGD("Key frame file %s, size %" PRIu64, filePath, pFrame->size);
     }
 
 CleanUp:
 
     return retStatus;
 }
-
-// Forward declaration of the default thread sleep function
-VOID defaultThreadSleep(UINT64);
 
 INT32 main(INT32 argc, CHAR* argv[])
 {
@@ -62,25 +62,27 @@ INT32 main(INT32 argc, CHAR* argv[])
     DOUBLE startUpLatency;
     BOOL firstFrame = TRUE;
     UINT64 startTime;
+    CHAR videoCodec[VIDEO_CODEC_NAME_MAX_LENGTH];
+    STRNCPY(videoCodec, VIDEO_CODEC_NAME_H264, STRLEN(VIDEO_CODEC_NAME_H264)); // h264 video by default
+    VIDEO_CODEC_ID videoCodecID = VIDEO_CODEC_ID_H264;
 
     if (argc < 2) {
-        defaultLogPrint(
-            LOG_LEVEL_ERROR, "",
-            "Usage: AWS_ACCESS_KEY_ID=SAMPLEKEY AWS_SECRET_ACCESS_KEY=SAMPLESECRET %s <stream_name> <duration_in_seconds> <frame_files_path>\n",
-            argv[0]);
+        DLOGE("Usage: AWS_ACCESS_KEY_ID=SAMPLEKEY AWS_SECRET_ACCESS_KEY=SAMPLESECRET %s <stream_name> <codec> <duration_in_seconds> "
+              "<frame_files_path>\n",
+              argv[0]);
         CHK(FALSE, STATUS_INVALID_ARG);
     }
 
     if ((accessKey = getenv(ACCESS_KEY_ENV_VAR)) == NULL || (secretKey = getenv(SECRET_KEY_ENV_VAR)) == NULL) {
-        defaultLogPrint(LOG_LEVEL_ERROR, "", "Error missing credentials");
+        DLOGE("Error missing credentials");
         CHK(FALSE, STATUS_INVALID_ARG);
     }
 
     MEMSET(frameFilePath, 0x00, MAX_PATH_LEN + 1);
-    if (argc < 4) {
-        STRCPY(frameFilePath, (PCHAR) "../samples/h264SampleFrames");
+    if (argc < 5) {
+        STRCPY(frameFilePath, (PCHAR) "../samples/");
     } else {
-        STRNCPY(frameFilePath, argv[3], MAX_PATH_LEN);
+        STRNCPY(frameFilePath, argv[4], MAX_PATH_LEN);
     }
 
     cacertPath = getenv(CACERT_PATH_ENV_VAR);
@@ -91,12 +93,19 @@ INT32 main(INT32 argc, CHAR* argv[])
     }
 
     if (argc >= 3) {
+        if (!STRCMP(argv[2], VIDEO_CODEC_NAME_H265)) {
+            STRNCPY(videoCodec, VIDEO_CODEC_NAME_H265, STRLEN(VIDEO_CODEC_NAME_H265));
+            videoCodecID = VIDEO_CODEC_ID_H265;
+        }
+    }
+
+    if (argc >= 4) {
         // Get the duration and convert to an integer
-        CHK_STATUS(STRTOUI64(argv[2], NULL, 10, &streamingDuration));
+        CHK_STATUS(STRTOUI64(argv[3], NULL, 10, &streamingDuration));
         streamingDuration *= HUNDREDS_OF_NANOS_IN_A_SECOND;
     }
 
-    streamStopTime = defaultGetTime() + streamingDuration;
+    streamStopTime = GETTIME() + streamingDuration;
 
     // default storage size is 128MB. Use setDeviceInfoStorageSize after create to change storage size.
     CHK_STATUS(createDefaultDeviceInfo(&pDeviceInfo));
@@ -104,7 +113,8 @@ INT32 main(INT32 argc, CHAR* argv[])
     pDeviceInfo->clientInfo.loggerLogLevel = LOG_LEVEL_DEBUG;
     pDeviceInfo->storageInfo.storageSize = DEFAULT_STORAGE_SIZE;
 
-    CHK_STATUS(createRealtimeVideoStreamInfoProvider(streamName, DEFAULT_RETENTION_PERIOD, DEFAULT_BUFFER_DURATION, &pStreamInfo));
+    CHK_STATUS(
+        createOfflineVideoStreamInfoProviderWithCodecs(streamName, DEFAULT_RETENTION_PERIOD, DEFAULT_BUFFER_DURATION, videoCodecID, &pStreamInfo));
     CHK_STATUS(setStreamInfoBasedOnStorageSize(DEFAULT_STORAGE_SIZE, RECORDED_FRAME_AVG_BITRATE_BIT_PS, 1, pStreamInfo));
     // adjust members of pStreamInfo here if needed
 
@@ -131,23 +141,17 @@ INT32 main(INT32 argc, CHAR* argv[])
     frame.version = FRAME_CURRENT_VERSION;
     frame.trackId = DEFAULT_VIDEO_TRACK_ID;
     frame.duration = HUNDREDS_OF_NANOS_IN_A_SECOND / DEFAULT_FPS_VALUE;
-    frame.decodingTs = defaultGetTime(); // current time
+    streamStopTime = GETTIME();
+    frame.decodingTs = streamStopTime - streamingDuration; // current time
     frame.presentationTs = frame.decodingTs;
 
-    while (defaultGetTime() < streamStopTime) {
+    while (frame.decodingTs < streamStopTime) {
         frame.index = frameIndex;
         frame.flags = fileIndex % DEFAULT_KEY_FRAME_INTERVAL == 0 ? FRAME_FLAG_KEY_FRAME : FRAME_FLAG_NONE;
         frame.size = SIZEOF(frameBuffer);
 
-        CHK_STATUS(readFrameData(&frame, frameFilePath));
-
+        CHK_STATUS(readFrameData(&frame, frameFilePath, videoCodec));
         CHK_STATUS(putKinesisVideoFrame(streamHandle, &frame));
-        if (firstFrame) {
-            startUpLatency = (DOUBLE)(GETTIME() - startTime) / (DOUBLE) HUNDREDS_OF_NANOS_IN_A_MILLISECOND;
-            DLOGD("Start up latency: %lf ms", startUpLatency);
-            firstFrame = FALSE;
-        }
-        defaultThreadSleep(frame.duration);
 
         frame.decodingTs += frame.duration;
         frame.presentationTs = frame.decodingTs;
@@ -163,7 +167,7 @@ INT32 main(INT32 argc, CHAR* argv[])
 CleanUp:
 
     if (STATUS_FAILED(retStatus)) {
-        defaultLogPrint(LOG_LEVEL_ERROR, "", "Failed with status 0x%08x\n", retStatus);
+        DLOGE("Failed with status 0x%08x", retStatus);
     }
 
     if (pDeviceInfo != NULL) {

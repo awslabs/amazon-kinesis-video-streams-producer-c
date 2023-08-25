@@ -58,6 +58,61 @@ CleanUp:
     return retStatus;
 }
 
+/*
+ * Create IoT credentials callback
+ */
+STATUS createIotAuthCallbacksWithTimeouts(PClientCallbacks pCallbacksProvider, PCHAR iotGetCredentialEndpoint, PCHAR certPath, PCHAR privateKeyPath,
+                                          PCHAR caCertPath, PCHAR roleAlias, PCHAR streamName, UINT64 connectionTimeout, UINT64 completionTimeout,
+                                          PAuthCallbacks* ppIotAuthCallbacks)
+{
+    ENTERS();
+    STATUS retStatus = STATUS_SUCCESS;
+
+    PIotAuthCallbacks pIotAuthCallbacks = NULL;
+
+    CHK(pCallbacksProvider != NULL && ppIotAuthCallbacks != NULL, STATUS_NULL_ARG);
+
+    // Allocate the entire structure
+    pIotAuthCallbacks = (PIotAuthCallbacks) MEMCALLOC(1, SIZEOF(IotAuthCallbacks));
+    CHK(pIotAuthCallbacks != NULL, STATUS_NOT_ENOUGH_MEMORY);
+
+    // Set the version, self
+    pIotAuthCallbacks->authCallbacks.version = AUTH_CALLBACKS_CURRENT_VERSION;
+    pIotAuthCallbacks->authCallbacks.customData = (UINT64) pIotAuthCallbacks;
+
+    // Store the back pointer as we will be using the other callbacks
+    pIotAuthCallbacks->pCallbacksProvider = (PCallbacksProvider) pCallbacksProvider;
+
+    // Set the callbacks
+    pIotAuthCallbacks->authCallbacks.getStreamingTokenFn = getStreamingTokenIotFunc;
+    pIotAuthCallbacks->authCallbacks.getSecurityTokenFn = getSecurityTokenIotFunc;
+    pIotAuthCallbacks->authCallbacks.freeAuthCallbacksFn = freeIotAuthCallbacksFunc;
+    pIotAuthCallbacks->authCallbacks.getDeviceCertificateFn = NULL;
+    pIotAuthCallbacks->authCallbacks.deviceCertToTokenFn = NULL;
+    pIotAuthCallbacks->authCallbacks.getDeviceFingerprintFn = NULL;
+
+    CHK_STATUS(createCurlIotCredentialProviderWithTimeAndTimeout(
+        iotGetCredentialEndpoint, certPath, privateKeyPath, caCertPath, roleAlias, streamName, connectionTimeout, completionTimeout,
+        pIotAuthCallbacks->pCallbacksProvider->clientCallbacks.getCurrentTimeFn, pIotAuthCallbacks->pCallbacksProvider->clientCallbacks.customData,
+        (PAwsCredentialProvider*) &pIotAuthCallbacks->pCredentialProvider));
+
+    CHK_STATUS(addAuthCallbacks(pCallbacksProvider, (PAuthCallbacks) pIotAuthCallbacks));
+
+CleanUp:
+
+    if (STATUS_FAILED(retStatus)) {
+        freeIotAuthCallbacks((PAuthCallbacks*) &pIotAuthCallbacks);
+        pIotAuthCallbacks = NULL;
+    }
+    // Set the return value if it's not NULL
+    if (ppIotAuthCallbacks != NULL) {
+        *ppIotAuthCallbacks = (PAuthCallbacks) pIotAuthCallbacks;
+    }
+
+    LEAVES();
+    return retStatus;
+}
+
 /**
  * Frees the IotCredential Auth callback object
  *

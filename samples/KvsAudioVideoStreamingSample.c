@@ -1,31 +1,31 @@
 #include <com/amazonaws/kinesis/video/cproducer/Include.h>
 
-#define DEFAULT_RETENTION_PERIOD            2 * HUNDREDS_OF_NANOS_IN_AN_HOUR
-#define DEFAULT_BUFFER_DURATION             120 * HUNDREDS_OF_NANOS_IN_A_SECOND
-#define DEFAULT_CALLBACK_CHAIN_COUNT        5
-#define DEFAULT_KEY_FRAME_INTERVAL          45
-#define DEFAULT_FPS_VALUE                   25
-#define DEFAULT_STREAM_DURATION             20 * HUNDREDS_OF_NANOS_IN_A_SECOND
-#define SAMPLE_AUDIO_FRAME_DURATION         (20 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND)
-#define SAMPLE_VIDEO_FRAME_DURATION         (HUNDREDS_OF_NANOS_IN_A_SECOND / DEFAULT_FPS_VALUE)
-#define AAC_AUDIO_TRACK_SAMPLING_RATE       48000
-#define ALAW_AUDIO_TRACK_SAMPLING_RATE      8000
-#define AAC_AUDIO_TRACK_CHANNEL_CONFIG      2
-#define ALAW_AUDIO_TRACK_CHANNEL_CONFIG     1
-#define AUDIO_CODEC_NAME_MAX_LENGTH         5
-#define AUDIO_CODEC_NAME_ALAW               "alaw"
-#define AUDIO_CODEC_NAME_AAC                "aac"
+#define DEFAULT_RETENTION_PERIOD        2 * HUNDREDS_OF_NANOS_IN_AN_HOUR
+#define DEFAULT_BUFFER_DURATION         120 * HUNDREDS_OF_NANOS_IN_A_SECOND
+#define DEFAULT_CALLBACK_CHAIN_COUNT    5
+#define DEFAULT_KEY_FRAME_INTERVAL      45
+#define DEFAULT_FPS_VALUE               25
+#define DEFAULT_STREAM_DURATION         20 * HUNDREDS_OF_NANOS_IN_A_SECOND
+#define SAMPLE_AUDIO_FRAME_DURATION     (20 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND)
+#define SAMPLE_VIDEO_FRAME_DURATION     (HUNDREDS_OF_NANOS_IN_A_SECOND / DEFAULT_FPS_VALUE)
+#define AAC_AUDIO_TRACK_SAMPLING_RATE   48000
+#define ALAW_AUDIO_TRACK_SAMPLING_RATE  8000
+#define AAC_AUDIO_TRACK_CHANNEL_CONFIG  2
+#define ALAW_AUDIO_TRACK_CHANNEL_CONFIG 1
+#define AUDIO_CODEC_NAME_MAX_LENGTH     5
+#define VIDEO_CODEC_NAME_MAX_LENGTH     5
+#define AUDIO_CODEC_NAME_ALAW           "alaw"
+#define AUDIO_CODEC_NAME_AAC            "aac"
+#define VIDEO_CODEC_NAME_H264           "h264"
+#define VIDEO_CODEC_NAME_H265           "h265"
 
 #define NUMBER_OF_VIDEO_FRAME_FILES 403
-#define NUMBER_OF_AUDIO_FRAME_FILES  582
+#define NUMBER_OF_AUDIO_FRAME_FILES 582
 
 #define FILE_LOGGING_BUFFER_SIZE (100 * 1024)
 #define MAX_NUMBER_OF_LOG_FILES  5
 
-#define KEYFRAME_EVENT_INTERVAL 200
-
 UINT8 gEventsEnabled = 0;
-UINT16 gKeyFrameCount = 0;
 
 typedef struct {
     PBYTE buffer;
@@ -68,37 +68,17 @@ PVOID putVideoFrameRoutine(PVOID args)
     // video track is used to mark new fragment. A new fragment is generated for every frame with FRAME_FLAG_KEY_FRAME
     frame.flags = fileIndex % DEFAULT_KEY_FRAME_INTERVAL == 0 ? FRAME_FLAG_KEY_FRAME : FRAME_FLAG_NONE;
 
-    while (defaultGetTime() < data->streamStopTime) {
+    while (GETTIME() < data->streamStopTime) {
         status = putKinesisVideoFrame(data->streamHandle, &frame);
         if (data->firstFrame) {
-            startUpLatency = (DOUBLE)(GETTIME() - data->startTime) / (DOUBLE) HUNDREDS_OF_NANOS_IN_A_MILLISECOND;
+            startUpLatency = (DOUBLE) (GETTIME() - data->startTime) / (DOUBLE) HUNDREDS_OF_NANOS_IN_A_MILLISECOND;
             DLOGD("Start up latency: %lf ms", startUpLatency);
             data->firstFrame = FALSE;
-            if(gEventsEnabled) {
-                //generate an image and notification event at the start of the video stream.
-                putKinesisVideoEventMetadata(data->streamHandle, STREAM_EVENT_TYPE_NOTIFICATION | STREAM_EVENT_TYPE_IMAGE_GENERATION, NULL);
-            }
-        }
-        else if (frame.flags == FRAME_FLAG_KEY_FRAME) {
-            if(gKeyFrameCount%KEYFRAME_EVENT_INTERVAL == 0)
-            {
-                //reset to 0 to avoid overflow in long running applications
-                gKeyFrameCount = 0;
-                switch (gEventsEnabled) {
-                    case 1:
-                        putKinesisVideoEventMetadata(data->streamHandle, STREAM_EVENT_TYPE_NOTIFICATION, NULL);
-                        break;
-                    case 2:
-                        putKinesisVideoEventMetadata(data->streamHandle, STREAM_EVENT_TYPE_IMAGE_GENERATION, NULL);
-                        break;
-                    case 3:
-                        putKinesisVideoEventMetadata(data->streamHandle, STREAM_EVENT_TYPE_NOTIFICATION | STREAM_EVENT_TYPE_IMAGE_GENERATION, NULL);
-                        break;
-                    default:
-                        break;
-                }
-            }
-            gKeyFrameCount++;
+        } else if (frame.flags == FRAME_FLAG_KEY_FRAME && gEventsEnabled) {
+            // generate an image and notification event at the start of the video stream.
+            putKinesisVideoEventMetadata(data->streamHandle, STREAM_EVENT_TYPE_NOTIFICATION | STREAM_EVENT_TYPE_IMAGE_GENERATION, NULL);
+            // only push this once in this sample. A customer may use this whenever it is necessary though
+            gEventsEnabled = 0;
         }
 
         ATOMIC_STORE_BOOL(&data->firstVideoFramePut, TRUE);
@@ -117,7 +97,7 @@ PVOID putVideoFrameRoutine(PVOID args)
         frame.size = data->videoFrames[fileIndex].size;
 
         // synchronize putKinesisVideoFrame to running time
-        runningTime = defaultGetTime() - data->streamStartTime;
+        runningTime = GETTIME() - data->streamStartTime;
         if (runningTime < frame.presentationTs) {
             // reduce sleep time a little for smoother video
             THREAD_SLEEP((frame.presentationTs - runningTime) * 0.9);
@@ -130,7 +110,7 @@ CleanUp:
         printf("putVideoFrameRoutine failed with 0x%08x", retStatus);
     }
 
-    return (PVOID)(ULONG_PTR) retStatus;
+    return (PVOID) (ULONG_PTR) retStatus;
 }
 
 PVOID putAudioFrameRoutine(PVOID args)
@@ -154,7 +134,7 @@ PVOID putAudioFrameRoutine(PVOID args)
     frame.index = 0;
     frame.flags = FRAME_FLAG_NONE; // audio track is not used to cut fragment
 
-    while (defaultGetTime() < data->streamStopTime) {
+    while (GETTIME() < data->streamStopTime) {
         // no audio can be put until first video frame is put
         if (ATOMIC_LOAD_BOOL(&data->firstVideoFramePut)) {
             status = putKinesisVideoFrame(data->streamHandle, &frame);
@@ -172,7 +152,7 @@ PVOID putAudioFrameRoutine(PVOID args)
             frame.size = data->audioFrames[fileIndex].size;
 
             // synchronize putKinesisVideoFrame to running time
-            runningTime = defaultGetTime() - data->streamStartTime;
+            runningTime = GETTIME() - data->streamStartTime;
             if (runningTime < frame.presentationTs) {
                 THREAD_SLEEP(frame.presentationTs - runningTime);
             }
@@ -185,7 +165,7 @@ CleanUp:
         printf("putAudioFrameRoutine failed with 0x%08x", retStatus);
     }
 
-    return (PVOID)(ULONG_PTR) retStatus;
+    return (PVOID) (ULONG_PTR) retStatus;
 }
 
 INT32 main(INT32 argc, CHAR* argv[])
@@ -204,32 +184,34 @@ INT32 main(INT32 argc, CHAR* argv[])
     UINT32 i;
     CHAR filePath[MAX_PATH_LEN + 1];
     PTrackInfo pAudioTrack = NULL;
-    CHAR audioCodec[AUDIO_CODEC_NAME_MAX_LENGTH]; 
+    CHAR audioCodec[AUDIO_CODEC_NAME_MAX_LENGTH] = {0};
+    CHAR videoCodec[VIDEO_CODEC_NAME_MAX_LENGTH] = {0};
     BYTE aacAudioCpd[KVS_AAC_CPD_SIZE_BYTE];
     BYTE alawAudioCpd[KVS_PCM_CPD_SIZE_BYTE];
+    VIDEO_CODEC_ID videoCodecID = VIDEO_CODEC_ID_H264;
 
     MEMSET(&data, 0x00, SIZEOF(SampleCustomData));
 
-    STRNCPY(audioCodec, AUDIO_CODEC_NAME_AAC, STRLEN(AUDIO_CODEC_NAME_AAC)); //aac audio by default
+    STRNCPY(audioCodec, AUDIO_CODEC_NAME_AAC, STRLEN(AUDIO_CODEC_NAME_AAC));   // aac audio by default
+    STRNCPY(videoCodec, VIDEO_CODEC_NAME_H264, STRLEN(VIDEO_CODEC_NAME_H264)); // h264 video by default
 
-    if (argc == 6) {
-        if (!STRCMP(argv[5], "both")){
-            gEventsEnabled = 3;
-        }
-        if (!STRCMP(argv[5], "image")){
-            gEventsEnabled = 2;
-        }
-        if (!STRCMP(argv[5], "notification")){
+    if (argc == 7) {
+        if (!STRCMP(argv[6], "1")) {
             gEventsEnabled = 1;
         }
     }
-    if (argc >= 5) {
-        if (!STRCMP(argv[4], AUDIO_CODEC_NAME_ALAW)){
+    if (argc >= 6) {
+        if (!STRCMP(argv[4], AUDIO_CODEC_NAME_ALAW)) {
             STRNCPY(audioCodec, AUDIO_CODEC_NAME_ALAW, STRLEN(AUDIO_CODEC_NAME_ALAW));
-        } 
+        }
+        if (!STRCMP(argv[5], VIDEO_CODEC_NAME_H265)) {
+            STRNCPY(videoCodec, VIDEO_CODEC_NAME_H265, STRLEN(VIDEO_CODEC_NAME_H265));
+            videoCodecID = VIDEO_CODEC_ID_H265;
+        }
     }
     if (argc < 2) {
-        printf("Usage: AWS_ACCESS_KEY_ID=SAMPLEKEY AWS_SECRET_ACCESS_KEY=SAMPLESECRET %s <stream_name> <duration_in_seconds> <frame_files_path>\n",
+        printf("Usage: AWS_ACCESS_KEY_ID=SAMPLEKEY AWS_SECRET_ACCESS_KEY=SAMPLESECRET %s <stream_name> <duration_in_seconds> <frame_files_path> "
+               "[audio_codec] [video_codec] [events_enabled]\n",
                argv[0]);
         CHK(FALSE, STATUS_INVALID_ARG);
     }
@@ -261,7 +243,7 @@ INT32 main(INT32 argc, CHAR* argv[])
 
     printf("Loading video frames...\n");
     for (i = 0; i < NUMBER_OF_VIDEO_FRAME_FILES; ++i) {
-        SNPRINTF(filePath, MAX_PATH_LEN, "%s/h264SampleFrames/frame-%03d.h264", data.sampleDir, i + 1);
+        SNPRINTF(filePath, MAX_PATH_LEN, "%s/%sSampleFrames/frame-%03d.%s", data.sampleDir, videoCodec, i + 1, videoCodec);
         CHK_STATUS(readFile(filePath, TRUE, NULL, &fileSize));
         data.videoFrames[i].buffer = (PBYTE) MEMALLOC(fileSize);
         data.videoFrames[i].size = fileSize;
@@ -283,7 +265,7 @@ INT32 main(INT32 argc, CHAR* argv[])
         streamingDuration *= HUNDREDS_OF_NANOS_IN_A_SECOND;
     }
 
-    streamStopTime = defaultGetTime() + streamingDuration;
+    streamStopTime = GETTIME() + streamingDuration;
 
     // default storage size is 128MB. Use setDeviceInfoStorageSize after create to change storage size.
     CHK_STATUS(createDefaultDeviceInfo(&pDeviceInfo));
@@ -292,34 +274,36 @@ INT32 main(INT32 argc, CHAR* argv[])
 
     // generate audio cpd
     if (!STRCMP(audioCodec, AUDIO_CODEC_NAME_ALAW)) {
-        CHK_STATUS(createRealtimeAudioVideoStreamInfoProviderWithCodecs(streamName, DEFAULT_RETENTION_PERIOD, DEFAULT_BUFFER_DURATION, VIDEO_CODEC_ID_H264, AUDIO_CODEC_ID_PCM_ALAW, &pStreamInfo));
+        CHK_STATUS(createRealtimeAudioVideoStreamInfoProviderWithCodecs(streamName, DEFAULT_RETENTION_PERIOD, DEFAULT_BUFFER_DURATION, videoCodecID,
+                                                                        AUDIO_CODEC_ID_PCM_ALAW, &pStreamInfo));
 
         // adjust members of pStreamInfo here if needed
 
         // set up audio cpd.
         pAudioTrack = pStreamInfo->streamCaps.trackInfoList[0].trackId == DEFAULT_AUDIO_TRACK_ID ? &pStreamInfo->streamCaps.trackInfoList[0]
-                                                                                             : &pStreamInfo->streamCaps.trackInfoList[1];
+                                                                                                 : &pStreamInfo->streamCaps.trackInfoList[1];
         pAudioTrack->codecPrivateData = alawAudioCpd;
         pAudioTrack->codecPrivateDataSize = KVS_PCM_CPD_SIZE_BYTE;
-        CHK_STATUS(mkvgenGeneratePcmCpd(KVS_PCM_FORMAT_CODE_ALAW, ALAW_AUDIO_TRACK_SAMPLING_RATE, ALAW_AUDIO_TRACK_CHANNEL_CONFIG, pAudioTrack->codecPrivateData,
-                                    pAudioTrack->codecPrivateDataSize));
+        CHK_STATUS(mkvgenGeneratePcmCpd(KVS_PCM_FORMAT_CODE_ALAW, ALAW_AUDIO_TRACK_SAMPLING_RATE, ALAW_AUDIO_TRACK_CHANNEL_CONFIG,
+                                        pAudioTrack->codecPrivateData, pAudioTrack->codecPrivateDataSize));
     } else {
-        CHK_STATUS(createRealtimeAudioVideoStreamInfoProviderWithCodecs(streamName, DEFAULT_RETENTION_PERIOD, DEFAULT_BUFFER_DURATION, VIDEO_CODEC_ID_H264, AUDIO_CODEC_ID_AAC, &pStreamInfo));
+        CHK_STATUS(createRealtimeAudioVideoStreamInfoProviderWithCodecs(streamName, DEFAULT_RETENTION_PERIOD, DEFAULT_BUFFER_DURATION, videoCodecID,
+                                                                        AUDIO_CODEC_ID_AAC, &pStreamInfo));
 
         // CHK_STATUS(createRealtimeAudioVideoStreamInfoProvider(streamName, DEFAULT_RETENTION_PERIOD, DEFAULT_BUFFER_DURATION, &pStreamInfo));
-        // You can use createRealtimeAudioVideoStreamInfoProvider for H.264 and AAC as it uses them by default 
+        // You can use createRealtimeAudioVideoStreamInfoProvider for H.264 and AAC as it uses them by default
         // To specify PCM/G.711 use createRealtimeAudioVideoStreamInfoProviderWithCodecs
         // adjust members of pStreamInfo here if needed
 
         // set up audio cpd.
         pAudioTrack = pStreamInfo->streamCaps.trackInfoList[0].trackId == DEFAULT_AUDIO_TRACK_ID ? &pStreamInfo->streamCaps.trackInfoList[0]
-                                                                                             : &pStreamInfo->streamCaps.trackInfoList[1];
+                                                                                                 : &pStreamInfo->streamCaps.trackInfoList[1];
         pAudioTrack->codecPrivateData = aacAudioCpd;
         pAudioTrack->codecPrivateDataSize = KVS_AAC_CPD_SIZE_BYTE;
         CHK_STATUS(mkvgenGenerateAacCpd(AAC_LC, AAC_AUDIO_TRACK_SAMPLING_RATE, AAC_AUDIO_TRACK_CHANNEL_CONFIG, pAudioTrack->codecPrivateData,
-                                    pAudioTrack->codecPrivateDataSize));
+                                        pAudioTrack->codecPrivateDataSize));
     }
-    
+
     // use relative time mode. Buffer timestamps start from 0
     pStreamInfo->streamCaps.absoluteFragmentTimes = FALSE;
 
@@ -343,7 +327,7 @@ INT32 main(INT32 argc, CHAR* argv[])
 
     data.streamStopTime = streamStopTime;
     data.streamHandle = streamHandle;
-    data.streamStartTime = defaultGetTime();
+    data.streamStartTime = GETTIME();
     ATOMIC_STORE_BOOL(&data.firstVideoFramePut, FALSE);
 
     THREAD_CREATE(&videoSendTid, putVideoFrameRoutine, (PVOID) &data);

@@ -197,7 +197,7 @@ STATUS initializeCurlSession(PRequestInfo pRequestInfo, PCallInfo pCallInfo, CUR
             break;
 
         case HTTP_REQUEST_VERB_PUT:
-            curl_easy_setopt(pCurl, CURLOPT_PUT, 1L);
+            curl_easy_setopt(pCurl, CURLOPT_UPLOAD, 1L);
             break;
 
         case HTTP_REQUEST_VERB_POST:
@@ -285,6 +285,7 @@ VOID terminateCurlSession(PCurlResponse pCurlResponse, UINT64 timeout)
 VOID dumpResponseCurlEasyInfo(PCurlResponse pCurlResponse)
 {
     DOUBLE time;
+    curl_off_t value;
     CURLcode ret;
 
     if (pCurlResponse != NULL) {
@@ -337,16 +338,16 @@ VOID dumpResponseCurlEasyInfo(PCurlResponse pCurlResponse)
             DLOGW("Unable to dump REDIRECT_TIME");
         }
 
-        ret = curl_easy_getinfo(pCurlResponse->pCurl, CURLINFO_SPEED_UPLOAD, &time);
+        ret = curl_easy_getinfo(pCurlResponse->pCurl, CURLINFO_SPEED_UPLOAD_T, &value);
         if (ret == CURLE_OK) {
-            DLOGI("CURLINFO_SPEED_UPLOAD: %f", time);
+            DLOGI("CURLINFO_SPEED_UPLOAD: %" CURL_FORMAT_CURL_OFF_T, value);
         } else {
             DLOGW("Unable to dump CURLINFO_SPEED_UPLOAD");
         }
 
-        ret = curl_easy_getinfo(pCurlResponse->pCurl, CURLINFO_SIZE_UPLOAD, &time);
+        ret = curl_easy_getinfo(pCurlResponse->pCurl, CURLINFO_SIZE_UPLOAD_T, &value);
         if (ret == CURLE_OK) {
-            DLOGI("CURLINFO_SIZE_UPLOAD: %f", time);
+            DLOGI("CURLINFO_SIZE_UPLOAD: %" CURL_FORMAT_CURL_OFF_T, value);
         } else {
             DLOGW("Unable to dump CURLINFO_SIZE_UPLOAD");
         }
@@ -413,7 +414,8 @@ STATUS curlCompleteSync(PCurlResponse pCurlResponse)
         pCurlResponse->callInfo.callResult = SERVICE_CALL_REQUEST_TIMEOUT;
     } else if (result != CURLE_OK) {
         curl_easy_getinfo(pCurlResponse->pCurl, CURLINFO_EFFECTIVE_URL, &url);
-        DLOGW("curl perform failed for url %s with result %s: %s", url, curl_easy_strerror(result), pCurlResponse->callInfo.errorBuffer);
+        DLOGW("[%s] curl perform failed for url %s with result %s: %s", pCurlResponse->pCurlRequest->streamName, url, curl_easy_strerror(result),
+              pCurlResponse->callInfo.errorBuffer);
 
         pCurlResponse->callInfo.callResult = getServiceCallResultFromCurlStatus(result);
     } else {
@@ -431,8 +433,8 @@ STATUS curlCompleteSync(PCurlResponse pCurlResponse)
             STRCAT(headers, header->data);
         }
 
-        DLOGW("HTTP Error %lu : Response: %s\nRequest URL: %s\nRequest Headers:%s", pCurlResponse->callInfo.httpStatus,
-              pCurlResponse->callInfo.responseData, url, headers);
+        DLOGW("[%s] HTTP Error %lu : Response: %s\nRequest URL: %s\nRequest Headers:%s", pCurlResponse->pCurlRequest->streamName,
+              pCurlResponse->callInfo.httpStatus, pCurlResponse->callInfo.responseData, url, headers);
     }
 
 CleanUp:
@@ -451,8 +453,8 @@ STATUS notifyDataAvailable(PCurlResponse pCurlResponse, UINT64 durationAvailable
 
     // pCurlResponse should be a putMedia session
     if (!ATOMIC_LOAD_BOOL(&pCurlResponse->terminated)) {
-        DLOGV("Note data received: duration(100ns): %" PRIu64 " bytes %" PRIu64 " for stream handle %" PRIu64, durationAvailable, sizeAvailable,
-              pCurlResponse->pCurlRequest->uploadHandle);
+        DLOGV("[%s] Note data received: duration(100ns): %" PRIu64 " bytes %" PRIu64 " for stream handle %" PRIu64,
+              pCurlResponse->pCurlRequest->streamName, durationAvailable, sizeAvailable, pCurlResponse->pCurlRequest->uploadHandle);
 
         if (pCurlResponse->paused && pCurlResponse->pCurl != NULL) {
             pCurlResponse->paused = FALSE;
@@ -461,7 +463,8 @@ STATUS notifyDataAvailable(PCurlResponse pCurlResponse, UINT64 durationAvailable
             // un-pause curl
             result = curl_easy_pause(pCurlResponse->pCurl, CURLPAUSE_SEND_CONT);
             if (result != CURLE_OK) {
-                DLOGW("Failed to un-pause curl with error: %u. Curl object %p", result, pCurlResponse->pCurl);
+                DLOGW("[%s] Failed to un-pause curl with error: %u. Curl object %p", pCurlResponse->pCurlRequest->streamName, result,
+                      pCurlResponse->pCurl);
             }
         }
     }
@@ -596,10 +599,10 @@ SIZE_T postWriteCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID cust
 CleanUp:
 
     if (STATUS_FAILED(retStatus)) {
-        DLOGW("Failed to submit ACK: %.*s with status code: 0x%08x", bufferSize, pBuffer, retStatus);
+        DLOGW("[%s] Failed to submit ACK: %.*s with status code: 0x%08x", pCurlRequest->streamName, bufferSize, pBuffer, retStatus);
 
     } else {
-        DLOGV("Processed ACK OK.");
+        DLOGV("[%s], Processed ACK OK.", pCurlRequest->streamName);
     }
 
     return dataSize;
@@ -616,6 +619,7 @@ SIZE_T postReadCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID custo
     UINT64 sleepTime = BASE_GET_DATA_SLEEP_TIME;
     UINT8 iter = 0;
     UPLOAD_HANDLE uploadHandle;
+    CHAR streamName[MAX_STREAM_NAME_LEN + 1];
     PCurlRequest pCurlRequest = (PCurlRequest) customData;
 
     if (pCurlRequest == NULL || pCurlRequest->pCurlResponse == NULL || pCurlRequest->pCurlApiCallbacks == NULL) {
@@ -623,6 +627,7 @@ SIZE_T postReadCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID custo
         CHK(FALSE, retStatus);
     }
 
+    STRNCPY(streamName, pCurlRequest->streamName, SIZEOF(pCurlRequest->streamName));
     pCurlResponse = pCurlRequest->pCurlResponse;
     pCurlApiCallbacks = pCurlRequest->pCurlApiCallbacks;
     uploadHandle = pCurlResponse->pCurlRequest->uploadHandle;
@@ -633,7 +638,7 @@ SIZE_T postReadCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID custo
     }
 
     if (pCurlResponse->endOfStream || ATOMIC_LOAD_BOOL(&pCurlRequest->requestInfo.terminating)) {
-        DLOGI("Closing connection for upload stream handle: %" PRIu64, uploadHandle);
+        DLOGI("[%s] Closing connection for upload stream handle: %" PRIu64, streamName, uploadHandle);
         CHK(FALSE, retStatus);
     }
 
@@ -642,7 +647,7 @@ SIZE_T postReadCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID custo
         // 20 40 80 160 320 (ms)
         if (iter > 0) {
             THREAD_SLEEP(sleepTime);
-            sleepTime *=2;
+            sleepTime *= 2;
         }
         retStatus =
             getKinesisVideoStreamData(pCurlResponse->pCurlRequest->streamHandle, uploadHandle, (PBYTE) pBuffer, (UINT32) bufferSize, &retrievedSize);
@@ -654,11 +659,10 @@ SIZE_T postReadCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID custo
 
         bytesWritten = (SIZE_T) retrievedSize;
 
-        DLOGV("Get Stream data returned: buffer size: %u written bytes: %u for upload handle: %" PRIu64 " current stream handle: %" PRIu64,
-              bufferSize, bytesWritten, uploadHandle, pCurlResponse->pCurlRequest->streamHandle);
-
+        DLOGV("[%s] Get Stream data returned: buffer size: %u written bytes: %u for upload handle: %" PRIu64 " current stream handle: %" PRIu64,
+              streamName, bufferSize, bytesWritten, uploadHandle, pCurlResponse->pCurlRequest->streamHandle);
         iter++;
-    } while(iter < MAX_GET_DATA_ITER && bytesWritten == 0 && (retStatus == STATUS_SUCCESS || retStatus == STATUS_NO_MORE_DATA_AVAILABLE));
+    } while (iter < MAX_GET_DATA_ITER && bytesWritten == 0 && (retStatus == STATUS_SUCCESS || retStatus == STATUS_NO_MORE_DATA_AVAILABLE));
 
     // The return should be OK, no more data or an end of stream
     switch (retStatus) {
@@ -667,13 +671,13 @@ SIZE_T postReadCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID custo
             // Media pipeline thread might be blocked due to heap or temporal limit.
             // Pause curl read and wait for persisted ack.
             if (bytesWritten == 0) {
-                DLOGD("Pausing CURL read for upload handle: %" PRIu64, uploadHandle);
+                DLOGD("[%s] Pausing CURL read for upload handle: %" PRIu64, streamName, uploadHandle);
                 bytesWritten = CURL_READFUNC_PAUSE;
             }
             break;
 
         case STATUS_END_OF_STREAM:
-            DLOGI("Reported end-of-stream for stream %s. Upload handle: %" PRIu64, pCurlRequest->streamName, uploadHandle);
+            DLOGI("Reported end-of-stream for stream %s. Upload handle: %" PRIu64, streamName, uploadHandle);
 
             pCurlResponse->endOfStream = TRUE;
 
@@ -684,13 +688,13 @@ SIZE_T postReadCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID custo
         case STATUS_AWAITING_PERSISTED_ACK:
             // If bytes_written == 0, set it to pause to exit the loop
             if (bytesWritten == 0) {
-                DLOGD("Pausing CURL read for upload handle: %" PRIu64 " waiting for last ack.", uploadHandle);
+                DLOGD("[%s] Pausing CURL read for upload handle: %" PRIu64 " waiting for last ack.", pCurlRequest->streamName, uploadHandle);
                 bytesWritten = CURL_READFUNC_PAUSE;
             }
             break;
 
         case STATUS_UPLOAD_HANDLE_ABORTED:
-            DLOGW("Reported abort-connection for Upload handle: %" PRIu64, uploadHandle);
+            DLOGW("[%s] Reported abort-connection for Upload handle: %" PRIu64, streamName, uploadHandle);
             bytesWritten = CURL_READFUNC_ABORT;
 
             // Graceful shutdown as PIC is aware of terminated stream
@@ -698,7 +702,7 @@ SIZE_T postReadCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID custo
             break;
 
         default:
-            DLOGE("Failed to get data from the stream with an error: 0x%08x", retStatus);
+            DLOGE("[%s] Failed to get data from the stream with an error: 0x%08x", streamName, retStatus);
 
             // set bytes_written to terminate and close the connection
             bytesWritten = CURL_READFUNC_ABORT;
@@ -707,12 +711,11 @@ SIZE_T postReadCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID custo
 CleanUp:
 
     if (bytesWritten != CURL_READFUNC_ABORT && bytesWritten != CURL_READFUNC_PAUSE) {
-        DLOGD("Wrote %u bytes to Kinesis Video. Upload stream handle: %" PRIu64, bytesWritten, uploadHandle);
-
+        DLOGD("[%s] Wrote %u bytes to Kinesis Video. Upload stream handle: %" PRIu64, streamName, bytesWritten, uploadHandle);
         if (bytesWritten != 0 && pCurlResponse->debugDumpFile) {
             retStatus = writeFile(pCurlResponse->debugDumpFilePath, TRUE, TRUE, (PBYTE) pBuffer, bytesWritten);
             if (STATUS_FAILED(retStatus)) {
-                DLOGW("Failed to write to debug dump file with error: 0x%08x", retStatus);
+                DLOGW("[%s] Failed to write to debug dump file with error: 0x%08x", streamName, retStatus);
             }
         }
     } else if (bytesWritten == CURL_READFUNC_PAUSE) {

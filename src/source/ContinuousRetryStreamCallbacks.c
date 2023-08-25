@@ -418,10 +418,8 @@ CleanUp:
             // Use the callback provider as the custom data
             // NOTE: This should be a prompt operation and shouldn't block the thread
             // NOTE: The handling application should perform it's own cleanup as continuous retry will not retry
-            pCallbacksProvider->clientCallbacks.streamErrorReportFn((UINT64) pCallbacksProvider,
-                                                                    pCallbackStateMachine->streamHandle,
-                                                                    pCallbackStateMachine->uploadHandle,
-                                                                    pCallbackStateMachine->erroredTimecode,
+            pCallbacksProvider->clientCallbacks.streamErrorReportFn((UINT64) pCallbacksProvider, pCallbackStateMachine->streamHandle,
+                                                                    pCallbackStateMachine->uploadHandle, pCallbackStateMachine->erroredTimecode,
                                                                     STATUS_CONTINUOUS_RETRY_RESET_FAILED);
         }
 
@@ -430,5 +428,5 @@ CleanUp:
     }
 
     LEAVES();
-    return (PVOID)(ULONG_PTR) retStatus;
+    return (PVOID) (ULONG_PTR) retStatus;
 }

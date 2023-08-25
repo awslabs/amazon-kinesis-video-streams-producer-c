@@ -73,12 +73,9 @@ STATUS blockingLwsCall(PRequestInfo pRequestInfo, PCallInfo pCallInfo)
 
 CleanUp:
 
-    if(retStatus == STATUS_IOT_CREATE_LWS_CONTEXT_FAILED)
-    {
+    if (retStatus == STATUS_IOT_CREATE_LWS_CONTEXT_FAILED) {
         DLOGW("Unable to create LWS context or connect to Websocket server");
-    }
-    else
-    {
+    } else {
         CHK_LOG_ERR(retStatus);
     }
     if (lwsContext != NULL) {
@@ -185,7 +182,7 @@ INT32 lwsIotCallbackRoutine(struct lws* wsi, enum lws_callback_reasons reason, P
             break;
 
         case LWS_CALLBACK_CLIENT_APPEND_HANDSHAKE_HEADER:
-            DLOGD("Client append handshake header\n");
+            DLOGD("Client append handshake header");
             CHK_STATUS(singleListGetNodeCount(pRequestInfo->pRequestHeaders, &headerCount));
             ppStartPtr = (PBYTE*) pDataIn;
             pEndPtr = *ppStartPtr + dataSize - 1;

@@ -25,7 +25,7 @@ TEST_F(ProducerFunctionalityTest, create_stream_async_free_stress_test)
 {
     createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
     UINT32 i = 0, wait;
-    SPRINTF(mStreamInfo.name, "ScaryTestStream_%d", 0);
+    SNPRINTF(mStreamInfo.name, MAX_STREAM_NAME_LEN + 1, "ScaryTestStream_%d", 0);
 
     for (i = 0; i < 5; i++) {
         EXPECT_EQ(STATUS_SUCCESS, createKinesisVideoStream(mClientHandle, &mStreamInfo, &mStreams[0]));
@@ -44,7 +44,7 @@ TEST_F(ProducerFunctionalityTest, create_two_stream_async_free_stress_test)
 
     for (i = 0; i < 3; i++) {
         for (j = 0; j < totalStreams; j++) {
-            SPRINTF(mStreamInfo.name, "ScaryTestStream_%d", j);
+            SNPRINTF(mStreamInfo.name, MAX_STREAM_NAME_LEN + 1, "ScaryTestStream_%d", j);
             EXPECT_EQ(STATUS_SUCCESS, createKinesisVideoStream(mClientHandle, &mStreamInfo, &mStreams[j]));
         }
         wait = RAND() % 100;

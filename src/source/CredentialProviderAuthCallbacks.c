@@ -7,8 +7,7 @@
 /**
  * Creates Credential Provider Auth callbacks
  */
-STATUS createCredentialProviderAuthCallbacks(PClientCallbacks pCallbacksProvider,
-                                             PAwsCredentialProvider pCredentialProvider,
+STATUS createCredentialProviderAuthCallbacks(PClientCallbacks pCallbacksProvider, PAwsCredentialProvider pCredentialProvider,
                                              PAuthCallbacks* ppCredentialProviderAuthCallbacks)
 {
     ENTERS();
@@ -105,7 +104,8 @@ CleanUp:
     return retStatus;
 }
 
-STATUS getStreamingTokenCredentialProviderFunc(UINT64 customData, PCHAR streamName, STREAM_ACCESS_MODE accessMode, PServiceCallContext pServiceCallContext)
+STATUS getStreamingTokenCredentialProviderFunc(UINT64 customData, PCHAR streamName, STREAM_ACCESS_MODE accessMode,
+                                               PServiceCallContext pServiceCallContext)
 {
     UNUSED_PARAM(streamName);
     UNUSED_PARAM(accessMode);
@@ -122,8 +122,7 @@ STATUS getStreamingTokenCredentialProviderFunc(UINT64 customData, PCHAR streamNa
     pCredentialProvider = (PAwsCredentialProvider) pCredentialProviderAuthCallbacks->pCredentialProvider;
     CHK_STATUS(pCredentialProvider->getCredentialsFn(pCredentialProvider, &pAwsCredentials));
 
-    retStatus = getStreamingTokenResultEvent(pServiceCallContext->customData, SERVICE_CALL_RESULT_OK,
-                                             (PBYTE) pAwsCredentials, pAwsCredentials->size,
+    retStatus = getStreamingTokenResultEvent(pServiceCallContext->customData, SERVICE_CALL_RESULT_OK, (PBYTE) pAwsCredentials, pAwsCredentials->size,
                                              pAwsCredentials->expiration);
 
     PCallbacksProvider pCallbacksProvider = pCredentialProviderAuthCallbacks->pCallbacksProvider;
