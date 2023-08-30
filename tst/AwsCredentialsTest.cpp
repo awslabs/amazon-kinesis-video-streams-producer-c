@@ -253,7 +253,7 @@ TEST_F(AwsCredentialsTest, TestFileCredentialsWriteWithSession) {
     UINT32 length = ARRAY_SIZE(fileContent);
 
     // Store the credentials in a file under the current dir
-    length = SNPRINTF(fileContent, length, "CREDENTIALS %s 1234567890 %s %s", mAccessKey, mSecretKey, mSessionToken);
+    length = SNPRINTF(fileContent, length, "CREDENTIALS %s 2200-01-01T00:00:00Z %s %s", mAccessKey, mSecretKey, mSessionToken);
     ASSERT_GT(ARRAY_SIZE(fileContent), length);
     ASSERT_EQ(STATUS_SUCCESS, writeFile(TEST_FILE_CREDENTIALS_FILE_PATH, FALSE, FALSE, (PBYTE) fileContent, length));
 
