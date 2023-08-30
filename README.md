@@ -70,6 +70,16 @@ cmake .. -DMEMORY_SANITIZER=TRUE
 ```
 DLOCAL_OPENSSL_BUILD requires first installing OpenSSL 1.1 (`brew install openssl@1.1` for Mac) and then running `export PKG_CONFIG_PATH="<YOUR-PATH>/openssl@1.1/lib/pkgconfig"` (your path can be printed to terminal using `which openssl` on Linux/Mac).
 
+
+DMEMORY_SANITIZER, DTHREAD_SANITIZER etc. flags works only with clang compiler 
+and not with gcc compiler. For using clang (on Ubuntu), do the following - 
+```
+sudo apt-get install clang
+export CC=/usr/bin/clang
+export CXX=/usr/bin/clang++
+cmake .. -DMEMORY_SANITIZER=TRUE
+```
+
 ### Build
 To build the library run make in the build directory you executed CMake.
 
