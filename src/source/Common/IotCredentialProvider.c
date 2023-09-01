@@ -139,7 +139,7 @@ STATUS parseIotResponse(PIotCredentialProvider pIotCredentialProvider, PCallInfo
     jsmn_parser parser;
     jsmntok_t tokens[MAX_JSON_TOKEN_COUNT];
     PCHAR accessKeyId = NULL, secretKey = NULL, sessionToken = NULL, expirationTimestamp = NULL, pResponseStr = NULL;
-    UINT64 expiration, currentTime;
+    UINT64 expiration, currentTime, jitter, randMultiplier;
     CHAR expirationTimestampStr[MAX_EXPIRATION_LEN + 1];
 
     CHK(pIotCredentialProvider != NULL && pCallInfo != NULL, STATUS_NULL_ARG);
@@ -191,10 +191,20 @@ STATUS parseIotResponse(PIotCredentialProvider pIotCredentialProvider, PCallInfo
         pIotCredentialProvider->pAwsCredentials = NULL;
     }
 
-    // Fix-up the expiration to be no more than max enforced token rotation to avoid extra token rotations
-    // as we are caching the returned value which is likely to be an hour but we are enforcing max
-    // rotation to be more frequent.
-    expiration = MIN(expiration, currentTime + MAX_ENFORCED_TOKEN_EXPIRATION_DURATION);
+    // Need to have large numbers since all items are in terms of HUNDREDS_NANOS_IN_A_SECOND. -1 to round down
+    randMultiplier = (ULONG_MAX / RAND_MAX) - 1;
+
+    // add randomized jitter between 1-20% of expiration
+    srand(currentTime / ((UINT64) sessionToken[rand() % (sessionTokenLen - 1)] + (UINT64) sessionToken[rand() % (sessionTokenLen - 1)]));
+    expiration -= currentTime;
+
+    // remainder after dividing by 19%
+    jitter = (rand() * randMultiplier) % (((expiration / 100) * 19) + (expiration % 100) * 19 / 100);
+    // add exaction 1% to change to range from 0-19 to 1-20;
+    jitter += expiration / 100;
+
+    expiration -= jitter;
+    expiration += currentTime;
 
     CHK_STATUS(createAwsCredentials(accessKeyId, accessKeyIdLen, secretKey, secretKeyLen, sessionToken, sessionTokenLen, expiration,
                                     &pIotCredentialProvider->pAwsCredentials));
