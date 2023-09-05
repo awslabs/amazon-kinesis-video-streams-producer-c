@@ -548,7 +548,9 @@ SIZE_T postResponseWriteCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PV
     pNewBuffer = (PCHAR) MEMALLOC(pCurlResponse->callInfo.responseDataLen + dataSize + SIZEOF(CHAR));
     if (pNewBuffer != NULL) {
         // Copy forward the old
-        MEMCPY(pNewBuffer, pCurlResponse->callInfo.responseData, pCurlResponse->callInfo.responseDataLen);
+        if (pCurlResponse->callInfo.responseDataLen > 0) {
+            MEMCPY(pNewBuffer, pCurlResponse->callInfo.responseData, pCurlResponse->callInfo.responseDataLen);
+        }
 
         // Append the new data
         MEMCPY((PBYTE) pNewBuffer + pCurlResponse->callInfo.responseDataLen, pBuffer, dataSize);
