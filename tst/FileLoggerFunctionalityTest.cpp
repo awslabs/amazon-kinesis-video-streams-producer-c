@@ -1,7 +1,7 @@
 #include "ProducerTestFixture.h"
 
-// length of time and log level string in log: "2019-11-09 19:11:16.xxxxxx VERBOSE "
-#define TIMESTRING_OFFSET               35
+// length of time and log level string in log: "2019-11-09 19:11:16.xxx VERBOSE "
+#define TIMESTRING_OFFSET               32
 
 namespace com { namespace amazonaws { namespace kinesis { namespace video {
 
