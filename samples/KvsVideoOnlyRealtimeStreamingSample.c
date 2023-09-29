@@ -4,7 +4,7 @@
 #define DEFAULT_BUFFER_DURATION           120 * HUNDREDS_OF_NANOS_IN_A_SECOND
 #define DEFAULT_CALLBACK_CHAIN_COUNT      5
 #define DEFAULT_KEY_FRAME_INTERVAL        45
-#define DEFAULT_FPS_VALUE                 25
+#define DEFAULT_FPS_VALUE                 1
 #define DEFAULT_STREAM_DURATION           20 * HUNDREDS_OF_NANOS_IN_A_SECOND
 #define DEFAULT_STORAGE_SIZE              20 * 1024 * 1024
 #define RECORDED_FRAME_AVG_BITRATE_BIT_PS 3800000
@@ -16,6 +16,24 @@
 
 #define FILE_LOGGING_BUFFER_SIZE (100 * 1024)
 #define MAX_NUMBER_OF_LOG_FILES  5
+
+BOOL g_error = FALSE;
+
+// Forward declaration of the default thread sleep function
+VOID defaultThreadSleep(UINT64);
+
+STATUS customStreamErrorReportCallback(UINT64 customData, STREAM_HANDLE streamHandle, UPLOAD_HANDLE uploadHandle, UINT64 fragmentTimecode,
+                                       STATUS errorStatus)
+{
+    DLOGW("Handling stream in custom callback");
+
+
+    g_error = TRUE;
+
+    return STATUS_SUCCESS;
+}
+
+
 STATUS readFrameData(PFrame pFrame, PCHAR frameFilePath, PCHAR videoCodec)
 {
     STATUS retStatus = STATUS_SUCCESS;
@@ -39,13 +57,23 @@ STATUS readFrameData(PFrame pFrame, PCHAR frameFilePath, PCHAR videoCodec)
         DLOGD("Key frame file %s, size %" PRIu64, filePath, pFrame->size);
     }
 
-CleanUp:
+    CleanUp:
 
     return retStatus;
 }
 
-// Forward declaration of the default thread sleep function
-VOID defaultThreadSleep(UINT64);
+PVOID test(PVOID args) {
+    PSTREAM_HANDLE streamHandle = (PSTREAM_HANDLE) args;
+
+    while(!g_error) {
+        THREAD_SLEEP(2 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND);
+    }
+    DLOGI("Attempting to stop streaming");
+    STATUS retStatus = stopKinesisVideoStreamSync(*streamHandle);
+    DLOGI("Stopping the streaming returned: 0x%08x", retStatus);
+
+    return NULL;
+}
 
 INT32 main(INT32 argc, CHAR* argv[])
 {
@@ -68,10 +96,11 @@ INT32 main(INT32 argc, CHAR* argv[])
     CHAR videoCodec[VIDEO_CODEC_NAME_MAX_LENGTH];
     STRNCPY(videoCodec, VIDEO_CODEC_NAME_H264, STRLEN(VIDEO_CODEC_NAME_H264)); // h264 video by default
     VIDEO_CODEC_ID videoCodecID = VIDEO_CODEC_ID_H264;
+    UINT32 callbacks = 0;
 
     if (argc < 2) {
         DLOGE("Usage: AWS_ACCESS_KEY_ID=SAMPLEKEY AWS_SECRET_ACCESS_KEY=SAMPLESECRET %s <stream_name> <codec> <duration_in_seconds> "
-              "<frame_files_path>\n",
+              "<frame_files_path> [callbacks]\n",
               argv[0]);
         CHK(FALSE, STATUS_INVALID_ARG);
     }
@@ -82,7 +111,7 @@ INT32 main(INT32 argc, CHAR* argv[])
     }
 
     MEMSET(frameFilePath, 0x00, MAX_PATH_LEN + 1);
-    if (argc < 5) {
+    if (argc < 5 || strlen(argv[4]) == 0) {
         STRCPY(frameFilePath, (PCHAR) "../samples/");
     } else {
         STRNCPY(frameFilePath, argv[4], MAX_PATH_LEN);
@@ -106,6 +135,11 @@ INT32 main(INT32 argc, CHAR* argv[])
         // Get the duration and convert to an integer
         CHK_STATUS(STRTOUI64(argv[3], NULL, 10, &streamingDuration));
         streamingDuration *= HUNDREDS_OF_NANOS_IN_A_SECOND;
+        printf("Streaming duration: %llu\n", streamingDuration);
+    }
+
+    if (argc >= 6) {
+        CHK_STATUS(STRTOUI32(argv[5], NULL, 10, &callbacks));
     }
 
     streamStopTime = GETTIME() + streamingDuration;
@@ -113,11 +147,11 @@ INT32 main(INT32 argc, CHAR* argv[])
     // default storage size is 128MB. Use setDeviceInfoStorageSize after create to change storage size.
     CHK_STATUS(createDefaultDeviceInfo(&pDeviceInfo));
     // adjust members of pDeviceInfo here if needed
-    pDeviceInfo->clientInfo.loggerLogLevel = LOG_LEVEL_DEBUG;
+    pDeviceInfo->clientInfo.loggerLogLevel = LOG_LEVEL_VERBOSE;
     pDeviceInfo->storageInfo.storageSize = DEFAULT_STORAGE_SIZE;
 
     CHK_STATUS(
-        createRealtimeVideoStreamInfoProviderWithCodecs(streamName, DEFAULT_RETENTION_PERIOD, DEFAULT_BUFFER_DURATION, videoCodecID, &pStreamInfo));
+            createRealtimeVideoStreamInfoProviderWithCodecs(streamName, DEFAULT_RETENTION_PERIOD, DEFAULT_BUFFER_DURATION, videoCodecID, &pStreamInfo));
     CHK_STATUS(setStreamInfoBasedOnStorageSize(DEFAULT_STORAGE_SIZE, RECORDED_FRAME_AVG_BITRATE_BIT_PS, 1, pStreamInfo));
     // adjust members of pStreamInfo here if needed
 
@@ -133,7 +167,11 @@ INT32 main(INT32 argc, CHAR* argv[])
     }
 
     CHK_STATUS(createStreamCallbacks(&pStreamCallbacks));
+    if (callbacks & 1) {
+        pStreamCallbacks->streamErrorReportFn = customStreamErrorReportCallback;
+    }
     CHK_STATUS(addStreamCallbacks(pClientCallbacks, pStreamCallbacks));
+
 
     CHK_STATUS(createKinesisVideoClient(pDeviceInfo, pClientCallbacks, &clientHandle));
     CHK_STATUS(createKinesisVideoStreamSync(clientHandle, pStreamInfo, &streamHandle));
@@ -147,7 +185,10 @@ INT32 main(INT32 argc, CHAR* argv[])
     frame.decodingTs = GETTIME(); // current time
     frame.presentationTs = frame.decodingTs;
 
-    while (GETTIME() < streamStopTime) {
+    TID threadId;
+    THREAD_CREATE(&threadId, test, (PVOID) &streamHandle);
+
+    while (GETTIME() < streamStopTime && !g_error) {
         frame.index = frameIndex;
         frame.flags = fileIndex % DEFAULT_KEY_FRAME_INTERVAL == 0 ? FRAME_FLAG_KEY_FRAME : FRAME_FLAG_NONE;
         frame.size = SIZEOF(frameBuffer);
@@ -169,12 +210,15 @@ INT32 main(INT32 argc, CHAR* argv[])
         fileIndex = fileIndex % NUMBER_OF_FRAME_FILES;
     }
 
-    CHK_STATUS(stopKinesisVideoStreamSync(streamHandle));
+    THREAD_JOIN(threadId, NULL);
+
+    if(g_error) {
+        CHK_STATUS(kinesisVideoStreamResetStream(streamHandle));
+    }
     CHK_STATUS(freeKinesisVideoStream(&streamHandle));
     CHK_STATUS(freeKinesisVideoClient(&clientHandle));
 
-CleanUp:
-
+    CleanUp:
     if (STATUS_FAILED(retStatus)) {
         DLOGE("Failed with status 0x%08x", retStatus);
     }
