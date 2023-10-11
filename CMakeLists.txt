@@ -16,6 +16,7 @@ option(BUILD_COMMON_LWS "Whether or not to build ProducerC libwebsockets common 
 option(BUILD_COMMON_CURL "Whether or not to build ProducerC curl common library" ON)
 option(BUILD_OPENSSL_PLATFORM "If buildng OpenSSL what is the target platform" OFF)
 option(LOCAL_OPENSSL_BUILD "Whether or not to use local OpenSSL build" OFF)
+option(CONSTRAINED_DEVICE "Change pthread stack size" OFF)
 
 # Developer Flags
 option(BUILD_TEST "Build the testing tree." OFF)
@@ -33,6 +34,10 @@ set(CMAKE_MACOSX_RPATH TRUE)
 get_filename_component(ROOT "${CMAKE_CURRENT_SOURCE_DIR}" ABSOLUTE)
 
 add_definitions(-DVERSION_STRING=\"${PROJECT_VERSION}\")
+
+if(CONSTRAINED_DEVICE)
+    add_definitions(-DCONSTRAINED_DEVICE)
+endif()
 
 if(NOT KINESIS_VIDEO_PRODUCER_C_SRC)
     if(DEFINED ENV{KINESIS_VIDEO_PRODUCER_C_SRC})
