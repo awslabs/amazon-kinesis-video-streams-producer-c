@@ -133,6 +133,31 @@ For audio only, run `./kvsAudioOnlyStreamingSample <stream-name> <streaming_dura
 
 This will stream the audio files from the `samples/aacSampleFrames` or `samples/alawSampleFrames` (as per the choice of audio codec in the last argument) respectively. 
 
+### Setting log levels
+
+
+### Setup logging:
+Set up the desired log level. The log levels and corresponding values currently available are:
+1. `LOG_LEVEL_VERBOSE` ---- 1
+2. `LOG_LEVEL_DEBUG`   ---- 2
+3. `LOG_LEVEL_INFO`    ---- 3
+4. `LOG_LEVEL_WARN`    ---- 4
+5. `LOG_LEVEL_ERROR`   ---- 5
+6. `LOG_LEVEL_FATAL`   ---- 6
+7. `LOG_LEVEL_SILENT`  ---- 7
+8. `LOG_LEVEL_PROFILE` ---- 8
+
+To set a log level, you can set it using the deviceInfo structure. 
+```
+pDeviceInfo->clientInfo.loggerLogLevel = LOG_LEVEL_DEBUG;
+```
+
+By default, our samples set the log level to `LOG_LEVEL_DEBUG`.
+
+The SDK also tracks entry and exit of functions which increases the verbosity of the logs. This will be useful when you want to track the transitions within the codebase. To do so, you need to set log level to `LOG_LEVEL_VERBOSE` and add the following to the cmake file:
+`add_definitions(-DLOG_STREAMING)`
+Note: This log level is extremely VERBOSE and could flood the files if using file based logging strategy.
+
 ### Run unit tests
 Since these tests exercise networking you need to have AWS credentials specified, specifically you need to:
 
