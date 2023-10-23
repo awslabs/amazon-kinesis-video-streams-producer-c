@@ -1,5 +1,7 @@
 var NAVTREEINDEX1 =
 {
+"struct____ApiCallbacks.html#a0755592a536906d948047b068eb82a9b":[1,8,10,4],
+"struct____ApiCallbacks.html#a0bf3224a128a4c071a42744b41ed9635":[1,8,10,6],
 "struct____ApiCallbacks.html#a0d3c5e397c739a9babb32b22fa47fce4":[1,8,10,8],
 "struct____ApiCallbacks.html#a295fb04bb6f3e7c652b4b1fc7faea3e9":[1,8,10,5],
 "struct____ApiCallbacks.html#a4736e86a8272d0c90888e6f8acbe6ce7":[1,8,10,2],
