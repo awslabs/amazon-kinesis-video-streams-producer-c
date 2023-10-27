@@ -348,6 +348,9 @@ if(BUILD_COMMON_CURL)
     add_executable(kvsAudioOnlyStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsAudioOnlyStreamingSample.c)
     target_link_libraries(kvsAudioOnlyStreamingSample cproducer)
 
+    add_executable(kvsMuLawAudioVideoStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsMuLawAudioVideoStreamingSample.c)
+    target_link_libraries(kvsMuLawAudioVideoStreamingSample cproducer)
+
     if (BUILD_TEST)
         add_subdirectory(tst)
     endif()
