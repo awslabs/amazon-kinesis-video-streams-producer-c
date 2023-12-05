@@ -13,6 +13,7 @@
 #define VIDEO_CODEC_NAME_MAX_LENGTH       5
 #define METADATA_MAX_KEY_LENGTH           128
 #define METADATA_MAX_VALUE_LENGTH         256
+#define MAX_METADATA_PER_FRAGMENT         10
 
 #define NUMBER_OF_FRAME_FILES 403
 
@@ -72,8 +73,8 @@ INT32 main(INT32 argc, CHAR* argv[])
     VIDEO_CODEC_ID videoCodecID = VIDEO_CODEC_ID_H264;
 
     if (argc < 2) {
-        DLOGE("Usage: AWS_ACCESS_KEY_ID=SAMPLEKEY AWS_SECRET_ACCESS_KEY=SAMPLESECRET %s <stream_name> <codec> <duration_in_seconds> "
-              "<frame_files_path> [num_metadata]\n",
+        DLOGE("Usage: AWS_ACCESS_KEY_ID=SAMPLEKEY AWS_SECRET_ACCESS_KEY=SAMPLESECRET %s <stream_name>"
+              "<codec> <duration_in_seconds> <frame_files_path> [num_metadata = 10]\n",
               argv[0]);
         CHK(FALSE, STATUS_INVALID_ARG);
     }
@@ -90,28 +91,30 @@ INT32 main(INT32 argc, CHAR* argv[])
         region = (PCHAR) DEFAULT_AWS_REGION;
     }
 
-    if (argc >= 3 && STRLEN(argv[2]) > 0) {
+    if (argc >= 3 && !IS_EMPTY_STRING(argv[2])) {
         if (!STRCMP(argv[2], VIDEO_CODEC_NAME_H265)) {
             STRNCPY(videoCodec, VIDEO_CODEC_NAME_H265, STRLEN(VIDEO_CODEC_NAME_H265));
             videoCodecID = VIDEO_CODEC_ID_H265;
         }
     }
 
-    if (argc >= 4 && STRLEN(argv[3]) > 0) {
+    if (argc >= 4 && !IS_EMPTY_STRING(argv[3])) {
         // Get the duration and convert to an integer
         CHK_STATUS(STRTOUI64(argv[3], NULL, 10, &streamingDuration));
         streamingDuration *= HUNDREDS_OF_NANOS_IN_A_SECOND;
     }
 
     MEMSET(frameFilePath, 0x00, MAX_PATH_LEN + 1);
-    if (argc < 5 || STRLEN(argv[4]) == 0) {
-        STRCPY(frameFilePath, (PCHAR) "../samples/");
-    } else {
+    if (argc >= 5 && !IS_EMPTY_STRING(argv[4])) {
         STRNCPY(frameFilePath, argv[4], MAX_PATH_LEN);
+    } else {
+        STRCPY(frameFilePath, (PCHAR) "../samples/");
     }
 
-    if (argc >= 6 && STRLEN(argv[5]) > 0) {
+    if (argc >= 6 && !IS_EMPTY_STRING(argv[5])) {
         numMetadata = STRTOUL(argv[5], NULL, 10);
+        DLOGD("numMetadata: %d\n", numMetadata);
+        CHK(numMetadata <= MAX_METADATA_PER_FRAGMENT, STATUS_INVALID_ARG);
     }
 
     streamStopTime = GETTIME() + streamingDuration;
