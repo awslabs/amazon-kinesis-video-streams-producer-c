@@ -3,6 +3,11 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake;${CMAKE_MODULE_PATH}")
 include(Utilities)
 project(KinesisVideoProducerC VERSION 1.5.1 LANGUAGES C)
 
+set(KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION 1)
+set(KINESIS_VIDEO_PRODUCER_C_MINOR_VERSION 4)
+set(KINESIS_VIDEO_PRODUCER_C_PATCH_VERSION 0)
+set(KINESIS_VIDEO_PRODUCER_C_VERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION}.${KINESIS_VIDEO_PRODUCER_C_MINOR_VERSION}.${KINESIS_VIDEO_PRODUCER_C_PATCH_VERSION})
+
 include(GNUInstallDirs)
 
 
@@ -28,6 +33,11 @@ option(THREAD_SANITIZER "Build with ThreadSanitizer." OFF)
 option(UNDEFINED_BEHAVIOR_SANITIZER "Build with UndefinedBehaviorSanitizer." OFF)
 option(ALIGNED_MEMORY_MODEL "Aligned memory model ONLY." OFF)
 option(SET_SSL_CALLBACKS "Set SSL thread and lock callbacks." OFF)
+
+set(TYPE_OF_LIB SHARED)
+if (BUILD_STATIC)
+  set(TYPE_OF_LIB STATIC)
+endif()
 
 set(CMAKE_MACOSX_RPATH TRUE)
 
@@ -262,8 +272,11 @@ if(BUILD_COMMON_LWS)
       "${CMAKE_CURRENT_SOURCE_DIR}/libkvsCommonLws.pc.cmake"
       "${CMAKE_CURRENT_BINARY_DIR}/libkvsCommonLws.pc" @ONLY)
 
-    add_library(kvsCommonLws STATIC ${KVS_COMMON_SOURCE_FILES_BASE} ${KVS_COMMON_SOURCE_FILES_LWS})
+    add_library(kvsCommonLws ${TYPE_OF_LIB} ${KVS_COMMON_SOURCE_FILES_BASE} ${KVS_COMMON_SOURCE_FILES_LWS})
     target_compile_definitions(kvsCommonLws PRIVATE KVS_BUILD_WITH_LWS ${CPRODUCER_COMMON_TLS_OPTION})
+    if(NOT BUILD_STATIC)
+      set_target_properties(kvsCommonLws PROPERTIES VERSION ${KINESIS_VIDEO_PRODUCER_C_VERSION} SOVERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION})
+    endif()
     target_link_libraries(kvsCommonLws
             ${OPENSSL_CRYPTO_LIBRARY}
             ${OPENSSL_SSL_LIBRARY}
@@ -295,8 +308,11 @@ if(BUILD_COMMON_CURL)
       endif()
     endif()
 
-    add_library(kvsCommonCurl STATIC ${KVS_COMMON_SOURCE_FILES_BASE} ${KVS_COMMON_SOURCE_FILES_CURL})
+    add_library(kvsCommonCurl ${TYPE_OF_LIB} ${KVS_COMMON_SOURCE_FILES_BASE} ${KVS_COMMON_SOURCE_FILES_CURL})
     target_compile_definitions(kvsCommonCurl PRIVATE KVS_BUILD_WITH_CURL ${CPRODUCER_COMMON_TLS_OPTION})
+    if(NOT BUILD_STATIC)
+      set_target_properties(kvsCommonCurl PROPERTIES VERSION ${KINESIS_VIDEO_PRODUCER_C_VERSION} SOVERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION})
+    endif()
     target_link_libraries(kvsCommonCurl
             kvspicUtils
             ${CURL_LIBRARIES}
@@ -315,15 +331,13 @@ if(BUILD_COMMON_CURL)
       "${CMAKE_CURRENT_SOURCE_DIR}/libcproducer.pc.cmake"
       "${CMAKE_CURRENT_BINARY_DIR}/libcproducer.pc" @ONLY)
 
-    set(TYPE_OF_LIB SHARED)
-    if (BUILD_STATIC)
-      set(TYPE_OF_LIB STATIC)
-    endif()
-
     if (WIN32)
       add_library(cproducer STATIC ${PRODUCER_C_SOURCE_FILES})
     else()
       add_library(cproducer ${TYPE_OF_LIB} ${PRODUCER_C_SOURCE_FILES})
+    endif()
+    if(NOT BUILD_STATIC)
+      set_target_properties(cproducer PROPERTIES VERSION ${KINESIS_VIDEO_PRODUCER_C_VERSION} SOVERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION})
     endif()
     target_link_libraries(cproducer PUBLIC kvsCommonCurl kvspic)
 
