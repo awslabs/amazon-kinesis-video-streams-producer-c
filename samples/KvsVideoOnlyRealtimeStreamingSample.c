@@ -113,7 +113,7 @@ INT32 main(INT32 argc, CHAR* argv[])
 
     if (argc >= 6 && !IS_EMPTY_STRING(argv[5])) {
         numMetadata = STRTOUL(argv[5], NULL, 10);
-        DLOGE("numMetadata: %d\n", numMetadata);
+        DLOGD("numMetadata: %d\n", numMetadata);
         CHK(numMetadata <= MAX_METADATA_PER_FRAGMENT, STATUS_INVALID_ARG);
     }
 

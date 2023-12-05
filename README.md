@@ -133,6 +133,17 @@ For audio only, run `./kvsAudioOnlyStreamingSample <stream-name> <streaming_dura
 
 This will stream the audio files from the `samples/aacSampleFrames` or `samples/alawSampleFrames` (as per the choice of audio codec in the last argument) respectively. 
 
+### Fragment metadata
+
+`./kvsVideoOnlyRealtimeStreamingSample` is the only sample that has the [fragment metadata](https://docs.aws.amazon.com/kinesisvideostreams/latest/dg/how-meta.html) implemented out of the box.
+
+In addition to the required arguments above, this sample has an additional argument:
+```shell
+./kvsVideoOnlyRealtimeStreamingSample <stream-name> <video-codec> <streaming-duration-in-seconds> <sample-location> <num-metadata>
+```
+
+`num-metadata` -- the number of sample fragment metadata key-value pairs that are added to each fragment. Min: 0, Max: 10. Default: 10.
+
 ### Setting log levels
 
 
