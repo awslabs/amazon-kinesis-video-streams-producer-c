@@ -113,7 +113,7 @@ INT32 main(INT32 argc, CHAR* argv[])
 
     if (argc >= 6 && !IS_EMPTY_STRING(argv[5])) {
         numMetadata = STRTOUL(argv[5], NULL, 10);
-        DLOGD("numMetadata: %d\n", numMetadata);
+        DLOGE("numMetadata: %d\n", numMetadata);
         CHK(numMetadata <= MAX_METADATA_PER_FRAGMENT, STATUS_INVALID_ARG);
     }
 
@@ -165,7 +165,7 @@ INT32 main(INT32 argc, CHAR* argv[])
 
         // Add the fragment metadata key-value pairs
         // For limits, refer to https://docs.aws.amazon.com/kinesisvideostreams/latest/dg/limits.html#limits-streaming-metadata
-        if (frame.flags == FRAME_FLAG_KEY_FRAME) {
+        if (numMetadata > 0 && frame.flags == FRAME_FLAG_KEY_FRAME) {
             DLOGD("Adding metadata! frameIndex: %d", frame.index);
             for (n = 1; n <= numMetadata; n++) {
                 SNPRINTF(metadataKey, METADATA_MAX_KEY_LENGTH, "TEST_KEY_%d", n);
