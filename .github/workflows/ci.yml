@@ -29,8 +29,8 @@ jobs:
       id-token: write
       contents: read
     env:
-      CC: gcc
-      CXX: g++
+      CC: /usr/local/bin/gcc-13
+      CXX: /usr/local/bin/g++-13
       AWS_KVS_LOG_LEVEL: 2
     steps:
       - name: Clone repository
@@ -85,14 +85,43 @@ jobs:
           cd build
           ./tst/producer_test
 
+  mac-os-m1-build-clang:
+    runs-on: macos-13-xlarge
+    env:
+      AWS_KVS_LOG_LEVEL: 2
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+      - name: Build repository
+        run: |
+          brew install pkgconfig
+          brew unlink openssl # it seems the libcurl is trying to access this openssl despite explicitly setting it to our build
+          mkdir build && cd build
+          sh -c 'cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DCMAKE_C_COMPILER=$(brew --prefix llvm@15)/bin/clang -DCMAKE_CXX_COMPILER=$(brew --prefix llvm@15)/bin/clang++;cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DCMAKE_C_COMPILER=$(brew --prefix llvm@15)/bin/clang -DCMAKE_CXX_COMPILER=$(brew --prefix llvm@15)/bin/clang++'
+          make
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-duration-seconds: 10800
+      - name: Run tests
+        run: |
+          cd build
+          ./tst/producer_test
+
   mac-os-build-gcc-local-openssl:
     runs-on: macos-11
     permissions:
       id-token: write
       contents: read
     env:
-      CC: gcc
-      CXX: g++
+      CC: /usr/local/bin/gcc-13
+      CXX: /usr/local/bin/g++-13
       AWS_KVS_LOG_LEVEL: 2
       LDFLAGS: -L/usr/local/opt/openssl@3/lib
       CPPFLAGS: -I/usr/local/opt/openssl@3/include
