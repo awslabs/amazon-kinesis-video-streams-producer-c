@@ -133,6 +133,15 @@ For audio only, run `./kvsAudioOnlyStreamingSample <stream-name> <streaming_dura
 
 This will stream the audio files from the `samples/aacSampleFrames` or `samples/alawSampleFrames` (as per the choice of audio codec in the last argument) respectively. 
 
+### Running with IoT credential provider
+
+To run the samples with IoT credential provider:
+
+1. Run the IoT thing generation script available under `scripts`: `source scripts/generate-iot-credential.sh`. For more information on IoT set up, visit [AWS KVS IoT Set up](https://docs.aws.amazon.com/kinesisvideostreams/latest/dg/how-iot.html)
+2. Uncomment `#define IOT_CORE_ENABLE_CREDENTIALS 1` in the relevant sample
+3. Build the changes: `make`
+4. Run the sample using the instructions in previous section.
+
 ### Setting log levels
 
 
