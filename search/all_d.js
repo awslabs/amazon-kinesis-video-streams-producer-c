@@ -18,7 +18,8 @@ var searchData=
   ['max_5frequest_5fheader_5fvalue_5flen_341',['MAX_REQUEST_HEADER_VALUE_LEN',['../group__NameLengths.html#gad2bb224c59263f240736e62845ba8f9e',1,'Include.h']]],
   ['max_5frole_5falias_5flen_342',['MAX_ROLE_ALIAS_LEN',['../group__NameLengths.html#gadab2a0271144b7cc64762619c2dcfa30',1,'Include.h']]],
   ['max_5fsecret_5fkey_5flen_343',['MAX_SECRET_KEY_LEN',['../group__NameLengths.html#gaff3aaabf4f4790b750613d28c0e9f6da',1,'Include.h']]],
-  ['max_5fsession_5ftoken_5flen_344',['MAX_SESSION_TOKEN_LEN',['../group__NameLengths.html#ga7352d249181da907a72552a26b6f74d2',1,'Include.h']]],
-  ['max_5fuser_5fagent_5flen_345',['MAX_USER_AGENT_LEN',['../group__NameLengths.html#ga1fd58571978293f33ed3c56e1c5b4b30',1,'Include.h']]],
-  ['miscellaneous_346',['Miscellaneous',['../group__Miscellaneous.html',1,'']]]
+  ['max_5fservice_5fname_5flen_344',['MAX_SERVICE_NAME_LEN',['../group__NameLengths.html#ga0223834bc64d85613a198d7ded5c5b93',1,'Include.h']]],
+  ['max_5fsession_5ftoken_5flen_345',['MAX_SESSION_TOKEN_LEN',['../group__NameLengths.html#ga7352d249181da907a72552a26b6f74d2',1,'Include.h']]],
+  ['max_5fuser_5fagent_5flen_346',['MAX_USER_AGENT_LEN',['../group__NameLengths.html#ga1fd58571978293f33ed3c56e1c5b4b30',1,'Include.h']]],
+  ['miscellaneous_347',['Miscellaneous',['../group__Miscellaneous.html',1,'']]]
 ];

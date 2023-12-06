@@ -32,6 +32,7 @@ var group__PublicStructures =
       [ "pAwsCredentials", "struct____RequestInfo.html#a76d91a3f4cb2a9b5eaa9e04f7431a2fc", null ],
       [ "pRequestHeaders", "struct____RequestInfo.html#a202e403af1ed8778ded34baad2a0f2f7", null ],
       [ "region", "struct____RequestInfo.html#a8b3d52b06e3e1213db1e68cc18c267be", null ],
+      [ "service", "struct____RequestInfo.html#aac8cb457af2496639eb6ba84bc37b9ca", null ],
       [ "sslCertPath", "struct____RequestInfo.html#a44b60d70457b4228d26707ad590d63a4", null ],
       [ "sslPrivateKeyPath", "struct____RequestInfo.html#ac5a8eb4ef63c830e5b5a961bfcf105ae", null ],
       [ "terminating", "struct____RequestInfo.html#a3e740399d2856512c914bae1e8010f17", null ],
