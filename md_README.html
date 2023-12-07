@@ -182,13 +182,22 @@ Run samples</h3>
 <p>For audio only, run <code>./kvsAudioOnlyStreamingSample &lt;stream-name&gt; &lt;streaming_duration&gt; &lt;sample_location&gt; &lt;audio-codec&gt;</code>.</p>
 <p>This will stream the audio files from the <code>samples/aacSampleFrames</code> or <code>samples/alawSampleFrames</code> (as per the choice of audio codec in the last argument) respectively.</p>
 <h3><a class="anchor" id="autotoc_md8"></a>
+Running with IoT credential provider</h3>
+<p>To run the samples with IoT credential provider:</p>
+<ol type="1">
+<li>Run the IoT thing generation script available under <code>scripts</code>: <code>source scripts/generate-iot-credential.sh</code>. For more information on IoT set up, visit <a href="https://docs.aws.amazon.com/kinesisvideostreams/latest/dg/how-iot.html">AWS KVS IoT Set up</a></li>
+<li>Uncomment <code>#define IOT_CORE_ENABLE_CREDENTIALS 1</code> in the relevant sample</li>
+<li>Build the changes: <code>make</code></li>
+<li>Run the sample using the instructions in previous section.</li>
+</ol>
+<h3><a class="anchor" id="autotoc_md9"></a>
 Fragment metadata</h3>
 <p><code>./kvsVideoOnlyRealtimeStreamingSample</code> is the only sample that has the <a href="https://docs.aws.amazon.com/kinesisvideostreams/latest/dg/how-meta.html">fragment metadata</a> implemented out of the box.</p>
 <p>In addition to the required arguments above, this sample has an additional argument: </p><div class="fragment"><div class="line">./kvsVideoOnlyRealtimeStreamingSample &lt;stream-name&gt; &lt;video-codec&gt; &lt;streaming-duration-in-seconds&gt; &lt;sample-location&gt; &lt;num-metadata&gt;</div>
 </div><!-- fragment --><p><code>num-metadata</code> &ndash; the number of sample fragment metadata key-value pairs that are added to each fragment. Min: 0, Max: 10. Default: 10.</p>
-<h3><a class="anchor" id="autotoc_md9"></a>
-Setting log levels</h3>
 <h3><a class="anchor" id="autotoc_md10"></a>
+Setting log levels</h3>
+<h3><a class="anchor" id="autotoc_md11"></a>
 Setup logging:</h3>
 <p>Set up the desired log level. The log levels and corresponding values currently available are:</p><ol type="1">
 <li><code>LOG_LEVEL_VERBOSE</code> -&mdash; 1</li>
@@ -203,18 +212,18 @@ Setup logging:</h3>
 <p>To set a log level, you can set it using the deviceInfo structure. </p><div class="fragment"><div class="line">pDeviceInfo-&gt;clientInfo.loggerLogLevel = LOG_LEVEL_DEBUG;</div>
 </div><!-- fragment --><p>By default, our samples set the log level to <code>LOG_LEVEL_DEBUG</code>.</p>
 <p>The SDK also tracks entry and exit of functions which increases the verbosity of the logs. This will be useful when you want to track the transitions within the codebase. To do so, you need to set log level to <code>LOG_LEVEL_VERBOSE</code> and add the following to the cmake file: <code>add_definitions(-DLOG_STREAMING)</code> Note: This log level is extremely VERBOSE and could flood the files if using file based logging strategy.</p>
-<h3><a class="anchor" id="autotoc_md11"></a>
+<h3><a class="anchor" id="autotoc_md12"></a>
 Run unit tests</h3>
 <p>Since these tests exercise networking you need to have AWS credentials specified, specifically you need to:</p>
 <div class="fragment"><div class="line">export AWS_SECRET_ACCESS_KEY=&lt;YourAWSSecretAccessKey&gt;</div>
 <div class="line">export AWS_ACCESS_KEY_ID=&lt;YourAWSAccessKey&gt;</div>
 </div><!-- fragment --><p>Now you can execute the unit tests from the <code>build</code> directory as follows: <code>./tst/producer_test</code></p>
-<h3><a class="anchor" id="autotoc_md12"></a>
+<h3><a class="anchor" id="autotoc_md13"></a>
 Offline mode</h3>
 <p>The samples run in near real time mode by default. In order to set up offline mode, the following APIs can be used in the samples instead of the realtime variant:</p>
 <p>For video only: <code><a class="el" href="group__PublicMemberFunctions.html#ga6e083dfc57516c4efaa9951df09c6848">createOfflineVideoStreamInfoProviderWithCodecs()</a></code> For video and audio: <code><a class="el" href="group__PublicMemberFunctions.html#ga70f651dfddea8ff8e60c89571204be15">createOfflineAudioVideoStreamInfoProviderWithCodecs()</a></code></p>
 <p>The 2 APIs are available in <a href="https://github.com/awslabs/amazon-kinesis-video-streams-producer-c/blob/412aab82c99a72f9dbde975f5fea81ffdc844ae5/src/include/com/amazonaws/kinesis/video/cproducer/Include.h">this</a> header file.</p>
-<h2><a class="anchor" id="autotoc_md13"></a>
+<h2><a class="anchor" id="autotoc_md14"></a>
 DEBUG</h2>
 <ul>
 <li>When building OpenSSL during <code>cmake ..</code>, if you encounter an architecture error such as <code>ld: symbol(s) not found for architecture i386</code>, building with a local OpenSSL build may help. First install OpenSSL 1.1 (for Mac: <code>brew install openssl@1.1</code>). Next set <code>export PKG_CONFIG_PATH="&lt;YOUR-PATH&gt;/openssl@1.1/lib/pkgconfig"</code> (your path can be printed to terminal using <code>which openssl</code> on Linux/Mac). Now set the following flag to ON when building: <code>cmake .. -DLOCAL_OPENSSL_BUILD=ON</code>. If there are still errors regarding locating the local OpenSSL library:<ul>
@@ -224,29 +233,29 @@ DEBUG</h2>
 </ul>
 </li>
 </ul>
-<h2><a class="anchor" id="autotoc_md14"></a>
+<h2><a class="anchor" id="autotoc_md15"></a>
 Development</h2>
 <p>The repository is using <code>develop</code> branch as the aggregation and all of the feature development is done in appropriate feature branches. The PRs (Pull Requests) are cut on a feature branch and once approved with all the checks passed they can be merged by a click of a button on the PR tool. The master branch should always be build-able and all the tests should be passing. We are welcoming any contribution to the code base. The master branch contains our most recent release cycle from <code>develop</code>.</p>
-<h3><a class="anchor" id="autotoc_md15"></a>
+<h3><a class="anchor" id="autotoc_md16"></a>
 Release</h3>
 <p>The repository is under active development and even with incremental unit test coverage where some of the tests are actually full integration tests, we require more rigorous internal testing in order to 'cut' release versions. The release is cut against a particular commit that gets approved. The general philosophy is to cut a release when a set of commits contribute to a self-containing feature or when we add major internal functionality improvements.</p>
-<h3><a class="anchor" id="autotoc_md16"></a>
+<h3><a class="anchor" id="autotoc_md17"></a>
 Versioning</h3>
 <p>We deploy 3 digit version strings in a form of 'Major.Minor.Revision' scheme.</p><ul>
 <li>Major version update - Major functionality changes. Might not have direct backward compatibility. For example, multiple public API parameter changes.</li>
 <li>Minor version update - Additional features. Major bug fixes. Might have some minor backward compatibility issues. For example, an extra parameter on a callback function.</li>
 <li>Revision version update - Minor features. Bug fixes. Full backward compatibility. For example, an extra fields added to the public structures with version bump.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md17"></a>
-Documentation</h2>
 <h2><a class="anchor" id="autotoc_md18"></a>
+Documentation</h2>
+<h2><a class="anchor" id="autotoc_md19"></a>
 Related</h2>
 <ul>
 <li><a href="https://github.com/awslabs/amazon-kinesis-video-streams-producer-sdk-cpp/">CPP SDK</a></li>
 <li><a href="https://github.com/awslabs/amazon-kinesis-video-streams-producer-sdk-java/">Java SDK</a></li>
 <li><a href="https://github.com/awslabs/amazon-kinesis-video-streams-pic/">PIC</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md19"></a>
+<h2><a class="anchor" id="autotoc_md20"></a>
 License</h2>
 <p>This library is licensed under the Apache 2.0 License. </p>
 </div></div><!-- contents -->
@@ -255,7 +264,7 @@ License</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Thu Dec 7 2023 07:15:15 for Amazon Kinesis Producer C SDK by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+    <li class="footer">Generated on Thu Dec 7 2023 15:29:13 for Amazon Kinesis Producer C SDK by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
 </body>
