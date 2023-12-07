@@ -51,14 +51,14 @@ extern "C" {
 #define AUTH_HEADER_TEMPLATE "%s Credential=%.*s/%s, SignedHeaders=%.*s, Signature=%s"
 
 // Authentication query template
-#define AUTH_QUERY_TEMPLATE "?X-Amz-Algorithm=%s&X-Amz-Credential=%s&X-Amz-Date=%s&X-Amz-Expires=%u&X-Amz-SignedHeaders=%.*s"
+#define AUTH_QUERY_TEMPLATE "&X-Amz-Algorithm=%s&X-Amz-Credential=%s&X-Amz-Date=%s&X-Amz-Expires=%u&X-Amz-SignedHeaders=%.*s"
 
 // Token query param template
 #define SECURITY_TOKEN_PARAM_TEMPLATE "&X-Amz-Security-Token=%s"
 
 // Authentication query template
 #define AUTH_QUERY_TEMPLATE_WITH_TOKEN                                                                                                               \
-    "?X-Amz-Algorithm=%s&X-Amz-Credential=%s&X-Amz-Date=%s&X-Amz-Expires=%u&X-Amz-SignedHeaders=%.*s" SECURITY_TOKEN_PARAM_TEMPLATE
+    "&X-Amz-Algorithm=%s&X-Amz-Credential=%s&X-Amz-Date=%s&X-Amz-Expires=%u&X-Amz-SignedHeaders=%.*s" SECURITY_TOKEN_PARAM_TEMPLATE
 
 // Signature query param template
 #define SIGNATURE_PARAM_TEMPLATE "&X-Amz-Signature=%s"
@@ -81,8 +81,6 @@ extern "C" {
 #define SHA256_DIGEST_LENGTH 32
 
 #define KVS_MAX_HMAC_SIZE 64
-
-#define PREDEFINED_UNSIGNED_PAYLOAD "UNSIGNED-PAYLOAD"
 
 ////////////////////////////////////////////////////
 // Function definitions
