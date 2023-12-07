@@ -73,8 +73,7 @@ STATUS generateAwsSigV4Signature(PRequestInfo pRequestInfo, PCHAR dateTimeStr, B
     hmacSize = SIZEOF(hmac);
     CHK_STATUS(generateRequestHmac((PBYTE) pScratchBuf, curSize, (PBYTE) dateTimeStr, SIGNATURE_DATE_STRING_LEN * SIZEOF(CHAR), hmac, &hmacSize));
     CHK_STATUS(generateRequestHmac(hmac, hmacSize, (PBYTE) pRequestInfo->region, (UINT32) STRLEN(pRequestInfo->region), hmac, &hmacSize));
-    CHK_STATUS(generateRequestHmac(hmac, hmacSize, (PBYTE) pRequestInfo->service, (UINT32) STRNLEN(pRequestInfo->service, MAX_SERVICE_NAME_LEN), hmac,
-                                   &hmacSize));
+    CHK_STATUS(generateRequestHmac(hmac, hmacSize, (PBYTE) KINESIS_VIDEO_SERVICE_NAME, (UINT32) STRLEN(KINESIS_VIDEO_SERVICE_NAME), hmac, &hmacSize));
     CHK_STATUS(generateRequestHmac(hmac, hmacSize, (PBYTE) AWS_SIG_V4_SIGNATURE_END, (UINT32) STRLEN(AWS_SIG_V4_SIGNATURE_END), hmac, &hmacSize));
     CHK_STATUS(generateRequestHmac(hmac, hmacSize, (PBYTE) pSignedStr, signedStrLen * SIZEOF(CHAR), hmac, &hmacSize));
 
@@ -117,12 +116,6 @@ STATUS signAwsRequestInfo(PRequestInfo pRequestInfo)
     CHAR contentLenBuf[16];
 
     CHK(pRequestInfo != NULL && pRequestInfo->pAwsCredentials != NULL, STATUS_NULL_ARG);
-
-    // signAwsRequestInfo is a public api function, if service is not specified default to "kinesisvideo" so no breaking changes are introduced to the
-    // api
-    if (pRequestInfo->service[0] == L'\0') {
-        STRNCPY(pRequestInfo->service, KINESIS_VIDEO_SERVICE_NAME, MAX_SERVICE_NAME_LEN);
-    }
 
     // Generate the time
     CHK_STATUS(generateSignatureDateTime(pRequestInfo->currentTime, dateTimeStr));
@@ -173,12 +166,6 @@ STATUS signAwsRequestInfoQueryParam(PRequestInfo pRequestInfo)
     BOOL defaultPath;
 
     CHK(pRequestInfo != NULL && pRequestInfo->pAwsCredentials != NULL, STATUS_NULL_ARG);
-
-    // signAwsRequestInfoQueryParam is a public api function, if service is not specified default to "kinesisvideo" so no breaking changes are
-    // introduced to the api
-    if (pRequestInfo->service[0] == L'\0') {
-        STRNCPY(pRequestInfo->service, KINESIS_VIDEO_SERVICE_NAME, MAX_SERVICE_NAME_LEN);
-    }
 
     // Generate the time
     CHK_STATUS(generateSignatureDateTime(pRequestInfo->currentTime, dateTimeStr));
@@ -511,13 +498,8 @@ STATUS generateCanonicalRequestString(PRequestInfo pRequestInfo, PCHAR pRequestS
     len = SHA256_DIGEST_LENGTH * 2;
     CHK(curLen + len <= requestLen, STATUS_BUFFER_TOO_SMALL);
     if (pRequestInfo->body == NULL) {
-        if (STRNCMP(pRequestInfo->service, KINESIS_VIDEO_SERVICE_NAME, MAX_SERVICE_NAME_LEN) == 0) {
-            // Streaming treats this portion as if the body were empty
-            CHK_STATUS(hexEncodedSha256((PBYTE) EMPTY_STRING, 0, pCurPtr));
-        } else {
-            len = (UINT32) (ARRAY_SIZE(PREDEFINED_UNSIGNED_PAYLOAD) - 1);
-            MEMCPY(pCurPtr, PREDEFINED_UNSIGNED_PAYLOAD, SIZEOF(CHAR) * len);
-        }
+        // Streaming treats this portion as if the body were empty
+        CHK_STATUS(hexEncodedSha256((PBYTE) EMPTY_STRING, 0, pCurPtr));
     } else {
         // standard signing
         CHK_STATUS(hexEncodedSha256((PBYTE) pRequestInfo->body, pRequestInfo->bodySize, pCurPtr));
@@ -696,14 +678,14 @@ STATUS generateCredentialScope(PRequestInfo pRequestInfo, PCHAR dateTimeStr, PCH
     CHK(pRequestInfo != NULL && dateTimeStr != NULL && pScopeLen != NULL, STATUS_NULL_ARG);
 
     // Calculate the max string length with a null terminator at the end
-    scopeLen = SIGNATURE_DATE_TIME_STRING_LEN + 1 + MAX_REGION_NAME_LEN + 1 + (UINT32) STRNLEN(pRequestInfo->service, MAX_SERVICE_NAME_LEN) + 1 +
+    scopeLen = SIGNATURE_DATE_TIME_STRING_LEN + 1 + MAX_REGION_NAME_LEN + 1 + (UINT32) STRLEN(KINESIS_VIDEO_SERVICE_NAME) + 1 +
         (UINT32) STRLEN(AWS_SIG_V4_SIGNATURE_END) + 1;
 
     // Early exit on buffer calculation
     CHK(pScope != NULL, retStatus);
 
     scopeLen = (UINT32) SNPRINTF(pScope, *pScopeLen, CREDENTIAL_SCOPE_TEMPLATE, SIGNATURE_DATE_STRING_LEN, dateTimeStr, pRequestInfo->region,
-                                 pRequestInfo->service, AWS_SIG_V4_SIGNATURE_END);
+                                 KINESIS_VIDEO_SERVICE_NAME, AWS_SIG_V4_SIGNATURE_END);
     CHK(scopeLen > 0 && scopeLen <= *pScopeLen, STATUS_BUFFER_TOO_SMALL);
 
 CleanUp:
@@ -725,15 +707,15 @@ STATUS generateEncodedCredentials(PRequestInfo pRequestInfo, PCHAR dateTimeStr, 
     CHK(pRequestInfo != NULL && dateTimeStr != NULL && pCredsLen != NULL, STATUS_NULL_ARG);
 
     // Calculate the max string length with '/' and a null terminator at the end
-    credsLen = MAX_ACCESS_KEY_LEN + 1 + SIGNATURE_DATE_TIME_STRING_LEN + 1 + MAX_REGION_NAME_LEN + 1 +
-        (UINT32) STRNLEN(pRequestInfo->service, MAX_SERVICE_NAME_LEN) + 1 + (UINT32) STRLEN(AWS_SIG_V4_SIGNATURE_END) + 1;
+    credsLen = MAX_ACCESS_KEY_LEN + 1 + SIGNATURE_DATE_TIME_STRING_LEN + 1 + MAX_REGION_NAME_LEN + 1 + (UINT32) STRLEN(KINESIS_VIDEO_SERVICE_NAME) +
+        1 + (UINT32) STRLEN(AWS_SIG_V4_SIGNATURE_END) + 1;
 
     // Early exit on buffer calculation
     CHK(pCreds != NULL, retStatus);
 
     credsLen = (UINT32) SNPRINTF(pCreds, *pCredsLen, URL_ENCODED_CREDENTIAL_TEMPLATE, pRequestInfo->pAwsCredentials->accessKeyIdLen,
                                  pRequestInfo->pAwsCredentials->accessKeyId, SIGNATURE_DATE_STRING_LEN, dateTimeStr, pRequestInfo->region,
-                                 pRequestInfo->service, AWS_SIG_V4_SIGNATURE_END);
+                                 KINESIS_VIDEO_SERVICE_NAME, AWS_SIG_V4_SIGNATURE_END);
     CHK(credsLen > 0 && credsLen <= *pCredsLen, STATUS_BUFFER_TOO_SMALL);
 
 CleanUp:
