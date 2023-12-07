@@ -1,4 +1,4 @@
-#include <com/amazonaws/kinesis/video/cproducer/Include.h>
+#include "Samples.h"
 
 #define DEFAULT_RETENTION_PERIOD          2 * HUNDREDS_OF_NANOS_IN_AN_HOUR
 #define DEFAULT_BUFFER_DURATION           120 * HUNDREDS_OF_NANOS_IN_A_SECOND
@@ -17,8 +17,8 @@
 
 #define NUMBER_OF_FRAME_FILES 403
 
-#define FILE_LOGGING_BUFFER_SIZE (100 * 1024)
-#define MAX_NUMBER_OF_LOG_FILES  5
+// #define IOT_CORE_ENABLE_CREDENTIALS 1
+
 STATUS readFrameData(PFrame pFrame, PCHAR frameFilePath, PCHAR videoCodec)
 {
     STATUS retStatus = STATUS_SUCCESS;
@@ -72,22 +72,43 @@ INT32 main(INT32 argc, CHAR* argv[])
     STRNCPY(videoCodec, VIDEO_CODEC_NAME_H264, STRLEN(VIDEO_CODEC_NAME_H264)); // h264 video by default
     VIDEO_CODEC_ID videoCodecID = VIDEO_CODEC_ID_H264;
 
+#ifdef IOT_CORE_ENABLE_CREDENTIALS
+    PCHAR pIotCoreCredentialEndpoint, pIotCoreCert, pIotCorePrivateKey, pIotCoreRoleAlias, pIotCoreThingName;
+    CHK_ERR((pIotCoreCredentialEndpoint = GETENV(IOT_CORE_CREDENTIAL_ENDPOINT)) != NULL, STATUS_INVALID_OPERATION,
+            "AWS_IOT_CORE_CREDENTIAL_ENDPOINT must be set");
+    CHK_ERR((pIotCoreCert = GETENV(IOT_CORE_CERT)) != NULL, STATUS_INVALID_OPERATION, "AWS_IOT_CORE_CERT must be set");
+    CHK_ERR((pIotCorePrivateKey = GETENV(IOT_CORE_PRIVATE_KEY)) != NULL, STATUS_INVALID_OPERATION, "AWS_IOT_CORE_PRIVATE_KEY must be set");
+    CHK_ERR((pIotCoreRoleAlias = GETENV(IOT_CORE_ROLE_ALIAS)) != NULL, STATUS_INVALID_OPERATION, "AWS_IOT_CORE_ROLE_ALIAS must be set");
+    CHK_ERR((pIotCoreRoleAlias = GETENV(IOT_CORE_ROLE_ALIAS)) != NULL, STATUS_INVALID_OPERATION, "AWS_IOT_CORE_ROLE_ALIAS must be set");
+    CHK_ERR((pIotCoreThingName = GETENV(IOT_CORE_THING_NAME)) != NULL, STATUS_INVALID_OPERATION, "AWS_IOT_CORE_THING_NAME must be set");
+#else
     if (argc < 2) {
         DLOGE("Usage: AWS_ACCESS_KEY_ID=SAMPLEKEY AWS_SECRET_ACCESS_KEY=SAMPLESECRET %s <stream_name>"
               "<codec> <duration_in_seconds> <frame_files_path> [num_metadata = 10]\n",
               argv[0]);
         CHK(FALSE, STATUS_INVALID_ARG);
     }
-
-    if ((accessKey = getenv(ACCESS_KEY_ENV_VAR)) == NULL || (secretKey = getenv(SECRET_KEY_ENV_VAR)) == NULL) {
+    if ((accessKey = GETENV(ACCESS_KEY_ENV_VAR)) == NULL || (secretKey = GETENV(SECRET_KEY_ENV_VAR)) == NULL) {
         DLOGE("Error missing credentials");
         CHK(FALSE, STATUS_INVALID_ARG);
     }
+    sessionToken = GETENV(SESSION_TOKEN_ENV_VAR);
+#endif
 
-    cacertPath = getenv(CACERT_PATH_ENV_VAR);
-    sessionToken = getenv(SESSION_TOKEN_ENV_VAR);
+    MEMSET(frameFilePath, 0x00, MAX_PATH_LEN + 1);
+    if (argc < 5) {
+        STRCPY(frameFilePath, (PCHAR) "../samples/");
+    } else {
+        STRNCPY(frameFilePath, argv[4], MAX_PATH_LEN);
+    }
+
+    cacertPath = GETENV(CACERT_PATH_ENV_VAR);
+#ifdef IOT_CORE_ENABLE_CREDENTIALS
+    streamName = pIotCoreThingName;
+#else
     streamName = argv[1];
-    if ((region = getenv(DEFAULT_REGION_ENV_VAR)) == NULL) {
+#endif
+    if ((region = GETENV(DEFAULT_REGION_ENV_VAR)) == NULL) {
         region = (PCHAR) DEFAULT_AWS_REGION;
     }
 
@@ -131,10 +152,16 @@ INT32 main(INT32 argc, CHAR* argv[])
     // adjust members of pStreamInfo here if needed
 
     startTime = GETTIME();
+
+#ifdef IOT_CORE_ENABLE_CREDENTIALS
+    CHK_STATUS(createDefaultCallbacksProviderWithIotCertificate(pIotCoreCredentialEndpoint, pIotCoreCert, pIotCorePrivateKey, cacertPath,
+                                                                pIotCoreRoleAlias, pIotCoreThingName, region, NULL, NULL, &pClientCallbacks));
+#else
     CHK_STATUS(createDefaultCallbacksProviderWithAwsCredentials(accessKey, secretKey, sessionToken, MAX_UINT64, region, cacertPath, NULL, NULL,
                                                                 &pClientCallbacks));
+#endif
 
-    if (NULL != getenv(ENABLE_FILE_LOGGING)) {
+    if (NULL != GETENV(ENABLE_FILE_LOGGING)) {
         if ((retStatus = addFileLoggerPlatformCallbacksProvider(pClientCallbacks, FILE_LOGGING_BUFFER_SIZE, MAX_NUMBER_OF_LOG_FILES,
                                                                 (PCHAR) FILE_LOGGER_LOG_FILE_DIRECTORY_PATH, TRUE) != STATUS_SUCCESS)) {
             printf("File logging enable option failed with 0x%08x error code\n", retStatus);
