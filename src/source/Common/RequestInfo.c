@@ -64,6 +64,7 @@ STATUS createRequestInfo(PCHAR url, PCHAR body, PCHAR region, PCHAR certPath, PC
 CleanUp:
 
     if (STATUS_FAILED(retStatus)) {
+        DLOGD("createRequestInfo FAILED with STATUS: 0x%08x", retStatus);
         freeRequestInfo(&pRequestInfo);
         pRequestInfo = NULL;
     }
@@ -267,6 +268,8 @@ STATUS removeRequestHeaders(PRequestInfo pRequestInfo)
     UINT32 itemCount;
     PRequestHeader pRequestHeader;
 
+    DLOGD("Calling removeRequestHeaders...");
+
     CHK(pRequestInfo != NULL, STATUS_NULL_ARG);
 
     singleListGetNodeCount(pRequestInfo->pRequestHeaders, &itemCount);
@@ -276,6 +279,7 @@ STATUS removeRequestHeaders(PRequestInfo pRequestInfo)
         pRequestHeader = (PRequestHeader) pNode->data;
         SAFE_MEMFREE(pRequestHeader);
 
+        DLOGD("Calling singleListDeleteHead...");
         // Iterate
         singleListDeleteHead(pRequestInfo->pRequestHeaders);
     }
