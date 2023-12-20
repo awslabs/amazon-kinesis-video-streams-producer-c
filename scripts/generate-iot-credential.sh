@@ -3,7 +3,6 @@
 # You can use this script to setup environment variables in the shell which samples run on.
 # https://docs.aws.amazon.com/kinesisvideostreams/latest/dg/how-iot.html
 
-prefix=$1
 thingName="producerc_thing"
 thingTypeName="producerc_thing_type"
 iotPolicyName="producerc_policy"

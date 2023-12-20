@@ -139,9 +139,9 @@ extern "C" {
 #define MAX_ROLE_ALIAS_LEN 128
 
 /**
- * Maximum allowed string length for IoT thing name
+ * Maximum allowed string length for IoT thing name: https://docs.aws.amazon.com/iot/latest/apireference/API_CreateThing.html
  */
-#define MAX_IOT_THING_NAME_LEN MAX_STREAM_NAME_LEN
+#define MAX_IOT_THING_NAME_LEN 128
 
 /**
  * Maximum allowed request header length
