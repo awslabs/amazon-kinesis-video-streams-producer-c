@@ -79,12 +79,23 @@ STATUS createCurlApiCallbacks(PCallbacksProvider pCallbacksProvider, PCHAR regio
 
     // Set the control plane URL
     if (controlPlaneUrl == NULL || controlPlaneUrl[0] == '\0') {
-        // Create a fully qualified URI
-        SNPRINTF(pCurlApiCallbacks->controlPlaneUrl, MAX_URI_CHAR_LEN, "%s%s.%s%s", CONTROL_PLANE_URI_PREFIX, KINESIS_VIDEO_SERVICE_NAME,
-                 pCurlApiCallbacks->region, CONTROL_PLANE_URI_POSTFIX);
-        // If region is in CN, add CN region uri postfix
-        if (STRSTR(pCurlApiCallbacks->region, "cn-")) {
-            STRCAT(pCurlApiCallbacks->controlPlaneUrl, ".cn");
+        if (0 == STRNCMP(pCurlApiCallbacks->region, AWS_ISO_B_REGION_PREFIX, STRLEN(AWS_ISO_B_REGION_PREFIX))) {
+            SNPRINTF(pCurlApiCallbacks->controlPlaneUrl, MAX_URI_CHAR_LEN, "%s%s%s.%s%s", CONTROL_PLANE_URI_PREFIX, KINESIS_VIDEO_SERVICE_NAME,
+                     AWS_KVS_FIPS_ENDPOINT_POSTFIX, pCurlApiCallbacks->region, CONTROL_PLANE_URI_POSTFIX_ISO_B);
+            // Region is in "aws-iso" partition
+        } else if (0 == STRNCMP(pCurlApiCallbacks->region, AWS_ISO_REGION_PREFIX, STRLEN(AWS_ISO_REGION_PREFIX))) {
+            SNPRINTF(pCurlApiCallbacks->controlPlaneUrl, MAX_URI_CHAR_LEN, "%s%s%s.%s%s", CONTROL_PLANE_URI_PREFIX, KINESIS_VIDEO_SERVICE_NAME,
+                     AWS_KVS_FIPS_ENDPOINT_POSTFIX, pCurlApiCallbacks->region, CONTROL_PLANE_URI_POSTFIX_ISO);
+        } else if (0 == STRNCMP(pCurlApiCallbacks->region, AWS_GOV_CLOUD_REGION_PREFIX, STRLEN(AWS_GOV_CLOUD_REGION_PREFIX))) {
+            SNPRINTF(pCurlApiCallbacks->controlPlaneUrl, MAX_URI_CHAR_LEN, "%s%s%s.%s%s", CONTROL_PLANE_URI_PREFIX, KINESIS_VIDEO_SERVICE_NAME,
+                     AWS_KVS_FIPS_ENDPOINT_POSTFIX, pCurlApiCallbacks->region, CONTROL_PLANE_URI_POSTFIX);
+        } else if (0 == STRNCMP(pCurlApiCallbacks->region, AWS_CN_REGION_PREFIX, STRLEN(AWS_CN_REGION_PREFIX))) {
+            SNPRINTF(pCurlApiCallbacks->controlPlaneUrl, MAX_URI_CHAR_LEN, "%s%s.%s%s", CONTROL_PLANE_URI_PREFIX, KINESIS_VIDEO_SERVICE_NAME,
+                     pCurlApiCallbacks->region, CONTROL_PLANE_URI_POSTFIX_CN);
+        } else {
+            // Create a fully qualified URI
+            SNPRINTF(pCurlApiCallbacks->controlPlaneUrl, MAX_URI_CHAR_LEN, "%s%s.%s%s", CONTROL_PLANE_URI_PREFIX, KINESIS_VIDEO_SERVICE_NAME,
+                     pCurlApiCallbacks->region, CONTROL_PLANE_URI_POSTFIX);
         }
     } else {
         STRNCPY(pCurlApiCallbacks->controlPlaneUrl, controlPlaneUrl, MAX_URI_CHAR_LEN);
