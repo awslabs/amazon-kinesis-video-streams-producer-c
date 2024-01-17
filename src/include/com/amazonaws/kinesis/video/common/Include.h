@@ -327,7 +327,6 @@ extern "C" {
 
 #define CONTROL_PLANE_URI_POSTFIX_ISO_B ".sc2s.sgov.gov"
 
-
 #define AWS_ISO_B_REGION_PREFIX "us-isob-"
 
 #define AWS_ISO_REGION_PREFIX "us-iso-"
@@ -335,7 +334,6 @@ extern "C" {
 #define AWS_GOV_CLOUD_REGION_PREFIX "us-gov-"
 
 #define AWS_CN_REGION_PREFIX "cn-"
-
 
 /**
  * Default user agent name
