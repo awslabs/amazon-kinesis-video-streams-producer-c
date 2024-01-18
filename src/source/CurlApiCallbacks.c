@@ -1328,7 +1328,7 @@ PVOID describeStreamCurlHandler(PVOID arg)
     UINT32 i, strLen, resultLen;
     INT32 tokenCount;
     UINT64 retention;
-    BOOL jsonInStreamDescription = FALSE, requestTerminating = FALSE;
+    BOOL jsonInStreamDescription = FALSE, requestTerminating = FALSE, responseReceived = FALSE;
     StreamDescription streamDescription;
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     SERVICE_CALL_RESULT callResult = SERVICE_CALL_RESULT_NOT_SET;
@@ -1361,8 +1361,7 @@ PVOID describeStreamCurlHandler(PVOID arg)
     CHK(pCurlResponse->callInfo.callResult != SERVICE_CALL_RESULT_NOT_SET, STATUS_INVALID_OPERATION);
     pResponseStr = pCurlResponse->callInfo.responseData;
     resultLen = pCurlResponse->callInfo.responseDataLen;
-
-    DLOGD("[%s] DescribeStream API response: %.*s", streamDescription.streamName, resultLen, pResponseStr);
+    responseReceived = TRUE;
 
     // skip json parsing if call result not ok
     CHK(pCurlResponse->callInfo.callResult == SERVICE_CALL_RESULT_OK && resultLen != 0 && pResponseStr != NULL, retStatus);
@@ -1440,6 +1439,10 @@ PVOID describeStreamCurlHandler(PVOID arg)
     }
 
 CleanUp:
+
+    if (responseReceived) {
+        DLOGD("[%s] DescribeStream API response: %.*s", streamDescription.streamName, resultLen, pResponseStr);
+    }
 
     // Preserve the values as we need to free the request before the event notification
     if (pCurlRequest->pCurlResponse != NULL) {
