@@ -18,8 +18,13 @@ var searchData=
   ['auth_2ec_25',['Auth.c',['../Auth_8c.html',1,'']]],
   ['auth_5fcallbacks_5fcurrent_5fversion_26',['AUTH_CALLBACKS_CURRENT_VERSION',['../group__CallbackStructsVersion.html#ga46f39dcf5a9c141dc2e33aec2c13910f',1,'Include.h']]],
   ['authcallbacks_27',['AuthCallbacks',['../group__PublicStructures.html#ga6c99fddb15c3aba43f4a65ed4c37119c',1,'Include.h']]],
-  ['aws_5fcredentials_5fcurrent_5fversion_28',['AWS_CREDENTIALS_CURRENT_VERSION',['../group__Miscellaneous.html#ga1afc9b5d82e4da2bcfd5e4436b302747',1,'Include.h']]],
-  ['awscredentialprovider_29',['AwsCredentialProvider',['../group__PublicStructures.html#ga882c67d71b64127b618d7e67b889526e',1,'Include.h']]],
-  ['awscredentials_30',['AwsCredentials',['../group__PublicStructures.html#ga9178087f99d520c01400643671e115e6',1,'Include.h']]],
-  ['awsv4signer_2ec_31',['AwsV4Signer.c',['../AwsV4Signer_8c.html',1,'']]]
+  ['aws_5fcn_5fregion_5fprefix_28',['AWS_CN_REGION_PREFIX',['../group__StringConstants.html#ga1e6ba5468c4905077afebb512a1a723b',1,'Include.h']]],
+  ['aws_5fcredentials_5fcurrent_5fversion_29',['AWS_CREDENTIALS_CURRENT_VERSION',['../group__Miscellaneous.html#ga1afc9b5d82e4da2bcfd5e4436b302747',1,'Include.h']]],
+  ['aws_5fgov_5fcloud_5fregion_5fprefix_30',['AWS_GOV_CLOUD_REGION_PREFIX',['../group__StringConstants.html#ga377f879df2e70ad93d503221ac677ea2',1,'Include.h']]],
+  ['aws_5fiso_5fb_5fregion_5fprefix_31',['AWS_ISO_B_REGION_PREFIX',['../group__StringConstants.html#ga842fd5d7fcc4ddbb632b79dee4a2747a',1,'Include.h']]],
+  ['aws_5fiso_5fregion_5fprefix_32',['AWS_ISO_REGION_PREFIX',['../group__StringConstants.html#gab57331f4c09b80b070f0cf6eaa2df73f',1,'Include.h']]],
+  ['aws_5fkvs_5ffips_5fendpoint_5fpostfix_33',['AWS_KVS_FIPS_ENDPOINT_POSTFIX',['../group__StringConstants.html#ga8576e42ea85383c6cb90f922b100ad20',1,'Include.h']]],
+  ['awscredentialprovider_34',['AwsCredentialProvider',['../group__PublicStructures.html#ga882c67d71b64127b618d7e67b889526e',1,'Include.h']]],
+  ['awscredentials_35',['AwsCredentials',['../group__PublicStructures.html#ga9178087f99d520c01400643671e115e6',1,'Include.h']]],
+  ['awsv4signer_2ec_36',['AwsV4Signer.c',['../AwsV4Signer_8c.html',1,'']]]
 ];

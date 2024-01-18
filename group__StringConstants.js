@@ -1,6 +1,14 @@
 var group__StringConstants =
 [
+    [ "AWS_CN_REGION_PREFIX", "group__StringConstants.html#ga1e6ba5468c4905077afebb512a1a723b", null ],
+    [ "AWS_GOV_CLOUD_REGION_PREFIX", "group__StringConstants.html#ga377f879df2e70ad93d503221ac677ea2", null ],
+    [ "AWS_ISO_B_REGION_PREFIX", "group__StringConstants.html#ga842fd5d7fcc4ddbb632b79dee4a2747a", null ],
+    [ "AWS_ISO_REGION_PREFIX", "group__StringConstants.html#gab57331f4c09b80b070f0cf6eaa2df73f", null ],
+    [ "AWS_KVS_FIPS_ENDPOINT_POSTFIX", "group__StringConstants.html#ga8576e42ea85383c6cb90f922b100ad20", null ],
     [ "CONTROL_PLANE_URI_POSTFIX", "group__StringConstants.html#gaa42e1da64c840ae59dcf85a7fe5099b6", null ],
+    [ "CONTROL_PLANE_URI_POSTFIX_CN", "group__StringConstants.html#gad0fb1a5de5480b60bdd90a8fdf39a278", null ],
+    [ "CONTROL_PLANE_URI_POSTFIX_ISO", "group__StringConstants.html#gaf2f2c03fdd5070a40404a10a7d37fe33", null ],
+    [ "CONTROL_PLANE_URI_POSTFIX_ISO_B", "group__StringConstants.html#ga402baed3b396f04d7afd83b2abfe33df", null ],
     [ "CONTROL_PLANE_URI_PREFIX", "group__StringConstants.html#ga2b62a7a873f1b0859fd91ae4f80b5578", null ],
     [ "DEFAULT_AWS_REGION", "group__StringConstants.html#ga4221824188f04472cdb151ac7e05b696", null ],
     [ "DEFAULT_CANONICAL_URI_STRING", "group__StringConstants.html#ga657517b10a097ee16b4f39460eaa06ef", null ],

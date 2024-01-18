@@ -33,7 +33,7 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "group__CallbackStructsVersion.html",
-"pages.html"
+"md_README.html#autotoc_md3"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
