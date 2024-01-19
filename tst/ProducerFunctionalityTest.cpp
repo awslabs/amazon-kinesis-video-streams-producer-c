@@ -2069,7 +2069,7 @@ TEST_F(ProducerFunctionalityTest, stopStreamingSyncSuccessTestWithErrorAcks)
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     UINT32 i;
 
-    createDefaultProducerClient(FALSE, 60 * HUNDREDS_OF_NANOS_IN_A_SECOND);
+    createDefaultProducerClient(FALSE, 60 * HUNDREDS_OF_NANOS_IN_A_SECOND, 120 * HUNDREDS_OF_NANOS_IN_A_SECOND);
 
     // Using low fps to enforce an error ack
     mFps = TEST_LOW_FPS;
