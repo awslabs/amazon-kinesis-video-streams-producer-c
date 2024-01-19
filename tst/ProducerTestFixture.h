@@ -38,10 +38,10 @@
 #define TEST_VIDEO_TRACK_ID                                1
 #define TEST_AUDIO_TRACK_ID                                2
 
-#define TEST_FPS                        20
-#define TEST_LOW_FPS                    1
-#define TEST_NORMAL_KEY_FRAME_INTERVAL  25
-#define TEST_MEDIA_DURATION_SECONDS 60
+#define TEST_FPS                       20
+#define TEST_LOW_FPS                   1
+#define TEST_NORMAL_KEY_FRAME_INTERVAL 25
+#define TEST_MEDIA_DURATION_SECONDS    60
 
 // 1 minutes of frames
 #define TEST_TOTAL_FRAME_COUNT (TEST_FPS * TEST_MEDIA_DURATION_SECONDS)
