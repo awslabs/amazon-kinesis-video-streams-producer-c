@@ -2064,6 +2064,32 @@ TEST_F(ProducerFunctionalityTest, dropTailFragPolicyBufferOverflowNoInvalidMkv)
     EXPECT_GT(mPersistedFragmentCount, 0);
 }
 
+TEST_F(ProducerFunctionalityTest, stopStreamingSyncSuccessTestWithErrorAcks)
+{
+    STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
+    UINT32 i;
+
+    createDefaultProducerClient(FALSE, 60 * HUNDREDS_OF_NANOS_IN_A_SECOND);
+
+    // Using low fps to enforce an error ack
+    mFps = TEST_LOW_FPS;
+    mKeyFrameInterval = TEST_NORMAL_KEY_FRAME_INTERVAL;
+    mFrame.duration = HUNDREDS_OF_NANOS_IN_A_SECOND / mFps;
+
+    EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION));
+    streamHandle = mStreams[0];
+    EXPECT_TRUE(streamHandle != INVALID_STREAM_HANDLE_VALUE);
+
+    UINT64 testRunTime = GETTIME() + (45 * HUNDREDS_OF_NANOS_IN_A_SECOND);
+    while (GETTIME() < testRunTime && mLastError == STATUS_SUCCESS) {
+        EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
+        updateFrame();
+        THREAD_SLEEP(mFrame.duration);
+    }
+
+    EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStreamSync(streamHandle));
+    EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
+}
 }
 }
 }
