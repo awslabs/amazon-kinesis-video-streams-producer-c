@@ -315,6 +315,7 @@ STATUS continuousRetryStreamErrorReportHandler(UINT64 customData, STREAM_HANDLE 
     pCallbackStateMachine->uploadHandle = uploadHandle;
     pCallbackStateMachine->erroredTimecode = erroredTimecode;
     CHK_STATUS(THREAD_CREATE(&threadId, continuousRetryStreamRestartHandler, (PVOID) pCallbackStateMachine));
+    CHK_STATUS(THREAD_DETACH(threadId));
     pCallbackStateMachine->resetTid = threadId;
 
     pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData, pContinuousRetryStreamCallbacks->syncLock);
