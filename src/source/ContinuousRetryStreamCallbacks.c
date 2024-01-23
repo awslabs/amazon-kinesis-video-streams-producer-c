@@ -315,7 +315,6 @@ STATUS continuousRetryStreamErrorReportHandler(UINT64 customData, STREAM_HANDLE 
     pCallbackStateMachine->uploadHandle = uploadHandle;
     pCallbackStateMachine->erroredTimecode = erroredTimecode;
     CHK_STATUS(THREAD_CREATE(&threadId, continuousRetryStreamRestartHandler, (PVOID) pCallbackStateMachine));
-    CHK_STATUS(THREAD_DETACH(threadId));
     pCallbackStateMachine->resetTid = threadId;
 
     pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData, pContinuousRetryStreamCallbacks->syncLock);
@@ -423,9 +422,6 @@ CleanUp:
                                                                     pCallbackStateMachine->uploadHandle, pCallbackStateMachine->erroredTimecode,
                                                                     STATUS_CONTINUOUS_RETRY_RESET_FAILED);
         }
-
-        // Reset the running thread ID just before returning
-        pCallbackStateMachine->resetTid = INVALID_TID_VALUE;
     }
 
     LEAVES();
