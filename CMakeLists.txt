@@ -291,6 +291,7 @@ if(BUILD_COMMON_LWS)
     target_link_libraries(kvsCommonLws
             ${OPENSSL_CRYPTO_LIBRARY}
             ${OPENSSL_SSL_LIBRARY}
+            ${MBEDTLS_LIBRARIES}
             ${LIBWEBSOCKETS_LIBRARIES}
             kvspicUtils)
 
