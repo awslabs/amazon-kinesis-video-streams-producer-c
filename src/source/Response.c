@@ -659,7 +659,7 @@ SIZE_T postReadCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID custo
                                                                   retStatus);
         }
 
-        bytesWritten = (SIZE_T) retrievedSize;
+        bytesWritten = (SIZE_T) retrievedSize; // [DEBUG] Not getting breakpoint hits here, so we are NOT stuck iterating this loop.
 
         DLOGV("[%s] Get Stream data returned: buffer size: %u written bytes: %u for upload handle: %" PRIu64 " current stream handle: %" PRIu64,
               streamName, bufferSize, bytesWritten, uploadHandle, pCurlResponse->pCurlRequest->streamHandle);

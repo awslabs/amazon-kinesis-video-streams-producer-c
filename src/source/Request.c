@@ -7,6 +7,7 @@
 /**
  * Create request object
  */
+// [DEBUG] Here is where uploadHandle gets set.
 STATUS createCurlRequest(HTTP_REQUEST_VERB curlVerb, PCHAR url, PCHAR body, STREAM_HANDLE streamHandle, PCHAR region, UINT64 currentTime,
                          UINT64 connectionTimeout, UINT64 completionTimeout, UINT64 callAfter, PCHAR certPath, PAwsCredentials pAwsCredentials,
                          PCurlApiCallbacks pCurlApiCallbacks, PCurlRequest* ppCurlRequest)
@@ -21,6 +22,8 @@ STATUS createCurlRequest(HTTP_REQUEST_VERB curlVerb, PCHAR url, PCHAR body, STRE
     CHK(ppCurlRequest != NULL && url != NULL && pCurlApiCallbacks != NULL && pCurlApiCallbacks->pCallbacksProvider != NULL, STATUS_NULL_ARG);
 
     pCallbacksProvider = pCurlApiCallbacks->pCallbacksProvider;
+
+    DLOGI("[DEBUG] Creating Curl request of type: %s", url);
 
     // Add body to the size excluding NULL terminator
     if (body != NULL) {
@@ -53,11 +56,14 @@ STATUS createCurlRequest(HTTP_REQUEST_VERB curlVerb, PCHAR url, PCHAR body, STRE
 
     // If the body is specified then it will be a request/response call
     // Otherwise we are streaming
+    // [DEBUG] For upload handle to be null, we must have not have incremented from 0, so check for this here.
     if (body != NULL) {
+        DLOGI("[DEBUG] Will be a request/response call, NOT incrementing streamingRequestCount.");
         pCurlRequest->requestInfo.body = (PCHAR) (pCurlRequest + 1);
         pCurlRequest->streaming = FALSE;
         MEMCPY(pCurlRequest->requestInfo.body, body, bodySize);
     } else {
+        DLOGI("[DEBUG] Will NOT be a request/response call, incrementing streamingRequestCount.");
         pCurlRequest->streaming = TRUE;
         pCurlRequest->requestInfo.body = NULL;
         pCurlRequest->uploadHandle = (UPLOAD_HANDLE) pCurlApiCallbacks->streamingRequestCount++;
@@ -73,6 +79,8 @@ STATUS createCurlRequest(HTTP_REQUEST_VERB curlVerb, PCHAR url, PCHAR body, STRE
     // Set the stream name
     CHK_STATUS(kinesisVideoStreamGetStreamInfo(streamHandle, &pStreamInfo));
     STRNCPY(pCurlRequest->streamName, pStreamInfo->name, MAX_STREAM_NAME_LEN);
+
+    DLOGI("[DEBUG] For stream name [%s].", pCurlRequest->streamName);
 
     // Create the response object
     CHK_STATUS(createCurlResponse(pCurlRequest, &pCurlRequest->pCurlResponse));
