@@ -10,8 +10,8 @@ public:
         mStreamsCreated = CVAR_CREATE();
         MEMSET(mClients, 0x00, SIZEOF(mClients));
         MEMSET(mClientCallbacks, 0x00, SIZEOF(mClientCallbacks));
-        mActiveStreamCount = 0;
-        mActiveClientCount = 0;
+        ATOMIC_STORE(&mActiveStreamCount, 0);
+        ATOMIC_STORE(&mActiveClientCount, 0);
     }
 
     VOID deinitialize()
@@ -35,8 +35,8 @@ public:
     CVAR mStreamsCreated;
     CLIENT_HANDLE mClients[TEST_STREAM_COUNT];
     PClientCallbacks mClientCallbacks[TEST_STREAM_COUNT];
-    volatile UINT32 mActiveStreamCount;
-    volatile UINT32 mActiveClientCount;
+    volatile SIZE_T mActiveStreamCount;
+    volatile SIZE_T mActiveClientCount;
 };
 
 extern ProducerClientTestBase* gProducerClientTestBase;
@@ -137,7 +137,8 @@ PVOID ProducerClientBasicTest::staticCreateProducerClientRoutine(PVOID arg)
 	
     EXPECT_EQ(STATUS_SUCCESS, retStatus = createKinesisVideoStreamSync(pTest->mClients[index], &streamInfo, &pTest->mStreams[index]));
 
-    if (++pTest->mActiveStreamCount == TEST_STREAM_COUNT) {
+    ATOMIC_INCREMENT(&pTest->mActiveStreamCount);
+    if (ATOMIC_LOAD(&pTest->mActiveStreamCount) == TEST_STREAM_COUNT) {
         CVAR_SIGNAL(pTest->mStreamsCreated);
     }
 
@@ -196,7 +197,8 @@ PVOID ProducerClientBasicTest::staticCreateProducerRoutine(PVOID arg)
 
     retStatus = createKinesisVideoStreamSync(pTest->mClientHandle, &streamInfo, &pTest->mStreams[index]);
 
-    if (++pTest->mActiveStreamCount == TEST_STREAM_COUNT) {
+    ATOMIC_INCREMENT(&pTest->mActiveStreamCount);
+    if (ATOMIC_LOAD(&pTest->mActiveStreamCount) == TEST_STREAM_COUNT) {
         CVAR_SIGNAL(pTest->mStreamsCreated);
     }
 
@@ -223,10 +225,10 @@ PVOID ProducerClientBasicTest::staticProducerClientStartRoutine(PVOID arg)
     EXPECT_EQ(STATUS_SUCCESS, kinesisVideoStreamGetStreamInfo(streamHandle, &pStreamInfo));
 
     // Set an indicator that the producer is not stopped
-    pTest->mProducerStopped = FALSE;
+    ATOMIC_STORE_BOOL(&pTest->mProducerStopped, FALSE);
 
     // Increment the active stream/producer count
-    pTest->mActiveClientCount++;
+    ATOMIC_INCREMENT(&pTest->mActiveClientCount);
 
     // Loop until cancelled
     frame.version = FRAME_CURRENT_VERSION;
@@ -245,7 +247,7 @@ PVOID ProducerClientBasicTest::staticProducerClientStartRoutine(PVOID arg)
 
     EXPECT_EQ(STATUS_SUCCESS, kinesisVideoStreamFormatChanged(streamHandle, cpdSize, cpd, DEFAULT_VIDEO_TRACK_ID));
 
-    while (!pTest->mStopProducer) {
+    while (!ATOMIC_LOAD_BOOL(&pTest->mStopProducer)) {
         // Produce frames
         timestamp = GETTIME();
 
@@ -319,8 +321,9 @@ PVOID ProducerClientBasicTest::staticProducerClientStartRoutine(PVOID arg)
     pTest->mStreams[streamIndex] = INVALID_STREAM_HANDLE_VALUE;
 
     // Indicate that the producer routine had stopped
-    if (--pTest->mActiveClientCount == 0) {
-        pTest->mProducerStopped = true;
+    ATOMIC_DECREMENT(&pTest->mActiveClientCount);
+    if (ATOMIC_LOAD(&pTest->mActiveClientCount) == 0) {
+        ATOMIC_STORE_BOOL(&pTest->mProducerStopped, TRUE);
     }
 
     return NULL;
@@ -356,7 +359,7 @@ PVOID ProducerClientTestBase::basicProducerRoutine(STREAM_HANDLE streamHandle, S
     EXPECT_EQ(STATUS_SUCCESS, kinesisVideoStreamGetStreamInfo(streamHandle, &pStreamInfo));
 
     // Set an indicator that the producer is not stopped
-    mProducerStopped = FALSE;
+    ATOMIC_STORE_BOOL(&mProducerStopped, FALSE);
 
     // Loop until cancelled
     frame.version = FRAME_CURRENT_VERSION;
@@ -375,7 +378,7 @@ PVOID ProducerClientTestBase::basicProducerRoutine(STREAM_HANDLE streamHandle, S
 
     EXPECT_EQ(STATUS_SUCCESS, kinesisVideoStreamFormatChanged(streamHandle, cpdSize, cpd, DEFAULT_VIDEO_TRACK_ID));
 
-    while (!mStopProducer) {
+    while (!ATOMIC_LOAD_BOOL(&mStopProducer)) {
         // Produce frames
         if (IS_OFFLINE_STREAMING_MODE(streamingType)) {
             timestamp += frame.duration;
@@ -459,7 +462,7 @@ EXPECT_TRUE(kinesis_video_stream->putFrame(eofr));
     EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStreamSync(streamHandle)) << "Timed out awaiting for the stream stop notification";
 
     // Indicate that the producer routine had stopped
-    mProducerStopped = true;
+    ATOMIC_STORE_BOOL(&mProducerStopped, TRUE);
 
     return NULL;
 }
@@ -489,7 +492,7 @@ TEST_F(ProducerClientBasicTest, create_produce_stream)
     for (UINT32 iter = 0; iter < 10; iter++) {
         THREAD_SLEEP(10 * HUNDREDS_OF_NANOS_IN_A_SECOND);
         DLOGD("Stopping the streams");
-        mStopProducer = TRUE;
+        ATOMIC_STORE_BOOL(&mStopProducer, TRUE);
         DLOGD("Waiting for the streams to finish and close...");
         THREAD_SLEEP(10 * HUNDREDS_OF_NANOS_IN_A_SECOND);
 
@@ -501,7 +504,7 @@ TEST_F(ProducerClientBasicTest, create_produce_stream)
         }
 
         DLOGD("Starting the streams again");
-        mStopProducer = FALSE;
+        ATOMIC_STORE_BOOL(&mStopProducer, FALSE);
 
         // Create new streams
         for (UINT32 i = 0; i < TEST_STREAM_COUNT; i++) {
@@ -521,7 +524,7 @@ TEST_F(ProducerClientBasicTest, create_produce_stream)
     THREAD_SLEEP(2*TEST_EXECUTION_DURATION);
 
     // Indicate the cancel for the threads
-    mStopProducer = TRUE;
+    ATOMIC_STORE_BOOL(&mStopProducer, TRUE);
 
     // Join the thread and wait to exit.
     // NOTE: This is not a right way of doing it as for the multiple stream scenario
@@ -531,9 +534,9 @@ TEST_F(ProducerClientBasicTest, create_produce_stream)
     UINT32 index = 0;
     do {
         THREAD_SLEEP(100 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND);
-    } while (index++ < 300 && !mProducerStopped);
+    } while (index++ < 300 && !ATOMIC_LOAD_BOOL(&mProducerStopped));
 
-    EXPECT_TRUE(mProducerStopped) << "Producer thread failed to stop cleanly";
+    EXPECT_TRUE(ATOMIC_LOAD_BOOL(&mProducerStopped)) << "Producer thread failed to stop cleanly";
 
     // We will block for some time due to an incorrect implementation of the awaiting code
     // NOTE: The proper implementation should use synchronization primitives to await for the
@@ -576,14 +579,14 @@ TEST_F(ProducerClientBasicTest, create_produce_stream_parallel)
     THREAD_SLEEP(2*TEST_EXECUTION_DURATION);
 
     // Indicate the cancel for the threads
-    mStopProducer = TRUE;
+    ATOMIC_STORE_BOOL(&mStopProducer, TRUE);
 
     UINT32 index = 0;
     do {
         THREAD_SLEEP(100 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND);
-    } while (index++ < 300 && !mProducerStopped);
+    } while (index++ < 300 && !ATOMIC_LOAD_BOOL(&mProducerStopped));
 
-    EXPECT_TRUE(mProducerStopped) << "Producer thread failed to stop cleanly";
+    EXPECT_TRUE(ATOMIC_LOAD_BOOL(&mProducerStopped)) << "Producer thread failed to stop cleanly";
 
     THREAD_SLEEP(10 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND);
 
@@ -622,14 +625,14 @@ TEST_F(ProducerClientBasicTest, create_produce_client_parallel)
     THREAD_SLEEP(2*TEST_EXECUTION_DURATION);
 
     // Indicate the cancel for the threads
-    mStopProducer = TRUE;
+    ATOMIC_STORE_BOOL(&mStopProducer, TRUE);
 
     UINT32 index = 0;
     do {
         THREAD_SLEEP(100 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND);
-    } while (index++ < 300 && !mProducerStopped);
+    } while (index++ < 300 && !ATOMIC_LOAD_BOOL(&mProducerStopped));
 
-    EXPECT_TRUE(mProducerStopped) << "Producer thread failed to stop cleanly";
+    EXPECT_TRUE(ATOMIC_LOAD_BOOL(&mProducerStopped)) << "Producer thread failed to stop cleanly";
 
     THREAD_SLEEP(10 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND);
 
@@ -662,7 +665,7 @@ TEST_F(ProducerClientBasicTest, cachingEndpointProvider_Returns_EndpointFromCach
     THREAD_SLEEP(TEST_STREAMING_TOKEN_DURATION * ITERATION_COUNT);
 
     // Indicate the cancel for the threads
-    mStopProducer = TRUE;
+    ATOMIC_STORE_BOOL(&mStopProducer, TRUE);
 
     // Join the thread and wait to exit.
     // NOTE: This is not a right way of doing it as for the multiple stream scenario
@@ -672,9 +675,9 @@ TEST_F(ProducerClientBasicTest, cachingEndpointProvider_Returns_EndpointFromCach
     UINT32 index = 0;
     do {
         THREAD_SLEEP(100 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND);
-    } while (index++ < 300 && !mProducerStopped);
+    } while (index++ < 300 && !ATOMIC_LOAD_BOOL(&mProducerStopped));
 
-    EXPECT_TRUE(mProducerStopped) << "Producer thread failed to stop cleanly";
+    EXPECT_TRUE(ATOMIC_LOAD_BOOL(&mProducerStopped)) << "Producer thread failed to stop cleanly";
 
     // Expect the number of calls
     EXPECT_EQ(((ITERATION_COUNT + 1) * TEST_STREAM_COUNT), mPutStreamFnCount);

@@ -181,9 +181,7 @@ ProducerClientTestBase::ProducerClientTestBase() :
         mAccessKeyIdSet(FALSE),
         mCaCertPath(NULL),
         mProducerThread(INVALID_TID_VALUE),
-        mProducerStopped(FALSE),
         mStartProducer(FALSE),
-        mStopProducer(FALSE),
         mAccessKey(NULL),
         mSecretKey(NULL),
         mSessionToken(NULL),
@@ -238,6 +236,8 @@ ProducerClientTestBase::ProducerClientTestBase() :
         assert(STRTOUI32(logLevelStr, NULL, 10, &this->loggerLogLevel) == STATUS_SUCCESS);
         SET_LOGGER_LOG_LEVEL(this->loggerLogLevel);
     }
+    ATOMIC_STORE_BOOL(&mStopProducer, FALSE);
+    ATOMIC_STORE_BOOL(&mProducerStopped, FALSE);
 
     // Store the function pointers
     gTotalProducerClientMemoryUsage = 0;
@@ -535,7 +535,7 @@ STATUS ProducerClientTestBase::createTestStream(UINT32 index, STREAMING_TYPE str
 
 VOID ProducerClientTestBase::freeStreams(BOOL sync)
 {
-    mProducerStopped = TRUE;
+    ATOMIC_STORE_BOOL(&mProducerStopped, TRUE);
     for (UINT32 i = 0; i < TEST_STREAM_COUNT; i++) {
         DLOGD("Freeing stream index %u with handle value %" PRIu64 " %s", i, mStreams[i], sync ? "synchronously" : "asynchronously");
 
