@@ -561,6 +561,7 @@ STATUS ProducerClientTestBase::curlEasyPerformHookFunc(PCurlResponse pCurlRespon
 
     // Get the test object
     ProducerClientTestBase* pTest = (ProducerClientTestBase*) pCurlResponse->pCurlRequest->pCurlApiCallbacks->hookCustomData;
+    MUTEX_LOCK(pTest->mTestCallbackLock);
 
     DLOGV("Curl perform hook for %s", pCurlResponse->pCurlRequest->requestInfo.url);
 
@@ -623,6 +624,7 @@ STATUS ProducerClientTestBase::curlEasyPerformHookFunc(PCurlResponse pCurlRespon
             pTest->mPutMediaCallResult = SERVICE_CALL_RESULT_OK;
         }
     }
+    MUTEX_UNLOCK(pTest->mTestCallbackLock);
 
     return retStatus;
 }
@@ -640,6 +642,7 @@ STATUS ProducerClientTestBase::curlWriteCallbackHookFunc(PCurlResponse pCurlResp
 
     // Get the test object
     ProducerClientTestBase* pTest = (ProducerClientTestBase*) pCurlResponse->pCurlRequest->pCurlApiCallbacks->hookCustomData;
+    MUTEX_LOCK(pTest->mTestCallbackLock);
 
     pTest->mWriteCallbackFnCount++;
 
@@ -647,6 +650,7 @@ STATUS ProducerClientTestBase::curlWriteCallbackHookFunc(PCurlResponse pCurlResp
         *ppRetBuffer = pTest->mWriteBuffer;
         *pRetDataSize = pTest->mWriteDataSize;
     }
+    MUTEX_UNLOCK(pTest->mTestCallbackLock);
 
     return pTest->mWriteStatus;
 }
@@ -671,6 +675,7 @@ STATUS ProducerClientTestBase::curlReadCallbackHookFunc(PCurlResponse pCurlRespo
 
     // Get the test object
     ProducerClientTestBase* pTest = (ProducerClientTestBase*) pCurlResponse->pCurlRequest->pCurlApiCallbacks->hookCustomData;
+    MUTEX_LOCK(pTest->mTestCallbackLock);
 
     pTest->mReadCallbackFnCount++;
 
@@ -679,6 +684,7 @@ STATUS ProducerClientTestBase::curlReadCallbackHookFunc(PCurlResponse pCurlRespo
     } else {
         pTest->mReadStatus = status;
     }
+    MUTEX_UNLOCK(pTest->mTestCallbackLock);
 
     return pTest->mReadStatus;
 }
