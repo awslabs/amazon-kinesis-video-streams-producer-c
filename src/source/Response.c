@@ -457,7 +457,7 @@ STATUS notifyDataAvailable(PCurlResponse pCurlResponse, UINT64 durationAvailable
               pCurlResponse->pCurlRequest->streamName, durationAvailable, sizeAvailable, pCurlResponse->pCurlRequest->uploadHandle);
 
         if (ATOMIC_LOAD_BOOL(&pCurlResponse->paused) && pCurlResponse->pCurl != NULL) {
-            ATOMIC_STORE_BOOL(&pCurlResponse->pause, FALSE);
+            ATOMIC_STORE_BOOL(&pCurlResponse->paused, FALSE);
             // frequent pause unpause causes curl segfault in offline scenario
             THREAD_SLEEP(10 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND);
             // un-pause curl
