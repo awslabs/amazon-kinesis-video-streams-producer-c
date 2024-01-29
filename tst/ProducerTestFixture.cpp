@@ -691,10 +691,10 @@ STATUS ProducerClientTestBase::curlReadCallbackHookFunc(PCurlResponse pCurlRespo
 
 STATUS ProducerClientTestBase::testFreeApiCallbackFunc(PUINT64 customData)
 {
-    ProducerClientTestBase* pTestBase = (ProducerClientTestBase*) *customData;
-
-    pTestBase->mFreeApiCallbacksFnCount++;
-
+    ProducerClientTestBase* pTest = (ProducerClientTestBase*) *customData;
+    MUTEX_LOCK(pTest->mTestCallbackLock);
+    pTest->mFreeApiCallbacksFnCount++;
+    MUTEX_UNLOCK(pTest->mTestCallbackLock);
     return STATUS_SUCCESS;
 }
 
