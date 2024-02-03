@@ -332,7 +332,7 @@ ProducerClientTestBase::ProducerClientTestBase() :
     mFps = TEST_FPS;
     mKeyFrameInterval = TEST_FPS;
     mFrameSize = TEST_FRAME_SIZE;
-    mFrameBuffer = (PBYTE) MEMALLOC(mFrameSize);
+    mFrameBuffer = (PBYTE) MEMCALLOC(1, mFrameSize);
 
     mFrame.duration = HUNDREDS_OF_NANOS_IN_A_SECOND / mFps;
     mFrame.frameData = mFrameBuffer;
