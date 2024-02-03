@@ -231,9 +231,16 @@ ProducerClientTestBase::ProducerClientTestBase() :
         mDescribeFailCount(0),
         mDescribeRecoverCount(0)
 {
+    STATUS retStatus = STATUS_SUCCESS;
     auto logLevelStr = GETENV("AWS_KVS_LOG_LEVEL");
     if (logLevelStr != NULL) {
-        assert(STRTOUI32(logLevelStr, NULL, 10, &this->loggerLogLevel) == STATUS_SUCCESS);
+        retStatus = STRTOUI32(logLevelStr, NULL, 10, &this->loggerLogLevel);
+        if (retStatus != STATUS_SUCCESS) {
+            // Throwing instead of asserting since this is being done in a constructor. ASSERT_EQ
+            // causes the function to exit immediately and constructor does not have a return type.
+            // The goal is to ensure if an env is set, it is set with a valid value and not empty
+            throw std::runtime_error("Failed to set log level from env");
+        }
         SET_LOGGER_LOG_LEVEL(this->loggerLogLevel);
     }
     ATOMIC_STORE_BOOL(&mStopProducer, FALSE);
@@ -332,7 +339,7 @@ ProducerClientTestBase::ProducerClientTestBase() :
     mFps = TEST_FPS;
     mKeyFrameInterval = TEST_FPS;
     mFrameSize = TEST_FRAME_SIZE;
-    mFrameBuffer = (PBYTE) MEMCALLOC(1, mFrameSize);
+    mFrameBuffer = (PBYTE) MEMCALLOC(mFrameSize, SIZEOF(BYTE));
 
     mFrame.duration = HUNDREDS_OF_NANOS_IN_A_SECOND / mFps;
     mFrame.frameData = mFrameBuffer;

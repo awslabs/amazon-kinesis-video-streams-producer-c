@@ -59,6 +59,11 @@ endif()
 
 message(STATUS "Kinesis Video Producer path is ${KINESIS_VIDEO_PRODUCER_C_SRC}")
 
+if(NOT CMAKE_BUILD_TYPE)
+    message(STATUS "Setting CMAKE_BUILD_TYPE to Release by default")
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
+endif()
+
 if(BUILD_DEPENDENCIES)
   if (NOT OPEN_SRC_INSTALL_PREFIX)
     set(OPEN_SRC_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/open-source)
@@ -88,7 +93,7 @@ if(BUILD_DEPENDENCIES)
                     -DBUILD_OPENSSL_PLATFORM=${BUILD_OPENSSL_PLATFORM})
       build_dependency(openssl ${BUILD_ARGS})
     elseif(USE_MBEDTLS)
-      set(BUILD_ARGS -DBUILD_STATIC=${BUILD_STATIC})
+      set(BUILD_ARGS -DBUILD_STATIC=${BUILD_STATIC} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
       build_dependency(mbedtls ${BUILD_ARGS})
     else()
       message(FATAL_ERROR "No crypto library selected.")
@@ -97,6 +102,7 @@ if(BUILD_DEPENDENCIES)
 
   if (BUILD_COMMON_LWS)
     set(BUILD_ARGS  -DBUILD_STATIC=${BUILD_STATIC}
+                    -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                     -DOPENSSL_DIR=${OPEN_SRC_INSTALL_PREFIX}
                     -DUSE_OPENSSL=${USE_OPENSSL}
                     -DUSE_MBEDTLS=${USE_MBEDTLS})
@@ -105,6 +111,7 @@ if(BUILD_DEPENDENCIES)
 
   if (BUILD_COMMON_CURL)
     set(BUILD_ARGS  -DBUILD_STATIC=${BUILD_STATIC}
+                    -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                     -DUSE_OPENSSL=${USE_OPENSSL}
                     -DUSE_MBEDTLS=${USE_MBEDTLS})
     build_dependency(curl ${BUILD_ARGS})
