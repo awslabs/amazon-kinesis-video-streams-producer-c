@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.6.3)
 
-project(libmbedtls-download NONE)
+project(libmbedtls-download LANGUAGES C)
 
 include(ExternalProject)
 

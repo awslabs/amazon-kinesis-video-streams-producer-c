@@ -272,8 +272,8 @@ class ProducerClientTestBase : public ::testing::Test {
     STREAM_HANDLE mStreams[TEST_MAX_STREAM_COUNT];
 
     volatile bool mStartProducer;
-    volatile bool mStopProducer;
-    volatile bool mProducerStopped;
+    volatile ATOMIC_BOOL mStopProducer;
+    volatile ATOMIC_BOOL mProducerStopped;
 
     // Test callbacks
     ApiCallbacks mApiCallbacks;

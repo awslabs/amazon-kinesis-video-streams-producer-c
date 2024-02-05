@@ -1005,15 +1005,17 @@ STATUS createStreamCurl(UINT64 customData, PCHAR deviceName, PCHAR streamName, P
 
 CleanUp:
 
+    if (startLocked) {
+        // Release the lock to let the awaiting handler thread to continue
+        pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData, pCurlRequest->startLock);
+    }
+
     if (STATUS_FAILED(retStatus)) {
         if (IS_VALID_TID_VALUE(threadId)) {
             THREAD_CANCEL(threadId);
         }
 
         freeCurlRequest(&pCurlRequest);
-    } else if (startLocked) {
-        // Release the lock to let the awaiting handler thread to continue
-        pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData, pCurlRequest->startLock);
     }
 
     if (shutdownLocked) {
@@ -1237,15 +1239,17 @@ STATUS describeStreamCurl(UINT64 customData, PCHAR streamName, PServiceCallConte
 
 CleanUp:
 
+    if (startLocked) {
+        // Release the lock to let the awaiting handler thread to continue
+        pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData, pCurlRequest->startLock);
+    }
+
     if (STATUS_FAILED(retStatus)) {
         if (IS_VALID_TID_VALUE(threadId)) {
             THREAD_CANCEL(threadId);
         }
 
         freeCurlRequest(&pCurlRequest);
-    } else if (startLocked) {
-        // Release the lock to let the awaiting handler thread to continue
-        pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData, pCurlRequest->startLock);
     }
 
     if (shutdownLocked) {
@@ -1548,15 +1552,18 @@ STATUS getStreamingEndpointCurl(UINT64 customData, PCHAR streamName, PCHAR apiNa
 
 CleanUp:
 
+    if (startLocked) {
+        // Release the lock to let the awaiting handler thread to continue.
+        // This needs to be done before freeCurlRequest because there we will free the startLock mutex
+        pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData, pCurlRequest->startLock);
+    }
+
     if (STATUS_FAILED(retStatus)) {
         if (IS_VALID_TID_VALUE(threadId)) {
             THREAD_CANCEL(threadId);
         }
 
         freeCurlRequest(&pCurlRequest);
-    } else if (startLocked) {
-        // Release the lock to let the awaiting handler thread to continue
-        pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData, pCurlRequest->startLock);
     }
 
     if (shutdownLocked) {
@@ -1877,15 +1884,17 @@ STATUS tagResourceCurl(UINT64 customData, PCHAR streamArn, UINT32 tagCount, PTag
 
 CleanUp:
 
+    if (startLocked) {
+        // Release the lock to let the awaiting handler thread to continue
+        pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData, pCurlRequest->startLock);
+    }
+
     if (STATUS_FAILED(retStatus)) {
         if (IS_VALID_TID_VALUE(threadId)) {
             THREAD_CANCEL(threadId);
         }
 
         freeCurlRequest(&pCurlRequest);
-    } else if (startLocked) {
-        // Release the lock to let the awaiting handler thread to continue
-        pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData, pCurlRequest->startLock);
     }
 
     if (shutdownLocked) {
