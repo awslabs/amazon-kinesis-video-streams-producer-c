@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.6.3)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake;${CMAKE_MODULE_PATH}")
 include(Utilities)
-project(KinesisVideoProducerC VERSION 1.5.1 LANGUAGES C)
+project(KinesisVideoProducerC VERSION 1.5.2 LANGUAGES C)
 
 set(KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION 1)
 set(KINESIS_VIDEO_PRODUCER_C_MINOR_VERSION 5)
-set(KINESIS_VIDEO_PRODUCER_C_PATCH_VERSION 1)
+set(KINESIS_VIDEO_PRODUCER_C_PATCH_VERSION 2)
 set(KINESIS_VIDEO_PRODUCER_C_VERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION}.${KINESIS_VIDEO_PRODUCER_C_MINOR_VERSION}.${KINESIS_VIDEO_PRODUCER_C_PATCH_VERSION})
 
 include(GNUInstallDirs)
@@ -312,7 +312,7 @@ if(BUILD_COMMON_CURL)
 
     if(BUILD_STATIC)
       # Curl will enable ZLIB as part of its build if it finds
-      # the package. We need to therefore link it for static builds. 
+      # the package. We need to therefore link it for static builds.
       find_package(ZLIB)
       if(ZLIB_FOUND)
         list(APPEND CURL_LIBRARIES z)
@@ -328,10 +328,10 @@ if(BUILD_COMMON_CURL)
     if(NOT BUILD_STATIC)
       set_target_properties(kvsCommonCurl PROPERTIES VERSION ${KINESIS_VIDEO_PRODUCER_C_VERSION} SOVERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION})
     endif()
-    set(LIBCURL_LIBRARIES "/Users/divku/kvs-sdk/amazon-kinesis-video-streams-producer-sdk-cpp/build/lib/libcurl.dylib")
+    message(STATUS "Curl libraries: ${CURL_LIBRARIES}")
     target_link_libraries(kvsCommonCurl
             kvspicUtils
-            ${LIBCURL_LIBRARIES}
+            ${CURL_LIBRARIES}
             ${PRODUCER_CRYPTO_LIBRARY})
 
     install(
