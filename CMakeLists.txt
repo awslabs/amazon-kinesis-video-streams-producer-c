@@ -328,9 +328,10 @@ if(BUILD_COMMON_CURL)
     if(NOT BUILD_STATIC)
       set_target_properties(kvsCommonCurl PROPERTIES VERSION ${KINESIS_VIDEO_PRODUCER_C_VERSION} SOVERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION})
     endif()
+    set(LIBCURL_LIBRARIES "/Users/divku/kvs-sdk/amazon-kinesis-video-streams-producer-sdk-cpp/build/lib/libcurl.dylib")
     target_link_libraries(kvsCommonCurl
             kvspicUtils
-            ${CURL_LIBRARIES}
+            ${LIBCURL_LIBRARIES}
             ${PRODUCER_CRYPTO_LIBRARY})
 
     install(
