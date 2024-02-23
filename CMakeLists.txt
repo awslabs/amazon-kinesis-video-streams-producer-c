@@ -69,9 +69,7 @@ if(BUILD_DEPENDENCIES)
     set(OPEN_SRC_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/open-source)
     set(ENV{PKG_CONFIG_PATH}
           "$ENV{PKG_CONFIG_PATH}:${OPEN_SRC_INSTALL_PREFIX}/lib/pkgconfig")
-    set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${OPEN_SRC_INSTALL_PREFIX})
   endif()
-
   if(NOT EXISTS ${OPEN_SRC_INSTALL_PREFIX})
     file(MAKE_DIRECTORY ${OPEN_SRC_INSTALL_PREFIX})
   endif()
@@ -153,6 +151,7 @@ endif()
 find_package(Threads)
 
 set(OPEN_SRC_INCLUDE_DIRS ${LIBKVSPIC_INCLUDE_DIRS})
+list(APPEND CMAKE_PREFIX_PATH "${OPEN_SRC_INSTALL_PREFIX}")
 
 if(USE_OPENSSL)
   find_package(OpenSSL)
@@ -172,12 +171,7 @@ if(BUILD_COMMON_CURL)
     find_package(CURL REQUIRED)
     set(CURL_LIBRARIES CURL::libcurl)
   else()
-      if (OPEN_SRC_INSTALL_PREFIX)
-          set(CMAKE_FIND_DEBUG_MODE ON)
-          find_package(CURL REQUIRED PATHS ${OPEN_SRC_INSTALL_PREFIX})
-      else()
-          find_package(CURL REQUIRED)
-      endif()
+      pkg_check_modules(CURL REQUIRED libcurl)
   endif()
 
   set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${CURL_INCLUDE_DIRS})
@@ -333,7 +327,7 @@ if(BUILD_COMMON_CURL)
     if(NOT BUILD_STATIC)
       set_target_properties(kvsCommonCurl PROPERTIES VERSION ${KINESIS_VIDEO_PRODUCER_C_VERSION} SOVERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION})
     endif()
-    message(STATUS "Curl libraries: ${CURL_LIBRARIES}")
+
     target_link_libraries(kvsCommonCurl
             kvspicUtils
             ${CURL_LIBRARIES}
