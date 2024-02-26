@@ -15,6 +15,9 @@ STATUS createCurlApiCallbacks(PCallbacksProvider pCallbacksProvider, PCHAR regio
     STATUS retStatus = STATUS_SUCCESS, status;
     PCurlApiCallbacks pCurlApiCallbacks = NULL;
 
+    curl_version_info_data *d = curl_version_info(CURLVERSION_NOW);
+    printf("Producer C's CURL version is: %s\n", d->version);
+
     CHK(pCallbacksProvider != NULL && ppCurlApiCallbacks != NULL, STATUS_NULL_ARG);
     CHK(certPath == NULL || STRNLEN(certPath, MAX_PATH_LEN + 1) <= MAX_PATH_LEN, STATUS_INVALID_CERT_PATH_LENGTH);
     CHK(customUserAgent == NULL || STRNLEN(customUserAgent, MAX_CUSTOM_USER_AGENT_LEN + 1) <= MAX_CUSTOM_USER_AGENT_LEN,
