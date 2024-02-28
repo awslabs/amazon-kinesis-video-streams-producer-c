@@ -297,7 +297,6 @@ include_directories(${KINESIS_VIDEO_PRODUCER_C_SRC}/src/include)
 include_directories(${OPEN_SRC_INCLUDE_DIRS})
 
 # TODO: Probably good to remove the CMAKE_CURRENT_SOURCE_DIR one
-link_directories(${CMAKE_CURRENT_SOURCE_DIR}/open-source/lib)
 link_directories(${CMAKE_SOURCE_DIR}/open-source/lib)
 
 if(ALIGNED_MEMORY_MODEL)
