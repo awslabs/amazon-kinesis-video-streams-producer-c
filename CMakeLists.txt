@@ -273,18 +273,32 @@ if(${CMAKE_C_COMPILER_ID} MATCHES "GNU|Clang")
     endif()
 endif()
 
-# TODO: What and why?
+# TODO: What and why is this MSVC thing?
 if(MSVC)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_WARNINGS -D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
 endif()
 
+
 file(GLOB KVS_COMMON_SOURCE_FILES_BASE "src/source/Common/*.c")
 file(GLOB KVS_COMMON_SOURCE_FILES_LWS "src/source/Common/Lws/*.c")
 file(GLOB KVS_COMMON_SOURCE_FILES_CURL "src/source/Common/Curl/*.c")
+
 file(GLOB PRODUCER_C_SOURCE_FILES "src/source/*.c")
+#file(GLOB_RECURSE PRODUCER_C_SOURCE_FILES "src/source/*.c")
+
+list(APPEND PRODUCER_C_SOURCE_FILES
+      ${KVS_COMMON_SOURCE_FILES_BASE}
+      ${KVS_COMMON_SOURCE_FILES_CURL})
+
+set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${OPEN_SRC_INSTALL_PREFIX}/include)
+set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${OPEN_SRC_INSTALL_PREFIX}/include)
+
 
 include_directories(${KINESIS_VIDEO_PRODUCER_C_SRC}/src/include)
 include_directories(${OPEN_SRC_INCLUDE_DIRS})
+
+link_directories(${CMAKE_CURRENT_SOURCE_DIR}/open-source/lib)
+
 
 if(ALIGNED_MEMORY_MODEL)
     add_definitions(-DALIGNED_MEMORY_MODEL)
@@ -297,14 +311,14 @@ endif()
 # use openssl by default
 set(CPRODUCER_COMMON_TLS_OPTION KVS_USE_OPENSSL)
 
-set(PRODUCER_CRYPTO_LIBRARY
-        OpenSSL::Crypto
-        OpenSSL::SSL)
+# set(PRODUCER_CRYPTO_LIBRARY
+#         OpenSSL::Crypto
+#         OpenSSL::SSL)
 if (USE_MBEDTLS)
-    set(CPRODUCER_COMMON_TLS_OPTION KVS_USE_MBEDTLS)
-    set(PRODUCER_CRYPTO_LIBRARY
-            MbedTLS
-            MbedCrypto)
+  set(CPRODUCER_COMMON_TLS_OPTION KVS_USE_MBEDTLS)
+#     set(PRODUCER_CRYPTO_LIBRARY
+#             MbedTLS
+#             MbedCrypto)
 endif()
 
 install(
@@ -320,7 +334,6 @@ install(
 # endif()
 
 
-# TODO: Still have to go through the rest below
   
 if(BUILD_COMMON_CURL)
   # producer only uses curl right now
@@ -337,28 +350,28 @@ if(BUILD_COMMON_CURL)
     endif()
   endif()
 
-  if (WIN32)
-    add_library(kvsCommonCurl STATIC ${KVS_COMMON_SOURCE_FILES_BASE} ${KVS_COMMON_SOURCE_FILES_CURL})
-  else()
-    add_library(kvsCommonCurl ${TYPE_OF_LIB} ${KVS_COMMON_SOURCE_FILES_BASE} ${KVS_COMMON_SOURCE_FILES_CURL})
-  endif()
-  target_compile_definitions(kvsCommonCurl PRIVATE KVS_BUILD_WITH_CURL ${CPRODUCER_COMMON_TLS_OPTION})
-  if(NOT BUILD_STATIC)
-    set_target_properties(kvsCommonCurl PROPERTIES VERSION ${KINESIS_VIDEO_PRODUCER_C_VERSION} SOVERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION})
-  endif()
-  target_link_libraries(kvsCommonCurl
-          kvspicUtils
-          ${CURL_LIBRARIES}
-          ${PRODUCER_CRYPTO_LIBRARY})
+  # if (WIN32)
+  #   add_library(kvsCommonCurl STATIC ${KVS_COMMON_SOURCE_FILES_BASE} ${KVS_COMMON_SOURCE_FILES_CURL})
+  # else()
+  #   add_library(kvsCommonCurl ${TYPE_OF_LIB} ${KVS_COMMON_SOURCE_FILES_BASE} ${KVS_COMMON_SOURCE_FILES_CURL})
+  # endif()
+  # target_compile_definitions(kvsCommonCurl PRIVATE KVS_BUILD_WITH_CURL ${CPRODUCER_COMMON_TLS_OPTION})
+  # if(NOT BUILD_STATIC)
+  #   set_target_properties(kvsCommonCurl PROPERTIES VERSION ${KINESIS_VIDEO_PRODUCER_C_VERSION} SOVERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION})
+  # endif()
+  # target_link_libraries(kvsCommonCurl
+  #         kvspicUtils
+  #         ${CURL_LIBRARIES}
+  #         ${PRODUCER_CRYPTO_LIBRARY})
 
-  install(
-    TARGETS kvsCommonCurl
-    ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-    LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-    RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
-  install(
-    FILES ${CMAKE_CURRENT_BINARY_DIR}/libkvsCommonCurl.pc
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+  # install(
+  #   TARGETS kvsCommonCurl
+  #   ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+  #   LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+  #   RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
+  # install(
+  #   FILES ${CMAKE_CURRENT_BINARY_DIR}/libkvsCommonCurl.pc
+  #   DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 
   configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/libcproducer.pc.cmake"
@@ -373,7 +386,10 @@ if(BUILD_COMMON_CURL)
   if(NOT BUILD_STATIC)
     set_target_properties(cproducer PROPERTIES VERSION ${KINESIS_VIDEO_PRODUCER_C_VERSION} SOVERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION})
   endif()
-  target_link_libraries(cproducer PUBLIC kvsCommonCurl kvspic)
+
+  target_compile_definitions(cproducer PRIVATE KVS_BUILD_WITH_CURL ${CPRODUCER_COMMON_TLS_OPTION})
+  
+  target_link_libraries(cproducer PUBLIC kvspic curl ssl crypto websockets)
 
   message("CMAKE_INSTALL_LIBDIR: ${CMAKE_INSTALL_LIBDIR}")
   install(
