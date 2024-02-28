@@ -389,7 +389,7 @@ if(BUILD_COMMON_CURL)
 
   target_compile_definitions(cproducer PRIVATE KVS_BUILD_WITH_CURL ${CPRODUCER_COMMON_TLS_OPTION})
   
-  target_link_libraries(cproducer PUBLIC kvspic curl ssl crypto websockets)
+  target_link_libraries(cproducer PUBLIC kvspic curl ssl crypto)
 
   message("CMAKE_INSTALL_LIBDIR: ${CMAKE_INSTALL_LIBDIR}")
   install(
