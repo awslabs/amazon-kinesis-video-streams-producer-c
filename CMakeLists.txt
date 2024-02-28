@@ -128,10 +128,11 @@ endif()
 find_package(PkgConfig REQUIRED)
 
 ############# Check system for kvspic #############
-
+#set(CMAKE_FIND_DEBUG_MODE ON)
 pkg_check_modules(KVSPIC libkvspicUtils)
 if(KVSPIC_FOUND)
   set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${KVSPIC_INCLUDE_DIRS})
+  message(STATUS "KVSPIC_INCLUDE_DIRS: ${KVSPIC_INCLUDE_DIRS}")
   link_directories(${KVSPIC_LIBRARY_DIRS})
 else()
   ############# fetch repos that we need do add_subdirectory ############
@@ -152,7 +153,6 @@ endif()
 
 find_package(Threads)
 
-set(OPEN_SRC_INCLUDE_DIRS ${LIBKVSPIC_INCLUDE_DIRS})
 
 if(USE_OPENSSL)
   find_package(OpenSSL)
@@ -291,6 +291,7 @@ if(BUILD_COMMON_LWS)
     target_link_libraries(kvsCommonLws
             ${OPENSSL_CRYPTO_LIBRARY}
             ${OPENSSL_SSL_LIBRARY}
+            ${MBEDTLS_LIBRARIES}
             ${LIBWEBSOCKETS_LIBRARIES}
             kvspicUtils)
 
