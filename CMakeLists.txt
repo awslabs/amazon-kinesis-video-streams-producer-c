@@ -390,7 +390,9 @@ if(BUILD_COMMON_CURL)
   
   # TODO: I'd like to know why there is no openssl library and we instead have to use
   #        ssl and crypto (openssl's dependencies).
-  target_link_libraries(cproducer PUBLIC kvspic curl ssl crypto)
+  target_link_libraries(cproducer 
+                        PUBLIC kvspic
+                        PRIVATE curl ssl crypto)
 
   message("CMAKE_INSTALL_LIBDIR: ${CMAKE_INSTALL_LIBDIR}")
   install(
