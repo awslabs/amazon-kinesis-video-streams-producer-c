@@ -71,7 +71,7 @@ if(BUILD_DEPENDENCIES)
 
   # Set directory where to build the dependencies.
   if (NOT OPEN_SRC_INSTALL_PREFIX)
-    set(OPEN_SRC_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/open-source)
+    set(OPEN_SRC_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/open-source)
     set(ENV{PKG_CONFIG_PATH}
           "$ENV{PKG_CONFIG_PATH}:${OPEN_SRC_INSTALL_PREFIX}/lib/pkgconfig")
     set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${OPEN_SRC_INSTALL_PREFIX})
@@ -296,6 +296,7 @@ set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${OPEN_SRC_INSTALL_PREFIX}/in
 include_directories(${KINESIS_VIDEO_PRODUCER_C_SRC}/src/include)
 include_directories(${OPEN_SRC_INCLUDE_DIRS})
 
+# TODO: Probably good to remove the CMAKE_CURRENT_SOURCE_DIR one
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/open-source/lib)
 link_directories(${CMAKE_SOURCE_DIR}/open-source/lib)
 
