@@ -291,7 +291,6 @@ list(APPEND PRODUCER_C_SOURCE_FILES
       ${KVS_COMMON_SOURCE_FILES_CURL})
 
 set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${OPEN_SRC_INSTALL_PREFIX}/include)
-set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${OPEN_SRC_INSTALL_PREFIX}/include)
 
 
 include_directories(${KINESIS_VIDEO_PRODUCER_C_SRC}/src/include)
@@ -334,7 +333,7 @@ install(
 # endif()
 
 
-  
+# TODO: I wonder, why would producer ever need lws?
 if(BUILD_COMMON_CURL)
   # producer only uses curl right now
   configure_file(
@@ -389,6 +388,8 @@ if(BUILD_COMMON_CURL)
 
   target_compile_definitions(cproducer PRIVATE KVS_BUILD_WITH_CURL ${CPRODUCER_COMMON_TLS_OPTION})
   
+  # TODO: I'd like to know why there is no openssl library and we instead have to use
+  #        ssl and crypto (openssl's dependencies).
   target_link_libraries(cproducer PUBLIC kvspic curl ssl crypto)
 
   message("CMAKE_INSTALL_LIBDIR: ${CMAKE_INSTALL_LIBDIR}")
