@@ -27,7 +27,6 @@ option(CONSTRAINED_DEVICE "Change pthread stack size" OFF)
 option(BUILD_KVS_PIC "Whether to build PIC SDK, else will use system-installed version" ON)
 option(BUILD_SAMPLES "Whether to build Producer C samples" ON)
 
-
 # Maintainer Flags
 option(BUILD_TEST "Build the testing tree." OFF)
 option(CODE_COVERAGE "Enable coverage reporting" OFF)
@@ -146,6 +145,7 @@ if(BUILD_KVS_PIC)
   # TODO: double check with the original comment that used to be here... make sure this comment is correct.
   # KVS PIC will live in the DEPENDENCY_DOWNLOAD_PATH.
   # TODO: Double check all the below is correct/necessary.
+  # TODO: Find a way to check specifically for an alrady built PIC here in the project, don't build if found
   set(DEPENDENCY_DOWNLOAD_PATH ${CMAKE_CURRENT_SOURCE_DIR}/dependency)
   set(BUILD_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
   fetch_repo(kvspic ${BUILD_ARGS})
@@ -226,6 +226,7 @@ endif()
 
 ############# TODO: Doing....   ############
 
+# TODO: Note, these variables are neber used, in C, CPP, WebRTC SDKs. Not in cmake and not in source files.
 if(CMAKE_SIZEOF_VOID_P STREQUAL 4)
     message(STATUS "Bitness 32 bits")
     set(KINESIS_VIDEO_BUILD_BITNESS "x86")
@@ -330,7 +331,11 @@ install(
 
 # TODO: I wonder, why would producer ever need lws?
 if(BUILD_COMMON_CURL)
-  set(CURL_LIBRARIES curl)
+  if(WIN32)
+    set(CURL_LIBRARIES libcurl)
+  else()
+    set(CURL_LIBRARIES curl)
+  endif()
 
   # producer only uses curl right now
   configure_file(
@@ -394,7 +399,7 @@ if(BUILD_COMMON_CURL)
   # STRING(REPLACE ";" " " CURL_LIBRARIES "${CURL_LIBRARIES}")
   # message("CURL_LIBRARIES: ${CURL_LIBRARIES}")
   # message("PRODUCER_CRYPTO_LIBRARY: ${PRODUCER_CRYPTO_LIBRARY}")
-  
+
   target_link_libraries(cproducer 
                         PUBLIC kvspic
                         PRIVATE ${CURL_LIBRARIES} ${PRODUCER_CRYPTO_LIBRARY})
