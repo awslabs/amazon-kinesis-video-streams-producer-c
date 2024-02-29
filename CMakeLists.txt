@@ -202,7 +202,6 @@ endif()
 if(NOT BUILD_DEPENDENCIES AND BUILD_COMMON_CURL) 
   if (WIN32)
       find_package(CURL REQUIRED)
-      set(CURL_LIBRARIES CURL::libcurl)
   else()
     pkg_check_modules(CURL REQUIRED libcurl)
   endif()
@@ -309,15 +308,11 @@ endif()
 
 # use openssl by default
 set(CPRODUCER_COMMON_TLS_OPTION KVS_USE_OPENSSL)
+set(PRODUCER_CRYPTO_LIBRARY ssl crypto)
 
-# set(PRODUCER_CRYPTO_LIBRARY
-#         OpenSSL::Crypto
-#         OpenSSL::SSL)
 if (USE_MBEDTLS)
   set(CPRODUCER_COMMON_TLS_OPTION KVS_USE_MBEDTLS)
-#     set(PRODUCER_CRYPTO_LIBRARY
-#             MbedTLS
-#             MbedCrypto)
+  set(PRODUCER_CRYPTO_LIBRARY MbedTLS MbedCrypto)
 endif()
 
 install(
@@ -335,6 +330,8 @@ install(
 
 # TODO: I wonder, why would producer ever need lws?
 if(BUILD_COMMON_CURL)
+  set(CURL_LIBRARIES curl)
+
   # producer only uses curl right now
   configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/libkvsCommonCurl.pc.cmake"
@@ -390,9 +387,17 @@ if(BUILD_COMMON_CURL)
   
   # TODO: I'd like to know why there is no openssl library and we instead have to use
   #        ssl and crypto (openssl's dependencies).
+  message("CURL_LIBRARIES: ${CURL_LIBRARIES}")
+  message("PRODUCER_CRYPTO_LIBRARY: ${PRODUCER_CRYPTO_LIBRARY}")
+
+  # STRING(REPLACE ";" " " PRODUCER_CRYPTO_LIBRARY "${PRODUCER_CRYPTO_LIBRARY}")
+  # STRING(REPLACE ";" " " CURL_LIBRARIES "${CURL_LIBRARIES}")
+  # message("CURL_LIBRARIES: ${CURL_LIBRARIES}")
+  # message("PRODUCER_CRYPTO_LIBRARY: ${PRODUCER_CRYPTO_LIBRARY}")
+  
   target_link_libraries(cproducer 
                         PUBLIC kvspic
-                        PRIVATE curl ssl crypto)
+                        PRIVATE ${CURL_LIBRARIES} ${PRODUCER_CRYPTO_LIBRARY})
 
   message("CMAKE_INSTALL_LIBDIR: ${CMAKE_INSTALL_LIBDIR}")
   install(
