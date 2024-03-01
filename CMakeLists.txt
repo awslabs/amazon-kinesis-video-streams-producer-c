@@ -250,6 +250,8 @@ file(GLOB PRODUCER_C_SOURCE_FILES "src/source/*.c")
 include_directories(${KINESIS_VIDEO_PRODUCER_C_SRC}/src/include)
 include_directories(${OPEN_SRC_INCLUDE_DIRS})
 
+link_directories(${CMAKE_SOURCE_DIR}/open-source/lib)
+
 if(ALIGNED_MEMORY_MODEL)
     add_definitions(-DALIGNED_MEMORY_MODEL)
 endif()
