@@ -139,11 +139,13 @@ set(CMAKE_FIND_DEBUG_MODE ON) #TODO: Remove this.
 # NOTE: this is possibly a breaking change, if not specified, system PIC will not be used.
 # Prev behavior: look for system PIC if not found, build PIC.
 # Now: is BUILD_KVS_PIC ? build PIC, else find syste PIC - if system PIC not found, fail build
-# TODO: Leave a not in the PIC file libkvspic.pc.cmake that the below comments/messages must be updated 
-#       if we change "prefix=" from CMAKE_INSTALL_PREFIX.
+# TODO: Leave a note in the PIC file libkvspic.pc.cmake that the below comments/messages must be updated 
+#       if we change "prefix=" from CMAKE_INSTALL_PREFIX. (CMAKE_INSTALL_PREFIX = usr/local).
 if(BUILD_KVS_PIC)
   # TODO: double check with the original comment that used to be here... make sure this comment is correct.
+
   # KVS PIC will live in the DEPENDENCY_DOWNLOAD_PATH.
+
   # TODO: Double check all the below is correct/necessary.
   # TODO: Find a way to check specifically for an alrady built PIC here in the project, don't build if found
   set(DEPENDENCY_DOWNLOAD_PATH ${CMAKE_CURRENT_SOURCE_DIR}/dependency)
