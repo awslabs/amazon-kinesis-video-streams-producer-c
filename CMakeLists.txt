@@ -337,7 +337,7 @@ if(BUILD_COMMON_CURL)
     
     target_link_libraries(kvsCommonCurl
             kvspicUtils
-            ${CURL_LIBRARIES}
+    PRIVATE ${CURL_LIBRARIES}
             ${PRODUCER_CRYPTO_LIBRARY})
 
     install(
