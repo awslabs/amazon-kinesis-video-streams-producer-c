@@ -177,8 +177,8 @@ if(BUILD_COMMON_CURL)
 
   set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${CURL_INCLUDE_DIRS})
   link_directories(${CURL_LIBRARY_DIRS})
-  message("CURL_INCLUDE_DIRS ${CURL_INCLUDE_DIRS}")
-  message("CURL_LIBRARY_DIRS ${CURL_LIBRARY_DIRS}")
+  message("CURL_INCLUDE_DIRS: ${CURL_INCLUDE_DIRS}")
+  message("CURL_LIBRARY_DIRS: ${CURL_LIBRARY_DIRS}")
 endif()
 
 if (BUILD_COMMON_LWS)
@@ -248,6 +248,8 @@ file(GLOB KVS_COMMON_SOURCE_FILES_CURL "src/source/Common/Curl/*.c")
 file(GLOB PRODUCER_C_SOURCE_FILES "src/source/*.c")
 
 include_directories(${KINESIS_VIDEO_PRODUCER_C_SRC}/src/include)
+
+message("OPEN_SRC_INCLUDE_DIRS: ${OPEN_SRC_INCLUDE_DIRS}")
 include_directories(${OPEN_SRC_INCLUDE_DIRS})
 
 link_directories(${CMAKE_SOURCE_DIR}/open-source/lib)
