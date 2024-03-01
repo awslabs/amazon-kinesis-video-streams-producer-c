@@ -253,7 +253,7 @@ include_directories(${KINESIS_VIDEO_PRODUCER_C_SRC}/src/include)
 message("OPEN_SRC_INCLUDE_DIRS: ${OPEN_SRC_INCLUDE_DIRS}")
 include_directories(${OPEN_SRC_INCLUDE_DIRS})
 
-link_directories(${CMAKE_SOURCE_DIR}/open-source/lib)
+link_directories(BEFORE ${CMAKE_SOURCE_DIR}/open-source/lib)
 
 if(ALIGNED_MEMORY_MODEL)
     add_definitions(-DALIGNED_MEMORY_MODEL)
@@ -334,6 +334,7 @@ if(BUILD_COMMON_CURL)
     if(NOT BUILD_STATIC)
       set_target_properties(kvsCommonCurl PROPERTIES VERSION ${KINESIS_VIDEO_PRODUCER_C_VERSION} SOVERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION})
     endif()
+    
     target_link_libraries(kvsCommonCurl
             kvspicUtils
             ${CURL_LIBRARIES}
