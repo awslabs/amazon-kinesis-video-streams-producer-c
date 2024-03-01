@@ -337,7 +337,7 @@ if(BUILD_COMMON_CURL)
     
     target_link_libraries(kvsCommonCurl
             kvspicUtils
-    PRIVATE ${CURL_LIBRARIES}
+    PRIVATE "${CMAKE_SOURCE_DIR}/open-source/lib/libcurl.dylib"
             ${PRODUCER_CRYPTO_LIBRARY})
 
     install(
