@@ -129,11 +129,11 @@ find_package(PkgConfig REQUIRED)
 
 ############# Check system for kvspic #############
 
-pkg_check_modules(KVSPIC libkvspicUtils)
-if(KVSPIC_FOUND)
-  set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${KVSPIC_INCLUDE_DIRS})
-  link_directories(${KVSPIC_LIBRARY_DIRS})
-else()
+# pkg_check_modules(KVSPIC libkvspicUtils)
+# if(KVSPIC_FOUND)
+   # set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${KVSPIC_INCLUDE_DIRS})
+   # link_directories(${KVSPIC_LIBRARY_DIRS})
+# else()
   ############# fetch repos that we need do add_subdirectory ############
   # repos that we will build using add_subdirectory will be stored in this path
   set(DEPENDENCY_DOWNLOAD_PATH ${CMAKE_CURRENT_SOURCE_DIR}/dependency)
@@ -144,7 +144,7 @@ else()
   include_directories("${PIC_HEADERS}")
 
   ############# fetch repos that we need do add_subdirectory done ############
-endif()
+# endif()
 
 ############# Check system for kvspic done #############
 
