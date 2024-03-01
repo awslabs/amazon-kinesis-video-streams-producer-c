@@ -172,6 +172,7 @@ if(BUILD_COMMON_CURL)
     find_package(CURL REQUIRED)
     set(CURL_LIBRARIES CURL::libcurl)
   else()
+    set(CURL_LIBRARIES curl)
     pkg_check_modules(CURL REQUIRED libcurl)
   endif()
 
