@@ -335,10 +335,9 @@ if(BUILD_COMMON_CURL)
       set_target_properties(kvsCommonCurl PROPERTIES VERSION ${KINESIS_VIDEO_PRODUCER_C_VERSION} SOVERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION})
     endif()
     
-    target_link_libraries(kvsCommonCurl
-            kvspicUtils
-    PRIVATE "${CMAKE_SOURCE_DIR}/open-source/lib/libcurl.dylib"
-            ${PRODUCER_CRYPTO_LIBRARY})
+    target_link_libraries(kvsCommonCurl PUBLIC kvspicUtils
+                                        PRIVATE "${CMAKE_SOURCE_DIR}/open-source/lib/libcurl.dylib" ${PRODUCER_CRYPTO_LIBRARY})
+    
 
     install(
       TARGETS kvsCommonCurl
