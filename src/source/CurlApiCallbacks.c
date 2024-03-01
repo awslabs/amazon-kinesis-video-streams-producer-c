@@ -657,6 +657,9 @@ STATUS curlCallApi(PCurlRequest pCurlRequest)
     STATUS retStatus = STATUS_SUCCESS;
     PCurlResponse pCurlResponse;
 
+    curl_version_info_data *d = curl_version_info(CURLVERSION_NOW);
+    printf("CURL version is: %s\n", d->version);
+
     CHK(pCurlRequest != NULL, STATUS_INVALID_ARG);
     CHK(pCurlRequest->pCurlApiCallbacks != NULL && pCurlRequest->pCurlApiCallbacks->pCallbacksProvider != NULL, STATUS_INVALID_OPERATION);
     pCurlResponse = pCurlRequest->pCurlResponse;
