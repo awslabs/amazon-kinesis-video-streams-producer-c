@@ -325,37 +325,6 @@ install(
   DESTINATION .)
 
 
-    if (WIN32)
-      add_library(kvsCommonLws STATIC ${KVS_COMMON_SOURCE_FILES_BASE} ${KVS_COMMON_SOURCE_FILES_LWS})
-    else()
-      add_library(kvsCommonLws ${TYPE_OF_LIB} ${KVS_COMMON_SOURCE_FILES_BASE} ${KVS_COMMON_SOURCE_FILES_LWS})
-    endif()
-    target_compile_definitions(kvsCommonLws PRIVATE KVS_BUILD_WITH_LWS ${CPRODUCER_COMMON_TLS_OPTION})
-    if(NOT BUILD_STATIC)
-      set_target_properties(kvsCommonLws PROPERTIES VERSION ${KINESIS_VIDEO_PRODUCER_C_VERSION} SOVERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION})
-    endif()
-    target_link_libraries(kvsCommonLws
-            ${PRODUCER_CRYPTO_LIBRARY}
-            ${LIBWEBSOCKETS_LIBRARIES}
-            kvspicUtils)
-
-    install(
-      TARGETS kvsCommonLws
-      ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-      LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-      RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
-    install(
-      FILES ${CMAKE_CURRENT_BINARY_DIR}/libkvsCommonLws.pc
-      DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
-endif()
-
-# if(BUILD_COMMON_LWS)
-
-  # .......
-
-# endif()
-
-
 # TODO: I wonder, why would producer ever need lws?
 if(BUILD_COMMON_CURL)
   if(WIN32)
