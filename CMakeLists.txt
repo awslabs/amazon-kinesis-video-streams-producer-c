@@ -201,9 +201,11 @@ endif()
 #       However, currently I have the logic setup reverse from the above: we only use common/system build
 #         if buildDeps is off AND buildCommon<> is TRUE for the package.
 
-if(NOT BUILD_DEPENDENCIES AND BUILD_COMMON_CURL) 
+
+  
+if((NOT BUILD_DEPENDENCIES OR WIN32) AND BUILD_COMMON_CURL) 
   if (WIN32)
-      find_package(CURL REQUIRED)
+    find_package(CURL REQUIRED)
   else()
     pkg_check_modules(CURL REQUIRED libcurl)
   endif()
@@ -396,11 +398,6 @@ if(BUILD_COMMON_CURL)
   #        ssl and crypto (openssl's dependencies).
   message("CURL_LIBRARIES: ${CURL_LIBRARIES}")
   message("PRODUCER_CRYPTO_LIBRARY: ${PRODUCER_CRYPTO_LIBRARY}")
-
-  # STRING(REPLACE ";" " " PRODUCER_CRYPTO_LIBRARY "${PRODUCER_CRYPTO_LIBRARY}")
-  # STRING(REPLACE ";" " " CURL_LIBRARIES "${CURL_LIBRARIES}")
-  # message("CURL_LIBRARIES: ${CURL_LIBRARIES}")
-  # message("PRODUCER_CRYPTO_LIBRARY: ${PRODUCER_CRYPTO_LIBRARY}")
 
   target_link_libraries(cproducer 
                         PUBLIC kvspic
