@@ -177,7 +177,7 @@ find_package(Threads)
 
 # TODO: Should maybe change "BUILD_CRYPTO" to be similar to the other ones: "BUILD_COMMON_CRYPTO"
 #       (and so BUILD_CRYPTO == !BUILD_COMMON_CRYPTO)
-if(NOT BUILD_DEPENDENCIES OR NOT BUILD_CRYPTO)
+if(NOT BUILD_DEPENDENCIES OR NOT BUILD_CRYPTO OR WIN32)
   if(USE_OPENSSL)
       find_package(OpenSSL REQUIRED)
       set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR})
@@ -214,16 +214,16 @@ if((NOT BUILD_DEPENDENCIES OR WIN32) AND BUILD_COMMON_CURL)
   link_directories(${CURL_LIBRARY_DIRS})
 endif()
 
-if(NOT BUILD_DEPENDENCIES AND BUILD_COMMON_LWS)
-  if (WIN32)
-    find_package(LIBWEBSOCKETS REQUIRED PATHS ${OPEN_SRC_INSTALL_PREFIX})
-  else()
-    pkg_check_modules(LIBWEBSOCKETS REQUIRED libwebsockets)
-  endif()
+# if(NOT BUILD_DEPENDENCIES AND BUILD_COMMON_LWS)
+#   if (WIN32)
+#     find_package(LIBWEBSOCKETS REQUIRED PATHS ${OPEN_SRC_INSTALL_PREFIX})
+#   else()
+#     pkg_check_modules(LIBWEBSOCKETS REQUIRED libwebsockets)
+#   endif()
 
-  set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${LIBWEBSOCKETS_INCLUDE_DIRS})
-  link_directories(${LIBWEBSOCKETS_LIBRARY_DIRS})
-endif()
+#   set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${LIBWEBSOCKETS_INCLUDE_DIRS})
+#   link_directories(${LIBWEBSOCKETS_LIBRARY_DIRS})
+# endif()
 
 ############# Done finding 3rd-party dependencies ############
 
