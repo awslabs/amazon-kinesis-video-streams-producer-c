@@ -313,7 +313,13 @@ endif()
 
 # use openssl by default
 set(CPRODUCER_COMMON_TLS_OPTION KVS_USE_OPENSSL)
-set(PRODUCER_CRYPTO_LIBRARY ssl crypto)
+if(WIN32)
+  set(PRODUCER_CRYPTO_LIBRARY
+          OpenSSL::Crypto
+          OpenSSL::SSL)
+else()
+  set(PRODUCER_CRYPTO_LIBRARY ssl crypto)
+endif()
 
 if (USE_MBEDTLS)
   set(CPRODUCER_COMMON_TLS_OPTION KVS_USE_MBEDTLS)
