@@ -328,7 +328,7 @@ install(
 # TODO: I wonder, why would producer ever need lws?
 if(BUILD_COMMON_CURL)
   if(WIN32)
-    set(CURL_LIBRARIES libcurl)
+    set(CURL_LIBRARIES CURL::libcurl)
   else()
     set(CURL_LIBRARIES curl)
   endif()
