@@ -45,6 +45,8 @@ STATUS createDefaultDeviceInfo(PDeviceInfo* ppDeviceInfo)
 
     // use 0 for default values
     pDeviceInfo->clientInfo.stopStreamTimeout = 0;
+    pDeviceInfo->clientInfo.serviceCallConnectionTimeout = SERVICE_CALL_DEFAULT_CONNECTION_TIMEOUT;
+    pDeviceInfo->clientInfo.serviceCallCompletionTimeout = SERVICE_CALL_DEFAULT_TIMEOUT;
     pDeviceInfo->clientInfo.createClientTimeout = 0;
     pDeviceInfo->clientInfo.createStreamTimeout = 0;
 

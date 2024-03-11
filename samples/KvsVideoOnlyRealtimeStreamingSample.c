@@ -1,4 +1,4 @@
-#include <com/amazonaws/kinesis/video/cproducer/Include.h>
+#include "Samples.h"
 
 #define DEFAULT_RETENTION_PERIOD          2 * HUNDREDS_OF_NANOS_IN_AN_HOUR
 #define DEFAULT_BUFFER_DURATION           120 * HUNDREDS_OF_NANOS_IN_A_SECOND
@@ -11,11 +11,14 @@
 #define VIDEO_CODEC_NAME_H264             "h264"
 #define VIDEO_CODEC_NAME_H265             "h265"
 #define VIDEO_CODEC_NAME_MAX_LENGTH       5
+#define METADATA_MAX_KEY_LENGTH           128
+#define METADATA_MAX_VALUE_LENGTH         256
+#define MAX_METADATA_PER_FRAGMENT         10
 
 #define NUMBER_OF_FRAME_FILES 403
 
-#define FILE_LOGGING_BUFFER_SIZE (100 * 1024)
-#define MAX_NUMBER_OF_LOG_FILES  5
+// #define IOT_CORE_ENABLE_CREDENTIALS 1
+
 STATUS readFrameData(PFrame pFrame, PCHAR frameFilePath, PCHAR videoCodec)
 {
     STATUS retStatus = STATUS_SUCCESS;
@@ -57,10 +60,10 @@ INT32 main(INT32 argc, CHAR* argv[])
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     STATUS retStatus = STATUS_SUCCESS;
     PCHAR accessKey = NULL, secretKey = NULL, sessionToken = NULL, streamName = NULL, region = NULL, cacertPath = NULL;
-    CHAR frameFilePath[MAX_PATH_LEN + 1];
+    CHAR frameFilePath[MAX_PATH_LEN + 1], metadataKey[METADATA_MAX_KEY_LENGTH + 1], metadataValue[METADATA_MAX_VALUE_LENGTH + 1];
     Frame frame;
     BYTE frameBuffer[200000]; // Assuming this is enough
-    UINT32 frameSize = SIZEOF(frameBuffer), frameIndex = 0, fileIndex = 0;
+    UINT32 frameSize = SIZEOF(frameBuffer), frameIndex = 0, fileIndex = 0, n = 0, numMetadata = 10;
     UINT64 streamStopTime, streamingDuration = DEFAULT_STREAM_DURATION;
     DOUBLE startUpLatency;
     BOOL firstFrame = TRUE;
@@ -69,17 +72,28 @@ INT32 main(INT32 argc, CHAR* argv[])
     STRNCPY(videoCodec, VIDEO_CODEC_NAME_H264, STRLEN(VIDEO_CODEC_NAME_H264)); // h264 video by default
     VIDEO_CODEC_ID videoCodecID = VIDEO_CODEC_ID_H264;
 
+#ifdef IOT_CORE_ENABLE_CREDENTIALS
+    PCHAR pIotCoreCredentialEndpoint, pIotCoreCert, pIotCorePrivateKey, pIotCoreRoleAlias, pIotCoreThingName;
+    CHK_ERR((pIotCoreCredentialEndpoint = GETENV(IOT_CORE_CREDENTIAL_ENDPOINT)) != NULL, STATUS_INVALID_OPERATION,
+            "AWS_IOT_CORE_CREDENTIAL_ENDPOINT must be set");
+    CHK_ERR((pIotCoreCert = GETENV(IOT_CORE_CERT)) != NULL, STATUS_INVALID_OPERATION, "AWS_IOT_CORE_CERT must be set");
+    CHK_ERR((pIotCorePrivateKey = GETENV(IOT_CORE_PRIVATE_KEY)) != NULL, STATUS_INVALID_OPERATION, "AWS_IOT_CORE_PRIVATE_KEY must be set");
+    CHK_ERR((pIotCoreRoleAlias = GETENV(IOT_CORE_ROLE_ALIAS)) != NULL, STATUS_INVALID_OPERATION, "AWS_IOT_CORE_ROLE_ALIAS must be set");
+    CHK_ERR((pIotCoreRoleAlias = GETENV(IOT_CORE_ROLE_ALIAS)) != NULL, STATUS_INVALID_OPERATION, "AWS_IOT_CORE_ROLE_ALIAS must be set");
+    CHK_ERR((pIotCoreThingName = GETENV(IOT_CORE_THING_NAME)) != NULL, STATUS_INVALID_OPERATION, "AWS_IOT_CORE_THING_NAME must be set");
+#else
     if (argc < 2) {
-        DLOGE("Usage: AWS_ACCESS_KEY_ID=SAMPLEKEY AWS_SECRET_ACCESS_KEY=SAMPLESECRET %s <stream_name> <codec> <duration_in_seconds> "
-              "<frame_files_path>\n",
+        DLOGE("Usage: AWS_ACCESS_KEY_ID=SAMPLEKEY AWS_SECRET_ACCESS_KEY=SAMPLESECRET %s <stream_name>"
+              "<codec> <duration_in_seconds> <frame_files_path> [num_metadata = 10]\n",
               argv[0]);
         CHK(FALSE, STATUS_INVALID_ARG);
     }
-
-    if ((accessKey = getenv(ACCESS_KEY_ENV_VAR)) == NULL || (secretKey = getenv(SECRET_KEY_ENV_VAR)) == NULL) {
+    if ((accessKey = GETENV(ACCESS_KEY_ENV_VAR)) == NULL || (secretKey = GETENV(SECRET_KEY_ENV_VAR)) == NULL) {
         DLOGE("Error missing credentials");
         CHK(FALSE, STATUS_INVALID_ARG);
     }
+    sessionToken = GETENV(SESSION_TOKEN_ENV_VAR);
+#endif
 
     MEMSET(frameFilePath, 0x00, MAX_PATH_LEN + 1);
     if (argc < 5) {
@@ -88,24 +102,40 @@ INT32 main(INT32 argc, CHAR* argv[])
         STRNCPY(frameFilePath, argv[4], MAX_PATH_LEN);
     }
 
-    cacertPath = getenv(CACERT_PATH_ENV_VAR);
-    sessionToken = getenv(SESSION_TOKEN_ENV_VAR);
+    cacertPath = GETENV(CACERT_PATH_ENV_VAR);
+#ifdef IOT_CORE_ENABLE_CREDENTIALS
+    streamName = pIotCoreThingName;
+#else
     streamName = argv[1];
-    if ((region = getenv(DEFAULT_REGION_ENV_VAR)) == NULL) {
+#endif
+    if ((region = GETENV(DEFAULT_REGION_ENV_VAR)) == NULL) {
         region = (PCHAR) DEFAULT_AWS_REGION;
     }
 
-    if (argc >= 3) {
+    if (argc >= 3 && !IS_EMPTY_STRING(argv[2])) {
         if (!STRCMP(argv[2], VIDEO_CODEC_NAME_H265)) {
             STRNCPY(videoCodec, VIDEO_CODEC_NAME_H265, STRLEN(VIDEO_CODEC_NAME_H265));
             videoCodecID = VIDEO_CODEC_ID_H265;
         }
     }
 
-    if (argc >= 4) {
+    if (argc >= 4 && !IS_EMPTY_STRING(argv[3])) {
         // Get the duration and convert to an integer
         CHK_STATUS(STRTOUI64(argv[3], NULL, 10, &streamingDuration));
         streamingDuration *= HUNDREDS_OF_NANOS_IN_A_SECOND;
+    }
+
+    MEMSET(frameFilePath, 0x00, MAX_PATH_LEN + 1);
+    if (argc >= 5 && !IS_EMPTY_STRING(argv[4])) {
+        STRNCPY(frameFilePath, argv[4], MAX_PATH_LEN);
+    } else {
+        STRCPY(frameFilePath, (PCHAR) "../samples/");
+    }
+
+    if (argc >= 6 && !IS_EMPTY_STRING(argv[5])) {
+        numMetadata = STRTOUL(argv[5], NULL, 10);
+        DLOGD("numMetadata: %d\n", numMetadata);
+        CHK(numMetadata <= MAX_METADATA_PER_FRAGMENT, STATUS_INVALID_ARG);
     }
 
     streamStopTime = GETTIME() + streamingDuration;
@@ -122,10 +152,16 @@ INT32 main(INT32 argc, CHAR* argv[])
     // adjust members of pStreamInfo here if needed
 
     startTime = GETTIME();
+
+#ifdef IOT_CORE_ENABLE_CREDENTIALS
+    CHK_STATUS(createDefaultCallbacksProviderWithIotCertificate(pIotCoreCredentialEndpoint, pIotCoreCert, pIotCorePrivateKey, cacertPath,
+                                                                pIotCoreRoleAlias, pIotCoreThingName, region, NULL, NULL, &pClientCallbacks));
+#else
     CHK_STATUS(createDefaultCallbacksProviderWithAwsCredentials(accessKey, secretKey, sessionToken, MAX_UINT64, region, cacertPath, NULL, NULL,
                                                                 &pClientCallbacks));
+#endif
 
-    if (NULL != getenv(ENABLE_FILE_LOGGING)) {
+    if (NULL != GETENV(ENABLE_FILE_LOGGING)) {
         if ((retStatus = addFileLoggerPlatformCallbacksProvider(pClientCallbacks, FILE_LOGGING_BUFFER_SIZE, MAX_NUMBER_OF_LOG_FILES,
                                                                 (PCHAR) FILE_LOGGER_LOG_FILE_DIRECTORY_PATH, TRUE) != STATUS_SUCCESS)) {
             printf("File logging enable option failed with 0x%08x error code\n", retStatus);
@@ -153,6 +189,17 @@ INT32 main(INT32 argc, CHAR* argv[])
         frame.size = SIZEOF(frameBuffer);
 
         CHK_STATUS(readFrameData(&frame, frameFilePath, videoCodec));
+
+        // Add the fragment metadata key-value pairs
+        // For limits, refer to https://docs.aws.amazon.com/kinesisvideostreams/latest/dg/limits.html#limits-streaming-metadata
+        if (numMetadata > 0 && frame.flags == FRAME_FLAG_KEY_FRAME) {
+            DLOGD("Adding metadata! frameIndex: %d", frame.index);
+            for (n = 1; n <= numMetadata; n++) {
+                SNPRINTF(metadataKey, METADATA_MAX_KEY_LENGTH, "TEST_KEY_%d", n);
+                SNPRINTF(metadataValue, METADATA_MAX_VALUE_LENGTH, "TEST_VALUE_%d", frame.index + n);
+                CHK_STATUS(putKinesisVideoFragmentMetadata(streamHandle, metadataKey, metadataValue, TRUE));
+            }
+        }
 
         CHK_STATUS(putKinesisVideoFrame(streamHandle, &frame));
         if (firstFrame) {

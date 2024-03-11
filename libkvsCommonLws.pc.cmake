@@ -5,6 +5,6 @@ libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@
 
 Name: KVS-libkvsCommonLws
 Description: KVS C Producer common libwebsockets library
-Version: 0.0.0
+Version: @KINESIS_VIDEO_PRODUCER_C_VERSION@
 Cflags: -I${includedir}
 Libs: -L${libdir} -lkvsCommonLws

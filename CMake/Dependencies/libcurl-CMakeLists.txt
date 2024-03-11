@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.6.3)
 
-project(libcurl-download NONE)
+project(libcurl-download LANGUAGES C)
 
 find_program(MAKE_EXE NAMES make)
 
@@ -17,6 +17,7 @@ endif()
 
 set(CMAKE_ARGS
         -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
         -DCMAKE_INSTALL_PREFIX=${OPEN_SRC_INSTALL_PREFIX}
         -DBUILD_CURL_EXE=0
         -DHTTP_ONLY=1)

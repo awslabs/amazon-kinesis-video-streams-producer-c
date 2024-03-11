@@ -659,7 +659,7 @@ STATUS generateSignatureDateTime(UINT64 currentTime, PCHAR pDateTimeStr)
 
     // Convert to time_t
     timeT = (time_t) (currentTime / HUNDREDS_OF_NANOS_IN_A_SECOND);
-    retSize = STRFTIME(pDateTimeStr, SIGNATURE_DATE_TIME_STRING_LEN, DATE_TIME_STRING_FORMAT, GMTIME(&timeT));
+    retSize = STRFTIME(pDateTimeStr, SIGNATURE_DATE_TIME_STRING_LEN, DATE_TIME_STRING_FORMAT, GMTIME_THREAD_SAFE(&timeT));
     CHK(retSize > 0, STATUS_BUFFER_TOO_SMALL);
     pDateTimeStr[retSize] = '\0';
 

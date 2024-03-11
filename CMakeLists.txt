@@ -1,7 +1,12 @@
 cmake_minimum_required(VERSION 3.6.3)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake;${CMAKE_MODULE_PATH}")
 include(Utilities)
-project(KinesisVideoProducerC VERSION 1.5.1 LANGUAGES C)
+project(KinesisVideoProducerC VERSION 1.5.2 LANGUAGES C)
+
+set(KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION 1)
+set(KINESIS_VIDEO_PRODUCER_C_MINOR_VERSION 5)
+set(KINESIS_VIDEO_PRODUCER_C_PATCH_VERSION 2)
+set(KINESIS_VIDEO_PRODUCER_C_VERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION}.${KINESIS_VIDEO_PRODUCER_C_MINOR_VERSION}.${KINESIS_VIDEO_PRODUCER_C_PATCH_VERSION})
 
 include(GNUInstallDirs)
 
@@ -16,6 +21,7 @@ option(BUILD_COMMON_LWS "Whether or not to build ProducerC libwebsockets common 
 option(BUILD_COMMON_CURL "Whether or not to build ProducerC curl common library" ON)
 option(BUILD_OPENSSL_PLATFORM "If buildng OpenSSL what is the target platform" OFF)
 option(LOCAL_OPENSSL_BUILD "Whether or not to use local OpenSSL build" OFF)
+option(CONSTRAINED_DEVICE "Change pthread stack size" OFF)
 
 # Developer Flags
 option(BUILD_TEST "Build the testing tree." OFF)
@@ -28,11 +34,20 @@ option(UNDEFINED_BEHAVIOR_SANITIZER "Build with UndefinedBehaviorSanitizer." OFF
 option(ALIGNED_MEMORY_MODEL "Aligned memory model ONLY." OFF)
 option(SET_SSL_CALLBACKS "Set SSL thread and lock callbacks." OFF)
 
+set(TYPE_OF_LIB SHARED)
+if (BUILD_STATIC)
+  set(TYPE_OF_LIB STATIC)
+endif()
+
 set(CMAKE_MACOSX_RPATH TRUE)
 
 get_filename_component(ROOT "${CMAKE_CURRENT_SOURCE_DIR}" ABSOLUTE)
 
 add_definitions(-DVERSION_STRING=\"${PROJECT_VERSION}\")
+
+if(CONSTRAINED_DEVICE)
+    add_definitions(-DCONSTRAINED_DEVICE)
+endif()
 
 if(NOT KINESIS_VIDEO_PRODUCER_C_SRC)
     if(DEFINED ENV{KINESIS_VIDEO_PRODUCER_C_SRC})
@@ -43,6 +58,11 @@ if(NOT KINESIS_VIDEO_PRODUCER_C_SRC)
 endif()
 
 message(STATUS "Kinesis Video Producer path is ${KINESIS_VIDEO_PRODUCER_C_SRC}")
+
+if(NOT CMAKE_BUILD_TYPE)
+    message(STATUS "Setting CMAKE_BUILD_TYPE to Release by default")
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
+endif()
 
 if(BUILD_DEPENDENCIES)
   if (NOT OPEN_SRC_INSTALL_PREFIX)
@@ -73,7 +93,7 @@ if(BUILD_DEPENDENCIES)
                     -DBUILD_OPENSSL_PLATFORM=${BUILD_OPENSSL_PLATFORM})
       build_dependency(openssl ${BUILD_ARGS})
     elseif(USE_MBEDTLS)
-      set(BUILD_ARGS -DBUILD_STATIC=${BUILD_STATIC})
+      set(BUILD_ARGS -DBUILD_STATIC=${BUILD_STATIC} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
       build_dependency(mbedtls ${BUILD_ARGS})
     else()
       message(FATAL_ERROR "No crypto library selected.")
@@ -82,6 +102,7 @@ if(BUILD_DEPENDENCIES)
 
   if (BUILD_COMMON_LWS)
     set(BUILD_ARGS  -DBUILD_STATIC=${BUILD_STATIC}
+                    -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                     -DOPENSSL_DIR=${OPEN_SRC_INSTALL_PREFIX}
                     -DUSE_OPENSSL=${USE_OPENSSL}
                     -DUSE_MBEDTLS=${USE_MBEDTLS})
@@ -90,6 +111,7 @@ if(BUILD_DEPENDENCIES)
 
   if (BUILD_COMMON_CURL)
     set(BUILD_ARGS  -DBUILD_STATIC=${BUILD_STATIC}
+                    -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                     -DUSE_OPENSSL=${USE_OPENSSL}
                     -DUSE_MBEDTLS=${USE_MBEDTLS})
     build_dependency(curl ${BUILD_ARGS})
@@ -257,8 +279,15 @@ if(BUILD_COMMON_LWS)
       "${CMAKE_CURRENT_SOURCE_DIR}/libkvsCommonLws.pc.cmake"
       "${CMAKE_CURRENT_BINARY_DIR}/libkvsCommonLws.pc" @ONLY)
 
-    add_library(kvsCommonLws STATIC ${KVS_COMMON_SOURCE_FILES_BASE} ${KVS_COMMON_SOURCE_FILES_LWS})
+    if (WIN32)
+      add_library(kvsCommonLws STATIC ${KVS_COMMON_SOURCE_FILES_BASE} ${KVS_COMMON_SOURCE_FILES_LWS})
+    else()
+      add_library(kvsCommonLws ${TYPE_OF_LIB} ${KVS_COMMON_SOURCE_FILES_BASE} ${KVS_COMMON_SOURCE_FILES_LWS})
+    endif()
     target_compile_definitions(kvsCommonLws PRIVATE KVS_BUILD_WITH_LWS ${CPRODUCER_COMMON_TLS_OPTION})
+    if(NOT BUILD_STATIC)
+      set_target_properties(kvsCommonLws PROPERTIES VERSION ${KINESIS_VIDEO_PRODUCER_C_VERSION} SOVERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION})
+    endif()
     target_link_libraries(kvsCommonLws
             ${OPENSSL_CRYPTO_LIBRARY}
             ${OPENSSL_SSL_LIBRARY}
@@ -290,8 +319,15 @@ if(BUILD_COMMON_CURL)
       endif()
     endif()
 
-    add_library(kvsCommonCurl STATIC ${KVS_COMMON_SOURCE_FILES_BASE} ${KVS_COMMON_SOURCE_FILES_CURL})
+    if (WIN32)
+      add_library(kvsCommonCurl STATIC ${KVS_COMMON_SOURCE_FILES_BASE} ${KVS_COMMON_SOURCE_FILES_CURL})
+    else()
+      add_library(kvsCommonCurl ${TYPE_OF_LIB} ${KVS_COMMON_SOURCE_FILES_BASE} ${KVS_COMMON_SOURCE_FILES_CURL})
+    endif()
     target_compile_definitions(kvsCommonCurl PRIVATE KVS_BUILD_WITH_CURL ${CPRODUCER_COMMON_TLS_OPTION})
+    if(NOT BUILD_STATIC)
+      set_target_properties(kvsCommonCurl PROPERTIES VERSION ${KINESIS_VIDEO_PRODUCER_C_VERSION} SOVERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION})
+    endif()
     target_link_libraries(kvsCommonCurl
             kvspicUtils
             ${CURL_LIBRARIES}
@@ -310,15 +346,13 @@ if(BUILD_COMMON_CURL)
       "${CMAKE_CURRENT_SOURCE_DIR}/libcproducer.pc.cmake"
       "${CMAKE_CURRENT_BINARY_DIR}/libcproducer.pc" @ONLY)
 
-    set(TYPE_OF_LIB SHARED)
-    if (BUILD_STATIC)
-      set(TYPE_OF_LIB STATIC)
-    endif()
-
     if (WIN32)
       add_library(cproducer STATIC ${PRODUCER_C_SOURCE_FILES})
     else()
       add_library(cproducer ${TYPE_OF_LIB} ${PRODUCER_C_SOURCE_FILES})
+    endif()
+    if(NOT BUILD_STATIC)
+      set_target_properties(cproducer PROPERTIES VERSION ${KINESIS_VIDEO_PRODUCER_C_VERSION} SOVERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION})
     endif()
     target_link_libraries(cproducer PUBLIC kvsCommonCurl kvspic)
 

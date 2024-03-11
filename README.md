@@ -58,6 +58,7 @@ You can pass the following options to `cmake ..`.
 * `-DUNDEFINED_BEHAVIOR_SANITIZER` Build with UndefinedBehaviorSanitizer
 * `-DALIGNED_MEMORY_MODEL` Build for aligned memory model only devices. Default is OFF.
 * `-DLOCAL_OPENSSL_BUILD` Whether or not to use local OpenSSL build. Default is OFF.
+* `-DCONSTRAINED_DEVICE` -- Change thread stack size to 0.5Mb, needed for Alpine.
 
 
 DMEMORY_SANITIZER, DTHREAD_SANITIZER etc. flags works only with clang compiler 
@@ -131,6 +132,51 @@ Note: The resulting sample video is the same.
 For audio only, run `./kvsAudioOnlyStreamingSample <stream-name> <streaming_duration> <sample_location> <audio-codec>`.
 
 This will stream the audio files from the `samples/aacSampleFrames` or `samples/alawSampleFrames` (as per the choice of audio codec in the last argument) respectively. 
+
+### Running with IoT credential provider
+
+To run the samples with IoT credential provider:
+
+1. Run the IoT thing generation script available under `scripts`: `source scripts/generate-iot-credential.sh`. For more information on IoT set up, visit [AWS KVS IoT Set up](https://docs.aws.amazon.com/kinesisvideostreams/latest/dg/how-iot.html)
+2. Uncomment `#define IOT_CORE_ENABLE_CREDENTIALS 1` in the relevant sample
+3. Build the changes: `make`
+4. Run the sample using the instructions in previous section.
+
+### Fragment metadata
+
+`./kvsVideoOnlyRealtimeStreamingSample` is the only sample that has the [fragment metadata](https://docs.aws.amazon.com/kinesisvideostreams/latest/dg/how-meta.html) implemented out of the box.
+
+In addition to the required arguments above, this sample has an additional argument:
+```shell
+./kvsVideoOnlyRealtimeStreamingSample <stream-name> <video-codec> <streaming-duration-in-seconds> <sample-location> <num-metadata>
+```
+
+`num-metadata` -- the number of sample fragment metadata key-value pairs that are added to each fragment. Min: 0, Max: 10. Default: 10.
+
+### Setting log levels
+
+
+### Setup logging:
+Set up the desired log level. The log levels and corresponding values currently available are:
+1. `LOG_LEVEL_VERBOSE` ---- 1
+2. `LOG_LEVEL_DEBUG`   ---- 2
+3. `LOG_LEVEL_INFO`    ---- 3
+4. `LOG_LEVEL_WARN`    ---- 4
+5. `LOG_LEVEL_ERROR`   ---- 5
+6. `LOG_LEVEL_FATAL`   ---- 6
+7. `LOG_LEVEL_SILENT`  ---- 7
+8. `LOG_LEVEL_PROFILE` ---- 8
+
+To set a log level, you can set it using the deviceInfo structure. 
+```
+pDeviceInfo->clientInfo.loggerLogLevel = LOG_LEVEL_DEBUG;
+```
+
+By default, our samples set the log level to `LOG_LEVEL_DEBUG`.
+
+The SDK also tracks entry and exit of functions which increases the verbosity of the logs. This will be useful when you want to track the transitions within the codebase. To do so, you need to set log level to `LOG_LEVEL_VERBOSE` and add the following to the cmake file:
+`add_definitions(-DLOG_STREAMING)`
+Note: This log level is extremely VERBOSE and could flood the files if using file based logging strategy.
 
 ### Run unit tests
 Since these tests exercise networking you need to have AWS credentials specified, specifically you need to:

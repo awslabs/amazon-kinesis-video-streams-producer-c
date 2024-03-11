@@ -62,7 +62,7 @@ struct __CurlResponse {
     BOOL endOfStream;
 
     // Whether curl is paused
-    volatile BOOL paused;
+    volatile ATOMIC_BOOL paused;
 
     // Whether to dump streaming session into mkv file
     BOOL debugDumpFile;

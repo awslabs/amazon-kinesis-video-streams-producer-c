@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.6.3)
 
-project(libmbedtls-download NONE)
+project(libmbedtls-download LANGUAGES C)
 
 include(ExternalProject)
 
@@ -22,7 +22,7 @@ ExternalProject_Add(
   CMAKE_ARGS
   	-DCMAKE_INSTALL_PREFIX=${OPEN_SRC_INSTALL_PREFIX}
     -DUSE_SHARED_MBEDTLS_LIBRARY=${BUILD_SHARED}
-    -DCMAKE_BUILD_TYPE=Release
+    -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
     -DCMAKE_MACOSX_RPATH=${CMAKE_MACOSX_RPATH}
   BUILD_ALWAYS 		TRUE
   TEST_COMMAND 		"")

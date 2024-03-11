@@ -79,12 +79,23 @@ STATUS createCurlApiCallbacks(PCallbacksProvider pCallbacksProvider, PCHAR regio
 
     // Set the control plane URL
     if (controlPlaneUrl == NULL || controlPlaneUrl[0] == '\0') {
-        // Create a fully qualified URI
-        SNPRINTF(pCurlApiCallbacks->controlPlaneUrl, MAX_URI_CHAR_LEN, "%s%s.%s%s", CONTROL_PLANE_URI_PREFIX, KINESIS_VIDEO_SERVICE_NAME,
-                 pCurlApiCallbacks->region, CONTROL_PLANE_URI_POSTFIX);
-        // If region is in CN, add CN region uri postfix
-        if (STRSTR(pCurlApiCallbacks->region, "cn-")) {
-            STRCAT(pCurlApiCallbacks->controlPlaneUrl, ".cn");
+        if (0 == STRNCMP(pCurlApiCallbacks->region, AWS_ISO_B_REGION_PREFIX, STRLEN(AWS_ISO_B_REGION_PREFIX))) {
+            SNPRINTF(pCurlApiCallbacks->controlPlaneUrl, MAX_URI_CHAR_LEN, "%s%s%s.%s%s", CONTROL_PLANE_URI_PREFIX, KINESIS_VIDEO_SERVICE_NAME,
+                     AWS_KVS_FIPS_ENDPOINT_POSTFIX, pCurlApiCallbacks->region, CONTROL_PLANE_URI_POSTFIX_ISO_B);
+            // Region is in "aws-iso" partition
+        } else if (0 == STRNCMP(pCurlApiCallbacks->region, AWS_ISO_REGION_PREFIX, STRLEN(AWS_ISO_REGION_PREFIX))) {
+            SNPRINTF(pCurlApiCallbacks->controlPlaneUrl, MAX_URI_CHAR_LEN, "%s%s%s.%s%s", CONTROL_PLANE_URI_PREFIX, KINESIS_VIDEO_SERVICE_NAME,
+                     AWS_KVS_FIPS_ENDPOINT_POSTFIX, pCurlApiCallbacks->region, CONTROL_PLANE_URI_POSTFIX_ISO);
+        } else if (0 == STRNCMP(pCurlApiCallbacks->region, AWS_GOV_CLOUD_REGION_PREFIX, STRLEN(AWS_GOV_CLOUD_REGION_PREFIX))) {
+            SNPRINTF(pCurlApiCallbacks->controlPlaneUrl, MAX_URI_CHAR_LEN, "%s%s%s.%s%s", CONTROL_PLANE_URI_PREFIX, KINESIS_VIDEO_SERVICE_NAME,
+                     AWS_KVS_FIPS_ENDPOINT_POSTFIX, pCurlApiCallbacks->region, CONTROL_PLANE_URI_POSTFIX);
+        } else if (0 == STRNCMP(pCurlApiCallbacks->region, AWS_CN_REGION_PREFIX, STRLEN(AWS_CN_REGION_PREFIX))) {
+            SNPRINTF(pCurlApiCallbacks->controlPlaneUrl, MAX_URI_CHAR_LEN, "%s%s.%s%s", CONTROL_PLANE_URI_PREFIX, KINESIS_VIDEO_SERVICE_NAME,
+                     pCurlApiCallbacks->region, CONTROL_PLANE_URI_POSTFIX_CN);
+        } else {
+            // Create a fully qualified URI
+            SNPRINTF(pCurlApiCallbacks->controlPlaneUrl, MAX_URI_CHAR_LEN, "%s%s.%s%s", CONTROL_PLANE_URI_PREFIX, KINESIS_VIDEO_SERVICE_NAME,
+                     pCurlApiCallbacks->region, CONTROL_PLANE_URI_POSTFIX);
         }
     } else {
         STRNCPY(pCurlApiCallbacks->controlPlaneUrl, controlPlaneUrl, MAX_URI_CHAR_LEN);
@@ -994,15 +1005,17 @@ STATUS createStreamCurl(UINT64 customData, PCHAR deviceName, PCHAR streamName, P
 
 CleanUp:
 
+    if (startLocked) {
+        // Release the lock to let the awaiting handler thread to continue
+        pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData, pCurlRequest->startLock);
+    }
+
     if (STATUS_FAILED(retStatus)) {
         if (IS_VALID_TID_VALUE(threadId)) {
             THREAD_CANCEL(threadId);
         }
 
         freeCurlRequest(&pCurlRequest);
-    } else if (startLocked) {
-        // Release the lock to let the awaiting handler thread to continue
-        pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData, pCurlRequest->startLock);
     }
 
     if (shutdownLocked) {
@@ -1226,15 +1239,17 @@ STATUS describeStreamCurl(UINT64 customData, PCHAR streamName, PServiceCallConte
 
 CleanUp:
 
+    if (startLocked) {
+        // Release the lock to let the awaiting handler thread to continue
+        pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData, pCurlRequest->startLock);
+    }
+
     if (STATUS_FAILED(retStatus)) {
         if (IS_VALID_TID_VALUE(threadId)) {
             THREAD_CANCEL(threadId);
         }
 
         freeCurlRequest(&pCurlRequest);
-    } else if (startLocked) {
-        // Release the lock to let the awaiting handler thread to continue
-        pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData, pCurlRequest->startLock);
     }
 
     if (shutdownLocked) {
@@ -1317,7 +1332,7 @@ PVOID describeStreamCurlHandler(PVOID arg)
     UINT32 i, strLen, resultLen;
     INT32 tokenCount;
     UINT64 retention;
-    BOOL jsonInStreamDescription = FALSE, requestTerminating = FALSE;
+    BOOL jsonInStreamDescription = FALSE, requestTerminating = FALSE, responseReceived = FALSE;
     StreamDescription streamDescription;
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     SERVICE_CALL_RESULT callResult = SERVICE_CALL_RESULT_NOT_SET;
@@ -1350,8 +1365,7 @@ PVOID describeStreamCurlHandler(PVOID arg)
     CHK(pCurlResponse->callInfo.callResult != SERVICE_CALL_RESULT_NOT_SET, STATUS_INVALID_OPERATION);
     pResponseStr = pCurlResponse->callInfo.responseData;
     resultLen = pCurlResponse->callInfo.responseDataLen;
-
-    DLOGD("[%s] DescribeStream API response: %.*s", streamDescription.streamName, resultLen, pResponseStr);
+    responseReceived = TRUE;
 
     // skip json parsing if call result not ok
     CHK(pCurlResponse->callInfo.callResult == SERVICE_CALL_RESULT_OK && resultLen != 0 && pResponseStr != NULL, retStatus);
@@ -1429,6 +1443,10 @@ PVOID describeStreamCurlHandler(PVOID arg)
     }
 
 CleanUp:
+
+    if (responseReceived) {
+        DLOGD("[%s] DescribeStream API response: %.*s", streamDescription.streamName, resultLen, pResponseStr);
+    }
 
     // Preserve the values as we need to free the request before the event notification
     if (pCurlRequest->pCurlResponse != NULL) {
@@ -1534,15 +1552,18 @@ STATUS getStreamingEndpointCurl(UINT64 customData, PCHAR streamName, PCHAR apiNa
 
 CleanUp:
 
+    if (startLocked) {
+        // Release the lock to let the awaiting handler thread to continue.
+        // This needs to be done before freeCurlRequest because there we will free the startLock mutex
+        pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData, pCurlRequest->startLock);
+    }
+
     if (STATUS_FAILED(retStatus)) {
         if (IS_VALID_TID_VALUE(threadId)) {
             THREAD_CANCEL(threadId);
         }
 
         freeCurlRequest(&pCurlRequest);
-    } else if (startLocked) {
-        // Release the lock to let the awaiting handler thread to continue
-        pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData, pCurlRequest->startLock);
     }
 
     if (shutdownLocked) {
@@ -1863,15 +1884,17 @@ STATUS tagResourceCurl(UINT64 customData, PCHAR streamArn, UINT32 tagCount, PTag
 
 CleanUp:
 
+    if (startLocked) {
+        // Release the lock to let the awaiting handler thread to continue
+        pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData, pCurlRequest->startLock);
+    }
+
     if (STATUS_FAILED(retStatus)) {
         if (IS_VALID_TID_VALUE(threadId)) {
             THREAD_CANCEL(threadId);
         }
 
         freeCurlRequest(&pCurlRequest);
-    } else if (startLocked) {
-        // Release the lock to let the awaiting handler thread to continue
-        pCallbacksProvider->clientCallbacks.unlockMutexFn(pCallbacksProvider->clientCallbacks.customData, pCurlRequest->startLock);
     }
 
     if (shutdownLocked) {
