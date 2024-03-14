@@ -58,6 +58,7 @@ else()
   set(KINESIS_VIDEO_PRODUCER_C_SRC "${CMAKE_CURRENT_SOURCE_DIR}")
 endif()
 
+# NOTE: The windows CI build has CMAKE_BUILD_TYPE set to debug, probably due to MSVC environment, TODO: look into this
 # Default to release build if unspecified.
 if(NOT CMAKE_BUILD_TYPE)
   message(STATUS "Setting CMAKE_BUILD_TYPE to Release by default")
@@ -316,8 +317,8 @@ set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${OPEN_SRC_INSTALL_PREFIX}/in
 include_directories(${KINESIS_VIDEO_PRODUCER_C_SRC}/src/include)
 include_directories(${OPEN_SRC_INCLUDE_DIRS})
 
-# TODO: Probably good to remove the CMAKE_CURRENT_SOURCE_DIR one
-link_directories(${OPEN_SRC_INSTALL_PREFIX}/lib)
+link_directories(${OPEN_SRC_INSTALL_PREFIX}/lib) # Unix intsalls libraries into /lib directory
+link_directories(${OPEN_SRC_INSTALL_PREFIX}/bin) # Windows installs libraries into /bin directory
 
 if(ALIGNED_MEMORY_MODEL)
     add_definitions(-DALIGNED_MEMORY_MODEL)
