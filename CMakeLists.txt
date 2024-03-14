@@ -53,16 +53,19 @@ add_definitions(-DVERSION_STRING=\"${PROJECT_VERSION}\")
 
 # Set where to build this project.
 if(DEFINED ENV{KINESIS_VIDEO_PRODUCER_C_SRC})
-    set(KINESIS_VIDEO_PRODUCER_C_SRC $ENV{KINESIS_VIDEO_PRODUCER_C_SRC})
+  set(KINESIS_VIDEO_PRODUCER_C_SRC $ENV{KINESIS_VIDEO_PRODUCER_C_SRC})
 else()
-    set(KINESIS_VIDEO_PRODUCER_C_SRC "${CMAKE_CURRENT_SOURCE_DIR}")
+  set(KINESIS_VIDEO_PRODUCER_C_SRC "${CMAKE_CURRENT_SOURCE_DIR}")
 endif()
 
 # Default to release build if unspecified.
 if(NOT CMAKE_BUILD_TYPE)
-    message(STATUS "Setting CMAKE_BUILD_TYPE to Release by default")
-    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
+  message(STATUS "Setting CMAKE_BUILD_TYPE to Release by default")
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
+else()
+  message(STATUS "CMAKE_BUILD_TYPE is set to: ${CMAKE_BUILD_TYPE}")
 endif()
+
 
 # Fetch and build 3rd-party dependencies if specified.
 if(BUILD_DEPENDENCIES)
