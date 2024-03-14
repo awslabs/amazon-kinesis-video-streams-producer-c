@@ -218,7 +218,7 @@ endif()
 
 
 
-if(NOT BUILD_DEPENDENCIES AND BUILD_COMMON_CURL) 
+if(NOT BUILD_DEPENDENCIES AND BUILD_COMMON_CURL)
   if (WIN32)
     find_package(CURL REQUIRED)
   else()
@@ -330,9 +330,10 @@ endif()
 set(CPRODUCER_COMMON_TLS_OPTION KVS_USE_OPENSSL)
 
 if(WIN32)
-  set(PRODUCER_CRYPTO_LIBRARY
-          OpenSSL::Crypto
-          OpenSSL::SSL)
+  # set(PRODUCER_CRYPTO_LIBRARY
+  #         OpenSSL::Crypto
+  #         OpenSSL::SSL)
+  set(PRODUCER_CRYPTO_LIBRARY ssl crypto)
 else()
   set(PRODUCER_CRYPTO_LIBRARY ssl crypto)
 endif()
