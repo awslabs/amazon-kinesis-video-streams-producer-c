@@ -378,12 +378,12 @@ endif()
 
 if(BUILD_COMMON_CURL)
   if(WIN32)
-    set(CURL_LIBRARIES CURL::libcurl)
+    #set(CURL_LIBRARIES CURL::libcurl)
+    set(CURL_LIBRARIES curl)
   else()
     set(CURL_LIBRARIES curl)
   endif()
 
-  # producer only uses curl right now
   configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/libkvsCommonCurl.pc.cmake"
     "${CMAKE_CURRENT_BINARY_DIR}/libkvsCommonCurl.pc" @ONLY)
@@ -410,7 +410,6 @@ if(BUILD_COMMON_CURL)
     set_target_properties(cproducer PROPERTIES VERSION ${KINESIS_VIDEO_PRODUCER_C_VERSION} SOVERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION})
   endif()
 
-  # TODO: what does this do?
   target_compile_definitions(cproducer PRIVATE KVS_BUILD_WITH_CURL ${CPRODUCER_COMMON_TLS_OPTION})
 
   # TODO: I'd like to know why there is no openssl library and we instead have to use
