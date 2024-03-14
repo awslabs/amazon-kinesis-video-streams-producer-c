@@ -155,6 +155,7 @@ if(BUILD_KVS_PIC)
   file(GLOB PIC_HEADERS "${pic_project_SOURCE_DIR}/src/*/include")
   include_directories("${PIC_HEADERS}")
 else()
+  # TODO: test this already-installed case
   # Finding PIC on system using the libcproducer.pc.cmake file.
   pkg_check_modules(KVSPIC libkvspicUtils)
   if(KVSPIC_FOUND)
@@ -173,11 +174,12 @@ endif()
 
 ############# Finding 3rd-party dependencies ############
 
+# TODO: shouldn't this be "required" ?
 find_package(Threads)
 
 # TODO: Should maybe change "BUILD_CRYPTO" to be similar to the other ones: "BUILD_COMMON_CRYPTO"
 #       (and so BUILD_CRYPTO == !BUILD_COMMON_CRYPTO)
-if(NOT BUILD_DEPENDENCIES OR NOT BUILD_CRYPTO OR WIN32)
+if(NOT BUILD_DEPENDENCIES OR NOT BUILD_CRYPTO)
   if(USE_OPENSSL)
       find_package(OpenSSL REQUIRED)
       set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR})
