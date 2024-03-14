@@ -1,4 +1,4 @@
-REM  NOTE: May need to replace "Enterprise" with "Community" int eh below command
+REM  NOTE: May need to replace "Enterprise" with "Community" int the below command
 call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
 mkdir build
 cd build
