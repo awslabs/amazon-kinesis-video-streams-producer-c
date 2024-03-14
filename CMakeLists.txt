@@ -217,7 +217,7 @@ endif()
 #         if buildDeps is off AND buildCommon<> is TRUE for the package.
 
 
-  
+
 if((NOT BUILD_DEPENDENCIES OR WIN32) AND BUILD_COMMON_CURL) 
   if (WIN32)
     find_package(CURL REQUIRED)
@@ -245,7 +245,8 @@ endif()
 
 ############# TODO: Doing....   ############
 
-# TODO: Note, these variables are neber used, in C, CPP, WebRTC SDKs. Not in cmake and not in source files.
+# TODO: Note, these variables are never used, in C, CPP, WebRTC SDKs. Not in cmake and not in source files.
+#       Confirm whether we need these.
 if(CMAKE_SIZEOF_VOID_P STREQUAL 4)
     message(STATUS "Bitness 32 bits")
     set(KINESIS_VIDEO_BUILD_BITNESS "x86")
@@ -292,7 +293,6 @@ if(${CMAKE_C_COMPILER_ID} MATCHES "GNU|Clang")
     endif()
 endif()
 
-# TODO: What and why is this MSVC thing?
 if(MSVC)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_WARNINGS -D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
 endif()
@@ -396,33 +396,9 @@ if(BUILD_COMMON_CURL)
     endif()
   endif()
 
-  # if (WIN32)
-  #   add_library(kvsCommonCurl STATIC ${KVS_COMMON_SOURCE_FILES_BASE} ${KVS_COMMON_SOURCE_FILES_CURL})
-  # else()
-  #   add_library(kvsCommonCurl ${TYPE_OF_LIB} ${KVS_COMMON_SOURCE_FILES_BASE} ${KVS_COMMON_SOURCE_FILES_CURL})
-  # endif()
-  # target_compile_definitions(kvsCommonCurl PRIVATE KVS_BUILD_WITH_CURL ${CPRODUCER_COMMON_TLS_OPTION})
-  # if(NOT BUILD_STATIC)
-  #   set_target_properties(kvsCommonCurl PROPERTIES VERSION ${KINESIS_VIDEO_PRODUCER_C_VERSION} SOVERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION})
-  # endif()
-  # target_link_libraries(kvsCommonCurl
-  #         kvspicUtils
-  #         ${CURL_LIBRARIES}
-  #         ${PRODUCER_CRYPTO_LIBRARY})
-
-  # install(
-  #   TARGETS kvsCommonCurl
-  #   ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-  #   LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-  #   RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
-  # install(
-  #   FILES ${CMAKE_CURRENT_BINARY_DIR}/libkvsCommonCurl.pc
-  #   DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
-
   configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/libcproducer.pc.cmake"
     "${CMAKE_CURRENT_BINARY_DIR}/libcproducer.pc" @ONLY)
-
 
   if (WIN32)
     add_library(cproducer STATIC ${PRODUCER_C_SOURCE_FILES})
@@ -435,7 +411,7 @@ if(BUILD_COMMON_CURL)
 
   # TODO: what does this do?
   target_compile_definitions(cproducer PRIVATE KVS_BUILD_WITH_CURL ${CPRODUCER_COMMON_TLS_OPTION})
-  
+
   # TODO: I'd like to know why there is no openssl library and we instead have to use
   #        ssl and crypto (openssl's dependencies).
   message("CURL_LIBRARIES: ${CURL_LIBRARIES}")
@@ -455,17 +431,19 @@ if(BUILD_COMMON_CURL)
     FILES ${CMAKE_CURRENT_BINARY_DIR}/libcproducer.pc
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 
-  add_executable(kvsVideoOnlyRealtimeStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsVideoOnlyRealtimeStreamingSample.c)
-  target_link_libraries(kvsVideoOnlyRealtimeStreamingSample cproducer)
+  if(BUILD_SAMPLES)
+    add_executable(kvsVideoOnlyRealtimeStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsVideoOnlyRealtimeStreamingSample.c)
+    target_link_libraries(kvsVideoOnlyRealtimeStreamingSample cproducer)
 
-  add_executable(kvsVideoOnlyOfflineStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsVideoOnlyOfflineStreamingSample.c)
-  target_link_libraries(kvsVideoOnlyOfflineStreamingSample cproducer)
+    add_executable(kvsVideoOnlyOfflineStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsVideoOnlyOfflineStreamingSample.c)
+    target_link_libraries(kvsVideoOnlyOfflineStreamingSample cproducer)
 
-  add_executable(kvsAudioVideoStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsAudioVideoStreamingSample.c)
-  target_link_libraries(kvsAudioVideoStreamingSample cproducer)
+    add_executable(kvsAudioVideoStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsAudioVideoStreamingSample.c)
+    target_link_libraries(kvsAudioVideoStreamingSample cproducer)
 
-  add_executable(kvsAudioOnlyStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsAudioOnlyStreamingSample.c)
-  target_link_libraries(kvsAudioOnlyStreamingSample cproducer)
+    add_executable(kvsAudioOnlyStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsAudioOnlyStreamingSample.c)
+    target_link_libraries(kvsAudioOnlyStreamingSample cproducer)
+  endif()
 
   if (BUILD_TEST)
       add_subdirectory(tst)
