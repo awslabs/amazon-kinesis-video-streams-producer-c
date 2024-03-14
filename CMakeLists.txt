@@ -103,21 +103,19 @@ if(BUILD_DEPENDENCIES)
     endif()
   endif()
 
+  if (BUILD_COMMON_CURL)
+    set(BUILD_ARGS  -DBUILD_STATIC=${BUILD_STATIC}
+                    -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+                    -DUSE_MBEDTLS=${USE_MBEDTLS})
+    build_dependency(curl ${BUILD_ARGS})
+  endif()
+
   if (BUILD_COMMON_LWS)
     set(BUILD_ARGS  -DBUILD_STATIC=${BUILD_STATIC}
                     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                     -DOPENSSL_DIR=${OPEN_SRC_INSTALL_PREFIX}
-                    -DUSE_OPENSSL=${USE_OPENSSL}
                     -DUSE_MBEDTLS=${USE_MBEDTLS})
     build_dependency(websockets ${BUILD_ARGS})
-  endif()
-
-  if (BUILD_COMMON_CURL)
-    set(BUILD_ARGS  -DBUILD_STATIC=${BUILD_STATIC}
-                    -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-                    -DUSE_OPENSSL=${USE_OPENSSL}
-                    -DUSE_MBEDTLS=${USE_MBEDTLS})
-    build_dependency(curl ${BUILD_ARGS})
   endif()
 
   if(BUILD_TEST)
@@ -316,7 +314,7 @@ include_directories(${KINESIS_VIDEO_PRODUCER_C_SRC}/src/include)
 include_directories(${OPEN_SRC_INCLUDE_DIRS})
 
 # TODO: Probably good to remove the CMAKE_CURRENT_SOURCE_DIR one
-link_directories(${CMAKE_SOURCE_DIR}/open-source/lib)
+link_directories(${OPEN_SRC_INSTALL_PREFIX}/lib)
 
 if(ALIGNED_MEMORY_MODEL)
     add_definitions(-DALIGNED_MEMORY_MODEL)
