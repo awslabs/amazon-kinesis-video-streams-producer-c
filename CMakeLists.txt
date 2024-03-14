@@ -154,18 +154,31 @@ if(BUILD_KVS_PIC)
   add_subdirectory("${DEPENDENCY_DOWNLOAD_PATH}/libkvspic/kvspic-src")
   file(GLOB PIC_HEADERS "${pic_project_SOURCE_DIR}/src/*/include")
   include_directories("${PIC_HEADERS}")
+
 else()
   # TODO: test this already-installed case
   # Finding PIC on system using the libcproducer.pc.cmake file.
-  pkg_check_modules(KVSPIC libkvspicUtils)
-  if(KVSPIC_FOUND)
-    message("Found system KVS PIC located: ${KVSPIC_PREFIX}")
-    set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${KVSPIC_INCLUDE_DIRS})
-    link_directories(${KVSPIC_LIBRARY_DIRS})
+  pkg_check_modules(KVS_PIC kvspic)
+  if(KVS_PIC_FOUND)
+    message("Found system KVS PIC located: ${KVS_PIC_PREFIX}")
+    set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${KVS_PIC_UTILS_INCLUDE_DIRS})
+    link_directories(${KVS_PIC_LIBRARY_DIRS})
   else()
-    message(FATAL_ERROR "Could not find system KVS PIC. PkgConfig searched in: ${KVSPIC_INCLUDE_DIRS} \
+    message(FATAL_ERROR "Could not find system KVS PIC. PkgConfig searched in: ${KVS_PIC_INCLUDE_DIRS} \
                          Please check PIC installation or set BUILD_KVS_PIC to TRUE to build PIC with this project.")
   endif()
+
+  # Note: PIC Utils are built seperately as CommonLWS only uses these files.
+  pkg_check_modules(KVS_PIC_UTILS libkvspicUtils)
+  if(KVS_PIC_UTILS_FOUND)
+    message("Found system KVS PIC Utils located: ${KVS_PIC_UTILS_PREFIX}")
+    set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${KVS_PIC_UTILS_INCLUDE_DIRS})
+    link_directories(${KVS_PIC_UTILS_LIBRARY_DIRS})
+  else()
+    message(FATAL_ERROR "Could not find system KVS PIC Utils. PkgConfig searched in: ${KVS_PIC_UTILS_INCLUDE_DIRS} \
+                         Please check PIC installation or set BUILD_KVS_PIC to TRUE to build PIC with this project.")
+  endif()
+
 endif()
 
 ############# Done checking system for kvspic #############
@@ -194,10 +207,10 @@ endif()
 
 # TODO: Need to figure out the use case here.
 #       If we are building deps, should we check for system libraries at all?
-#         -   Is there ever a case that buildDeps=TRUE AND buildCommon<>=TRUE?
-#         -   And then is there ever a case buildDeps=FALSE AND buildCommon<>=FALSE?
+#         -   Is there ever a case that buildDeps==TRUE AND buildCommon<>==FALSE?
+#         -   And then is there ever a case buildDeps==FALSE AND buildCommon<>==TRUE?
 #         -   Which takes precedence?
-#       I would think buildCommon is a way of overriding the in-house building and avoiding 
+#       I would think buildCommon<> is a way of overriding the in-house building and avoiding 
 #         fetching the repo in this project. This way you can keep buildDeps=TRUE and then
 #         specify which ones you actually don't want built with the project by setting buildCommon to true.
 #       However, currently I have the logic setup reverse from the above: we only use common/system build
@@ -216,16 +229,16 @@ if((NOT BUILD_DEPENDENCIES OR WIN32) AND BUILD_COMMON_CURL)
   link_directories(${CURL_LIBRARY_DIRS})
 endif()
 
-# if(NOT BUILD_DEPENDENCIES AND BUILD_COMMON_LWS)
-#   if (WIN32)
-#     find_package(LIBWEBSOCKETS REQUIRED PATHS ${OPEN_SRC_INSTALL_PREFIX})
-#   else()
-#     pkg_check_modules(LIBWEBSOCKETS REQUIRED libwebsockets)
-#   endif()
+if(NOT BUILD_DEPENDENCIES AND BUILD_COMMON_LWS)
+  if (WIN32)
+    find_package(LIBWEBSOCKETS REQUIRED PATHS ${OPEN_SRC_INSTALL_PREFIX})
+  else()
+    pkg_check_modules(LIBWEBSOCKETS REQUIRED libwebsockets)
+  endif()
 
-#   set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${LIBWEBSOCKETS_INCLUDE_DIRS})
-#   link_directories(${LIBWEBSOCKETS_LIBRARY_DIRS})
-# endif()
+  set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${LIBWEBSOCKETS_INCLUDE_DIRS})
+  link_directories(${LIBWEBSOCKETS_LIBRARY_DIRS})
+endif()
 
 ############# Done finding 3rd-party dependencies ############
 
@@ -315,6 +328,7 @@ endif()
 
 # use openssl by default
 set(CPRODUCER_COMMON_TLS_OPTION KVS_USE_OPENSSL)
+
 if(WIN32)
   set(PRODUCER_CRYPTO_LIBRARY
           OpenSSL::Crypto
@@ -328,12 +342,39 @@ if (USE_MBEDTLS)
   set(PRODUCER_CRYPTO_LIBRARY MbedTLS MbedCrypto)
 endif()
 
-install(
-  DIRECTORY ${KINESIS_VIDEO_PRODUCER_C_SRC}/src/include
-  DESTINATION .)
+# TODO: Confirm this is ok to remove
+# install(
+#   DIRECTORY ${KINESIS_VIDEO_PRODUCER_C_SRC}/src/include
+#   DESTINATION .)
 
+if(BUILD_COMMON_LWS)
+  configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/libkvsCommonLws.pc.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/libkvsCommonLws.pc" @ONLY)
 
-# TODO: I wonder, why would producer ever need lws?
+  if (WIN32)
+    add_library(kvsCommonLws STATIC ${KVS_COMMON_SOURCE_FILES_BASE} ${KVS_COMMON_SOURCE_FILES_LWS})
+  else()
+    add_library(kvsCommonLws ${TYPE_OF_LIB} ${KVS_COMMON_SOURCE_FILES_BASE} ${KVS_COMMON_SOURCE_FILES_LWS})
+  endif()
+  target_compile_definitions(kvsCommonLws PRIVATE KVS_BUILD_WITH_LWS ${CPRODUCER_COMMON_TLS_OPTION})
+  if(NOT BUILD_STATIC)
+    set_target_properties(kvsCommonLws PROPERTIES VERSION ${KINESIS_VIDEO_PRODUCER_C_VERSION} SOVERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION})
+  endif()
+
+  target_link_libraries(kvsCommonLws ${LIBWEBSOCKETS_LIBRARIES} kvspicUtils)
+
+  install(
+    TARGETS kvsCommonLws
+    ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
+  install(
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/libkvsCommonLws.pc
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+
+endif()
+
 if(BUILD_COMMON_CURL)
   if(WIN32)
     set(CURL_LIBRARIES CURL::libcurl)
@@ -392,6 +433,7 @@ if(BUILD_COMMON_CURL)
     set_target_properties(cproducer PROPERTIES VERSION ${KINESIS_VIDEO_PRODUCER_C_VERSION} SOVERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION})
   endif()
 
+  # TODO: what does this do?
   target_compile_definitions(cproducer PRIVATE KVS_BUILD_WITH_CURL ${CPRODUCER_COMMON_TLS_OPTION})
   
   # TODO: I'd like to know why there is no openssl library and we instead have to use
