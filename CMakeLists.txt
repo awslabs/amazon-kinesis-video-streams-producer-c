@@ -340,7 +340,7 @@ if(WIN32)
   # set(PRODUCER_CRYPTO_LIBRARIES
           #         OpenSSL::Crypto
           #         OpenSSL::SSL)
-  set(PRODUCER_CRYPTO_LIBRARIES crypto ssl)
+  set(PRODUCER_CRYPTO_LIBRARIES libcrypto libssl)
 else()
   set(PRODUCER_CRYPTO_LIBRARIES ssl crypto)
 endif()
