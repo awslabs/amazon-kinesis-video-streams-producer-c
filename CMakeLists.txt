@@ -66,7 +66,7 @@ endif()
 
 if(BUILD_DEPENDENCIES)
   if (NOT OPEN_SRC_INSTALL_PREFIX)
-    set(OPEN_SRC_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/open-source)
+    set(OPEN_SRC_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/open-source)
     set(ENV{PKG_CONFIG_PATH}
           "$ENV{PKG_CONFIG_PATH}:${OPEN_SRC_INSTALL_PREFIX}/lib/pkgconfig")
     set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${OPEN_SRC_INSTALL_PREFIX})
@@ -129,11 +129,11 @@ find_package(PkgConfig REQUIRED)
 
 ############# Check system for kvspic #############
 
-# pkg_check_modules(KVSPIC libkvspicUtils)
-# if(KVSPIC_FOUND)
-   # set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${KVSPIC_INCLUDE_DIRS})
-   # link_directories(${KVSPIC_LIBRARY_DIRS})
-# else()
+pkg_check_modules(KVSPIC libkvspicUtils)
+if(KVSPIC_FOUND)
+  set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${KVSPIC_INCLUDE_DIRS})
+  link_directories(${KVSPIC_LIBRARY_DIRS})
+else()
   ############# fetch repos that we need do add_subdirectory ############
   # repos that we will build using add_subdirectory will be stored in this path
   set(DEPENDENCY_DOWNLOAD_PATH ${CMAKE_CURRENT_SOURCE_DIR}/dependency)
@@ -144,7 +144,7 @@ find_package(PkgConfig REQUIRED)
   include_directories("${PIC_HEADERS}")
 
   ############# fetch repos that we need do add_subdirectory done ############
-# endif()
+endif()
 
 ############# Check system for kvspic done #############
 
@@ -172,12 +172,11 @@ if(BUILD_COMMON_CURL)
     find_package(CURL REQUIRED)
     set(CURL_LIBRARIES CURL::libcurl)
   else()
-    set(CURL_LIBRARIES curl)
-    # pkg_check_modules(CURL REQUIRED libcurl)
+    pkg_check_modules(CURL REQUIRED libcurl)
   endif()
 
-  # set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${CURL_INCLUDE_DIRS})
-  # link_directories(${CURL_LIBRARY_DIRS})
+  set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${CURL_INCLUDE_DIRS})
+  link_directories(${CURL_LIBRARY_DIRS})
   message("CURL_INCLUDE_DIRS: ${CURL_INCLUDE_DIRS}")
   message("CURL_LIBRARY_DIRS: ${CURL_LIBRARY_DIRS}")
 endif()
@@ -249,11 +248,7 @@ file(GLOB KVS_COMMON_SOURCE_FILES_CURL "src/source/Common/Curl/*.c")
 file(GLOB PRODUCER_C_SOURCE_FILES "src/source/*.c")
 
 include_directories(${KINESIS_VIDEO_PRODUCER_C_SRC}/src/include)
-
-message("OPEN_SRC_INCLUDE_DIRS: ${OPEN_SRC_INCLUDE_DIRS}")
 include_directories(${OPEN_SRC_INCLUDE_DIRS})
-
-link_directories(BEFORE ${CMAKE_SOURCE_DIR}/open-source/lib)
 
 if(ALIGNED_MEMORY_MODEL)
     add_definitions(-DALIGNED_MEMORY_MODEL)
@@ -334,10 +329,10 @@ if(BUILD_COMMON_CURL)
     if(NOT BUILD_STATIC)
       set_target_properties(kvsCommonCurl PROPERTIES VERSION ${KINESIS_VIDEO_PRODUCER_C_VERSION} SOVERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION})
     endif()
-    
-    target_link_libraries(kvsCommonCurl PUBLIC kvspicUtils
-                                        PRIVATE "${CMAKE_SOURCE_DIR}/open-source/lib/libcurl.dylib" ${PRODUCER_CRYPTO_LIBRARY})
-    
+    target_link_libraries(kvsCommonCurl
+            kvspicUtils
+            ${CURL_LIBRARIES}
+            ${PRODUCER_CRYPTO_LIBRARY})
 
     install(
       TARGETS kvsCommonCurl
