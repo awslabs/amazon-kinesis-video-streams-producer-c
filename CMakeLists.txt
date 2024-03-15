@@ -40,6 +40,7 @@ option(SET_SSL_CALLBACKS "Set SSL thread and lock callbacks." OFF)
 
 if (WIN32)
   set(BUILD_STATIC TRUE)
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
 endif()
 
 if (BUILD_STATIC)
@@ -336,17 +337,17 @@ endif()
 set(CPRODUCER_COMMON_TLS_OPTION KVS_USE_OPENSSL)
 
 if(WIN32)
-  # set(PRODUCER_CRYPTO_LIBRARY
-  #         OpenSSL::Crypto
-  #         OpenSSL::SSL)
-  set(PRODUCER_CRYPTO_LIBRARY ssl crypto)
+  # set(PRODUCER_CRYPTO_LIBRARIES
+          #         OpenSSL::Crypto
+          #         OpenSSL::SSL)
+  set(PRODUCER_CRYPTO_LIBRARIES crypto ssl)
 else()
-  set(PRODUCER_CRYPTO_LIBRARY ssl crypto)
+  set(PRODUCER_CRYPTO_LIBRARIES ssl crypto)
 endif()
 
 if (USE_MBEDTLS)
   set(CPRODUCER_COMMON_TLS_OPTION KVS_USE_MBEDTLS)
-  set(PRODUCER_CRYPTO_LIBRARY MbedTLS MbedCrypto)
+  set(PRODUCER_CRYPTO_LIBRARIES MbedTLS MbedCrypto)
 endif()
 
 # TODO: Confirm this is ok to remove
@@ -384,8 +385,7 @@ endif()
 
 if(BUILD_COMMON_CURL)
   if(WIN32)
-    #set(CURL_LIBRARIES CURL::libcurl)
-    set(CURL_LIBRARIES curl-d)
+    set(CURL_LIBRARIES libcurl)
   else()
     set(CURL_LIBRARIES curl)
   endif()
@@ -421,11 +421,11 @@ if(BUILD_COMMON_CURL)
   # TODO: I'd like to know why there is no openssl library and we instead have to use
   #        ssl and crypto (openssl's dependencies).
   message("CURL_LIBRARIES: ${CURL_LIBRARIES}")
-  message("PRODUCER_CRYPTO_LIBRARY: ${PRODUCER_CRYPTO_LIBRARY}")
+  message("PRODUCER_CRYPTO_LIBRARIES: ${PRODUCER_CRYPTO_LIBRARIES}")
 
   target_link_libraries(cproducer 
                         PUBLIC kvspic
-                        PRIVATE ${CURL_LIBRARIES} ${PRODUCER_CRYPTO_LIBRARY})
+                        PRIVATE ${PRODUCER_CRYPTO_LIBRARIES} ${CURL_LIBRARIES})
 
   message("CMAKE_INSTALL_LIBDIR: ${CMAKE_INSTALL_LIBDIR}")
   install(
