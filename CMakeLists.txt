@@ -38,19 +38,18 @@ option(UNDEFINED_BEHAVIOR_SANITIZER "Build with UndefinedBehaviorSanitizer." OFF
 option(ALIGNED_MEMORY_MODEL "Aligned memory model ONLY." OFF)
 option(SET_SSL_CALLBACKS "Set SSL thread and lock callbacks." OFF)
 
-if (WIN32) {
+if (WIN32)
   set(BUILD_STATIC TRUE)
-}
-
-if (BUILD_STATIC)
-    set(TYPE_OF_LIB STATIC)
-else()
-    set(TYPE_OF_LIB SHARED)
 endif()
 
+if (BUILD_STATIC)
+  set(TYPE_OF_LIB STATIC)
+else()
+  set(TYPE_OF_LIB SHARED)
+endif()
 
 if(CONSTRAINED_DEVICE)
-    add_definitions(-DCONSTRAINED_DEVICE)
+  add_definitions(-DCONSTRAINED_DEVICE)
 endif()
 
 set(CMAKE_MACOSX_RPATH TRUE)
