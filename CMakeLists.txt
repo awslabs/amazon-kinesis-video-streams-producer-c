@@ -325,6 +325,14 @@ include_directories(${OPEN_SRC_INCLUDE_DIRS})
 link_directories(${OPEN_SRC_INSTALL_PREFIX}/lib) # Unix intsalls libraries into /lib directory
 link_directories(${OPEN_SRC_INSTALL_PREFIX}/bin) # Windows installs libraries into /bin directory
 
+# Get the list of link directories
+get_property(link_dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY LINK_DIRECTORIES)
+
+# Print each link directory
+foreach(dir IN LISTS link_dirs)
+    message("Link directory: ${dir}")
+endforeach()
+
 if(ALIGNED_MEMORY_MODEL)
     add_definitions(-DALIGNED_MEMORY_MODEL)
 endif()
