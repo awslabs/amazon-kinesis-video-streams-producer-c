@@ -391,13 +391,17 @@ jobs:
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
+      - name: Move cloned repo # to shorten path length for Windows OS
+        run: |
+          git config --system core.longpaths true
+          mkdir C:\amazon-kinesis-video-streams-producer-c
+          Move-Item -Path "D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\*" -Destination "C:\amazon-kinesis-video-streams-producer-c"
       - name: Install dependencies
         run: |
           choco install nasm strawberryperl
       - name: Build repository
         run: |
-          $env:Path += ';C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;C:\Program Files\NASM;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\lib;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\bin'
-          git config --system core.longpaths true
+          $env:Path += ';C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;C:\Program Files\NASM;C:\amazon-kinesis-video-streams-producer-c\open-source\lib;C:\amazon-kinesis-video-streams-producer-c\open-source\bin'
           .github/build_windows.bat
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -408,8 +412,8 @@ jobs:
           role-duration-seconds: 10800
       - name: Run tests
         run: |
-          $env:Path += ';C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;C:\Program Files\NASM;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\lib;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\bin'
-          & "D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\build\tst\producer_test.exe" --gtest_filter="-ProducerFunctionalityTest.pressure_on_buffer_duration_fail_new_connection_at_token_rotation"
+          $env:Path += ';C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;C:\Program Files\NASM;C:\amazon-kinesis-video-streams-producer-c\open-source\lib;C:\amazon-kinesis-video-streams-producer-c\open-source\bin'
+          & "C:\amazon-kinesis-video-streams-producer-c\build\tst\producer_test.exe" --gtest_filter="-ProducerFunctionalityTest.pressure_on_buffer_duration_fail_new_connection_at_token_rotation"
 
   arm64-cross-compilation:
     runs-on: ubuntu-20.04
