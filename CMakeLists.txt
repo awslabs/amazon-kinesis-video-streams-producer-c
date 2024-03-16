@@ -427,15 +427,19 @@ if(BUILD_COMMON_CURL)
   message("CURL_LIBRARIES: ${CURL_LIBRARIES}")
   message("PRODUCER_CRYPTO_LIBRARIES: ${PRODUCER_CRYPTO_LIBRARIES}")
 
-   target_link_libraries(cproducer
-            kvspic
-            C:/Users/Administrator/Desktop/Producer_C/amazon-kinesis-video-streams-producer-c/open-source/lib/libssl.lib
-            C:/Users/Administrator/Desktop/Producer_C/amazon-kinesis-video-streams-producer-c/open-source/lib/libcrypto.lib
-            C:/Users/Administrator/Desktop/Producer_C/amazon-kinesis-video-streams-producer-c/open-source/lib/libcurl-d_imp.lib)
+  if(WIN32)
+    target_link_libraries(cproducer
+                          kvspic
+                          ${OPEN_SRC_INSTALL_PREFIX}/lib/libssl.lib
+                          ${OPEN_SRC_INSTALL_PREFIX}/lib/libcrypto.lib
+                          ${OPEN_SRC_INSTALL_PREFIX}/lib/libcurl-d_imp.lib)
+  else()
+    target_link_libraries(cproducer 
+                          PUBLIC kvspic
+                          PRIVATE ${PRODUCER_CRYPTO_LIBRARIES} ${CURL_LIBRARIES})
+  endif()
 
-  # target_link_libraries(cproducer 
-  #                       PUBLIC kvspic
-  #                       PRIVATE ${PRODUCER_CRYPTO_LIBRARIES} ${CURL_LIBRARIES})
+
 
   message("CMAKE_INSTALL_LIBDIR: ${CMAKE_INSTALL_LIBDIR}")
   install(
