@@ -38,10 +38,6 @@ option(UNDEFINED_BEHAVIOR_SANITIZER "Build with UndefinedBehaviorSanitizer." OFF
 option(ALIGNED_MEMORY_MODEL "Aligned memory model ONLY." OFF)
 option(SET_SSL_CALLBACKS "Set SSL thread and lock callbacks." OFF)
 
-if (WIN32)
-  set(BUILD_STATIC TRUE)
-  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
-endif()
 
 if (BUILD_STATIC)
   set(TYPE_OF_LIB STATIC)
@@ -431,9 +427,15 @@ if(BUILD_COMMON_CURL)
   message("CURL_LIBRARIES: ${CURL_LIBRARIES}")
   message("PRODUCER_CRYPTO_LIBRARIES: ${PRODUCER_CRYPTO_LIBRARIES}")
 
-  target_link_libraries(cproducer 
-                        PUBLIC kvspic
-                        PRIVATE ${PRODUCER_CRYPTO_LIBRARIES} ${CURL_LIBRARIES})
+   target_link_libraries(cproducer
+            kvspic
+            C:/Users/Administrator/Desktop/Producer_C/amazon-kinesis-video-streams-producer-c/open-source/lib/libssl.lib
+            C:/Users/Administrator/Desktop/Producer_C/amazon-kinesis-video-streams-producer-c/open-source/lib/libcrypto.lib
+            C:/Users/Administrator/Desktop/Producer_C/amazon-kinesis-video-streams-producer-c/open-source/lib/libcurl-d_imp.lib)
+
+  # target_link_libraries(cproducer 
+  #                       PUBLIC kvspic
+  #                       PRIVATE ${PRODUCER_CRYPTO_LIBRARIES} ${CURL_LIBRARIES})
 
   message("CMAKE_INSTALL_LIBDIR: ${CMAKE_INSTALL_LIBDIR}")
   install(
