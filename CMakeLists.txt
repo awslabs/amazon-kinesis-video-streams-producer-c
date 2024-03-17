@@ -436,7 +436,7 @@ if(BUILD_COMMON_CURL)
   else()
     target_link_libraries(cproducer 
                           PUBLIC kvspic
-                          PRIVATE ${PRODUCER_CRYPTO_LIBRARIES} ${CURL_LIBRARIES})
+                          PRIVATE ${CURL_LIBRARIES} ${PRODUCER_CRYPTO_LIBRARIES})
   endif()
 
 
