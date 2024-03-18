@@ -375,7 +375,7 @@ if(BUILD_COMMON_LWS)
     set_target_properties(kvsCommonLws PROPERTIES VERSION ${KINESIS_VIDEO_PRODUCER_C_VERSION} SOVERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION})
   endif()
 
-  target_link_libraries(kvsCommonLws OpenSSL::Crypto OpenSSL::SSL kvspicUtils)
+  target_link_libraries(kvsCommonLws ${LIBWEBSOCKETS_LIBRARIES} kvspicUtils)
 
   install(
     TARGETS kvsCommonLws
