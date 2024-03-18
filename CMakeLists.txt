@@ -20,7 +20,7 @@ option(BUILD_DEPENDENCIES "Whether or not to build depending libraries from sour
 option(USE_OPENSSL "Use openssl as crypto library" ON)
 option(USE_MBEDTLS "Use mbedtls as crypto library" OFF)
 option(BUILD_COMMON_LWS "Whether or not to build ProducerC libwebsockets common library" OFF)
-option(BUILD_COMMON_CURL "Whether or not to build ProducerC curl common library" ON) # TODO: remove this and any other un-needed flags
+option(BUILD_COMMON_CURL "Whether or not to build ProducerC curl common library" ON)
 option(BUILD_OPENSSL_PLATFORM "If buildng OpenSSL what is the target platform" OFF)
 option(BUILD_CRYPTO "Whether or not to build OpenSSL or MbedTLS, if not, will use system-installed version" ON)
 option(CONSTRAINED_DEVICE "Change pthread stack size" OFF)
@@ -115,6 +115,7 @@ if(BUILD_DEPENDENCIES)
     build_dependency(curl ${BUILD_ARGS})
   endif()
 
+  # NOTE: LWS does not get built from source here in our WebRTC CI tests since we set BUILD_DEPENDENCIES=FALSE
   if (BUILD_COMMON_LWS)
     set(BUILD_ARGS  -DBUILD_STATIC=${BUILD_STATIC}
                     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
@@ -137,11 +138,10 @@ message("CMAKE_PREFIX_PATH : ${CMAKE_PREFIX_PATH}") #TODO: Remove this.
 
 ############# Checking system for kvspic #############
 
-set(CMAKE_FIND_DEBUG_MODE ON) #TODO: Remove this.
 
 # NOTE: this is possibly a breaking change, if not specified, system PIC will not be used.
 # Prev behavior: look for system PIC if not found, build PIC.
-# Now: is BUILD_KVS_PIC ? build PIC, else find syste PIC - if system PIC not found, fail build
+# Now: is BUILD_KVS_PIC ? build PIC, else find system PIC - if system PIC not found, fail build
 # TODO: Leave a note in the PIC file libkvspic.pc.cmake that the below comments/messages must be updated 
 #       if we change "prefix=" from CMAKE_INSTALL_PREFIX. (CMAKE_INSTALL_PREFIX = usr/local).
 if(BUILD_KVS_PIC)
@@ -195,7 +195,7 @@ find_package(Threads)
 
 # TODO: Should maybe change "BUILD_CRYPTO" to be similar to the other ones: "BUILD_COMMON_CRYPTO"
 #       (and so BUILD_CRYPTO == !BUILD_COMMON_CRYPTO)
-if(NOT BUILD_DEPENDENCIES OR NOT BUILD_CRYPTO)
+if((NOT BUILD_DEPENDENCIES OR NOT BUILD_CRYPTO) AND BUILD_COMMON_CURL)
   if(USE_OPENSSL)
       find_package(OpenSSL REQUIRED)
       set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR})
@@ -427,6 +427,7 @@ if(BUILD_COMMON_CURL)
   message("CURL_LIBRARIES: ${CURL_LIBRARIES}")
   message("PRODUCER_CRYPTO_LIBRARIES: ${PRODUCER_CRYPTO_LIBRARIES}")
 
+  # Linker is not able to find the .lib files on Windows even when they are present and the path is searched.
   if(WIN32)
     target_link_libraries(cproducer
                           kvspic
