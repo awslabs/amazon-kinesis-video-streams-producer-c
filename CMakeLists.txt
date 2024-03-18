@@ -192,19 +192,19 @@ endif()
 # TODO: shouldn't this be "required" ?
 find_package(Threads)
 
-if(NOT BUILD_DEPENDENCIES OR NOT BUILD_CRYPTO)
-  if(USE_OPENSSL)
-      find_package(OpenSSL REQUIRED)
-      # set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR})
-  elseif(USE_MBEDTLS)
-    find_package(MbedTLS REQUIRED)
+# if(NOT BUILD_DEPENDENCIES OR NOT BUILD_CRYPTO)
+#   if(USE_OPENSSL)
+#       find_package(OpenSSL REQUIRED)
+#       # set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR})
+#   elseif(USE_MBEDTLS)
+#     find_package(MbedTLS REQUIRED)
 
-    # We do have a FindMbedTLS.cmake file.
-    set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${MBEDTLS_INCLUDE_DIRS})
-  else()
-    message(FATAL_ERROR "No crypto library selected. Please specify one of the following: " ${SUPPORTED_CRYPTO_LIBRARIES})
-  endif()
-endif()
+#     # We do have a FindMbedTLS.cmake file.
+#     set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${MBEDTLS_INCLUDE_DIRS})
+#   else()
+#     message(FATAL_ERROR "No crypto library selected. Please specify one of the following: " ${SUPPORTED_CRYPTO_LIBRARIES})
+#   endif()
+# endif()
 
 
 # TODO: Need to figure out the use case here.
