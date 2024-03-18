@@ -192,19 +192,22 @@ endif()
 # TODO: shouldn't this be "required" ?
 find_package(Threads)
 
-# if(NOT BUILD_DEPENDENCIES OR NOT BUILD_CRYPTO)
-#   if(USE_OPENSSL)
-#       find_package(OpenSSL REQUIRED)
-#       # set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR})
-#   elseif(USE_MBEDTLS)
-#     find_package(MbedTLS REQUIRED)
-
-#     # We do have a FindMbedTLS.cmake file.
-#     set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${MBEDTLS_INCLUDE_DIRS})
-#   else()
-#     message(FATAL_ERROR "No crypto library selected. Please specify one of the following: " ${SUPPORTED_CRYPTO_LIBRARIES})
-#   endif()
-# endif()
+if(NOT BUILD_DEPENDENCIES OR NOT BUILD_CRYPTO)
+  if(USE_OPENSSL)
+    find_package(OpenSSL)
+    if(NOT OPENSSL_FOUND AND NOT BUILD_DEPENDENCIES)
+      message(FATAL_ERROR "OpenSSL is not found. Make sure to export PKG_CONFIG_PATH to where OpenSSL's pc file is")
+    endif()
+    # TODO: I don't think the below line does anything
+    set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR})
+  elseif(USE_MBEDTLS)
+    find_package(MbedTLS REQUIRED)
+    # We do have a FindMbedTLS.cmake file.
+    set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${MBEDTLS_INCLUDE_DIRS})
+  else()
+    message(FATAL_ERROR "No crypto library selected. Please specify one of the following: " ${SUPPORTED_CRYPTO_LIBRARIES})
+  endif()
+endif()
 
 
 # TODO: Need to figure out the use case here.
@@ -372,7 +375,7 @@ if(BUILD_COMMON_LWS)
     set_target_properties(kvsCommonLws PROPERTIES VERSION ${KINESIS_VIDEO_PRODUCER_C_VERSION} SOVERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION})
   endif()
 
-  target_link_libraries(kvsCommonLws libwebsockets kvspicUtils)
+  target_link_libraries(kvsCommonLws OpenSSL::Crypto OpenSSL::SSL kvspicUtils)
 
   install(
     TARGETS kvsCommonLws
