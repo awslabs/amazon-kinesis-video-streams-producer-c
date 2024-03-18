@@ -193,14 +193,14 @@ endif()
 # TODO: shouldn't this be "required" ?
 find_package(Threads)
 
-# TODO: Should maybe change "BUILD_CRYPTO" to be similar to the other ones: "BUILD_COMMON_CRYPTO"
-#       (and so BUILD_CRYPTO == !BUILD_COMMON_CRYPTO)
 if(NOT BUILD_DEPENDENCIES OR NOT BUILD_CRYPTO)
   if(USE_OPENSSL)
       find_package(OpenSSL REQUIRED)
-      set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR})
+      # set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR})
   elseif(USE_MBEDTLS)
     find_package(MbedTLS REQUIRED)
+
+    # We do have a FindMbedTLS.cmake file.
     set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${MBEDTLS_INCLUDE_DIRS})
   else()
     message(FATAL_ERROR "No crypto library selected. Please specify one of the following: " ${SUPPORTED_CRYPTO_LIBRARIES})
@@ -226,21 +226,19 @@ if(NOT BUILD_DEPENDENCIES AND BUILD_COMMON_CURL)
     find_package(CURL REQUIRED)
   else()
     pkg_check_modules(CURL REQUIRED libcurl)
+    set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${CURL_INCLUDE_DIRS})
+    link_directories(${CURL_LIBRARY_DIRS})
   endif()
-
-  set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${CURL_INCLUDE_DIRS})
-  link_directories(${CURL_LIBRARY_DIRS})
 endif()
 
 if(NOT BUILD_DEPENDENCIES AND BUILD_COMMON_LWS)
   if (WIN32)
-    find_package(LIBWEBSOCKETS REQUIRED PATHS ${OPEN_SRC_INSTALL_PREFIX})
+    find_package(LIBWEBSOCKETS REQUIRED)
   else()
     pkg_check_modules(LIBWEBSOCKETS REQUIRED libwebsockets)
+    set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${LIBWEBSOCKETS_INCLUDE_DIRS})
+    link_directories(${LIBWEBSOCKETS_LIBRARY_DIRS})
   endif()
-
-  set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${LIBWEBSOCKETS_INCLUDE_DIRS})
-  link_directories(${LIBWEBSOCKETS_LIBRARY_DIRS})
 endif()
 
 ############# Done finding 3rd-party dependencies ############
@@ -317,6 +315,7 @@ set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${OPEN_SRC_INSTALL_PREFIX}/in
 
 include_directories(${KINESIS_VIDEO_PRODUCER_C_SRC}/src/include)
 include_directories(${OPEN_SRC_INCLUDE_DIRS})
+message("OPEN_SRC_INCLUDE_DIRS: ${OPEN_SRC_INCLUDE_DIRS}")
 
 link_directories(${OPEN_SRC_INSTALL_PREFIX}/lib) # Unix intsalls libraries into /lib directory
 link_directories(${OPEN_SRC_INSTALL_PREFIX}/bin) # Windows installs libraries into /bin directory
