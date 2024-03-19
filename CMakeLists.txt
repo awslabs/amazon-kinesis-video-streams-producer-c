@@ -79,10 +79,6 @@ else()
   message(STATUS "CMAKE_BUILD_TYPE is set to: ${CMAKE_BUILD_TYPE}")
 endif()
 
-if(NOT EXISTS ${OPEN_SRC_INSTALL_PREFIX})
-  file(MAKE_DIRECTORY ${OPEN_SRC_INSTALL_PREFIX})
-endif()
-
 
 # Fetch and build 3rd-party dependencies if specified.
 if(BUILD_DEPENDENCIES)
