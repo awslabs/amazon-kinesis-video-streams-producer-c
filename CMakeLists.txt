@@ -200,9 +200,11 @@ message("CMAKE_PREFIX_PATH : ${CMAKE_PREFIX_PATH}") #TODO: Remove this.
 
 pkg_check_modules(KVSPIC libkvspicUtils)
 if(KVSPIC_FOUND)
+  message("PIC was found")
   set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${KVSPIC_INCLUDE_DIRS})
   link_directories(${KVSPIC_LIBRARY_DIRS})
 else()
+  message("PIC was NOT found")
   ############# fetch repos that we need do add_subdirectory ############
   # repos that we will build using add_subdirectory will be stored in this path
   set(DEPENDENCY_DOWNLOAD_PATH ${CMAKE_CURRENT_SOURCE_DIR}/dependency)
