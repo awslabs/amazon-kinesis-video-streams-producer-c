@@ -79,17 +79,22 @@ else()
   message(STATUS "CMAKE_BUILD_TYPE is set to: ${CMAKE_BUILD_TYPE}")
 endif()
 
-# Set directory where to build the dependencies.
-if (NOT OPEN_SRC_INSTALL_PREFIX)
-  set(OPEN_SRC_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/open-source)
-  #set(OPEN_SRC_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/open-source)
-  set(ENV{PKG_CONFIG_PATH}
-        "$ENV{PKG_CONFIG_PATH}:${OPEN_SRC_INSTALL_PREFIX}/lib/pkgconfig")
-  set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${OPEN_SRC_INSTALL_PREFIX})
+if(NOT EXISTS ${OPEN_SRC_INSTALL_PREFIX})
+  file(MAKE_DIRECTORY ${OPEN_SRC_INSTALL_PREFIX})
 endif()
+
 
 # Fetch and build 3rd-party dependencies if specified.
 if(BUILD_DEPENDENCIES)
+  # Set directory where to build the dependencies.
+  if (NOT OPEN_SRC_INSTALL_PREFIX)
+    set(OPEN_SRC_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/open-source)
+    #set(OPEN_SRC_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/open-source)
+    set(ENV{PKG_CONFIG_PATH}
+          "$ENV{PKG_CONFIG_PATH}:${OPEN_SRC_INSTALL_PREFIX}/lib/pkgconfig")
+    set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${OPEN_SRC_INSTALL_PREFIX})
+  endif()
+
   message(STATUS "Begin building dependencies.")
 
   # Create the dependency directory if it doesn't exist.
@@ -222,6 +227,9 @@ endif()
 # TODO: shouldn't this be "required" ?
 find_package(Threads)
 
+set(OPEN_SRC_INCLUDE_DIRS ${LIBKVSPIC_INCLUDE_DIRS})
+
+
 if(NOT BUILD_DEPENDENCIES OR NOT BUILD_CRYPTO)
   if(USE_OPENSSL)
     find_package(OpenSSL)
@@ -269,7 +277,7 @@ if(NOT BUILD_DEPENDENCIES AND BUILD_COMMON_LWS)
   else()
     pkg_check_modules(LIBWEBSOCKETS REQUIRED libwebsockets)
     set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${LIBWEBSOCKETS_INCLUDE_DIRS})
-  link_directories(${LIBWEBSOCKETS_LIBRARY_DIRS})
+    link_directories(${LIBWEBSOCKETS_LIBRARY_DIRS})
   endif()
 endif()
 
@@ -349,7 +357,6 @@ link_directories(${OPEN_SRC_INSTALL_PREFIX}/bin) # Windows installs libraries in
 
 # Get the list of link directories
 get_property(link_dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY LINK_DIRECTORIES)
-
 # Print each link directory
 foreach(dir IN LISTS link_dirs)
     message("Link directory: ${dir}")
