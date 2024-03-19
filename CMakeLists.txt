@@ -155,13 +155,55 @@ message("CMAKE_PREFIX_PATH : ${CMAKE_PREFIX_PATH}") #TODO: Remove this.
 # Now: is BUILD_KVS_PIC ? build PIC, else find system PIC - if system PIC not found, fail build
 # TODO: Leave a note in the PIC file libkvspic.pc.cmake that the below comments/messages must be updated 
 #       if we change "prefix=" from CMAKE_INSTALL_PREFIX. (CMAKE_INSTALL_PREFIX = usr/local).
-if(BUILD_KVS_PIC)
-  # TODO: double check with the original comment that used to be here... make sure this comment is correct.
+# if(BUILD_KVS_PIC)
+#   # TODO: double check with the original comment that used to be here... make sure this comment is correct.
 
-  # KVS PIC will live in the DEPENDENCY_DOWNLOAD_PATH.
+#   # KVS PIC will live in the DEPENDENCY_DOWNLOAD_PATH.
 
-  # TODO: Double check all the below is correct/necessary.
-  # TODO: Find a way to check specifically for an alrady built PIC here in the project, don't build if found
+#   # TODO: Double check all the below is correct/necessary.
+#   # TODO: Find a way to check specifically for an alrady built PIC here in the project, don't build if found
+#   set(DEPENDENCY_DOWNLOAD_PATH ${CMAKE_CURRENT_SOURCE_DIR}/dependency)
+#   set(BUILD_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
+#   fetch_repo(kvspic ${BUILD_ARGS})
+#   add_subdirectory("${DEPENDENCY_DOWNLOAD_PATH}/libkvspic/kvspic-src")
+#   file(GLOB PIC_HEADERS "${pic_project_SOURCE_DIR}/src/*/include")
+#   include_directories("${PIC_HEADERS}")
+
+# else()
+#   # TODO: test this already-installed case
+#   # Finding PIC on system using the libcproducer.pc.cmake file.
+#   pkg_check_modules(KVS_PIC kvspic)
+#   if(KVS_PIC_FOUND)
+#     message("Found system KVS PIC located: ${KVS_PIC_PREFIX}")
+#     set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${KVS_PIC_UTILS_INCLUDE_DIRS})
+#     link_directories(${KVS_PIC_LIBRARY_DIRS})
+#   else()
+#     message(FATAL_ERROR "Could not find system KVS PIC. PkgConfig searched in: ${KVS_PIC_INCLUDE_DIRS} \
+#                          Please check PIC installation or set BUILD_KVS_PIC to TRUE to build PIC with this project.")
+#   endif()
+
+#   # Note: PIC Utils are built seperately as CommonLWS only uses these files.
+#   pkg_check_modules(KVS_PIC_UTILS libkvspicUtils)
+#   if(KVS_PIC_UTILS_FOUND)
+#     message("Found system KVS PIC Utils located: ${KVS_PIC_UTILS_PREFIX}")
+#     set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${KVS_PIC_UTILS_INCLUDE_DIRS})
+#     link_directories(${KVS_PIC_UTILS_LIBRARY_DIRS})
+#   else()
+#     message(FATAL_ERROR "Could not find system KVS PIC Utils. PkgConfig searched in: ${KVS_PIC_UTILS_INCLUDE_DIRS} \
+#                          Please check PIC installation or set BUILD_KVS_PIC to TRUE to build PIC with this project.")
+#   endif()
+
+# endif()
+
+############# Done checking system for kvspic #############
+
+pkg_check_modules(KVSPIC libkvspicUtils)
+if(KVSPIC_FOUND)
+  set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${KVSPIC_INCLUDE_DIRS})
+  link_directories(${KVSPIC_LIBRARY_DIRS})
+else()
+  ############# fetch repos that we need do add_subdirectory ############
+  # repos that we will build using add_subdirectory will be stored in this path
   set(DEPENDENCY_DOWNLOAD_PATH ${CMAKE_CURRENT_SOURCE_DIR}/dependency)
   set(BUILD_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
   fetch_repo(kvspic ${BUILD_ARGS})
@@ -169,33 +211,9 @@ if(BUILD_KVS_PIC)
   file(GLOB PIC_HEADERS "${pic_project_SOURCE_DIR}/src/*/include")
   include_directories("${PIC_HEADERS}")
 
-else()
-  # TODO: test this already-installed case
-  # Finding PIC on system using the libcproducer.pc.cmake file.
-  pkg_check_modules(KVS_PIC kvspic)
-  if(KVS_PIC_FOUND)
-    message("Found system KVS PIC located: ${KVS_PIC_PREFIX}")
-    set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${KVS_PIC_UTILS_INCLUDE_DIRS})
-    link_directories(${KVS_PIC_LIBRARY_DIRS})
-  else()
-    message(FATAL_ERROR "Could not find system KVS PIC. PkgConfig searched in: ${KVS_PIC_INCLUDE_DIRS} \
-                         Please check PIC installation or set BUILD_KVS_PIC to TRUE to build PIC with this project.")
-  endif()
-
-  # Note: PIC Utils are built seperately as CommonLWS only uses these files.
-  pkg_check_modules(KVS_PIC_UTILS libkvspicUtils)
-  if(KVS_PIC_UTILS_FOUND)
-    message("Found system KVS PIC Utils located: ${KVS_PIC_UTILS_PREFIX}")
-    set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${KVS_PIC_UTILS_INCLUDE_DIRS})
-    link_directories(${KVS_PIC_UTILS_LIBRARY_DIRS})
-  else()
-    message(FATAL_ERROR "Could not find system KVS PIC Utils. PkgConfig searched in: ${KVS_PIC_UTILS_INCLUDE_DIRS} \
-                         Please check PIC installation or set BUILD_KVS_PIC to TRUE to build PIC with this project.")
-  endif()
-
+  ############# fetch repos that we need do add_subdirectory done ############
 endif()
 
-############# Done checking system for kvspic #############
 
 
 
