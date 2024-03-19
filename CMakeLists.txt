@@ -13,6 +13,10 @@ set(KINESIS_VIDEO_PRODUCER_C_VERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION}.$
 
 set(SUPPORTED_CRYPTO_LIBRARIES "{OpenSSL, MbedTLS}")
 
+# TODO: Verify if need this
+include(GNUInstallDirs)
+
+
 # User Flags
 option(ADD_MUCLIBC "Add -muclibc c flag" OFF)
 option(BUILD_STATIC "Static build" OFF)
@@ -50,14 +54,21 @@ if(CONSTRAINED_DEVICE)
 endif()
 
 set(CMAKE_MACOSX_RPATH TRUE)
+
+# TODO: Verify if need this
+get_filename_component(ROOT "${CMAKE_CURRENT_SOURCE_DIR}" ABSOLUTE)
+
 add_definitions(-DVERSION_STRING=\"${PROJECT_VERSION}\")
 
 # Set where to build this project.
-if(DEFINED ENV{KINESIS_VIDEO_PRODUCER_C_SRC})
-  set(KINESIS_VIDEO_PRODUCER_C_SRC $ENV{KINESIS_VIDEO_PRODUCER_C_SRC})
-else()
-  set(KINESIS_VIDEO_PRODUCER_C_SRC "${CMAKE_CURRENT_SOURCE_DIR}")
+if(NOT KINESIS_VIDEO_PRODUCER_C_SRC)
+  if(DEFINED ENV{KINESIS_VIDEO_PRODUCER_C_SRC})
+    set(KINESIS_VIDEO_PRODUCER_C_SRC $ENV{KINESIS_VIDEO_PRODUCER_C_SRC})
+  else()
+    set(KINESIS_VIDEO_PRODUCER_C_SRC "${CMAKE_CURRENT_SOURCE_DIR}")
+  endif()
 endif()
+message(STATUS "Kinesis Video Producer path is ${KINESIS_VIDEO_PRODUCER_C_SRC}")
 
 # NOTE: The windows CI build has CMAKE_BUILD_TYPE set to debug, probably due to MSVC environment, TODO: look into this
 # Default to release build if unspecified.
