@@ -337,16 +337,16 @@ endif()
 # use openssl by default
 set(CPRODUCER_COMMON_TLS_OPTION KVS_USE_OPENSSL)
 
-if(WIN32)
-  # set(PRODUCER_CRYPTO_LIBRARIES
-          #         OpenSSL::Crypto
-          #         OpenSSL::SSL)
-  set(PRODUCER_CRYPTO_LIBRARIES libcrypto libssl)
-else()
-  set(PRODUCER_CRYPTO_LIBRARIES ssl crypto)
-endif()
-
-if (USE_MBEDTLS)
+if (USE_OPENSSL)
+  if(WIN32)
+    # set(PRODUCER_CRYPTO_LIBRARIES
+            #         OpenSSL::Crypto
+            #         OpenSSL::SSL)
+    set(PRODUCER_CRYPTO_LIBRARIES libssl libcrypto)
+  else()
+    set(PRODUCER_CRYPTO_LIBRARIES ssl crypto)
+  endif()
+else() # USE_MBEDTLS
   set(CPRODUCER_COMMON_TLS_OPTION KVS_USE_MBEDTLS)
   set(PRODUCER_CRYPTO_LIBRARIES MbedTLS MbedCrypto)
 endif()
@@ -371,8 +371,8 @@ if(BUILD_COMMON_LWS)
     set_target_properties(kvsCommonLws PROPERTIES VERSION ${KINESIS_VIDEO_PRODUCER_C_VERSION} SOVERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION})
   endif()
 
-  target_link_libraries(kvsCommonLws OpenSSL::Crypto OpenSSL::SSL ${LIBWEBSOCKETS_LIBRARIES} kvspicUtils)
-  
+  target_link_libraries(kvsCommonLws ${PRODUCER_CRYPTO_LIBRARIES} ${LIBWEBSOCKETS_LIBRARIES} kvspicUtils)
+
   install(
     TARGETS kvsCommonLws
     ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
