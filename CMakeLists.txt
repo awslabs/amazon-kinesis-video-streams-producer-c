@@ -146,7 +146,7 @@ message("CMAKE_PREFIX_PATH : ${CMAKE_PREFIX_PATH}") #TODO: Remove this.
 
 # NOTE: this is possibly a breaking change, if not specified, system PIC will not be used.
 # Prev behavior: look for system PIC if not found, build PIC.
-# Now: is BUILD_KVS_PIC ? build PIC, else find syste PIC - if system PIC not found, fail build
+# Now: is BUILD_KVS_PIC ? build PIC, else find system PIC - if system PIC not found, fail build
 # TODO: Leave a note in the PIC file libkvspic.pc.cmake that the below comments/messages must be updated 
 #       if we change "prefix=" from CMAKE_INSTALL_PREFIX. (CMAKE_INSTALL_PREFIX = usr/local).
 if(BUILD_KVS_PIC)
@@ -198,8 +198,6 @@ endif()
 # TODO: shouldn't this be "required" ?
 find_package(Threads)
 
-# TODO: Should maybe change "BUILD_CRYPTO" to be similar to the other ones: "BUILD_COMMON_CRYPTO"
-#       (and so BUILD_CRYPTO == !BUILD_COMMON_CRYPTO)
 if(NOT BUILD_DEPENDENCIES OR NOT BUILD_CRYPTO)
   if(USE_OPENSSL)
       find_package(OpenSSL REQUIRED)
@@ -373,8 +371,8 @@ if(BUILD_COMMON_LWS)
     set_target_properties(kvsCommonLws PROPERTIES VERSION ${KINESIS_VIDEO_PRODUCER_C_VERSION} SOVERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION})
   endif()
 
-  target_link_libraries(kvsCommonLws ${LIBWEBSOCKETS_LIBRARIES} kvspicUtils)
-
+  target_link_libraries(kvsCommonLws OpenSSL::Crypto OpenSSL::SSL ${LIBWEBSOCKETS_LIBRARIES} kvspicUtils)
+  
   install(
     TARGETS kvsCommonLws
     ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
