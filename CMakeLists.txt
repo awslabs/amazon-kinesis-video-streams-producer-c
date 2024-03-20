@@ -377,9 +377,9 @@ if (USE_MBEDTLS)
   set(PRODUCER_CRYPTO_LIBRARIES MbedTLS MbedCrypto)
 endif()
 
-install(
-  DIRECTORY ${KINESIS_VIDEO_PRODUCER_C_SRC}/src/include
-  DESTINATION .)
+# install(
+#   DIRECTORY ${KINESIS_VIDEO_PRODUCER_C_SRC}/src/include
+#   DESTINATION .)
 
 if(BUILD_COMMON_LWS)
   configure_file(
