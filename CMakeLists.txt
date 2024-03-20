@@ -13,7 +13,7 @@ set(KINESIS_VIDEO_PRODUCER_C_VERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION}.$
 
 set(SUPPORTED_CRYPTO_LIBRARIES "{OpenSSL, MbedTLS}")
 
-# TODO: Verify if need this
+# This sets CMAKE_INSTAL_... directories based on GNU standard
 include(GNUInstallDirs)
 
 
@@ -24,7 +24,7 @@ option(BUILD_DEPENDENCIES "Whether or not to build depending libraries from sour
 option(USE_OPENSSL "Use openssl as crypto library" ON)
 option(USE_MBEDTLS "Use mbedtls as crypto library" OFF)
 option(BUILD_COMMON_LWS "Whether or not to build ProducerC libwebsockets common library" OFF)
-option(BUILD_COMMON_CURL "Whether or not to build ProducerC curl common library" ON)
+option(BUILD_COMMON_CURL "Whether or not to build ProducerC curl common library" ON) # TODO: remove this and any other un-needed flags
 option(BUILD_OPENSSL_PLATFORM "If buildng OpenSSL what is the target platform" OFF)
 option(BUILD_CRYPTO "Whether or not to build OpenSSL or MbedTLS, if not, will use system-installed version" ON)
 option(CONSTRAINED_DEVICE "Change pthread stack size" OFF)
@@ -45,19 +45,18 @@ option(SET_SSL_CALLBACKS "Set SSL thread and lock callbacks." OFF)
 
 if (BUILD_STATIC)
   set(TYPE_OF_LIB STATIC)
+else()
+  set(TYPE_OF_LIB SHARED)
+endif()
+
+if(CONSTRAINED_DEVICE)
+  add_definitions(-DCONSTRAINED_DEVICE)
 endif()
 
 set(CMAKE_MACOSX_RPATH TRUE)
-
-# TODO: Verify if need this
-get_filename_component(ROOT "${CMAKE_CURRENT_SOURCE_DIR}" ABSOLUTE)
-
 add_definitions(-DVERSION_STRING=\"${PROJECT_VERSION}\")
 
-if(CONSTRAINED_DEVICE)
-    add_definitions(-DCONSTRAINED_DEVICE)
-endif()
-
+# Set where to build this project.
 if(NOT KINESIS_VIDEO_PRODUCER_C_SRC)
   if(DEFINED ENV{KINESIS_VIDEO_PRODUCER_C_SRC})
     set(KINESIS_VIDEO_PRODUCER_C_SRC $ENV{KINESIS_VIDEO_PRODUCER_C_SRC})
@@ -79,16 +78,15 @@ endif()
 
 # Fetch and build 3rd-party dependencies if specified.
 if(BUILD_DEPENDENCIES)
+  message(STATUS "Begin building dependencies.")
+
   # Set directory where to build the dependencies.
   if (NOT OPEN_SRC_INSTALL_PREFIX)
-    set(OPEN_SRC_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/open-source)
-    #set(OPEN_SRC_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/open-source)
+    set(OPEN_SRC_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/open-source)
     set(ENV{PKG_CONFIG_PATH}
           "$ENV{PKG_CONFIG_PATH}:${OPEN_SRC_INSTALL_PREFIX}/lib/pkgconfig")
     set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${OPEN_SRC_INSTALL_PREFIX})
   endif()
-
-  message(STATUS "Begin building dependencies.")
 
   # Create the dependency directory if it doesn't exist.
   if(NOT EXISTS ${OPEN_SRC_INSTALL_PREFIX})
@@ -124,7 +122,6 @@ if(BUILD_DEPENDENCIES)
     build_dependency(curl ${BUILD_ARGS})
   endif()
 
-  # NOTE: LWS does not get built from source here in our WebRTC CI tests since we set BUILD_DEPENDENCIES=FALSE
   if (BUILD_COMMON_LWS)
     set(BUILD_ARGS  -DBUILD_STATIC=${BUILD_STATIC}
                     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
@@ -147,63 +144,18 @@ message("CMAKE_PREFIX_PATH : ${CMAKE_PREFIX_PATH}") #TODO: Remove this.
 
 ############# Checking system for kvspic #############
 
-
 # NOTE: this is possibly a breaking change, if not specified, system PIC will not be used.
 # Prev behavior: look for system PIC if not found, build PIC.
-# Now: is BUILD_KVS_PIC ? build PIC, else find system PIC - if system PIC not found, fail build
+# Now: is BUILD_KVS_PIC ? build PIC, else find syste PIC - if system PIC not found, fail build
 # TODO: Leave a note in the PIC file libkvspic.pc.cmake that the below comments/messages must be updated 
 #       if we change "prefix=" from CMAKE_INSTALL_PREFIX. (CMAKE_INSTALL_PREFIX = usr/local).
-# if(BUILD_KVS_PIC)
-#   # TODO: double check with the original comment that used to be here... make sure this comment is correct.
+if(BUILD_KVS_PIC)
+  # TODO: double check with the original comment that used to be here... make sure this comment is correct.
 
-#   # KVS PIC will live in the DEPENDENCY_DOWNLOAD_PATH.
+  # KVS PIC will live in the DEPENDENCY_DOWNLOAD_PATH.
 
-#   # TODO: Double check all the below is correct/necessary.
-#   # TODO: Find a way to check specifically for an alrady built PIC here in the project, don't build if found
-#   set(DEPENDENCY_DOWNLOAD_PATH ${CMAKE_CURRENT_SOURCE_DIR}/dependency)
-#   set(BUILD_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
-#   fetch_repo(kvspic ${BUILD_ARGS})
-#   add_subdirectory("${DEPENDENCY_DOWNLOAD_PATH}/libkvspic/kvspic-src")
-#   file(GLOB PIC_HEADERS "${pic_project_SOURCE_DIR}/src/*/include")
-#   include_directories("${PIC_HEADERS}")
-
-# else()
-#   # TODO: test this already-installed case
-#   # Finding PIC on system using the libcproducer.pc.cmake file.
-#   pkg_check_modules(KVS_PIC kvspic)
-#   if(KVS_PIC_FOUND)
-#     message("Found system KVS PIC located: ${KVS_PIC_PREFIX}")
-#     set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${KVS_PIC_UTILS_INCLUDE_DIRS})
-#     link_directories(${KVS_PIC_LIBRARY_DIRS})
-#   else()
-#     message(FATAL_ERROR "Could not find system KVS PIC. PkgConfig searched in: ${KVS_PIC_INCLUDE_DIRS} \
-#                          Please check PIC installation or set BUILD_KVS_PIC to TRUE to build PIC with this project.")
-#   endif()
-
-#   # Note: PIC Utils are built seperately as CommonLWS only uses these files.
-#   pkg_check_modules(KVS_PIC_UTILS libkvspicUtils)
-#   if(KVS_PIC_UTILS_FOUND)
-#     message("Found system KVS PIC Utils located: ${KVS_PIC_UTILS_PREFIX}")
-#     set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${KVS_PIC_UTILS_INCLUDE_DIRS})
-#     link_directories(${KVS_PIC_UTILS_LIBRARY_DIRS})
-#   else()
-#     message(FATAL_ERROR "Could not find system KVS PIC Utils. PkgConfig searched in: ${KVS_PIC_UTILS_INCLUDE_DIRS} \
-#                          Please check PIC installation or set BUILD_KVS_PIC to TRUE to build PIC with this project.")
-#   endif()
-
-# endif()
-
-############# Done checking system for kvspic #############
-
-pkg_check_modules(KVSPIC libkvspicUtils)
-if(KVSPIC_FOUND)
-  message("PIC was found")
-  set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${KVSPIC_INCLUDE_DIRS})
-  link_directories(${KVSPIC_LIBRARY_DIRS})
-else()
-  message("PIC was NOT found")
-  ############# fetch repos that we need do add_subdirectory ############
-  # repos that we will build using add_subdirectory will be stored in this path
+  # TODO: Double check all the below is correct/necessary.
+  # TODO: Find a way to check specifically for an alrady built PIC here in the project, don't build if found
   set(DEPENDENCY_DOWNLOAD_PATH ${CMAKE_CURRENT_SOURCE_DIR}/dependency)
   set(BUILD_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
   fetch_repo(kvspic ${BUILD_ARGS})
@@ -211,9 +163,33 @@ else()
   file(GLOB PIC_HEADERS "${pic_project_SOURCE_DIR}/src/*/include")
   include_directories("${PIC_HEADERS}")
 
-  ############# fetch repos that we need do add_subdirectory done ############
+else()
+  # TODO: test this already-installed case
+  # Finding PIC on system using the libcproducer.pc.cmake file.
+  pkg_check_modules(KVS_PIC kvspic)
+  if(KVS_PIC_FOUND)
+    message("Found system KVS PIC located: ${KVS_PIC_PREFIX}")
+    set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${KVS_PIC_UTILS_INCLUDE_DIRS})
+    link_directories(${KVS_PIC_LIBRARY_DIRS})
+  else()
+    message(FATAL_ERROR "Could not find system KVS PIC. PkgConfig searched in: ${KVS_PIC_INCLUDE_DIRS} \
+                         Please check PIC installation or set BUILD_KVS_PIC to TRUE to build PIC with this project.")
+  endif()
+
+  # Note: PIC Utils are built seperately as CommonLWS only uses these files.
+  pkg_check_modules(KVS_PIC_UTILS libkvspicUtils)
+  if(KVS_PIC_UTILS_FOUND)
+    message("Found system KVS PIC Utils located: ${KVS_PIC_UTILS_PREFIX}")
+    set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${KVS_PIC_UTILS_INCLUDE_DIRS})
+    link_directories(${KVS_PIC_UTILS_LIBRARY_DIRS})
+  else()
+    message(FATAL_ERROR "Could not find system KVS PIC Utils. PkgConfig searched in: ${KVS_PIC_UTILS_INCLUDE_DIRS} \
+                         Please check PIC installation or set BUILD_KVS_PIC to TRUE to build PIC with this project.")
+  endif()
+
 endif()
 
+############# Done checking system for kvspic #############
 
 
 
@@ -222,20 +198,13 @@ endif()
 # TODO: shouldn't this be "required" ?
 find_package(Threads)
 
-set(OPEN_SRC_INCLUDE_DIRS ${LIBKVSPIC_INCLUDE_DIRS})
-
-
+# TODO: Should maybe change "BUILD_CRYPTO" to be similar to the other ones: "BUILD_COMMON_CRYPTO"
+#       (and so BUILD_CRYPTO == !BUILD_COMMON_CRYPTO)
 if(NOT BUILD_DEPENDENCIES OR NOT BUILD_CRYPTO)
   if(USE_OPENSSL)
-    find_package(OpenSSL)
-    if(NOT OPENSSL_FOUND AND NOT BUILD_DEPENDENCIES)
-      message(FATAL_ERROR "OpenSSL is not found. Make sure to export PKG_CONFIG_PATH to where OpenSSL's pc file is")
-    endif()
-    # TODO: I don't think the below line does anything
-    set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR})
+      find_package(OpenSSL REQUIRED)
   elseif(USE_MBEDTLS)
     find_package(MbedTLS REQUIRED)
-    # We do have a FindMbedTLS.cmake file.
     set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${MBEDTLS_INCLUDE_DIRS})
   else()
     message(FATAL_ERROR "No crypto library selected. Please specify one of the following: " ${SUPPORTED_CRYPTO_LIBRARIES})
@@ -338,6 +307,7 @@ endif()
 file(GLOB KVS_COMMON_SOURCE_FILES_BASE "src/source/Common/*.c")
 file(GLOB KVS_COMMON_SOURCE_FILES_LWS "src/source/Common/Lws/*.c")
 file(GLOB KVS_COMMON_SOURCE_FILES_CURL "src/source/Common/Curl/*.c")
+
 file(GLOB PRODUCER_C_SOURCE_FILES "src/source/*.c")
 #file(GLOB_RECURSE PRODUCER_C_SOURCE_FILES "src/source/*.c")
 
@@ -346,13 +316,13 @@ set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${OPEN_SRC_INSTALL_PREFIX}/in
 
 include_directories(${KINESIS_VIDEO_PRODUCER_C_SRC}/src/include)
 include_directories(${OPEN_SRC_INCLUDE_DIRS})
-message("OPEN_SRC_INCLUDE_DIRS: ${OPEN_SRC_INCLUDE_DIRS}")
 
 link_directories(${OPEN_SRC_INSTALL_PREFIX}/lib) # Unix intsalls libraries into /lib directory
 link_directories(${OPEN_SRC_INSTALL_PREFIX}/bin) # Windows installs libraries into /bin directory
 
 # Get the list of link directories
 get_property(link_dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY LINK_DIRECTORIES)
+
 # Print each link directory
 foreach(dir IN LISTS link_dirs)
     message("Link directory: ${dir}")
@@ -369,17 +339,24 @@ endif()
 # use openssl by default
 set(CPRODUCER_COMMON_TLS_OPTION KVS_USE_OPENSSL)
 
-set(PRODUCER_CRYPTO_LIBRARY
-        OpenSSL::Crypto
-        OpenSSL::SSL)
+if(WIN32)
+  # set(PRODUCER_CRYPTO_LIBRARIES
+          #         OpenSSL::Crypto
+          #         OpenSSL::SSL)
+  set(PRODUCER_CRYPTO_LIBRARIES libcrypto libssl)
+else()
+  set(PRODUCER_CRYPTO_LIBRARIES ssl crypto)
+endif()
+
 if (USE_MBEDTLS)
   set(CPRODUCER_COMMON_TLS_OPTION KVS_USE_MBEDTLS)
   set(PRODUCER_CRYPTO_LIBRARIES MbedTLS MbedCrypto)
 endif()
 
-# install(
-#   DIRECTORY ${KINESIS_VIDEO_PRODUCER_C_SRC}/src/include
-#   DESTINATION .)
+# TODO: Confirm this is where WebRTC build is broken
+install(
+  DIRECTORY ${KINESIS_VIDEO_PRODUCER_C_SRC}/src/include
+  DESTINATION .)
 
 if(BUILD_COMMON_LWS)
   configure_file(
@@ -396,7 +373,7 @@ if(BUILD_COMMON_LWS)
     set_target_properties(kvsCommonLws PROPERTIES VERSION ${KINESIS_VIDEO_PRODUCER_C_VERSION} SOVERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION})
   endif()
 
-  target_link_libraries(kvsCommonLws OpenSSL::Crypto OpenSSL::SSL ${LIBWEBSOCKETS_LIBRARIES} kvspicUtils)
+  target_link_libraries(kvsCommonLws ${LIBWEBSOCKETS_LIBRARIES} kvspicUtils)
 
   install(
     TARGETS kvsCommonLws
