@@ -19,17 +19,20 @@ include(GNUInstallDirs)
 
 # User Flags
 option(ADD_MUCLIBC "Add -muclibc c flag" OFF)
-option(BUILD_STATIC "Static build" OFF)
-option(BUILD_DEPENDENCIES "Whether or not to build depending libraries from source" ON)
 option(USE_OPENSSL "Use openssl as crypto library" ON)
 option(USE_MBEDTLS "Use mbedtls as crypto library" OFF)
-option(BUILD_COMMON_LWS "Whether or not to build ProducerC libwebsockets common library" OFF)
-option(BUILD_COMMON_CURL "Whether or not to build ProducerC curl common library" ON) # TODO: remove this and any other un-needed flags
+option(BUILD_STATIC "Static build" OFF)
+option(BUILD_DEPENDENCIES "Whether to build depending libraries from source" ON) # This is a master OFF switch, non will be built if off, but if it is ON, some can be specified to be not built
+option(BUILD_COMMON_LWS "Whether to build ProducerC libwebsockets common library" OFF)
+option(BUILD_COMMON_CURL "Whether to build ProducerC curl common library" ON) # TODO: remove this and any other un-needed flags
 option(BUILD_OPENSSL_PLATFORM "If buildng OpenSSL what is the target platform" OFF)
-option(BUILD_CRYPTO "Whether or not to build OpenSSL or MbedTLS, if not, will use system-installed version" ON)
-option(CONSTRAINED_DEVICE "Change pthread stack size" OFF)
+option(BUILD_CRYPTO "Whether to build OpenSSL or MbedTLS, if not, will use system-installed version" ON)
+option(BUILD_LWS "Whether to build LibWebSockets, if not, will use system-installed version" ON)
+option(BUILD_CURL "Whether to build CURL library, if not, will use system-installed version" ON)
 option(BUILD_KVS_PIC "Whether to build PIC SDK, else will use system-installed version" ON)
 option(BUILD_SAMPLES "Whether to build Producer C samples" ON)
+option(CONSTRAINED_DEVICE "Change pthread stack size" OFF)
+
 
 # Maintainer Flags
 option(BUILD_TEST "Build the testing tree." OFF)
@@ -41,6 +44,9 @@ option(THREAD_SANITIZER "Build with ThreadSanitizer." OFF)
 option(UNDEFINED_BEHAVIOR_SANITIZER "Build with UndefinedBehaviorSanitizer." OFF)
 option(ALIGNED_MEMORY_MODEL "Aligned memory model ONLY." OFF)
 option(SET_SSL_CALLBACKS "Set SSL thread and lock callbacks." OFF)
+
+# TODO: Use target_include_directories to not give headers to WHOLE project
+#   - Print out the dependencies for each target via command line and verify there are no duplicate libraries being linked
 
 
 if (BUILD_STATIC)
@@ -115,14 +121,14 @@ if(BUILD_DEPENDENCIES)
     endif()
   endif()
 
-  if (BUILD_COMMON_CURL)
+  if (BUILD_COMMON_CURL AND BUILD_CURL)
     set(BUILD_ARGS  -DBUILD_STATIC=${BUILD_STATIC}
                     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                     -DUSE_MBEDTLS=${USE_MBEDTLS})
     build_dependency(curl ${BUILD_ARGS})
   endif()
 
-  if (BUILD_COMMON_LWS)
+  if (BUILD_COMMON_LWS AND BUILD_LWS)
     set(BUILD_ARGS  -DBUILD_STATIC=${BUILD_STATIC}
                     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                     -DOPENSSL_DIR=${OPEN_SRC_INSTALL_PREFIX}
@@ -200,10 +206,9 @@ find_package(Threads)
 
 if(NOT BUILD_DEPENDENCIES OR NOT BUILD_CRYPTO)
   if(USE_OPENSSL)
-      find_package(OpenSSL REQUIRED)
+    find_package(OpenSSL REQUIRED)
   elseif(USE_MBEDTLS)
     find_package(MbedTLS REQUIRED)
-    set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${MBEDTLS_INCLUDE_DIRS})
   else()
     message(FATAL_ERROR "No crypto library selected. Please specify one of the following: " ${SUPPORTED_CRYPTO_LIBRARIES})
   endif()
@@ -223,7 +228,7 @@ endif()
 
 
 
-if(NOT BUILD_DEPENDENCIES AND BUILD_COMMON_CURL)
+if((NOT BUILD_DEPENDENCIES OR NOT BUILD_CURL) AND BUILD_COMMON_CURL)
   if (WIN32)
     find_package(CURL REQUIRED)
   else()
@@ -233,7 +238,7 @@ if(NOT BUILD_DEPENDENCIES AND BUILD_COMMON_CURL)
   endif()
 endif()
 
-if(NOT BUILD_DEPENDENCIES AND BUILD_COMMON_LWS)
+if((NOT BUILD_DEPENDENCIES OR NOT BUILD_LWS) AND BUILD_COMMON_LWS)
   if (WIN32)
     find_package(LIBWEBSOCKETS REQUIRED PATHS ${OPEN_SRC_INSTALL_PREFIX})
   else()
@@ -247,7 +252,7 @@ endif()
 ############# Done finding 3rd-party dependencies ############
 
 
-############# TODO: Doing....   ############
+############# TODO: Doing.... what   ############
 
 # TODO: Note, these variables are never used, in C, CPP, WebRTC SDKs. Not in cmake and not in source files.
 #       Confirm whether we need these.
@@ -348,7 +353,7 @@ if (USE_OPENSSL)
   endif()
 else() # USE_MBEDTLS
   set(CPRODUCER_COMMON_TLS_OPTION KVS_USE_MBEDTLS)
-  set(PRODUCER_CRYPTO_LIBRARIES MbedTLS MbedCrypto)
+  set(PRODUCER_CRYPTO_LIBRARIES mbedtls mbedcrypto)
 endif()
 
 # TODO: Confirm this is where WebRTC build is broken
