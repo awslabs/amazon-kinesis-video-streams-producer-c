@@ -347,9 +347,9 @@ if (USE_OPENSSL)
     # set(PRODUCER_CRYPTO_LIBRARIES
             #         OpenSSL::Crypto
             #         OpenSSL::SSL)
-    set(PRODUCER_CRYPTO_LIBRARIES libcrypto libssl)
+    set(PRODUCER_CRYPTO_LIBRARIES libssl libcrypto)
   else()
-    set(PRODUCER_CRYPTO_LIBRARIES crypto ssl)
+    set(PRODUCER_CRYPTO_LIBRARIES ssl crypto)
   endif()
 else() # USE_MBEDTLS
   set(CPRODUCER_COMMON_TLS_OPTION KVS_USE_MBEDTLS)
