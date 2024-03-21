@@ -106,7 +106,7 @@ if(BUILD_DEPENDENCIES)
     message(FATAL_ERROR "Only one of ${SSL_OPTIONS} can be enabled")
   endif()
 
-  # If not using system's crypto library.
+  # If building the specified crypto library from source
   if(BUILD_CRYPTO)
     if(USE_OPENSSL)
       message(STATUS "Building OpenSSL")
@@ -121,6 +121,7 @@ if(BUILD_DEPENDENCIES)
     endif()
   endif()
 
+  # If building KVS Producer C Common Curl, build curl.
   if (BUILD_COMMON_CURL AND BUILD_CURL)
     set(BUILD_ARGS  -DBUILD_STATIC=${BUILD_STATIC}
                     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
@@ -128,6 +129,7 @@ if(BUILD_DEPENDENCIES)
     build_dependency(curl ${BUILD_ARGS})
   endif()
 
+  # If building KVS Producer C Common LWS, build libwebsockets.
   if (BUILD_COMMON_LWS AND BUILD_LWS)
     set(BUILD_ARGS  -DBUILD_STATIC=${BUILD_STATIC}
                     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
@@ -136,6 +138,7 @@ if(BUILD_DEPENDENCIES)
     build_dependency(websockets ${BUILD_ARGS})
   endif()
 
+  # If building KVS Producer C tests, build gtest.
   if(BUILD_TEST)
     build_dependency(gtest)
   endif()
@@ -156,19 +159,14 @@ message("CMAKE_PREFIX_PATH : ${CMAKE_PREFIX_PATH}") #TODO: Remove this.
 # TODO: Leave a note in the PIC file libkvspic.pc.cmake that the below comments/messages must be updated 
 #       if we change "prefix=" from CMAKE_INSTALL_PREFIX. (CMAKE_INSTALL_PREFIX = usr/local).
 if(BUILD_KVS_PIC)
-  # TODO: double check with the original comment that used to be here... make sure this comment is correct.
-
   # KVS PIC will live in the DEPENDENCY_DOWNLOAD_PATH.
-
   # TODO: Double check all the below is correct/necessary.
-  # TODO: Find a way to check specifically for an alrady built PIC here in the project, don't build if found
   set(DEPENDENCY_DOWNLOAD_PATH ${CMAKE_CURRENT_SOURCE_DIR}/dependency)
   set(BUILD_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
   fetch_repo(kvspic ${BUILD_ARGS})
   add_subdirectory("${DEPENDENCY_DOWNLOAD_PATH}/libkvspic/kvspic-src")
   file(GLOB PIC_HEADERS "${pic_project_SOURCE_DIR}/src/*/include")
   include_directories("${PIC_HEADERS}")
-
 else()
   # TODO: test this already-installed case
   # Finding PIC on system using the libcproducer.pc.cmake file.
@@ -182,7 +180,6 @@ else()
                          Please check PIC installation or set BUILD_KVS_PIC to TRUE to build PIC with this project.")
   endif()
 
-  # Note: PIC Utils are built seperately as CommonLWS only uses these files.
   pkg_check_modules(KVS_PIC_UTILS libkvspicUtils)
   if(KVS_PIC_UTILS_FOUND)
     message("Found system KVS PIC Utils located: ${KVS_PIC_UTILS_PREFIX}")
@@ -192,14 +189,13 @@ else()
     message(FATAL_ERROR "Could not find system KVS PIC Utils. PkgConfig searched in: ${KVS_PIC_UTILS_INCLUDE_DIRS} \
                          Please check PIC installation or set BUILD_KVS_PIC to TRUE to build PIC with this project.")
   endif()
-
 endif()
 
 ############# Done checking system for kvspic #############
 
 
 
-############# Finding 3rd-party dependencies ############
+############# Finding 3rd-party dependencies if not built from source ############
 
 # TODO: shouldn't this be "required" ?
 find_package(Threads)
@@ -213,20 +209,6 @@ if(NOT BUILD_DEPENDENCIES OR NOT BUILD_CRYPTO)
     message(FATAL_ERROR "No crypto library selected. Please specify one of the following: " ${SUPPORTED_CRYPTO_LIBRARIES})
   endif()
 endif()
-
-
-# TODO: Need to figure out the use case here.
-#       If we are building deps, should we check for system libraries at all?
-#         -   Is there ever a case that buildDeps==TRUE AND buildCommon<>==FALSE?
-#         -   And then is there ever a case buildDeps==FALSE AND buildCommon<>==TRUE?
-#         -   Which takes precedence?
-#       I would think buildCommon<> is a way of overriding the in-house building and avoiding 
-#         fetching the repo in this project. This way you can keep buildDeps=TRUE and then
-#         specify which ones you actually don't want built with the project by setting buildCommon to true.
-#       However, currently I have the logic setup reverse from the above: we only use common/system build
-#         if buildDeps is off AND buildCommon<> is TRUE for the package.
-
-
 
 if((NOT BUILD_DEPENDENCIES OR NOT BUILD_CURL) AND BUILD_COMMON_CURL)
   if (WIN32)
@@ -249,11 +231,10 @@ if((NOT BUILD_DEPENDENCIES OR NOT BUILD_LWS) AND BUILD_COMMON_LWS)
   link_directories(${LIBWEBSOCKETS_LIBRARY_DIRS})
 endif()
 
-############# Done finding 3rd-party dependencies ############
+############# Done finding 3rd-party dependencies if not built from source ############
 
 
-############# TODO: Doing.... what   ############
-
+# Configure bitness.
 # TODO: Note, these variables are never used, in C, CPP, WebRTC SDKs. Not in cmake and not in source files.
 #       Confirm whether we need these.
 if(CMAKE_SIZEOF_VOID_P STREQUAL 4)
@@ -312,20 +293,18 @@ file(GLOB KVS_COMMON_SOURCE_FILES_LWS "src/source/Common/Lws/*.c")
 file(GLOB KVS_COMMON_SOURCE_FILES_CURL "src/source/Common/Curl/*.c")
 
 file(GLOB PRODUCER_C_SOURCE_FILES "src/source/*.c")
-#file(GLOB_RECURSE PRODUCER_C_SOURCE_FILES "src/source/*.c")
 
 set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${OPEN_SRC_INSTALL_PREFIX}/include)
-
 
 include_directories(${KINESIS_VIDEO_PRODUCER_C_SRC}/src/include)
 include_directories(${OPEN_SRC_INCLUDE_DIRS})
 
 link_directories(${OPEN_SRC_INSTALL_PREFIX}/lib) # Unix intsalls libraries into /lib directory
-link_directories(${OPEN_SRC_INSTALL_PREFIX}/bin) # Windows installs libraries into /bin directory
+link_directories(${OPEN_SRC_INSTALL_PREFIX}/bin) # Windows may install libraries into /bin directory
 
+# TODO: Remove the below debugging code
 # Get the list of link directories
 get_property(link_dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY LINK_DIRECTORIES)
-
 # Print each link directory
 foreach(dir IN LISTS link_dirs)
     message("Link directory: ${dir}")
@@ -339,11 +318,12 @@ if(SET_SSL_CALLBACKS)
     add_definitions(-DSET_SSL_CALLBACKS)
 endif()
 
-# use openssl by default
-set(CPRODUCER_COMMON_TLS_OPTION KVS_USE_OPENSSL)
 
+# Set which crypto libraries to link with (OpenSSL or MbedTLS).
 if (USE_OPENSSL)
+  set(CPRODUCER_COMMON_TLS_OPTION KVS_USE_OPENSSL)
   if(WIN32)
+  # TODO: remove the below once done testing/debugging
     # set(PRODUCER_CRYPTO_LIBRARIES
             #         OpenSSL::Crypto
             #         OpenSSL::SSL)
@@ -356,16 +336,17 @@ else() # USE_MBEDTLS
   set(PRODUCER_CRYPTO_LIBRARIES mbedtls mbedcrypto)
 endif()
 
-# TODO: Confirm this is where WebRTC build is broken
+# Note: This install path is necessary for KSV WebRTC SDK to find Producer C headers.
 install(
   DIRECTORY ${KINESIS_VIDEO_PRODUCER_C_SRC}/src/include
   DESTINATION .)
 
+# Create KVS Common LWS library, link its dependecies, and define its installation.
 if(BUILD_COMMON_LWS)
   configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/libkvsCommonLws.pc.cmake"
     "${CMAKE_CURRENT_BINARY_DIR}/libkvsCommonLws.pc" @ONLY)
-
+    
   if (WIN32)
     add_library(kvsCommonLws STATIC ${KVS_COMMON_SOURCE_FILES_BASE} ${KVS_COMMON_SOURCE_FILES_LWS})
   else()
@@ -386,20 +367,22 @@ if(BUILD_COMMON_LWS)
   install(
     FILES ${CMAKE_CURRENT_BINARY_DIR}/libkvsCommonLws.pc
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
-
 endif()
 
+# Create KVS Producer C Common Curl library, link its dependecies, and define its installation.
+# Build KVS Producer C samples and tests if specified.
 if(BUILD_COMMON_CURL)
+  configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/libkvsCommonCurl.pc.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/libkvsCommonCurl.pc" @ONLY)
+
   if(WIN32)
     set(CURL_LIBRARIES libcurl)
   else()
     set(CURL_LIBRARIES curl)
   endif()
 
-  configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/libkvsCommonCurl.pc.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/libkvsCommonCurl.pc" @ONLY)
-
+  # TODO: Should verify if this is infact built along with curl, if so, do not use find_package when building it from source.
   if(BUILD_STATIC)
     # Curl will enable ZLIB as part of its build if it finds
     # the package. We need to therefore link it for static builds. 
@@ -424,12 +407,11 @@ if(BUILD_COMMON_CURL)
 
   target_compile_definitions(cproducer PRIVATE KVS_BUILD_WITH_CURL ${CPRODUCER_COMMON_TLS_OPTION})
 
-  # TODO: I'd like to know why there is no openssl library and we instead have to use
-  #        ssl and crypto (openssl's dependencies).
+   # TODO: Remove debug messages, this one and others.
   message("CURL_LIBRARIES: ${CURL_LIBRARIES}")
   message("PRODUCER_CRYPTO_LIBRARIES: ${PRODUCER_CRYPTO_LIBRARIES}")
 
-  # Linker is not able to find the .lib files on Windows even when they are present and the path is searched.
+  # Note: The linker is not able to find the .lib files on Windows even when they are present and the path is searched.
   if(WIN32)
     target_link_libraries(cproducer
                           kvspic
@@ -442,9 +424,9 @@ if(BUILD_COMMON_CURL)
                           PRIVATE ${CURL_LIBRARIES} ${PRODUCER_CRYPTO_LIBRARIES})
   endif()
 
-
-
+ # TODO: Remove debug messages, this one and others.
   message("CMAKE_INSTALL_LIBDIR: ${CMAKE_INSTALL_LIBDIR}")
+
   install(
     TARGETS cproducer
     ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
