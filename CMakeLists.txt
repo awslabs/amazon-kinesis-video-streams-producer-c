@@ -13,18 +13,17 @@ set(KINESIS_VIDEO_PRODUCER_C_VERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION}.$
 
 set(SUPPORTED_CRYPTO_LIBRARIES "{OpenSSL, MbedTLS}")
 
-# This sets CMAKE_INSTAL_... directories based on GNU standard
+# Set CMAKE_INSTALL_ directories based on GNU standard.
 include(GNUInstallDirs)
-
 
 # User Flags
 option(ADD_MUCLIBC "Add -muclibc c flag" OFF)
 option(USE_OPENSSL "Use openssl as crypto library" ON)
 option(USE_MBEDTLS "Use mbedtls as crypto library" OFF)
 option(BUILD_STATIC "Static build" OFF)
-option(BUILD_DEPENDENCIES "Whether to build depending libraries from source" ON) # This is a master OFF switch, non will be built if off, but if it is ON, some can be specified to be not built
+option(BUILD_DEPENDENCIES "Whether to build dependency libraries from source" ON) # This is a master OFF switch, none will be built if off, but if it is ON, some can be specified to be not built
 option(BUILD_COMMON_LWS "Whether to build ProducerC libwebsockets common library" OFF)
-option(BUILD_COMMON_CURL "Whether to build ProducerC curl common library" ON) # TODO: remove this and any other un-needed flags
+option(BUILD_COMMON_CURL "Whether to build ProducerC curl common library" ON)
 option(BUILD_OPENSSL_PLATFORM "If buildng OpenSSL what is the target platform" OFF)
 option(BUILD_CRYPTO "Whether to build OpenSSL or MbedTLS, if not, will use system-installed version" ON)
 option(BUILD_LWS "Whether to build LibWebSockets, if not, will use system-installed version" ON)
@@ -254,16 +253,21 @@ endif()
 
 # TODO: Figure out what is going on in here and add comments.
 if(${CMAKE_C_COMPILER_ID} MATCHES "GNU|Clang")
+    # Enable compiler to genarate "Positin Independent Code".
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
-
+    
+    # Note: muclib is a standard C library alternative to glibc.
     if(ADD_MUCLIBC)
       set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -muclibc")
     endif()
 
+    # Set compiler flags for code coverage check and enable debug mode.
     if(CODE_COVERAGE)
       set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -g -fprofile-arcs -ftest-coverage")
       set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
     endif()
+
+    # Set compiler flags for appropriate sanitizer checks and enable debug mode.
     function(enableSanitizer SANITIZER)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g -fsanitize=${SANITIZER} -fno-omit-frame-pointer" PARENT_SCOPE)
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -g -fsanitize=${SANITIZER} -fno-omit-frame-pointer -fno-optimize-sibling-calls" PARENT_SCOPE)
@@ -283,15 +287,15 @@ if(${CMAKE_C_COMPILER_ID} MATCHES "GNU|Clang")
     endif()
 endif()
 
+# Silence warnings for Windows builds.
 if(MSVC)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_WARNINGS -D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
 endif()
 
-
+# Producer C source files are seperated by Common, LWS, Curl, and Producer related code.
 file(GLOB KVS_COMMON_SOURCE_FILES_BASE "src/source/Common/*.c")
 file(GLOB KVS_COMMON_SOURCE_FILES_LWS "src/source/Common/Lws/*.c")
 file(GLOB KVS_COMMON_SOURCE_FILES_CURL "src/source/Common/Curl/*.c")
-
 file(GLOB PRODUCER_C_SOURCE_FILES "src/source/*.c")
 
 set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${OPEN_SRC_INSTALL_PREFIX}/include)
@@ -302,13 +306,6 @@ include_directories(${OPEN_SRC_INCLUDE_DIRS})
 link_directories(${OPEN_SRC_INSTALL_PREFIX}/lib) # Unix intsalls libraries into /lib directory
 link_directories(${OPEN_SRC_INSTALL_PREFIX}/bin) # Windows may install libraries into /bin directory
 
-# TODO: Remove the below debugging code
-# Get the list of link directories
-get_property(link_dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY LINK_DIRECTORIES)
-# Print each link directory
-foreach(dir IN LISTS link_dirs)
-    message("Link directory: ${dir}")
-endforeach()
 
 if(ALIGNED_MEMORY_MODEL)
     add_definitions(-DALIGNED_MEMORY_MODEL)
@@ -323,10 +320,6 @@ endif()
 if (USE_OPENSSL)
   set(CPRODUCER_COMMON_TLS_OPTION KVS_USE_OPENSSL)
   if(WIN32)
-  # TODO: remove the below once done testing/debugging
-    # set(PRODUCER_CRYPTO_LIBRARIES
-            #         OpenSSL::Crypto
-            #         OpenSSL::SSL)
     set(PRODUCER_CRYPTO_LIBRARIES libssl libcrypto)
   else()
     set(PRODUCER_CRYPTO_LIBRARIES ssl crypto)
@@ -336,7 +329,7 @@ else() # USE_MBEDTLS
   set(PRODUCER_CRYPTO_LIBRARIES mbedtls mbedcrypto)
 endif()
 
-# Note: This install path is necessary for KSV WebRTC SDK to find Producer C headers.
+# Note: This install instruction is necessary for KSV WebRTC SDK to find Producer C headers.
 install(
   DIRECTORY ${KINESIS_VIDEO_PRODUCER_C_SRC}/src/include
   DESTINATION .)
@@ -382,7 +375,6 @@ if(BUILD_COMMON_CURL)
     set(CURL_LIBRARIES curl)
   endif()
 
-  # TODO: Should verify if this is infact built along with curl, if so, do not use find_package when building it from source.
   if(BUILD_STATIC)
     # Curl will enable ZLIB as part of its build if it finds
     # the package. We need to therefore link it for static builds. 
@@ -411,7 +403,9 @@ if(BUILD_COMMON_CURL)
   message("CURL_LIBRARIES: ${CURL_LIBRARIES}")
   message("PRODUCER_CRYPTO_LIBRARIES: ${PRODUCER_CRYPTO_LIBRARIES}")
 
-  # Note: The linker is not able to find the .lib files on Windows even when they are present and the path is searched.
+  # TODO: Make this work with mbedtls on Windows
+  # Note: The linker is not able to find the .lib files on Windows without the full path,
+  #       even when they are present and in the LIBPATH search path.
   if(WIN32)
     target_link_libraries(cproducer
                           kvspic
@@ -450,7 +444,7 @@ if(BUILD_COMMON_CURL)
     target_link_libraries(kvsAudioOnlyStreamingSample cproducer)
   endif()
 
-  if (BUILD_TEST)
+  if(BUILD_TEST)
       add_subdirectory(tst)
   endif()
 endif()
