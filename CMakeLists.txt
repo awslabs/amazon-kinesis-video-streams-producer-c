@@ -152,6 +152,7 @@ message("CMAKE_PREFIX_PATH : ${CMAKE_PREFIX_PATH}") #TODO: Remove this.
 
 ############# Checking system for kvspic #############
 
+# TODO: Remove this comment in final cleanup.
 # NOTE: this is possibly a breaking change, if not specified, system PIC will not be used.
 # Prev behavior: look for system PIC if not found, build PIC.
 # Now: is BUILD_KVS_PIC ? build PIC, else find system PIC - if system PIC not found, fail build
