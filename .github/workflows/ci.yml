@@ -37,7 +37,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Build repository
         run: |
-          brew install pkgconfig
+          brew install pkg-config
           mkdir build && cd build
           cmake .. --trace -DBUILD_TEST=TRUE
           make
@@ -65,7 +65,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Build repository
         run: |
-          brew install pkgconfig
+          brew install pkg-config
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE
           make
@@ -93,7 +93,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Build repository
         run: |
-          brew install pkgconfig
+          brew install pkg-config
           mkdir build && cd build
           sh -c 'cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DCMAKE_C_COMPILER=$(brew --prefix llvm@15)/bin/clang -DCMAKE_CXX_COMPILER=$(brew --prefix llvm@15)/bin/clang++;cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DCMAKE_C_COMPILER=$(brew --prefix llvm@15)/bin/clang -DCMAKE_CXX_COMPILER=$(brew --prefix llvm@15)/bin/clang++'
           make
@@ -109,7 +109,7 @@ jobs:
           cd build
           ./tst/producer_test
 
-  mac-os-build-gcc-local-openssl:
+  mac-os-build-gcc-system-depsa-openssl:
     runs-on: macos-11
     permissions:
       id-token: write
@@ -126,9 +126,9 @@ jobs:
         uses: actions/checkout@v3
       - name: Build repository
         run: |
-          brew info openssl
+          brew install pkg-config openssl curl 
           mkdir build && cd build
-          cmake .. -DBUILD_TEST=TRUE -DLOCAL_OPENSSL_BUILD=ON
+          cmake .. -DBUILD_TEST=TRUE -DBUILD_DEPENDENCIES=FALSE
           make
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -157,7 +157,6 @@ jobs:
         uses: actions/checkout@v3
       - name: Build repository
         run: |
-          brew info openssl
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DLOCAL_OPENSSL_BUILD=ON
           make
