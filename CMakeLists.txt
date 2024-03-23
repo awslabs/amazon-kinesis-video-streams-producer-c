@@ -316,6 +316,7 @@ if(SET_SSL_CALLBACKS)
     add_definitions(-DSET_SSL_CALLBACKS)
 endif()
 
+# TODO: Test building with BUILD_DEPENDENCIES=OFF
 
 # Set which crypto libraries to link with (OpenSSL or MbedTLS).
 if (USE_OPENSSL)
@@ -325,7 +326,16 @@ if (USE_OPENSSL)
           ${OPEN_SRC_INSTALL_PREFIX}/lib/libssl.lib
           ${OPEN_SRC_INSTALL_PREFIX}/lib/libcrypto.lib)
   else()
-    set(PRODUCER_CRYPTO_LIBRARIES ssl crypto)
+    # Specify library path if using library built from source.
+    if(!BUILD_DEPENDENCIES OR !BUILD_CRYPTO)
+      if(BUILD_STATIC)
+        set(PRODUCER_CRYPTO_LIBRARIES ${OPEN_SRC_INSTALL_PREFIX}/lib/ssl.a ${OPEN_SRC_INSTALL_PREFIX}/lib/crypto.a)
+      else()
+        set(PRODUCER_CRYPTO_LIBRARIES ${OPEN_SRC_INSTALL_PREFIX}/lib/ssl.dylib ${OPEN_SRC_INSTALL_PREFIX}/lib/crypto.dylib)
+      endif()
+    else()
+      set(PRODUCER_CRYPTO_LIBRARIES ssl crypto)
+    endif()
   endif()
 elseif(USE_MBEDTLS)
   set(CPRODUCER_COMMON_TLS_OPTION KVS_USE_MBEDTLS)
