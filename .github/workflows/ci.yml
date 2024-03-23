@@ -67,6 +67,7 @@ jobs:
         run: |
           brew install pkg-config
           mkdir build && cd build
+          echo $DYLD_LIBRARY_PATH
           unset DYLD_LIBRARY_PATH
           cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE
           make
