@@ -130,7 +130,9 @@ if(BUILD_DEPENDENCIES)
   if (BUILD_COMMON_CURL AND BUILD_CURL)
     set(BUILD_ARGS  -DBUILD_STATIC=${BUILD_STATIC}
                     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-                    -DUSE_MBEDTLS=${USE_MBEDTLS})
+                    -DUSE_MBEDTLS=${USE_MBEDTLS}
+                    -DBUILD_CRYPTO=${BUILD_CRYPTO}
+                    -DUSE_OPENSSL=${USE_OPENSSL})
     build_dependency(curl ${BUILD_ARGS})
   endif()
 
