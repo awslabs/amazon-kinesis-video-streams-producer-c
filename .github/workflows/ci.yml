@@ -38,7 +38,6 @@ jobs:
       - name: Build repository
         run: |
           brew install pkgconfig
-          brew unlink openssl # it seems the libcurl is trying to access this openssl despite explicitly setting it to our build
           mkdir build && cd build
           cmake .. --trace -DBUILD_TEST=TRUE
           make
@@ -67,7 +66,6 @@ jobs:
       - name: Build repository
         run: |
           brew install pkgconfig
-          brew unlink openssl # it seems the libcurl is trying to access this openssl despite explicitly setting it to our build
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE
           make
@@ -96,7 +94,6 @@ jobs:
       - name: Build repository
         run: |
           brew install pkgconfig
-          brew unlink openssl # it seems the libcurl is trying to access this openssl despite explicitly setting it to our build
           mkdir build && cd build
           sh -c 'cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DCMAKE_C_COMPILER=$(brew --prefix llvm@15)/bin/clang -DCMAKE_CXX_COMPILER=$(brew --prefix llvm@15)/bin/clang++;cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DCMAKE_C_COMPILER=$(brew --prefix llvm@15)/bin/clang -DCMAKE_CXX_COMPILER=$(brew --prefix llvm@15)/bin/clang++'
           make
