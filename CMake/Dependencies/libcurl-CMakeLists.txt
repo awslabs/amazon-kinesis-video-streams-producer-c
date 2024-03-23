@@ -30,8 +30,9 @@ if (WIN32)
 endif()
 
 message("OPEN_SRC_INSTALL_PREFIX from curl build: ${OPEN_SRC_INSTALL_PREFIX}")
-
-if(BUILD_DEPENDENCIES AND BUILD_CRYPTO AND USE_OPENSSL)
+message("BUILD_CRYPTO: ${BUILD_CRYPTO}")
+message("USE_OPENSSL: ${USE_OPENSSL}")
+if(BUILD_CRYPTO AND USE_OPENSSL)
     message("Setting OPEN_SRC_INSTALL_PREFIX from curl build.")
     set(CMAKE_ARGS ${CMAKE_ARGS} -DOPENSSL_INCLUDE_DIR=${OPEN_SRC_INSTALL_PREFIX}/include/openssl
                                  -DOPENSSL_SSL_LIBRARY=${OPEN_SRC_INSTALL_PREFIX}/lib/ssl.dylib
