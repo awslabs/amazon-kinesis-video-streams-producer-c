@@ -321,13 +321,21 @@ endif()
 if (USE_OPENSSL)
   set(CPRODUCER_COMMON_TLS_OPTION KVS_USE_OPENSSL)
   if(WIN32)
-    set(PRODUCER_CRYPTO_LIBRARIES libssl libcrypto)
+    set(PRODUCER_CRYPTO_LIBRARIES
+          ${OPEN_SRC_INSTALL_PREFIX}/lib/libssl.lib
+          ${OPEN_SRC_INSTALL_PREFIX}/lib/libcrypto.lib)
   else()
     set(PRODUCER_CRYPTO_LIBRARIES ssl crypto)
   endif()
-else() # USE_MBEDTLS
+elseif(USE_MBEDTLS)
   set(CPRODUCER_COMMON_TLS_OPTION KVS_USE_MBEDTLS)
-  set(PRODUCER_CRYPTO_LIBRARIES mbedtls mbedcrypto)
+  if(WIN32)
+    set(PRODUCER_CRYPTO_LIBRARIES
+          ${OPEN_SRC_INSTALL_PREFIX}/lib/mbedtls.lib
+          ${OPEN_SRC_INSTALL_PREFIX}/lib/mbedcrypto.lib)
+  else()
+    set(PRODUCER_CRYPTO_LIBRARIES mbedtls mbedcrypto)
+  endif()
 endif()
 
 # Note: This install instruction is necessary for KSV WebRTC SDK to find Producer C headers.
@@ -371,7 +379,7 @@ if(BUILD_COMMON_CURL)
     "${CMAKE_CURRENT_BINARY_DIR}/libkvsCommonCurl.pc" @ONLY)
 
   if(WIN32)
-    set(CURL_LIBRARIES libcurl)
+    set(CURL_LIBRARIES ${OPEN_SRC_INSTALL_PREFIX}/lib/libcurl-d_imp.lib)
   else()
     set(CURL_LIBRARIES curl)
   endif()
@@ -407,17 +415,9 @@ if(BUILD_COMMON_CURL)
   # TODO: Make this work with mbedtls on Windows
   # Note: The linker is not able to find the .lib files on Windows without the full path,
   #       even when they are present and in the LIBPATH search path.
-  if(WIN32)
-    target_link_libraries(cproducer
-                          kvspic
-                          ${OPEN_SRC_INSTALL_PREFIX}/lib/libssl.lib
-                          ${OPEN_SRC_INSTALL_PREFIX}/lib/libcrypto.lib
-                          ${OPEN_SRC_INSTALL_PREFIX}/lib/libcurl-d_imp.lib)
-  else()
-    target_link_libraries(cproducer 
+  target_link_libraries(cproducer 
                           PUBLIC kvspic
                           PRIVATE ${CURL_LIBRARIES} ${PRODUCER_CRYPTO_LIBRARIES})
-  endif()
 
  # TODO: Remove debug messages, this one and others.
   message("CMAKE_INSTALL_LIBDIR: ${CMAKE_INSTALL_LIBDIR}")
