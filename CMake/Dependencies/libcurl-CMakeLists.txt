@@ -37,7 +37,9 @@ if(BUILD_CRYPTO AND USE_OPENSSL)
     set(CMAKE_ARGS ${CMAKE_ARGS} -DOPENSSL_INCLUDE_DIR=${OPEN_SRC_INSTALL_PREFIX}/include/openssl
                                  -DOPENSSL_SSL_LIBRARY=${OPEN_SRC_INSTALL_PREFIX}/lib/ssl.dylib
                                  -DOPENSSL_CRYPTO_LIBRARY=${OPEN_SRC_INSTALL_PREFIX}/lib/crypto.dylib
-                                 -DOPENSSL_ROOT_DIR=${OPEN_SRC_INSTALL_PREFIX})
+                                 -DOPENSSL_LIBRARIES=${OPEN_SRC_INSTALL_PREFIX}/lib
+                                 -DOPENSSL_ROOT_DIR=${OPEN_SRC_INSTALL_PREFIX}
+                                 -DCMAKE_PREFIX_PATH=${OPEN_SRC_INSTALL_PREFIX})
 endif()
 
 ExternalProject_Add(project_libcurl
