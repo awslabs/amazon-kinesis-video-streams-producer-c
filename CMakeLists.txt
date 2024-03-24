@@ -83,6 +83,9 @@ endif()
 
 # Fetch and build 3rd-party dependencies if specified.
 if(BUILD_DEPENDENCIES)
+  # TODO: Should we instead set the RPATH?
+  set(ENV{DYLD_LIBRARY_PATH} ${CMAKE_SOURCE_DIR}/open-source/lib)
+
   message(STATUS "Begin building dependencies.")
 
   # Set directory where to build the dependencies.
