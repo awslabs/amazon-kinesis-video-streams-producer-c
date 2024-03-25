@@ -37,7 +37,6 @@ jobs:
         uses: actions/checkout@v3
       - name: Build repository
         run: |
-          brew install pkgconfig
           brew unlink openssl # it seems the libcurl is trying to access this openssl despite explicitly setting it to our build
           mkdir build && cd build
           cmake .. --trace -DBUILD_TEST=TRUE
@@ -66,7 +65,6 @@ jobs:
         uses: actions/checkout@v3
       - name: Build repository
         run: |
-          brew install pkgconfig
           brew unlink openssl # it seems the libcurl is trying to access this openssl despite explicitly setting it to our build
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE
@@ -95,10 +93,9 @@ jobs:
         uses: actions/checkout@v3
       - name: Build repository
         run: |
-          brew install pkgconfig
           brew unlink openssl # it seems the libcurl is trying to access this openssl despite explicitly setting it to our build
           mkdir build && cd build
-          sh -c 'cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DCMAKE_C_COMPILER=$(brew --prefix llvm@15)/bin/clang -DCMAKE_CXX_COMPILER=$(brew --prefix llvm@15)/bin/clang++;cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DCMAKE_C_COMPILER=$(brew --prefix llvm@15)/bin/clang -DCMAKE_CXX_COMPILER=$(brew --prefix llvm@15)/bin/clang++'
+          cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DCMAKE_C_COMPILER=$(brew --prefix llvm@15)/bin/clang -DCMAKE_CXX_COMPILER=$(brew --prefix llvm@15)/bin/clang++
           make
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -112,7 +109,7 @@ jobs:
           cd build
           ./tst/producer_test
 
-  mac-os-build-gcc-local-openssl:
+  mac-os-build-gcc-system-deps:
     runs-on: macos-11
     permissions:
       id-token: write
@@ -131,7 +128,7 @@ jobs:
         run: |
           brew info openssl
           mkdir build && cd build
-          cmake .. -DBUILD_TEST=TRUE -DLOCAL_OPENSSL_BUILD=ON
+          cmake .. -DBUILD_TEST=TRUE -DBUILD_DEPENDENCIES=FALSE
           make
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -145,7 +142,7 @@ jobs:
           cd build
           ./tst/producer_test
 
-  mac-os-build-clang-local-openssl:
+  mac-os-build-clang-system-deps:
     runs-on: macos-latest
     env:
       AWS_KVS_LOG_LEVEL: 2
@@ -162,7 +159,7 @@ jobs:
         run: |
           brew info openssl
           mkdir build && cd build
-          cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DLOCAL_OPENSSL_BUILD=ON
+          cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DBUILD_DEPENDENCIES=FALSE
           make
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -435,6 +432,7 @@ jobs:
           cmake .. -DBUILD_TEST=TRUE -DBUILD_OPENSSL_PLATFORM=linux-generic64
           make
           file libcproducer.so
+
   linux-aarch64-cross-compilation:
     runs-on: ubuntu-20.04
     env:
@@ -454,6 +452,7 @@ jobs:
           cmake .. -DBUILD_TEST=TRUE -DBUILD_OPENSSL_PLATFORM=linux-aarch64
           make
           file libcproducer.so
+          
   arm32-cross-compilation:
     runs-on: ubuntu-20.04
     env:
