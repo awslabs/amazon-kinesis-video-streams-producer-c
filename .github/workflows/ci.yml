@@ -11,7 +11,7 @@ on:
       - master
 jobs:
   clang-format-check:
-    runs-on: macos-11
+    runs-on: macos-latest
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
@@ -24,13 +24,13 @@ jobs:
           bash scripts/check-clang.sh
 
   mac-os-build-gcc:
-    runs-on: macos-12
+    runs-on: macos-latest
     permissions:
       id-token: write
       contents: read
     env:
-      CC: /usr/local/bin/gcc-13
-      CXX: /usr/local/bin/g++-13
+      CC: gcc-13
+      CXX: g++-13
       AWS_KVS_LOG_LEVEL: 2
     steps:
       - name: Clone repository
@@ -54,7 +54,7 @@ jobs:
           ./tst/producer_test
 
   mac-os-build-clang:
-    runs-on: macos-11
+    runs-on: macos-latest
     env:
       AWS_KVS_LOG_LEVEL: 2
     permissions:
@@ -109,14 +109,80 @@ jobs:
           cd build
           ./tst/producer_test
 
-  mac-os-build-gcc-system-deps:
-    runs-on: macos-11
+  mac-os-build-gcc-system-openssl:
+    runs-on: macos-latest
     permissions:
       id-token: write
       contents: read
     env:
-      CC: /usr/local/bin/gcc-13
-      CXX: /usr/local/bin/g++-13
+      CC: gcc-13
+      CXX: g++-13
+      AWS_KVS_LOG_LEVEL: 2
+      LDFLAGS: -L/usr/local/opt/openssl@3/lib
+      CPPFLAGS: -I/usr/local/opt/openssl@3/include
+      OPENSSL_ROOT_DIR: /usr/local/opt/openssl@3/
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+      - name: Build repository
+        run: |
+          brew info openssl
+          mkdir build && cd build
+          cmake .. -DBUILD_TEST=TRUE -DBUILD_CRYPTO=FALSE
+          make
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-duration-seconds: 10800
+      - name: Run tests
+        run: |
+          cd build
+          ./tst/producer_test
+
+  mac-os-build-clang-system-openssl:
+    runs-on: macos-latest
+    env:
+      AWS_KVS_LOG_LEVEL: 2
+      LDFLAGS: -L/usr/local/opt/openssl@3/lib
+      CPPFLAGS: -I/usr/local/opt/openssl@3/include
+      OPENSSL_ROOT_DIR: /usr/local/opt/openssl@3/
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+      - name: Build repository
+        run: |
+          brew install googletest
+          brew info openssl
+          mkdir build && cd build
+          cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DBUILD_CRYPTO=FALSE
+          make
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-duration-seconds: 10800
+      - name: Run tests
+        run: |
+          cd build
+          ./tst/producer_test
+
+  # Producer is not compatible with latest CURL, so build only, don't run tests.
+  mac-os-build-gcc-system-deps:
+    runs-on: macos-latest
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      CC: gcc-13
+      CXX: g++-13
       AWS_KVS_LOG_LEVEL: 2
       LDFLAGS: -L/usr/local/opt/openssl@3/lib
       CPPFLAGS: -I/usr/local/opt/openssl@3/include
@@ -131,18 +197,8 @@ jobs:
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DBUILD_DEPENDENCIES=FALSE
           make
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-          aws-region: ${{ secrets.AWS_REGION }}
-          role-duration-seconds: 10800
-      - name: Run tests
-        run: |
-          cd build
-          ./tst/producer_test
 
+  # Producer is not compatible with latest CURL, so build only, don't run tests.
   mac-os-build-clang-system-deps:
     runs-on: macos-latest
     env:
@@ -163,17 +219,6 @@ jobs:
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DBUILD_DEPENDENCIES=FALSE
           make
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-          aws-region: ${{ secrets.AWS_REGION }}
-          role-duration-seconds: 10800
-      - name: Run tests
-        run: |
-          cd build
-          ./tst/producer_test
 
   ubuntu-os-gcc-build-lws-mbedtls:
     runs-on: ubuntu-20.04

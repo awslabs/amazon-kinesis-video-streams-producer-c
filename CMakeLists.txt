@@ -129,7 +129,7 @@ if(BUILD_DEPENDENCIES)
   endif()
 
   # If building KVS Producer C Common LWS, build libwebsockets.
-  # NOTE: This version of LWS does not build on Mac
+  # NOTE: This version of LWS does not build succesfully on Mac due to a LWS bug.
   if (BUILD_COMMON_LWS AND BUILD_LWS)
     set(BUILD_ARGS  -DBUILD_STATIC=${BUILD_STATIC}
                     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
@@ -144,6 +144,31 @@ if(BUILD_DEPENDENCIES)
   endif()
 
   message(STATUS "Finished building dependencies.")
+
+# GTest MUST be built if using GCC compiler because Mac system-built GTest uses Clang.
+#   Clang-built GTest is not compatible with GCC-built libraries. This check expects the
+#   CC env var to be set in the following format: "export CC=<optional path>/gcc-<version number>".
+#   We currently only test with BUILD_DEPENDENCIES=OFF on Mac CI.
+elseif(BUILD_TEST AND APPLE AND DEFINED ENV{CC})
+  # Set directory where to build the dependencies.
+  if (NOT OPEN_SRC_INSTALL_PREFIX)
+    set(OPEN_SRC_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/open-source)
+    set(ENV{PKG_CONFIG_PATH}
+          "$ENV{PKG_CONFIG_PATH}:${OPEN_SRC_INSTALL_PREFIX}/lib/pkgconfig")
+    set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${OPEN_SRC_INSTALL_PREFIX})
+  endif()
+
+  # Create the dependency directory if it doesn't exist.
+  if(NOT EXISTS ${OPEN_SRC_INSTALL_PREFIX})
+    file(MAKE_DIRECTORY ${OPEN_SRC_INSTALL_PREFIX})
+  endif()
+
+  # Check if CC env var starts with "gcc".
+  string(STRIP $ENV{CC} CC_NAME)
+  message(${CC_NAME})
+  if(${CC_NAME} MATCHES ".*gcc-.*")
+    build_dependency(gtest)
+  endif()
 endif()
 
 find_package(PkgConfig REQUIRED)
