@@ -129,6 +129,7 @@ if(BUILD_DEPENDENCIES)
   endif()
 
   # If building KVS Producer C Common LWS, build libwebsockets.
+  # NOTE: This version of LWS does not build on Mac
   if (BUILD_COMMON_LWS AND BUILD_LWS)
     set(BUILD_ARGS  -DBUILD_STATIC=${BUILD_STATIC}
                     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
@@ -203,6 +204,7 @@ find_package(Threads)
 if(NOT BUILD_DEPENDENCIES OR NOT BUILD_CRYPTO)
   if(USE_OPENSSL)
     find_package(OpenSSL REQUIRED)
+    include_directories(${OPENSSL_INCLUDE_DIR})
   elseif(USE_MBEDTLS)
     find_package(MbedTLS REQUIRED)
   else()
@@ -325,7 +327,11 @@ if (USE_OPENSSL)
           ${OPEN_SRC_INSTALL_PREFIX}/lib/libssl.lib
           ${OPEN_SRC_INSTALL_PREFIX}/lib/libcrypto.lib)
   else()
-    set(PRODUCER_CRYPTO_LIBRARIES ssl crypto)
+    if(BUILD_DEPENDENCIES AND BUILD_CRYPTO)
+      set(PRODUCER_CRYPTO_LIBRARIES ssl crypto)
+    else()
+      set(PRODUCER_CRYPTO_LIBRARIES OpenSSL::SSL OpenSSL::Crypto)
+    endif()
   endif()
 elseif(USE_MBEDTLS)
   set(CPRODUCER_COMMON_TLS_OPTION KVS_USE_MBEDTLS)
