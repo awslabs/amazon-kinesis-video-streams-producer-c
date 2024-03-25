@@ -83,19 +83,15 @@ endif()
 
 # Fetch and build 3rd-party dependencies if specified.
 if(BUILD_DEPENDENCIES)
-  # TODO: Should we instead set the RPATH?
-  set(ENV{DYLD_LIBRARY_PATH} ${CMAKE_SOURCE_DIR}/open-source/lib)
-
   message(STATUS "Begin building dependencies.")
 
   # Set directory where to build the dependencies.
   if (NOT OPEN_SRC_INSTALL_PREFIX)
     set(OPEN_SRC_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/open-source)
+    set(ENV{PKG_CONFIG_PATH}
+          "$ENV{PKG_CONFIG_PATH}:${OPEN_SRC_INSTALL_PREFIX}/lib/pkgconfig")
+    set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${OPEN_SRC_INSTALL_PREFIX})
   endif()
-
-  set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${OPEN_SRC_INSTALL_PREFIX}/lib/pkgconfig")
-  set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${OPEN_SRC_INSTALL_PREFIX})
-
 
   # Create the dependency directory if it doesn't exist.
   if(NOT EXISTS ${OPEN_SRC_INSTALL_PREFIX})
@@ -115,14 +111,6 @@ if(BUILD_DEPENDENCIES)
       message(STATUS "Building OpenSSL")
       set(BUILD_ARGS -DBUILD_STATIC=${BUILD_STATIC} -DBUILD_OPENSSL_PLATFORM=${BUILD_OPENSSL_PLATFORM})
       build_dependency(openssl ${BUILD_ARGS})
-      set(OPENSSL_ROOT_DIR ${OPEN_SRC_INSTALL_PREFIX})
-      find_package(OpenSSL REQUIRED)
-      message("OPENSSL_FOUND: ${OPENSSL_FOUND}")
-      message("OPENSSL_INCLUDE_DIR: ${OPENSSL_INCLUDE_DIR}")
-      message("OPENSSL_LIBRARIES: ${OPENSSL_LIBRARIES}")
-      message("OPENSSL_VERSION: ${OPENSSL_VERSION}")
-      message("OPENSSL_CRYPTO_LIBRARY: ${OPENSSL_CRYPTO_LIBRARY}")
-      message("OPENSSL_SSL_LIBRARY: ${OPENSSL_SSL_LIBRARY}")
     elseif(USE_MBEDTLS)
       message(STATUS "Building MbedTLS")
       set(BUILD_ARGS -DBUILD_STATIC=${BUILD_STATIC} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
@@ -136,9 +124,7 @@ if(BUILD_DEPENDENCIES)
   if (BUILD_COMMON_CURL AND BUILD_CURL)
     set(BUILD_ARGS  -DBUILD_STATIC=${BUILD_STATIC}
                     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-                    -DUSE_MBEDTLS=${USE_MBEDTLS}
-                    -DBUILD_CRYPTO=${BUILD_CRYPTO}
-                    -DUSE_OPENSSL=${USE_OPENSSL})
+                    -DUSE_MBEDTLS=${USE_MBEDTLS})
     build_dependency(curl ${BUILD_ARGS})
   endif()
 
@@ -330,7 +316,6 @@ if(SET_SSL_CALLBACKS)
     add_definitions(-DSET_SSL_CALLBACKS)
 endif()
 
-# TODO: Test building with BUILD_DEPENDENCIES=OFF
 
 # Set which crypto libraries to link with (OpenSSL or MbedTLS).
 if (USE_OPENSSL)
@@ -340,16 +325,7 @@ if (USE_OPENSSL)
           ${OPEN_SRC_INSTALL_PREFIX}/lib/libssl.lib
           ${OPEN_SRC_INSTALL_PREFIX}/lib/libcrypto.lib)
   else()
-    # Specify library path if using library built from source.
-    if(!BUILD_DEPENDENCIES OR !BUILD_CRYPTO)
-      if(BUILD_STATIC)
-        set(PRODUCER_CRYPTO_LIBRARIES ${OPEN_SRC_INSTALL_PREFIX}/lib/ssl.a ${OPEN_SRC_INSTALL_PREFIX}/lib/crypto.a)
-      else()
-        set(PRODUCER_CRYPTO_LIBRARIES ${OPEN_SRC_INSTALL_PREFIX}/lib/ssl.dylib ${OPEN_SRC_INSTALL_PREFIX}/lib/crypto.dylib)
-      endif()
-    else()
-      set(PRODUCER_CRYPTO_LIBRARIES ssl crypto)
-    endif()
+    set(PRODUCER_CRYPTO_LIBRARIES ssl crypto)
   endif()
 elseif(USE_MBEDTLS)
   set(CPRODUCER_COMMON_TLS_OPTION KVS_USE_MBEDTLS)
