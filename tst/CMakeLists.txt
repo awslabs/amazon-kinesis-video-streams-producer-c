@@ -19,6 +19,7 @@ endif()
 include_directories(${KINESIS_VIDEO_PRODUCER_C_SRC})
 
 file(GLOB PRODUCER_TEST_SOURCE_FILES "*.cpp")
+file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/sample_file_creds.txt" DESTINATION .)
 
 add_executable(producer_test ${PRODUCER_TEST_SOURCE_FILES})
 target_link_libraries(producer_test cproducer ${GTEST_LIBNAME})

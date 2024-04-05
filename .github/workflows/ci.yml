@@ -208,6 +208,10 @@ jobs:
       CC: clang
       CXX: clang++
       AWS_KVS_LOG_LEVEL: 2
+      # The unit tests will have both LWS and CURL enabled, both linking to globalMemCalloc. Our PIC is
+      # has quite a few global definitions that get linked twice. TODO: see if we can list common dependency
+      # to remove this option
+      ASAN_OPTIONS: detect_odr_violation=0
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
