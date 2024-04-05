@@ -39,6 +39,7 @@ jobs:
         run: |
           cd build
           ulimit -c unlimited -S
+          source ../scripts/get-iot-certs.sh ci
           timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
       - name: Code coverage
         run: |

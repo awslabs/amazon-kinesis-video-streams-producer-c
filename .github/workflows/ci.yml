@@ -53,6 +53,7 @@ jobs:
       - name: Run tests
         run: |
           cd build
+          source ../scripts/get-iot-certs.sh ci
           ./tst/producer_test
 
   mac-os-build-clang:
@@ -82,6 +83,7 @@ jobs:
       - name: Run tests
         run: |
           cd build
+          source ../scripts/get-iot-certs.sh ci
           ./tst/producer_test
 
   mac-os-m1-build-clang:
@@ -111,6 +113,7 @@ jobs:
       - name: Run tests
         run: |
           cd build
+          source ../scripts/get-iot-certs.sh ci
           ./tst/producer_test
 
   mac-os-build-gcc-local-openssl:
@@ -144,6 +147,7 @@ jobs:
       - name: Run tests
         run: |
           cd build
+          source ../scripts/get-iot-certs.sh ci
           ./tst/producer_test
 
   mac-os-build-clang-local-openssl:
@@ -175,6 +179,7 @@ jobs:
       - name: Run tests
         run: |
           cd build
+          source ../scripts/get-iot-certs.sh ci
           ./tst/producer_test
 
   ubuntu-os-gcc-build-lws-mbedtls:
@@ -231,6 +236,7 @@ jobs:
         run: |
           cd build
           ulimit -c unlimited -S
+          source ../scripts/get-iot-certs.sh ci
           timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
 
   undefined-behavior-sanitizer:
@@ -261,6 +267,7 @@ jobs:
         run: |
           cd build
           ulimit -c unlimited -S
+          source ../scripts/get-iot-certs.sh ci
           timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
 
 
@@ -351,6 +358,7 @@ jobs:
         run: |
           cd build
           ulimit -c unlimited -S
+          source ../scripts/get-iot-certs.sh ci
           timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
 
   windows-msvc:
@@ -381,7 +389,7 @@ jobs:
       - name: Run tests
         run: |
           $env:Path += ';C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;C:\Program Files\NASM;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\lib;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\bin'
-          & "D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\build\tst\producer_test.exe" --gtest_filter="-ProducerFunctionalityTest.pressure_on_buffer_duration_fail_new_connection_at_token_rotation"
+          & "D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\build\tst\producer_test.exe" --gtest_filter="-ProducerFunctionalityTest.pressure_on_buffer_duration_fail_new_connection_at_token_rotation:IotCredentialTest.*"
 
   arm64-cross-compilation:
     runs-on: ubuntu-20.04

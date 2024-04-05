@@ -8,16 +8,16 @@ class IoTCredentialTest : public ProducerClientTestBase {
 TEST_F(IoTCredentialTest, createDefaultCallbacksProviderWithIotCertificateValidEndpoint)
 {
     PClientCallbacks pClientCallbacks;
-    PCHAR iotCoreCredentialEndPoint;
-    PCHAR iotCoreCert;
-    PCHAR iotCorePrivateKey;
-    PCHAR iotCoreRoleAlias;
-    PCHAR iotThingName;
-    iotCoreCredentialEndPoint = GETENV("AWS_IOT_CORE_CREDENTIAL_ENDPOINT");
-    iotCoreCert = GETENV("AWS_IOT_CORE_CERT");
-    iotCorePrivateKey = GETENV("AWS_IOT_CORE_PRIVATE_KEY");
-    iotCoreRoleAlias = GETENV("AWS_IOT_CORE_ROLE_ALIAS");
-    iotThingName = GETENV("AWS_IOT_CORE_THING_NAME");
+    PCHAR iotCoreCredentialEndPoint = NULL;
+    PCHAR iotCoreCert = NULL;
+    PCHAR iotCorePrivateKey = NULL;
+    PCHAR iotCoreRoleAlias = NULL;
+    PCHAR iotThingName = NULL;
+    EXPECT_TRUE((iotCoreCredentialEndPoint = GETENV(AWS_IOT_CORE_CREDENTIAL_ENDPOINT_ENV_VAR)) != NULL);
+    EXPECT_TRUE((iotCoreCert = GETENV(AWS_IOT_CORE_CERT_ENV_VAR)) != NULL);
+    EXPECT_TRUE((iotCorePrivateKey = GETENV(AWS_IOT_CORE_PRIVATE_KEY_ENV_VAR)) != NULL);
+    EXPECT_TRUE((iotCoreRoleAlias = GETENV(AWS_IOT_CORE_ROLE_ALIAS_ENV_VAR)) != NULL);
+    EXPECT_TRUE((iotThingName = GETENV(AWS_IOT_CORE_THING_NAME_ENV_VAR)) != NULL);
 
 
     EXPECT_EQ(STATUS_SUCCESS, createDefaultCallbacksProviderWithIotCertificate(
@@ -37,16 +37,16 @@ TEST_F(IoTCredentialTest, createDefaultCallbacksProviderWithIotCertificateValidE
 TEST_F(IoTCredentialTest, createDefaultCallbacksProviderWithIotCertificateAndTimeoutsValidEndpoint)
 {
     PClientCallbacks pClientCallbacks;
-    PCHAR iotCoreCredentialEndPoint;
-    PCHAR iotCoreCert;
-    PCHAR iotCorePrivateKey;
-    PCHAR iotCoreRoleAlias;
-    PCHAR iotThingName;
-    iotCoreCredentialEndPoint = GETENV("AWS_IOT_CORE_CREDENTIAL_ENDPOINT");
-    iotCoreCert = GETENV("AWS_IOT_CORE_CERT");
-    iotCorePrivateKey = GETENV("AWS_IOT_CORE_PRIVATE_KEY");
-    iotCoreRoleAlias = GETENV("AWS_IOT_CORE_ROLE_ALIAS");
-    iotThingName = GETENV("AWS_IOT_CORE_THING_NAME");
+    PCHAR iotCoreCredentialEndPoint = NULL;
+    PCHAR iotCoreCert = NULL;
+    PCHAR iotCorePrivateKey = NULL;
+    PCHAR iotCoreRoleAlias = NULL;
+    PCHAR iotThingName = NULL;
+    EXPECT_TRUE((iotCoreCredentialEndPoint = GETENV(AWS_IOT_CORE_CREDENTIAL_ENDPOINT_ENV_VAR)) != NULL);
+    EXPECT_TRUE((iotCoreCert = GETENV(AWS_IOT_CORE_CERT_ENV_VAR)) != NULL);
+    EXPECT_TRUE((iotCorePrivateKey = GETENV(AWS_IOT_CORE_PRIVATE_KEY_ENV_VAR)) != NULL);
+    EXPECT_TRUE((iotCoreRoleAlias = GETENV(AWS_IOT_CORE_ROLE_ALIAS_ENV_VAR)) != NULL);
+    EXPECT_TRUE((iotThingName = GETENV(AWS_IOT_CORE_THING_NAME_ENV_VAR)) != NULL);
 
     EXPECT_EQ(STATUS_SUCCESS, createDefaultCallbacksProviderWithIotCertificateAndTimeouts(
             iotCoreCredentialEndPoint,
