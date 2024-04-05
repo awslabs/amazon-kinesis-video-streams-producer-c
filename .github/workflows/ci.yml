@@ -5,6 +5,7 @@ on:
     branches:
       - develop
       - master
+      - pre-ut
   pull_request:
     branches:
       - develop
@@ -192,6 +193,7 @@ jobs:
         run: |
           sudo apt clean && sudo apt update
           sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'
+          sudo apt install lcov
       - name: Build repository
         run: |
           mkdir build && cd build
@@ -229,7 +231,15 @@ jobs:
         run: |
           cd build
           for test_file in $(find cproducer.dir kvsCommonCurl.dir kvsCommonLws.dir -name '*.gcno'); do gcov $test_file; done
-          bash <(curl -s https://codecov.io/bash)
+      - name: Generate and process coverage data with lcov
+        run: |
+          cd build
+          lcov --capture --directory CMakeFiles/cproducer.dir --directory CMakeFiles/kvsCommonCurl.dir --directory CMakeFiles/kvsCommonLws.dir --output-file coverage.info
+          lcov --list coverage.info
+          lcov --remove coverage.info '*jsmn*' -o coverage_filtered.info
+          lcov --list coverage_filtered.info
+          rm coverage.info
+          bash <(curl -s https://codecov.io/bash) -f ./coverage_filtered.info -t ${{ secrets.CODECOV_TOKEN }} -Z
 
   address-sanitizer:
     runs-on: ubuntu-20.04
