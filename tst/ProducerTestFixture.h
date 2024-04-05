@@ -4,6 +4,7 @@
 #include "RotatingStaticAuthCallbacks.h"
 
 #define TEST_AUTH_FILE_PATH      (PCHAR) "TEST_KVS_AUTH_FILE_PATH"
+#define SAMPLE_AUTH_FILE_PATH    (PCHAR) "./tst/sample_file_creds.txt"
 #define TEST_STREAM_NAME         (PCHAR) "ScaryTestStream_0"
 #define TEST_DEVICE_INFO_NAME    (PCHAR) "TestDeviceName"
 #define TEST_USER_AGENT          (PCHAR) "Test User Agent"

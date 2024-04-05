@@ -22,3 +22,10 @@ file(GLOB PRODUCER_TEST_SOURCE_FILES "*.cpp")
 
 add_executable(producer_test ${PRODUCER_TEST_SOURCE_FILES})
 target_link_libraries(producer_test cproducer ${GTEST_LIBNAME})
+
+if(BUILD_COMMON_LWS)
+  add_definitions(-DKVS_CA_CERT_PATH="${CMAKE_CURRENT_SOURCE_DIR}/cert.pem")
+  add_definitions(-DCMAKE_DETECTED_CACERT_PATH)
+  target_compile_definitions(producer_test PRIVATE KVS_BUILD_WITH_LWS)
+  target_link_libraries(producer_test kvsCommonLws ${GTEST_LIBNAME})
+endif()
