@@ -41,7 +41,7 @@ TEST_F(RequestInfoTest, removeRequestHeaderApiTest)
 {
     RequestInfo requestInfo;
     AwsCredentials awsCredentials;
-    PCHAR headerName;
+    CHAR headerName[5];
     PCHAR pHostStart, pHostEnd;
     UINT32 len;
     EXPECT_EQ(STATUS_NULL_ARG, removeRequestHeader(NULL, NULL));
