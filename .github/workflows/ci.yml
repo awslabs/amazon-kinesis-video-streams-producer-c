@@ -345,7 +345,7 @@ jobs:
       - name: Build repository
         run: |
           mkdir build && cd build
-          cmake .. -DBUILD_TEST=TRUE
+          cmake .. -DBUILD_TEST=TRUE -DBUILD_COMMON_LWS=ON
           make
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1-node16
