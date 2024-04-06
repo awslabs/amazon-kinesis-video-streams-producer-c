@@ -125,6 +125,157 @@ TEST_F(IoTCredentialTest, createCurlIotCredentialProviderApiTest)
 
 }
 
+#ifdef KVS_BUILD_WITH_LWS
+TEST_F(IoTCredentialTest, createLwsIotCredentialProviderApiTest) {
+    PAwsCredentialProvider pCredentialProvider;
+    PCHAR iotCoreCredentialEndPoint;
+    PCHAR iotCoreCert;
+    PCHAR iotCorePrivateKey;
+    PCHAR iotCoreRoleAlias;
+    PCHAR iotThingName;
+    CHAR invalidCredentialEndpointLength[MAX_URI_CHAR_LEN + 2];
+    CHAR invalidRoleAliasLength[MAX_ROLE_ALIAS_LEN + 2];
+    CHAR invalidPrivateKeyPathLength[MAX_PATH_LEN + 2];
+    CHAR invalidCaCertPathLength[MAX_PATH_LEN + 2];
+    CHAR invalidCoreCertPathLength[MAX_PATH_LEN + 2];
+    CHAR invalidThingNameLength[MAX_IOT_THING_NAME_LEN + 2];
+
+    EXPECT_EQ(STATUS_NULL_ARG, createLwsIotCredentialProvider(NULL,
+                                                             iotCoreCert,
+                                                             iotCorePrivateKey,
+                                                             (PCHAR) DEFAULT_KVS_CACERT_PATH,
+                                                             iotCoreRoleAlias,
+                                                             iotThingName,
+                                                             &pCredentialProvider));
+
+    EXPECT_EQ(STATUS_NULL_ARG, createLwsIotCredentialProvider(NULL,
+                                                              NULL,
+                                                              iotCorePrivateKey,
+                                                              (PCHAR) DEFAULT_KVS_CACERT_PATH,
+                                                              iotCoreRoleAlias,
+                                                              iotThingName,
+                                                              &pCredentialProvider));
+
+    EXPECT_EQ(STATUS_NULL_ARG, createLwsIotCredentialProvider(NULL,
+                                                              NULL,
+                                                              iotCorePrivateKey,
+                                                              (PCHAR) DEFAULT_KVS_CACERT_PATH,
+                                                              iotCoreRoleAlias,
+                                                              iotThingName,
+                                                              &pCredentialProvider));
+
+    EXPECT_EQ(STATUS_NULL_ARG, createLwsIotCredentialProvider(NULL,
+                                                              NULL,
+                                                              NULL,
+                                                              (PCHAR) DEFAULT_KVS_CACERT_PATH,
+                                                              iotCoreRoleAlias,
+                                                              iotThingName,
+                                                              &pCredentialProvider));
+
+    EXPECT_EQ(STATUS_NULL_ARG, createLwsIotCredentialProvider(NULL,
+                                                              NULL,
+                                                              NULL,
+                                                              NULL,
+                                                              iotCoreRoleAlias,
+                                                              iotThingName,
+                                                              &pCredentialProvider));
+
+    EXPECT_EQ(STATUS_NULL_ARG, createLwsIotCredentialProvider(NULL,
+                                                              NULL,
+                                                              NULL,
+                                                              NULL,
+                                                              NULL,
+                                                              iotThingName,
+                                                              &pCredentialProvider));
+
+    EXPECT_EQ(STATUS_NULL_ARG, createLwsIotCredentialProvider(NULL,
+                                                              NULL,
+                                                              NULL,
+                                                              NULL,
+                                                              NULL,
+                                                              NULL,
+                                                              &pCredentialProvider));
+
+    EXPECT_EQ(STATUS_NULL_ARG, createLwsIotCredentialProvider(NULL,
+                                                              NULL,
+                                                              NULL,
+                                                              NULL,
+                                                              NULL,
+                                                              NULL,
+                                                              NULL));
+
+    iotCoreCredentialEndPoint = GETENV("AWS_IOT_CORE_CREDENTIAL_ENDPOINT");
+    iotCoreCert = GETENV("AWS_IOT_CORE_CERT");
+    iotCorePrivateKey = GETENV("AWS_IOT_CORE_PRIVATE_KEY");
+    iotCoreRoleAlias = GETENV("AWS_IOT_CORE_ROLE_ALIAS");
+    iotThingName = GETENV("AWS_IOT_CORE_THING_NAME");
+    MEMSET(invalidCredentialEndpointLength, 'a', SIZEOF(invalidCredentialEndpointLength));
+    MEMSET(invalidRoleAliasLength, 'b', SIZEOF(invalidRoleAliasLength));
+    MEMSET(invalidPrivateKeyPathLength, 'c', SIZEOF(invalidPrivateKeyPathLength));
+    MEMSET(invalidCaCertPathLength, 'd', SIZEOF(invalidCaCertPathLength));
+    MEMSET(invalidCoreCertPathLength, 'e', SIZEOF(invalidCoreCertPathLength));
+    MEMSET(invalidThingNameLength, 'f', SIZEOF(invalidThingNameLength));
+
+    EXPECT_EQ(STATUS_INVALID_ARG, createLwsIotCredentialProvider(invalidCredentialEndpointLength,
+                                                             iotCoreCert,
+                                                             iotCorePrivateKey,
+                                                             (PCHAR) DEFAULT_KVS_CACERT_PATH,
+                                                             iotCoreRoleAlias,
+                                                             iotThingName,
+                                                             &pCredentialProvider));
+    EXPECT_EQ(STATUS_MAX_ROLE_ALIAS_LEN_EXCEEDED, createLwsIotCredentialProvider(iotCoreCredentialEndPoint,
+                                                             iotCoreCert,
+                                                             iotCorePrivateKey,
+                                                             (PCHAR) DEFAULT_KVS_CACERT_PATH,
+                                                             invalidRoleAliasLength,
+                                                             iotThingName,
+                                                             &pCredentialProvider));
+    EXPECT_EQ(STATUS_PATH_TOO_LONG, createLwsIotCredentialProvider(iotCoreCredentialEndPoint,
+                                                             iotCoreCert,
+                                                             invalidPrivateKeyPathLength,
+                                                             (PCHAR) DEFAULT_KVS_CACERT_PATH,
+                                                             iotCoreRoleAlias,
+                                                             iotThingName,
+                                                             &pCredentialProvider));
+    EXPECT_EQ(STATUS_PATH_TOO_LONG, createLwsIotCredentialProvider(iotCoreCredentialEndPoint,
+                                                             iotCoreCert,
+                                                             invalidPrivateKeyPathLength,
+                                                             (PCHAR) DEFAULT_KVS_CACERT_PATH,
+                                                             iotCoreRoleAlias,
+                                                             iotThingName,
+                                                             &pCredentialProvider));
+    EXPECT_EQ(STATUS_PATH_TOO_LONG, createLwsIotCredentialProvider(iotCoreCredentialEndPoint,
+                                                             iotCoreCert,
+                                                             iotCorePrivateKey,
+                                                             invalidCaCertPathLength,
+                                                             iotCoreRoleAlias,
+                                                             iotThingName,
+                                                             &pCredentialProvider));
+    EXPECT_EQ(STATUS_PATH_TOO_LONG, createLwsIotCredentialProvider(iotCoreCredentialEndPoint,
+                                                             invalidCoreCertPathLength,
+                                                             iotCorePrivateKey,
+                                                             (PCHAR) DEFAULT_KVS_CACERT_PATH,
+                                                             iotCoreRoleAlias,
+                                                             iotThingName,
+                                                             &pCredentialProvider));
+    EXPECT_EQ(STATUS_MAX_IOT_THING_NAME_LENGTH, createLwsIotCredentialProvider(iotCoreCredentialEndPoint,
+                                                             iotCoreCert,
+                                                             iotCorePrivateKey,
+                                                             (PCHAR) DEFAULT_KVS_CACERT_PATH,
+                                                             iotCoreRoleAlias,
+                                                             invalidThingNameLength,
+                                                             &pCredentialProvider));
+    EXPECT_EQ(STATUS_SUCCESS, createLwsIotCredentialProvider(iotCoreCredentialEndPoint,
+                                                             iotCoreCert,
+                                                             iotCorePrivateKey,
+                                                             (PCHAR) DEFAULT_KVS_CACERT_PATH,
+                                                             iotCoreRoleAlias,
+                                                             iotThingName,
+                                                             &pCredentialProvider));
+    EXPECT_EQ(STATUS_SUCCESS, freeIotCredentialProvider(&pCredentialProvider));
+}
+#endif
+
 }  // namespace video
 }  // namespace kinesis
 }  // namespace amazonaws
