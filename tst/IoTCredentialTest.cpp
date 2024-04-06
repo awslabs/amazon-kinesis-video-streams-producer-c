@@ -64,6 +64,67 @@ TEST_F(IoTCredentialTest, createDefaultCallbacksProviderWithIotCertificateAndTim
     EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks));
 }
 
+TEST_F(IoTCredentialTest, createCurlIotCredentialProviderApiTest)
+{
+    PAwsCredentialProvider pCredentialProvider = NULL;
+    PCHAR iotCoreCredentialEndPoint;
+    PCHAR iotCoreCert;
+    PCHAR iotCorePrivateKey;
+    PCHAR iotCoreRoleAlias;
+    PCHAR iotThingName;
+
+    EXPECT_EQ(STATUS_NULL_ARG, createCurlIotCredentialProvider(NULL,
+                                                               iotCoreCert,
+                                                               iotCorePrivateKey,
+                                                               NULL,
+                                                               iotCoreRoleAlias,
+                                                               iotThingName,
+                                                               &pCredentialProvider));
+    EXPECT_EQ(STATUS_NULL_ARG, createCurlIotCredentialProvider(NULL,
+                                                               NULL,
+                                                               iotCorePrivateKey,
+                                                               NULL,
+                                                               iotCoreRoleAlias,
+                                                               iotThingName,
+                                                               &pCredentialProvider));
+    EXPECT_EQ(STATUS_NULL_ARG, createCurlIotCredentialProvider(NULL,
+                                                               NULL,
+                                                               NULL,
+                                                               NULL,
+                                                               iotCoreRoleAlias,
+                                                               iotThingName,
+                                                               &pCredentialProvider));
+    EXPECT_EQ(STATUS_NULL_ARG, createCurlIotCredentialProvider(NULL,
+                                                               NULL,
+                                                               NULL,
+                                                               NULL,
+                                                               NULL,
+                                                               iotThingName,
+                                                               &pCredentialProvider));
+    EXPECT_EQ(STATUS_NULL_ARG, createCurlIotCredentialProvider(NULL,
+                                                               NULL,
+                                                               NULL,
+                                                               NULL,
+                                                               NULL,
+                                                               NULL,
+                                                               &pCredentialProvider));
+    EXPECT_EQ(STATUS_NULL_ARG, createCurlIotCredentialProvider(NULL,
+                                                               NULL,
+                                                               NULL,
+                                                               NULL,
+                                                               NULL,
+                                                               NULL,
+                                                               NULL));
+    EXPECT_EQ(STATUS_NULL_ARG, createCurlIotCredentialProvider(NULL,
+                                                               iotCoreCert,
+                                                               iotCorePrivateKey,
+                                                               NULL,
+                                                               iotCoreRoleAlias,
+                                                               iotThingName,
+                                                               &pCredentialProvider));
+
+}
+
 }  // namespace video
 }  // namespace kinesis
 }  // namespace amazonaws
