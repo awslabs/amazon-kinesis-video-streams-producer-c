@@ -22,7 +22,6 @@ option(BUILD_COMMON_CURL "Whether or not to build ProducerC curl common library"
 option(BUILD_OPENSSL_PLATFORM "If buildng OpenSSL what is the target platform" OFF)
 option(LOCAL_OPENSSL_BUILD "Whether or not to use local OpenSSL build" OFF)
 option(CONSTRAINED_DEVICE "Change pthread stack size" OFF)
-option(BUILD_SAMPLE "Build available samples" ON)
 
 # Developer Flags
 option(BUILD_TEST "Build the testing tree." OFF)
@@ -365,19 +364,17 @@ if(BUILD_COMMON_CURL)
       FILES ${CMAKE_CURRENT_BINARY_DIR}/libcproducer.pc
       DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 
-    if(BUILD_SAMPLE)
-        add_executable(kvsVideoOnlyRealtimeStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsVideoOnlyRealtimeStreamingSample.c)
-        target_link_libraries(kvsVideoOnlyRealtimeStreamingSample cproducer)
+    add_executable(kvsVideoOnlyRealtimeStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsVideoOnlyRealtimeStreamingSample.c)
+    target_link_libraries(kvsVideoOnlyRealtimeStreamingSample cproducer)
 
-        add_executable(kvsVideoOnlyOfflineStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsVideoOnlyOfflineStreamingSample.c)
-        target_link_libraries(kvsVideoOnlyOfflineStreamingSample cproducer)
+    add_executable(kvsVideoOnlyOfflineStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsVideoOnlyOfflineStreamingSample.c)
+    target_link_libraries(kvsVideoOnlyOfflineStreamingSample cproducer)
 
-        add_executable(kvsAudioVideoStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsAudioVideoStreamingSample.c)
-        target_link_libraries(kvsAudioVideoStreamingSample cproducer)
+    add_executable(kvsAudioVideoStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsAudioVideoStreamingSample.c)
+    target_link_libraries(kvsAudioVideoStreamingSample cproducer)
 
-        add_executable(kvsAudioOnlyStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsAudioOnlyStreamingSample.c)
-        target_link_libraries(kvsAudioOnlyStreamingSample cproducer)
-    endif()
+    add_executable(kvsAudioOnlyStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsAudioOnlyStreamingSample.c)
+    target_link_libraries(kvsAudioOnlyStreamingSample cproducer)
 
     if (BUILD_TEST)
         add_subdirectory(tst)
