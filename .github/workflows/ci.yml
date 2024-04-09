@@ -388,7 +388,7 @@ jobs:
           role-duration-seconds: 10800
       - name: Run tests
         run: |
-          .\D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\scripts\get-iot-certs-windows.bat ci
+          scripts/get-iot-certs-windows.bat ci
           $env:Path += ';C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;C:\Program Files\NASM;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\lib;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\bin'
           & "D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\build\tst\producer_test.exe" --gtest_filter="-ProducerFunctionalityTest.pressure_on_buffer_duration_fail_new_connection_at_token_rotation"
 #  arm64-cross-compilation:

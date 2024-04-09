@@ -1,4 +1,5 @@
 #include "ProducerTestFixture.h"
+#include "src/source/Common/IotCredentialProvider.h"
 
 namespace com { namespace amazonaws { namespace kinesis { namespace video {
 
@@ -125,6 +126,34 @@ TEST_F(IoTCredentialTest, createCurlIotCredentialProviderApiTest)
 
 }
 
+
+TEST_F(IoTCredentialTest, createCurlIotCredentialProviderWithTimeAndTimeoutApiTest) {
+    PAwsCredentialProvider pCredentialProvider = NULL;
+    PCHAR iotCoreCredentialEndPoint = NULL;
+    PCHAR iotCoreCert = NULL;
+    PCHAR iotCorePrivateKey = NULL;
+    PCHAR iotCoreRoleAlias = NULL;
+    PCHAR iotThingName = NULL;
+
+    EXPECT_TRUE((iotCoreCredentialEndPoint = GETENV(AWS_IOT_CORE_CREDENTIAL_ENDPOINT_ENV_VAR)) != NULL);
+    EXPECT_TRUE((iotCoreCert = GETENV(AWS_IOT_CORE_CERT_ENV_VAR)) != NULL);
+    EXPECT_TRUE((iotCorePrivateKey = GETENV(AWS_IOT_CORE_PRIVATE_KEY_ENV_VAR)) != NULL);
+    EXPECT_TRUE((iotCoreRoleAlias = GETENV(AWS_IOT_CORE_ROLE_ALIAS_ENV_VAR)) != NULL);
+    EXPECT_TRUE((iotThingName = GETENV(AWS_IOT_CORE_THING_NAME_ENV_VAR)) != NULL);
+
+    EXPECT_EQ(STATUS_SUCCESS, createCurlIotCredentialProviderWithTimeAndTimeout(iotCoreCredentialEndPoint, iotCoreCert,
+                                                                                iotCorePrivateKey, NULL,
+                                                                                iotCoreRoleAlias,
+                                                                                iotThingName,
+                                                                                10 * HUNDREDS_OF_NANOS_IN_A_SECOND,
+                                                                                5 * HUNDREDS_OF_NANOS_IN_A_SECOND, NULL,
+                                                                                0,
+                                                                                &pCredentialProvider)
+    );
+    EXPECT_EQ(IOT_REQUEST_CONNECTION_TIMEOUT, reinterpret_cast<IotCredentialProvider*>(pCredentialProvider)->connectionTimeout);
+    EXPECT_EQ(IOT_REQUEST_COMPLETION_TIMEOUT, reinterpret_cast<IotCredentialProvider*>(pCredentialProvider)->completionTimeout);
+    EXPECT_EQ(STATUS_SUCCESS, freeIotCredentialProvider(&pCredentialProvider));
+}
 #ifdef KVS_BUILD_WITH_LWS
 TEST_F(IoTCredentialTest, createLwsIotCredentialProviderApiTest) {
     PAwsCredentialProvider pCredentialProvider;
@@ -279,4 +308,4 @@ TEST_F(IoTCredentialTest, createLwsIotCredentialProviderApiTest) {
 }  // namespace video
 }  // namespace kinesis
 }  // namespace amazonaws
-}  // namespace com;
+}  // namespace com
