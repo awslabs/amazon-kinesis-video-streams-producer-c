@@ -24,37 +24,37 @@ jobs:
 #        run: |
 #          bash scripts/check-clang.sh
 #
-#  mac-os-build-gcc:
-#    runs-on: macos-12
-#    permissions:
-#      id-token: write
-#      contents: read
-#    env:
-#      CC: /usr/local/bin/gcc-13
-#      CXX: /usr/local/bin/g++-13
-#      AWS_KVS_LOG_LEVEL: 2
-#    steps:
-#      - name: Clone repository
-#        uses: actions/checkout@v3
-#      - name: Build repository
-#        run: |
-#          brew install pkgconfig
-#          brew unlink openssl # it seems the libcurl is trying to access this openssl despite explicitly setting it to our build
-#          mkdir build && cd build
-#          cmake .. --trace -DBUILD_TEST=TRUE
-#          make
-#      - name: Configure AWS Credentials
-#        uses: aws-actions/configure-aws-credentials@v1-node16
-#        with:
-#          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-#          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-#          aws-region: ${{ secrets.AWS_REGION }}
-#          role-duration-seconds: 10800
-#      - name: Run tests
-#        run: |
-#          cd build
-#          source ../scripts/get-iot-certs.sh ci
-#          ./tst/producer_test
+  mac-os-build-gcc:
+    runs-on: macos-12
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      CC: /usr/local/bin/gcc-13
+      CXX: /usr/local/bin/g++-13
+      AWS_KVS_LOG_LEVEL: 2
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+      - name: Build repository
+        run: |
+          brew install pkgconfig
+          brew unlink openssl # it seems the libcurl is trying to access this openssl despite explicitly setting it to our build
+          mkdir build && cd build
+          cmake .. --trace -DBUILD_TEST=TRUE
+          make
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-duration-seconds: 10800
+      - name: Run tests
+        run: |
+          cd build
+          source ../scripts/get-iot-certs.sh ci
+          ./tst/producer_test
 #
 #  mac-os-build-clang:
 #    runs-on: macos-11
