@@ -154,6 +154,7 @@ TEST_F(IoTCredentialTest, createCurlIotCredentialProviderWithTimeAndTimeoutApiTe
     EXPECT_EQ(IOT_REQUEST_COMPLETION_TIMEOUT, reinterpret_cast<IotCredentialProvider*>(pCredentialProvider)->completionTimeout);
     EXPECT_EQ(STATUS_SUCCESS, freeIotCredentialProvider(&pCredentialProvider));
 }
+
 #ifdef KVS_BUILD_WITH_LWS
 TEST_F(IoTCredentialTest, createLwsIotCredentialProviderApiTest) {
     PAwsCredentialProvider pCredentialProvider;
