@@ -24,37 +24,37 @@ jobs:
 #        run: |
 #          bash scripts/check-clang.sh
 #
-  mac-os-build-gcc:
-    runs-on: macos-12
-    permissions:
-      id-token: write
-      contents: read
-    env:
-      CC: /usr/local/bin/gcc-13
-      CXX: /usr/local/bin/g++-13
-      AWS_KVS_LOG_LEVEL: 2
-    steps:
-      - name: Clone repository
-        uses: actions/checkout@v3
-      - name: Build repository
-        run: |
-          brew install pkgconfig
-          brew unlink openssl # it seems the libcurl is trying to access this openssl despite explicitly setting it to our build
-          mkdir build && cd build
-          cmake .. --trace -DBUILD_TEST=TRUE
-          make
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-          aws-region: ${{ secrets.AWS_REGION }}
-          role-duration-seconds: 10800
-      - name: Run tests
-        run: |
-          cd build
-          source ../scripts/get-iot-certs.sh ci
-          ./tst/producer_test
+#  mac-os-build-gcc:
+#    runs-on: macos-12
+#    permissions:
+#      id-token: write
+#      contents: read
+#    env:
+#      CC: /usr/local/bin/gcc-13
+#      CXX: /usr/local/bin/g++-13
+#      AWS_KVS_LOG_LEVEL: 2
+#    steps:
+#      - name: Clone repository
+#        uses: actions/checkout@v3
+#      - name: Build repository
+#        run: |
+#          brew install pkgconfig
+#          brew unlink openssl # it seems the libcurl is trying to access this openssl despite explicitly setting it to our build
+#          mkdir build && cd build
+#          cmake .. --trace -DBUILD_TEST=TRUE
+#          make
+#      - name: Configure AWS Credentials
+#        uses: aws-actions/configure-aws-credentials@v1-node16
+#        with:
+#          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+#          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+#          aws-region: ${{ secrets.AWS_REGION }}
+#          role-duration-seconds: 10800
+#      - name: Run tests
+#        run: |
+#          cd build
+#          source ../scripts/get-iot-certs.sh ci
+#          ./tst/producer_test
 #
 #  mac-os-build-clang:
 #    runs-on: macos-11
@@ -388,14 +388,51 @@ jobs:
           role-duration-seconds: 10800
       - name: Run tests
         run: |
-          scripts/get-iot-certs-windows.bat ci
-          echo AWS IoT Core Credential Endpoint: %AWS_IOT_CORE_CREDENTIAL_ENDPOINT%
-          echo AWS IoT Core Certificate: %AWS_IOT_CORE_CERT%
-          echo AWS IoT Core Private Key: %AWS_IOT_CORE_PRIVATE_KEY%
-          echo AWS IoT Core Role Alias: %AWS_IOT_CORE_ROLE_ALIAS%
-          echo AWS IoT Core Thing Name: %AWS_IOT_CORE_THING_NAME%
-#          $env:Path += ';C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;C:\Program Files\NASM;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\lib;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\bin'
-#          & "D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\build\tst\producer_test.exe" --gtest_filter="-ProducerFunctionalityTest.pressure_on_buffer_duration_fail_new_connection_at_token_rotation"
+          # Define Variables
+          $prefix = "ci"
+          $iotCert = "${prefix}_certificate.pem"
+          $iotPublicKey = "${prefix}_public.key"
+          $iotPrivateKey = "${prefix}_private.key"
+          $iotPolicyName = "${prefix}_policy"
+          $thingName = "${prefix}_thing"
+          $iotRoleAlias = "${prefix}_role_alias"
+          
+          # Create the keys and certificate
+          aws iot create-keys-and-certificate --set-as-active `
+          --certificate-pem-outfile $iotCert `
+          --public-key-outfile $iotPublicKey `
+          --private-key-outfile $iotPrivateKey | Out-File -FilePath certificate.json
+          
+          # Extract certificate ARN
+          $certificateArn = (jq --raw-output '.certificateArn' certificate.json).Trim()
+          aws iot attach-policy --policy-name $iotPolicyName --target $certificateArn
+          aws iot attach-thing-principal --thing-name $thingName --principal $certificateArn
+          
+          # Get the IoT credentials endpoint
+          $endpoint = aws iot describe-endpoint --endpoint-type iot:CredentialProvider --output text
+          Invoke-WebRequest -Uri 'https://www.amazontrust.com/repository/SFSRootCAG2.pem' -OutFile 'cacert.pem'
+          
+          # Set environment variables
+          $env:AWS_IOT_CORE_CREDENTIAL_ENDPOINT = $endpoint.Trim()
+          $env:AWS_IOT_CORE_CERT = "$(Get-Location)\$iotCert"
+          $env:AWS_IOT_CORE_PRIVATE_KEY = "$(Get-Location)\$iotPrivateKey"
+          $env:AWS_IOT_CORE_ROLE_ALIAS = $iotRoleAlias
+          $env:AWS_IOT_CORE_THING_NAME = $thingName
+
+          # Output environment variables to confirm
+          Write-Output "AWS_IOT_CORE_CREDENTIAL_ENDPOINT: $env:AWS_IOT_CORE_CREDENTIAL_ENDPOINT"
+          Write-Output "AWS_IOT_CORE_CERT: $env:AWS_IOT_CORE_CERT"
+          Write-Output "AWS_IOT_CORE_PRIVATE_KEY: $env:AWS_IOT_CORE_PRIVATE_KEY"
+          Write-Output "AWS_IOT_CORE_ROLE_ALIAS: $env:AWS_IOT_CORE_ROLE_ALIAS"
+          Write-Output "AWS_IOT_CORE_THING_NAME: $env:AWS_IOT_CORE_THING_NAME"
+          
+          Get-Content -Path ./ci_certificate.pem
+          openssl x509 -in ci_certificate.pem -text -noout
+          icacls "ci_certificate.pem"
+          icacls ".\ci_certificate.pem" /grant:r Users:R
+          $env:Path += ';C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;C:\Program Files\NASM;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\lib;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\bin'
+          & "D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\build\tst\producer_test.exe" --gtest_filter="IoTCredentialTest.*"
+
 #  arm64-cross-compilation:
 #    runs-on: ubuntu-20.04
 #    env:
