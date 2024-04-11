@@ -93,6 +93,24 @@ TEST_F(AwsV4SignerTest, uriDecodeStringApiTest)
     EXPECT_EQ(STATUS_INVALID_ARG, uriDecodeString(invalidSource, STRLEN(invalidSource), invalidSrcDest, &invalidSrcDestLen));
 }
 
+TEST_F(AwsV4SignerTest, uriEncodeStringApiTest)
+{
+    CHAR input[] = "$";
+    CHAR outputInvalid[2] = {'\0'}; // Space required for 3 characters + '\0' . But reserved only for 2
+    CHAR outputValid[4] = {'\0'};
+    UINT32 outputInvalidLength = SIZEOF(outputInvalid);
+    UINT32 outputValidLength = SIZEOF(outputValid);
+    EXPECT_EQ(STATUS_NOT_ENOUGH_MEMORY, uriEncodeString(input, STRLEN(input), outputInvalid, &outputInvalidLength));
+    EXPECT_EQ(STATUS_SUCCESS, uriEncodeString(input, STRLEN(input), outputValid, &outputValidLength));
+}
+TEST_F(AwsV4SignerTest, getRequestVerbStringApiTest)
+{
+    EXPECT_STREQ(HTTP_REQUEST_VERB_PUT_STRING, getRequestVerbString(HTTP_REQUEST_VERB_PUT));
+    EXPECT_STREQ(HTTP_REQUEST_VERB_GET_STRING, getRequestVerbString(HTTP_REQUEST_VERB_GET));
+    EXPECT_STREQ(HTTP_REQUEST_VERB_POST_STRING, getRequestVerbString(HTTP_REQUEST_VERB_POST));
+    EXPECT_EQ(NULL, getRequestVerbString((HTTP_REQUEST_VERB) 0xffff));
+}
+
 }  // namespace video
 }  // namespace kinesis
 }  // namespace amazonaws
