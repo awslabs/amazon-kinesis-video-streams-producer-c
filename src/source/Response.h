@@ -109,14 +109,6 @@ STATUS freeCurlResponse(PCurlResponse*);
 STATUS closeCurlHandles(PCurlResponse);
 
 /**
- * Debug prints statistics of the request/response
- *
- * @param - PCurlResponse - IN - Response object
- *
- */
-VOID dumpResponseCurlEasyInfo(PCurlResponse);
-
-/**
  * Terminates the ongoing curl session
  *
  * @param - PCurlResponse - IN - Response object
