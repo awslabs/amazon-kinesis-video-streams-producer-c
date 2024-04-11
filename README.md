@@ -138,10 +138,11 @@ This will stream the audio files from the `samples/aacSampleFrames` or `samples/
 
 To run the samples with IoT credential provider:
 
-1. Run the IoT thing generation script available under `scripts`: `source scripts/generate-iot-credential.sh`. For more information on IoT set up, visit [AWS KVS IoT Set up](https://docs.aws.amazon.com/kinesisvideostreams/latest/dg/how-iot.html)
-2. Uncomment `#define IOT_CORE_ENABLE_CREDENTIALS 1` in the relevant sample
-3. Build the changes: `make`
-4. Run the sample using the instructions in previous section.
+1. Run the IoT thing generation script available under `scripts`: `source scripts/generate-iot-credential.sh`.
+2. Then run `source scripts/get-iot-certs.sh` to generate the certs and set the relevant envs. For more information on IoT set up, visit [AWS KVS IoT Set up](https://docs.aws.amazon.com/kinesisvideostreams/latest/dg/how-iot.html)
+3. Uncomment `#define IOT_CORE_ENABLE_CREDENTIALS 1` in the relevant sample
+4. Build the changes: `make`
+5. Run the sample using the instructions in previous section.
 
 ### Fragment metadata
 
