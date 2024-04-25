@@ -1011,7 +1011,7 @@ STATUS generateRequestHmac(PBYTE key, UINT32 keyLen, PBYTE message, UINT32 messa
 #if defined(KVS_USE_MBEDTLS)
     const mbedtls_md_info_t* info = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
     if(info == NULL) {
-        DLOGI("Null ctx");
+        DLOGI("Null ctx...%d", MBEDTLS_MD_SHA256);
     }
     int ret = mbedtls_md_hmac(info, key, keyLen, message, messageLen, outBuffer);
     hmacLen = mbedtls_md_get_size(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256));
