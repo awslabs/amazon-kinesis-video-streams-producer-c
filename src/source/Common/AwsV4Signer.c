@@ -1007,7 +1007,20 @@ STATUS generateRequestHmac(PBYTE key, UINT32 keyLen, PBYTE message, UINT32 messa
     if(outBuffer == NULL) {
         DLOGI("Null outbuffer");
     }
-    KVS_HMAC(key, keyLen, message, messageLen, outBuffer, &hmacLen);
+//    KVS_HMAC(key, keyLen, message, messageLen, outBuffer, &hmacLen);
+#if defined(KVS_USE_MBEDTLS)
+    const mbedtls_md_info_t* info = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
+    if(info == NULL) {
+        DLOGI("Null ctx");
+    }
+    int ret = mbedtls_md_hmac(info, key, keyLen, message, messageLen, outBuffer);
+    hmacLen = mbedtls_md_get_size(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256));
+    DLOGI("mbedtls_md_hmac returned %d", ret);
+    if(ret != 0) {
+        retStatus = STATUS_HMAC_GENERATION_ERROR;
+        goto CleanUp;
+    }
+#endif
     *pHmacLen = hmacLen;
 
 CleanUp:
