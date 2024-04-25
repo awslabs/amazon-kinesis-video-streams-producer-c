@@ -71,6 +71,9 @@ STATUS generateAwsSigV4Signature(PRequestInfo pRequestInfo, PCHAR dateTimeStr, B
     curSize += pRequestInfo->pAwsCredentials->secretKeyLen;
 
     hmacSize = SIZEOF(hmac);
+    DLOGI("BEFORE");
+    const mbedtls_md_info_t* info1 = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
+    DLOGI("AFTER");
     CHK_STATUS(generateRequestHmac((PBYTE) pScratchBuf, curSize, (PBYTE) dateTimeStr, SIGNATURE_DATE_STRING_LEN * SIZEOF(CHAR), hmac, &hmacSize));
     CHK_STATUS(generateRequestHmac(hmac, hmacSize, (PBYTE) pRequestInfo->region, (UINT32) STRLEN(pRequestInfo->region), hmac, &hmacSize));
     CHK_STATUS(generateRequestHmac(hmac, hmacSize, (PBYTE) KINESIS_VIDEO_SERVICE_NAME, (UINT32) STRLEN(KINESIS_VIDEO_SERVICE_NAME), hmac, &hmacSize));
@@ -1009,17 +1012,19 @@ STATUS generateRequestHmac(PBYTE key, UINT32 keyLen, PBYTE message, UINT32 messa
     }
 //    KVS_HMAC(key, keyLen, message, messageLen, outBuffer, &hmacLen);
 #if defined(KVS_USE_MBEDTLS)
+    DLOGI("Before get info");
     const mbedtls_md_info_t* info = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
-    if(info == NULL) {
-        DLOGI("Null ctx...%d", MBEDTLS_MD_SHA256);
-    }
-    int ret = mbedtls_md_hmac(info, key, keyLen, message, messageLen, outBuffer);
-    hmacLen = mbedtls_md_get_size(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256));
-    DLOGI("mbedtls_md_hmac returned %d", ret);
-    if(ret != 0) {
-        retStatus = STATUS_HMAC_GENERATION_ERROR;
-        goto CleanUp;
-    }
+    DLOGI("After get info");
+//    if(info == NULL) {
+//        DLOGI("Null ctx...%d", MBEDTLS_MD_SHA256);
+//    }
+//    int ret = mbedtls_md_hmac(info, key, keyLen, message, messageLen, outBuffer);
+//    hmacLen = mbedtls_md_get_size(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256));
+//    DLOGI("mbedtls_md_hmac returned %d", ret);
+//    if(ret != 0) {
+//        retStatus = STATUS_HMAC_GENERATION_ERROR;
+//        goto CleanUp;
+//    }
 #endif
     *pHmacLen = hmacLen;
 

@@ -28,7 +28,6 @@ extern "C" {
 
 #include <mbedtls/sha256.h>
 #include <mbedtls/md.h>
-#include <mbedtls/config.h>
 #define KVS_HMAC(k, klen, m, mlen, ob, plen)                                                                                                         \
     CHK(0 == mbedtls_md_hmac(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256), (k), (klen), (m), (mlen), (ob)), STATUS_HMAC_GENERATION_ERROR);           \
     *(plen) = mbedtls_md_get_size(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256));
