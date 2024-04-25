@@ -994,6 +994,19 @@ STATUS generateRequestHmac(PBYTE key, UINT32 keyLen, PBYTE message, UINT32 messa
 
     *pHmacLen = 0;
 
+    if(key == NULL) {
+        DLOGI("Null key");
+    }
+    if(message == NULL) {
+        DLOGI("Null message");
+    }
+    if(messageLen == 0)
+    {
+        DLOGI("Null message len");
+    }
+    if(outBuffer == NULL) {
+        DLOGI("Null outbuffer");
+    }
     KVS_HMAC(key, keyLen, message, messageLen, outBuffer, &hmacLen);
     *pHmacLen = hmacLen;
 
