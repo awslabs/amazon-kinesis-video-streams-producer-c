@@ -11,7 +11,7 @@ on:
       - master
 jobs:
   clang-format-check:
-    runs-on: macos-11
+    runs-on: macos-latest
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
@@ -24,20 +24,19 @@ jobs:
           bash scripts/check-clang.sh
 
   mac-os-build-gcc:
-    runs-on: macos-12
+    runs-on: macos-latest
     permissions:
       id-token: write
       contents: read
     env:
-      CC: /usr/local/bin/gcc-13
-      CXX: /usr/local/bin/g++-13
+      CC: gcc-13
+      CXX: g++-13
       AWS_KVS_LOG_LEVEL: 2
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
       - name: Build repository
         run: |
-          brew install pkgconfig
           brew unlink openssl # it seems the libcurl is trying to access this openssl despite explicitly setting it to our build
           mkdir build && cd build
           cmake .. --trace -DBUILD_TEST=TRUE
@@ -55,7 +54,7 @@ jobs:
           ./tst/producer_test
 
   mac-os-build-clang:
-    runs-on: macos-11
+    runs-on: macos-latest
     env:
       AWS_KVS_LOG_LEVEL: 2
     permissions:
@@ -66,7 +65,6 @@ jobs:
         uses: actions/checkout@v3
       - name: Build repository
         run: |
-          brew install pkgconfig
           brew unlink openssl # it seems the libcurl is trying to access this openssl despite explicitly setting it to our build
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE
@@ -95,10 +93,9 @@ jobs:
         uses: actions/checkout@v3
       - name: Build repository
         run: |
-          brew install pkgconfig
           brew unlink openssl # it seems the libcurl is trying to access this openssl despite explicitly setting it to our build
           mkdir build && cd build
-          sh -c 'cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DCMAKE_C_COMPILER=$(brew --prefix llvm@15)/bin/clang -DCMAKE_CXX_COMPILER=$(brew --prefix llvm@15)/bin/clang++;cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DCMAKE_C_COMPILER=$(brew --prefix llvm@15)/bin/clang -DCMAKE_CXX_COMPILER=$(brew --prefix llvm@15)/bin/clang++'
+          cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DCMAKE_C_COMPILER=$(brew --prefix llvm@15)/bin/clang -DCMAKE_CXX_COMPILER=$(brew --prefix llvm@15)/bin/clang++
           make
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -112,14 +109,14 @@ jobs:
           cd build
           ./tst/producer_test
 
-  mac-os-build-gcc-local-openssl:
-    runs-on: macos-11
+  mac-os-build-gcc-system-openssl:
+    runs-on: macos-latest
     permissions:
       id-token: write
       contents: read
     env:
-      CC: /usr/local/bin/gcc-13
-      CXX: /usr/local/bin/g++-13
+      CC: gcc-13
+      CXX: g++-13
       AWS_KVS_LOG_LEVEL: 2
       LDFLAGS: -L/usr/local/opt/openssl@3/lib
       CPPFLAGS: -I/usr/local/opt/openssl@3/include
@@ -131,7 +128,7 @@ jobs:
         run: |
           brew info openssl
           mkdir build && cd build
-          cmake .. -DBUILD_TEST=TRUE -DLOCAL_OPENSSL_BUILD=ON
+          cmake .. -DBUILD_TEST=TRUE -DBUILD_CRYPTO=FALSE
           make
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -145,7 +142,7 @@ jobs:
           cd build
           ./tst/producer_test
 
-  mac-os-build-clang-local-openssl:
+  mac-os-build-clang-system-openssl:
     runs-on: macos-latest
     env:
       AWS_KVS_LOG_LEVEL: 2
@@ -160,9 +157,10 @@ jobs:
         uses: actions/checkout@v3
       - name: Build repository
         run: |
+          brew install googletest
           brew info openssl
           mkdir build && cd build
-          cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DLOCAL_OPENSSL_BUILD=ON
+          cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DBUILD_CRYPTO=FALSE
           make
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -175,6 +173,52 @@ jobs:
         run: |
           cd build
           ./tst/producer_test
+
+  # Producer is not compatible with latest CURL, so build only, don't run tests.
+  mac-os-build-gcc-system-deps:
+    runs-on: macos-latest
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      CC: gcc-13
+      CXX: g++-13
+      AWS_KVS_LOG_LEVEL: 2
+      LDFLAGS: -L/usr/local/opt/openssl@3/lib
+      CPPFLAGS: -I/usr/local/opt/openssl@3/include
+      OPENSSL_ROOT_DIR: /usr/local/opt/openssl@3/
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+      - name: Build repository
+        run: |
+          brew install googletest
+          brew info openssl
+          mkdir build && cd build
+          cmake .. -DBUILD_TEST=TRUE -DBUILD_DEPENDENCIES=FALSE
+          make
+
+  # Producer is not compatible with latest CURL, so build only, don't run tests.
+  mac-os-build-clang-system-deps:
+    runs-on: macos-latest
+    env:
+      AWS_KVS_LOG_LEVEL: 2
+      LDFLAGS: -L/usr/local/opt/openssl@3/lib
+      CPPFLAGS: -I/usr/local/opt/openssl@3/include
+      OPENSSL_ROOT_DIR: /usr/local/opt/openssl@3/
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+      - name: Build repository
+        run: |
+          brew install googletest
+          brew info openssl
+          mkdir build && cd build
+          cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DBUILD_DEPENDENCIES=FALSE
+          make
 
   ubuntu-os-gcc-build-lws-mbedtls:
     runs-on: ubuntu-20.04
@@ -391,13 +435,18 @@ jobs:
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
+      - name: Move cloned repo # to shorten path length for Windows OS
+        run: |
+          git config --system core.longpaths true
+          mkdir C:\amazon-kinesis-video-streams-producer-c
+          Move-Item -Path "D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\*" -Destination "C:\amazon-kinesis-video-streams-producer-c"
       - name: Install dependencies
         run: |
           choco install nasm strawberryperl pkgconfiglite
       - name: Build repository
         run: |
-          $env:Path += ';C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;C:\Program Files\NASM;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\lib;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\bin'
-          git config --system core.longpaths true
+          $env:Path += ';C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;C:\Program Files\NASM;C:\amazon-kinesis-video-streams-producer-c\open-source\lib;C:\amazon-kinesis-video-streams-producer-c\open-source\bin'
+          cd C:\amazon-kinesis-video-streams-producer-c
           .github/build_windows.bat
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -408,8 +457,8 @@ jobs:
           role-duration-seconds: 10800
       - name: Run tests
         run: |
-          $env:Path += ';C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;C:\Program Files\NASM;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\lib;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\bin'
-          & "D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\build\tst\producer_test.exe" --gtest_filter="-ProducerFunctionalityTest.pressure_on_buffer_duration_fail_new_connection_at_token_rotation"
+          $env:Path += ';C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;C:\Program Files\NASM;C:\amazon-kinesis-video-streams-producer-c\open-source\lib;C:\amazon-kinesis-video-streams-producer-c\open-source\bin'
+          & "C:\amazon-kinesis-video-streams-producer-c\build\tst\producer_test.exe" --gtest_filter="-ProducerFunctionalityTest.pressure_on_buffer_duration_fail_new_connection_at_token_rotation"
 
   arm64-cross-compilation:
     runs-on: ubuntu-20.04
@@ -430,6 +479,7 @@ jobs:
           cmake .. -DBUILD_TEST=TRUE -DBUILD_OPENSSL_PLATFORM=linux-generic64
           make
           file libcproducer.so
+
   linux-aarch64-cross-compilation:
     runs-on: ubuntu-20.04
     env:
@@ -449,6 +499,7 @@ jobs:
           cmake .. -DBUILD_TEST=TRUE -DBUILD_OPENSSL_PLATFORM=linux-aarch64
           make
           file libcproducer.so
+          
   arm32-cross-compilation:
     runs-on: ubuntu-20.04
     env:
