@@ -36,6 +36,7 @@ option(SET_SSL_CALLBACKS "Set SSL thread and lock callbacks." OFF)
 
 set(TYPE_OF_LIB SHARED)
 if (BUILD_STATIC)
+    message(STATUS "Static build")
   set(TYPE_OF_LIB STATIC)
 endif()
 
