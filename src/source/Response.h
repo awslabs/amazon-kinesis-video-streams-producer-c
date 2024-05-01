@@ -115,6 +115,12 @@ STATUS closeCurlHandles(PCurlResponse);
  * @param - UINT64 - IN - Timeout value to use in 100ns
  *
  */
+
+/* @param - PCurlResponse - IN - Response object
+ *
+ * VOID dumpResponseCurlEasyInfo(PCurlResponse);
+ */
+
 VOID terminateCurlSession(PCurlResponse, UINT64);
 
 /**

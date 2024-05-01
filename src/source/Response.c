@@ -282,6 +282,80 @@ VOID terminateCurlSession(PCurlResponse pCurlResponse, UINT64 timeout)
     }
 }
 
+/* UNCOMMENT if required to use for CURL debugging. Not used at the moment.
+VOID dumpResponseCurlEasyInfo(PCurlResponse pCurlResponse)
+{
+    DOUBLE time;
+    curl_off_t value;
+    CURLcode ret;
+
+    if (pCurlResponse != NULL) {
+        ret = curl_easy_getinfo(pCurlResponse->pCurl, CURLINFO_TOTAL_TIME, &time);
+        if (ret == CURLE_OK) {
+            DLOGI("TOTAL_TIME: %f", time);
+        } else {
+            DLOGW("Unable to dump TOTAL_TIME");
+        }
+
+        ret = curl_easy_getinfo(pCurlResponse->pCurl, CURLINFO_NAMELOOKUP_TIME, &time);
+        if (ret == CURLE_OK) {
+            DLOGI("NAMELOOKUP_TIME: %f", time);
+        } else {
+            DLOGW("Unable to dump NAMELOOKUP_TIME");
+        }
+
+        ret = curl_easy_getinfo(pCurlResponse->pCurl, CURLINFO_CONNECT_TIME, &time);
+        if (ret == CURLE_OK) {
+            DLOGI("CONNECT_TIME: %f", time);
+        } else {
+            DLOGW("Unable to dump CONNECT_TIME");
+        }
+
+        ret = curl_easy_getinfo(pCurlResponse->pCurl, CURLINFO_APPCONNECT_TIME, &time);
+        if (ret == CURLE_OK) {
+            DLOGI("APPCONNECT_TIME: %f", time);
+        } else {
+            DLOGW("Unable to dump APPCONNECT_TIME");
+        }
+
+        ret = curl_easy_getinfo(pCurlResponse->pCurl, CURLINFO_PRETRANSFER_TIME, &time);
+        if (ret == CURLE_OK) {
+            DLOGI("PRETRANSFER_TIME: %f", time);
+        } else {
+            DLOGW("Unable to dump PRETRANSFER_TIME");
+        }
+
+        ret = curl_easy_getinfo(pCurlResponse->pCurl, CURLINFO_STARTTRANSFER_TIME, &time);
+        if (ret == CURLE_OK) {
+            DLOGI("STARTTRANSFER_TIME: %f", time);
+        } else {
+            DLOGW("Unable to dump STARTTRANSFER_TIME");
+        }
+
+        ret = curl_easy_getinfo(pCurlResponse->pCurl, CURLINFO_REDIRECT_TIME, &time);
+        if (ret == CURLE_OK) {
+            DLOGI("REDIRECT_TIME: %f", time);
+        } else {
+            DLOGW("Unable to dump REDIRECT_TIME");
+        }
+
+        ret = curl_easy_getinfo(pCurlResponse->pCurl, CURLINFO_SPEED_UPLOAD_T, &value);
+        if (ret == CURLE_OK) {
+            DLOGI("CURLINFO_SPEED_UPLOAD: %" CURL_FORMAT_CURL_OFF_T, value);
+        } else {
+            DLOGW("Unable to dump CURLINFO_SPEED_UPLOAD");
+        }
+
+        ret = curl_easy_getinfo(pCurlResponse->pCurl, CURLINFO_SIZE_UPLOAD_T, &value);
+        if (ret == CURLE_OK) {
+            DLOGI("CURLINFO_SIZE_UPLOAD: %" CURL_FORMAT_CURL_OFF_T, value);
+        } else {
+            DLOGW("Unable to dump CURLINFO_SIZE_UPLOAD");
+        }
+    }
+}
+ */
+
 SERVICE_CALL_RESULT getServiceCallResultFromCurlStatus(CURLcode curlStatus)
 {
     switch (curlStatus) {
