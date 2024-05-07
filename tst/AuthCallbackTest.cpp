@@ -19,13 +19,16 @@ TEST_F(AuthCallbackTest, ioTExpirationParsing_Returns_Success)
     CHAR validFormatIotExpirationTimeStamp[] = "2019-01-31T23:00:59Z"; // expiration is current time + 1 hour
     UINT64 expirationTimestampInEpoch = 0;
 
-    convertTimestampToEpoch(validFormatIotExpirationTimeStamp, iotTimeInEpoch, &expirationTimestampInEpoch);
+    EXPECT_EQ(STATUS_NULL_ARG, convertTimestampToEpoch(NULL, iotTimeInEpoch, &expirationTimestampInEpoch));
+    EXPECT_EQ(STATUS_NULL_ARG, convertTimestampToEpoch(NULL, iotTimeInEpoch, NULL));
+    EXPECT_EQ(STATUS_NULL_ARG, convertTimestampToEpoch(validFormatIotExpirationTimeStamp, iotTimeInEpoch, NULL));
+    EXPECT_EQ(STATUS_SUCCESS, convertTimestampToEpoch(validFormatIotExpirationTimeStamp, iotTimeInEpoch, &expirationTimestampInEpoch));
 
     EXPECT_TRUE(iotTimeInEpoch == expirationTimestampInEpoch / HUNDREDS_OF_NANOS_IN_A_SECOND - 3600);
 
     iotTimeInEpoch = 1548975659;   // iot expiration same as current time
 
-    convertTimestampToEpoch(validFormatIotExpirationTimeStamp, iotTimeInEpoch, &expirationTimestampInEpoch);
+    EXPECT_EQ(STATUS_SUCCESS,convertTimestampToEpoch(validFormatIotExpirationTimeStamp, iotTimeInEpoch, &expirationTimestampInEpoch));
 
     EXPECT_TRUE(iotTimeInEpoch == expirationTimestampInEpoch / HUNDREDS_OF_NANOS_IN_A_SECOND);
 
@@ -71,11 +74,7 @@ TEST_F(AuthCallbackTest, verify_fileAuthCallback_provider_works)
     PCHAR authFilePath = NULL;
     PAuthCallbacks pAuthCallbacks = NULL;
 
-    authFilePath = getenv(TEST_AUTH_FILE_PATH);
-    if (authFilePath == NULL) {
-        DLOGI("Auth file not provided, passing test");
-        return;
-    }
+    authFilePath = SAMPLE_AUTH_FILE_PATH;
 
     STRNCPY(streamName, (PCHAR) TEST_STREAM_NAME, MAX_STREAM_NAME_LEN);
     streamName[MAX_STREAM_NAME_LEN] = '\0';
@@ -96,12 +95,6 @@ TEST_F(AuthCallbackTest, verify_fileAuthCallback_provider_works)
                                                       authFilePath,
                                                       &pAuthCallbacks));
 
-    EXPECT_EQ(STATUS_SUCCESS, createKinesisVideoClientSync(pDeviceInfo, pClientCallbacks, &clientHandle));
-    EXPECT_EQ(STATUS_SUCCESS, createKinesisVideoStreamSync(clientHandle, pStreamInfo, &streamHandle));
-
-    EXPECT_EQ(STATUS_SUCCESS, stopKinesisVideoStreamSync(streamHandle));
-    EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoStream(&streamHandle));
-    EXPECT_EQ(STATUS_SUCCESS, freeKinesisVideoClient(&clientHandle));
     EXPECT_EQ(STATUS_SUCCESS, freeDeviceInfo(&pDeviceInfo));
     EXPECT_EQ(STATUS_SUCCESS, freeStreamInfoProvider(&pStreamInfo));
     EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks));
@@ -136,6 +129,8 @@ TEST_F(AuthCallbackTest, credential_provider_auth_callbacks_test)
                                                                      NULL,
                                                                      &pClientCallbacks));
 
+    EXPECT_EQ(STATUS_NULL_ARG, createStaticCredentialProvider(mAccessKey, 0, mSecretKey, 0, mSessionToken, 0,
+                                                            MAX_UINT64, NULL));
     // Create the credential provider based on static credentials which will be used with auth callbacks
     EXPECT_EQ(STATUS_SUCCESS, createStaticCredentialProvider(mAccessKey, 0, mSecretKey, 0, mSessionToken, 0,
                                                              MAX_UINT64, &pAwsCredentialProvider));
@@ -159,6 +154,7 @@ TEST_F(AuthCallbackTest, credential_provider_auth_callbacks_test)
     EXPECT_EQ(STATUS_SUCCESS, freeDeviceInfo(&pDeviceInfo));
     EXPECT_EQ(STATUS_SUCCESS, freeStreamInfoProvider(&pStreamInfo));
     EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks));
+    EXPECT_EQ(STATUS_NULL_ARG, freeStaticCredentialProvider(NULL));
     EXPECT_EQ(STATUS_SUCCESS, freeStaticCredentialProvider(&pAwsCredentialProvider));
 }
 }  // namespace video

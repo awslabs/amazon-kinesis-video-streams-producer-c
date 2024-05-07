@@ -916,13 +916,13 @@ STATUS uriDecodeString(PCHAR pSrc, UINT32 srcLen, PCHAR pDst, PUINT32 pDstLen)
     PCHAR pCurPtr = pSrc, pDec = pDst;
     CHAR ch;
 
+    CHK(pSrc != NULL && pDstLen != NULL, STATUS_NULL_ARG);
+
     // Set the source length to max if not specified
     strLen = (srcLen == 0) ? MAX_UINT32 : srcLen;
 
     // Set the remaining length
     remaining = (pDst == NULL) ? MAX_UINT32 : *pDstLen;
-
-    CHK(pSrc != NULL && pDstLen != NULL, STATUS_NULL_ARG);
 
     while (((UINT32) (pCurPtr - pSrc) < strLen) && ((ch = *pCurPtr) != '\0')) {
         if (ch == '%') {

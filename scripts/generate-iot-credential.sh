@@ -15,9 +15,9 @@ iotPrivateKey="producerc_private.key"
 
 # Step 1: Create an IoT Thing Type and an IoT Thing
 # The following example command creates a thing type $thingTypeName
-aws --profile default  iot create-thing-type --thing-type-name $thingTypeName > iot-thing-type.json
+aws iot create-thing-type --thing-type-name $thingTypeName > iot-thing-type.json
 # And this example command creates the $thingName thing of the $thingTypeName thing type:
-aws --profile default  iot create-thing --thing-name $thingName --thing-type-name $thingTypeName > iot-thing.json
+aws iot create-thing --thing-name $thingName --thing-type-name $thingTypeName > iot-thing.json
 
 # Step 2: Create an IAM Role to be Assumed by IoT
 # You can use the following trust policy JSON for the iam-policy-document.json:
@@ -37,7 +37,7 @@ cat > iam-policy-document.json <<EOF
 EOF
 
 # Create an IAM role.
-aws --profile default  iam create-role --role-name $iotRoleName --assume-role-policy-document 'file://iam-policy-document.json' > iam-role.json
+aws iam create-role --role-name $iotRoleName --assume-role-policy-document 'file://iam-policy-document.json' > iam-role.json
 
 # You can use the following IAM policy JSON for the iam-permission-document.json:
 cat > iam-permission-document.json <<EOF
@@ -67,9 +67,9 @@ cat > iam-permission-document.json <<EOF
 EOF
 
 # Next, you must attach a permissions policy to the IAM role you created above.
-aws --profile default iam put-role-policy --role-name $iotRoleName --policy-name $kvsPolicyName --policy-document 'file://iam-permission-document.json'
+aws iam put-role-policy --role-name $iotRoleName --policy-name $kvsPolicyName --policy-document 'file://iam-permission-document.json'
 # Next, create a Role Alias for your IAM Role
-aws --profile default  iot create-role-alias --role-alias $iotRoleAlias --role-arn $(jq --raw-output '.Role.Arn' iam-role.json) --credential-duration-seconds 3600 > iot-role-alias.json
+aws iot create-role-alias --role-alias $iotRoleAlias --role-arn $(jq --raw-output '.Role.Arn' iam-role.json) --credential-duration-seconds 3600 > iot-role-alias.json
 
 # You can use the following command to create the iot-policy-document.json document JSON:
 cat > iot-policy-document.json << EOF
@@ -95,21 +95,4 @@ cat > iot-policy-document.json << EOF
 EOF
 
 # Now you can create the policy that will enable IoT to assume role with the certificate (once it is attached) using the role alias.
-aws --profile default iot create-policy --policy-name $iotPolicyName --policy-document 'file://iot-policy-document.json'
-
-# Create the certificate to which you must attach the policy for IoT that you created above.
-aws --profile default  iot create-keys-and-certificate --set-as-active --certificate-pem-outfile $iotCert --public-key-outfile $iotPublicKey --private-key-outfile $iotPrivateKey > certificate
-# Attach the policy for IoT (KvsCameraIoTPolicy created above) to this certificate.
-aws --profile default  iot attach-policy --policy-name $iotPolicyName --target $(jq --raw-output '.certificateArn' certificate)
-# Attach your IoT thing (kvs_example_camera_stream) to the certificate you just created:
-aws --profile default  iot attach-thing-principal --thing-name $thingName --principal $(jq --raw-output '.certificateArn' certificate)
-# In order to authorize requests through the IoT credentials provider, you need the IoT credentials endpoint which is unique to your AWS account ID. You can use the following command to get the IoT credentials endpoint.
-aws --profile default  iot describe-endpoint --endpoint-type iot:CredentialProvider --output text > iot-credential-provider.txt
-# In addition to the X.509 cerficiate created above, you must also have a CA certificate to establish trust with the back-end service through TLS. You can get the CA certificate using the following command:
-curl 'https://www.amazontrust.com/repository/SFSRootCAG2.pem' --output cacert.pem
-
-export AWS_IOT_CORE_CREDENTIAL_ENDPOINT=$(cat iot-credential-provider.txt)
-export AWS_IOT_CORE_CERT=$(pwd)"/"$iotCert
-export AWS_IOT_CORE_PRIVATE_KEY=$(pwd)"/"$iotPrivateKey
-export AWS_IOT_CORE_ROLE_ALIAS=$iotRoleAlias
-export AWS_IOT_CORE_THING_NAME=$thingName
+aws iot create-policy --policy-name $iotPolicyName --policy-document 'file://iot-policy-document.json'
