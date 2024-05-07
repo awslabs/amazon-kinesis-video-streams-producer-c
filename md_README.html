@@ -186,7 +186,8 @@ Run samples</h3>
 Running with IoT credential provider</h3>
 <p>To run the samples with IoT credential provider:</p>
 <ol type="1">
-<li>Run the IoT thing generation script available under <code>scripts</code>: <code>source scripts/generate-iot-credential.sh</code>. For more information on IoT set up, visit <a href="https://docs.aws.amazon.com/kinesisvideostreams/latest/dg/how-iot.html">AWS KVS IoT Set up</a></li>
+<li>Run the IoT thing generation script available under <code>scripts</code>: <code>source scripts/generate-iot-credential.sh</code>.</li>
+<li>Then run <code>source scripts/get-iot-certs.sh</code> to generate the certs and set the relevant envs. For more information on IoT set up, visit <a href="https://docs.aws.amazon.com/kinesisvideostreams/latest/dg/how-iot.html">AWS KVS IoT Set up</a></li>
 <li>Uncomment <code>#define IOT_CORE_ENABLE_CREDENTIALS 1</code> in the relevant sample</li>
 <li>Build the changes: <code>make</code></li>
 <li>Run the sample using the instructions in previous section.</li>
@@ -265,7 +266,7 @@ License</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Thu Apr 25 2024 20:44:27 for Amazon Kinesis Producer C SDK by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+    <li class="footer">Generated on Tue May 7 2024 21:04:29 for Amazon Kinesis Producer C SDK by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
 </body>

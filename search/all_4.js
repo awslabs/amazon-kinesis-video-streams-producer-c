@@ -41,6 +41,5 @@ var searchData=
   ['droppedfragmentreportaggregate_196',['droppedFragmentReportAggregate',['../CallbacksProvider_8c.html#a42ba4d2ba593715d0f5e7693bf85e626',1,'CallbacksProvider.c']]],
   ['droppedfragmentreportfn_197',['droppedFragmentReportFn',['../struct____StreamCallbacks.html#aa3471f201107e490e5547bd67a3d9f47',1,'__StreamCallbacks']]],
   ['droppedframereportaggregate_198',['droppedFrameReportAggregate',['../CallbacksProvider_8c.html#a3ef0c33a3ad6467612417fb6c8899f5d',1,'CallbacksProvider.c']]],
-  ['droppedframereportfn_199',['droppedFrameReportFn',['../struct____StreamCallbacks.html#a0f2d222758b0a4cb7c530a648b8aea98',1,'__StreamCallbacks']]],
-  ['dumpresponsecurleasyinfo_200',['dumpResponseCurlEasyInfo',['../Response_8c.html#a48340261a9f0dfc3caeb302b7ff8b8f1',1,'Response.c']]]
+  ['droppedframereportfn_199',['droppedFrameReportFn',['../struct____StreamCallbacks.html#a0f2d222758b0a4cb7c530a648b8aea98',1,'__StreamCallbacks']]]
 ];
