@@ -29,8 +29,8 @@ jobs:
       id-token: write
       contents: read
     env:
-      CC: gcc-13
-      CXX: g++-13
+      CC: /usr/local/bin/gcc-13
+      CXX: /usr/local/bin/g++-13
       AWS_KVS_LOG_LEVEL: 2
     steps:
       - name: Clone repository
@@ -88,6 +88,75 @@ jobs:
     permissions:
       id-token: write
       contents: read
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+      - name: Build repository
+        run: |
+          brew install pkgconfig
+          brew unlink openssl # it seems the libcurl is trying to access this openssl despite explicitly setting it to our build
+          mkdir build && cd build
+          cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DCMAKE_C_COMPILER=$(brew --prefix llvm@15)/bin/clang -DCMAKE_CXX_COMPILER=$(brew --prefix llvm@15)/bin/clang++
+          make
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-duration-seconds: 10800
+      - name: Run tests
+        run: |
+          cd build
+          ./tst/producer_test
+
+  mac-os-m1-build-gcc:
+    runs-on: macos-13-xlarge
+    env:
+      CC: /opt/homebrew/bin/gcc-13
+      CXX: /opt/homebrew/bin/g++-13
+      AWS_KVS_LOG_LEVEL: 2
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Setup XCode version 15.2
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '15.2'
+      - name: Clone repository
+        uses: actions/checkout@v3
+      - name: Build repository
+        run: |
+          brew install pkgconfig
+          brew unlink openssl # it seems the libcurl is trying to access this openssl despite explicitly setting it to our build
+          mkdir build && cd build
+          cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE
+          make
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-duration-seconds: 10800
+      - name: Run tests
+        run: |
+          cd build
+          ./tst/producer_test
+
+  mac-os-build-gcc-local-openssl:
+    runs-on: macos-11
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      CC: /usr/local/bin/gcc-13
+      CXX: /usr/local/bin/g++-13
+      AWS_KVS_LOG_LEVEL: 2
+      LDFLAGS: -L/usr/local/opt/openssl@3/lib
+      CPPFLAGS: -I/usr/local/opt/openssl@3/include
+      OPENSSL_ROOT_DIR: /usr/local/opt/openssl@3/
     steps:
       - name: Clone repository
         uses: actions/checkout@v3

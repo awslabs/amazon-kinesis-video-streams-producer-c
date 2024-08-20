@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.6.3)
 
 project(libcurl-download LANGUAGES C)
 
+find_program(MAKE_EXE NAMES make)
+
 if (DEFINED CMAKE_OSX_SYSROOT AND NOT CMAKE_OSX_SYSROOT STREQUAL "")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -isysroot${CMAKE_OSX_SYSROOT}")
 endif()
