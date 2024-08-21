@@ -321,6 +321,8 @@ typedef enum {
  */
 PUBLIC_API STATUS createDefaultCallbacksProviderWithAwsCredentials(PCHAR, PCHAR, PCHAR, UINT64, PCHAR, PCHAR, PCHAR, PCHAR, PClientCallbacks*);
 
+PUBLIC_API STATUS createDefaultCallbacksProviderWithAwsCredentialsAndIPVersion(PCHAR, PCHAR, PCHAR, UINT64, PCHAR, PCHAR, PCHAR, PCHAR, IP_VERSION, PClientCallbacks*);
+
 /**
  * Creates a default callbacks provider that uses iot certificate as auth method.
  *
@@ -884,6 +886,8 @@ PUBLIC_API STATUS freeContinuousRetryStreamCallbacks(PStreamCallbacks*);
  * @return STATUS code of the execution
  */
 PUBLIC_API STATUS createAbstractDefaultCallbacksProvider(UINT32, API_CALL_CACHE_TYPE, UINT64, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PClientCallbacks*);
+
+PUBLIC_API STATUS createAbstractDefaultCallbacksProviderWithIPVersion(UINT32, API_CALL_CACHE_TYPE, UINT64, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, IP_VERSION, PClientCallbacks*);
 
 /**
  * Use file logger instead of default logger which log to stdout. The underlying objects are automatically freed

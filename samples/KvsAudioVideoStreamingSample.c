@@ -330,7 +330,7 @@ INT32 main(INT32 argc, CHAR* argv[])
     CHK_STATUS(createDefaultCallbacksProviderWithIotCertificateAndTimeoutsAndIPVersion(pIotCoreCredentialEndpoint, pIotCoreCert, pIotCorePrivateKey, cacertPath,
                                                                 pIotCoreRoleAlias, pIotCoreThingName, region, NULL, NULL, IOT_REQUEST_CONNECTION_TIMEOUT, IOT_REQUEST_COMPLETION_TIMEOUT, IPv4_ONLY, &pClientCallbacks));
 #else
-    CHK_STATUS(createDefaultCallbacksProviderWithAwsCredentials(accessKey, secretKey, sessionToken, MAX_UINT64, region, cacertPath, NULL, NULL,
+    CHK_STATUS(createDefaultCallbacksProviderWithAwsCredentialsAndIPVersion(accessKey, secretKey, sessionToken, MAX_UINT64, region, cacertPath, NULL, NULL, IPv4_ONLY,
                                                                 &pClientCallbacks));
 #endif
 

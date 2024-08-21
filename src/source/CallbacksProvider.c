@@ -109,6 +109,52 @@ CleanUp:
     return retStatus;
 }
 
+STATUS createDefaultCallbacksProviderWithAwsCredentialsAndIPVersion(PCHAR accessKeyId, PCHAR secretKey, PCHAR sessionToken, UINT64 expiration, PCHAR region,
+                                                        PCHAR caCertPath, PCHAR userAgentPostfix, PCHAR customUserAgent, IP_VERSION ipVersion, 
+                                                        PClientCallbacks* ppClientCallbacks)
+{
+    ENTERS();
+    STATUS retStatus = STATUS_SUCCESS;
+    PCallbacksProvider pCallbacksProvider = NULL;
+    PAuthCallbacks pAuthCallbacks = NULL;
+    PStreamCallbacks pStreamCallbacks = NULL;
+
+    CHK_STATUS(createAbstractDefaultCallbacksProviderWithIPVersion(DEFAULT_CALLBACK_CHAIN_COUNT, API_CALL_CACHE_TYPE_ALL, ENDPOINT_UPDATE_PERIOD_SENTINEL_VALUE,
+                                                      region, EMPTY_STRING, caCertPath, userAgentPostfix, customUserAgent, ipVersion, ppClientCallbacks));
+
+    pCallbacksProvider = (PCallbacksProvider) *ppClientCallbacks;
+
+    CHK_STATUS(createStaticAuthCallbacks((PClientCallbacks) pCallbacksProvider, accessKeyId, secretKey, sessionToken, expiration, &pAuthCallbacks));
+
+    CHK_STATUS(createContinuousRetryStreamCallbacks((PClientCallbacks) pCallbacksProvider, &pStreamCallbacks));
+
+CleanUp:
+
+    if (STATUS_FAILED(retStatus)) {
+        if (pCallbacksProvider != NULL) {
+            freeCallbacksProvider((PClientCallbacks*) &pCallbacksProvider);
+        }
+
+        if (pAuthCallbacks != NULL) {
+            freeStaticAuthCallbacks(&pAuthCallbacks);
+        }
+
+        if (pStreamCallbacks != NULL) {
+            freeContinuousRetryStreamCallbacks(&pStreamCallbacks);
+        }
+
+        pCallbacksProvider = NULL;
+    }
+
+    // Set the return value if it's not NULL
+    if (ppClientCallbacks != NULL) {
+        *ppClientCallbacks = (PClientCallbacks) pCallbacksProvider;
+    }
+
+    LEAVES();
+    return retStatus;
+}
+
 STATUS createDefaultCallbacksProviderWithIotCertificate(PCHAR endpoint, PCHAR iotCertPath, PCHAR privateKeyPath, PCHAR caCertPath, PCHAR roleAlias,
                                                         PCHAR streamName, PCHAR region, PCHAR userAgentPostfix, PCHAR customUserAgent,
                                                         PClientCallbacks* ppClientCallbacks)
@@ -216,8 +262,8 @@ STATUS createDefaultCallbacksProviderWithIotCertificateAndTimeoutsAndIPVersion(P
     PAuthCallbacks pAuthCallbacks = NULL;
     PStreamCallbacks pStreamCallbacks = NULL;
 
-    CHK_STATUS(createAbstractDefaultCallbacksProvider(DEFAULT_CALLBACK_CHAIN_COUNT, API_CALL_CACHE_TYPE_ALL, ENDPOINT_UPDATE_PERIOD_SENTINEL_VALUE,
-                                                      region, EMPTY_STRING, caCertPath, userAgentPostfix, customUserAgent, ppClientCallbacks));
+    CHK_STATUS(createAbstractDefaultCallbacksProviderWithIPVersion(DEFAULT_CALLBACK_CHAIN_COUNT, API_CALL_CACHE_TYPE_ALL, ENDPOINT_UPDATE_PERIOD_SENTINEL_VALUE,
+                                                      region, EMPTY_STRING, caCertPath, userAgentPostfix, customUserAgent, ipVersion, ppClientCallbacks));
 
     pCallbacksProvider = (PCallbacksProvider) *ppClientCallbacks;
 
@@ -334,6 +380,69 @@ CleanUp:
     LEAVES();
     return retStatus;
 }
+
+STATUS createAbstractDefaultCallbacksProviderWithIPVersion(UINT32 callbackChainCount, API_CALL_CACHE_TYPE cacheType, UINT64 endpointCachingPeriod, PCHAR region,
+                                              PCHAR controlPlaneUrl, PCHAR certPath, PCHAR userAgentName, PCHAR customUserAgent, IP_VERSION ipVersion,
+                                              PClientCallbacks* ppClientCallbacks)
+{
+    ENTERS();
+    STATUS retStatus = STATUS_SUCCESS;
+    PCallbacksProvider pCallbacksProvider = NULL;
+    PCurlApiCallbacks pCurlApiCallbacks = NULL;
+    PStreamCallbacks pStreamCallbacks = NULL;
+    UINT32 size;
+
+    CHK(ppClientCallbacks != NULL, STATUS_NULL_ARG);
+    CHK(callbackChainCount < MAX_CALLBACK_CHAIN_COUNT, STATUS_INVALID_ARG);
+
+    // Calculate the size
+    size = SIZEOF(CallbacksProvider) +
+        callbackChainCount * (SIZEOF(ProducerCallbacks) + SIZEOF(StreamCallbacks) + SIZEOF(AuthCallbacks) + SIZEOF(ApiCallbacks));
+
+    // Allocate the entire structure
+    pCallbacksProvider = (PCallbacksProvider) MEMCALLOC(1, size);
+    CHK(pCallbacksProvider != NULL, STATUS_NOT_ENOUGH_MEMORY);
+
+    // Set the correct values.
+    // NOTE: Fields are zero-ed by MEMCALLOC
+    pCallbacksProvider->clientCallbacks.version = CALLBACKS_CURRENT_VERSION;
+    pCallbacksProvider->callbackChainCount = callbackChainCount;
+
+    // Set the custom data field to self
+    pCallbacksProvider->clientCallbacks.customData = (UINT64) pCallbacksProvider;
+
+    // Set callback chain pointers
+    pCallbacksProvider->pProducerCallbacks = (PProducerCallbacks) (pCallbacksProvider + 1);
+    pCallbacksProvider->pStreamCallbacks = (PStreamCallbacks) (pCallbacksProvider->pProducerCallbacks + callbackChainCount);
+    pCallbacksProvider->pAuthCallbacks = (PAuthCallbacks) (pCallbacksProvider->pStreamCallbacks + callbackChainCount);
+    pCallbacksProvider->pApiCallbacks = (PApiCallbacks) (pCallbacksProvider->pAuthCallbacks + callbackChainCount);
+
+    // Set the default Platform callbacks
+    CHK_STATUS(setDefaultPlatformCallbacks(pCallbacksProvider));
+
+    // Create the default Curl API callbacks
+    CHK_STATUS(createCurlApiCallbacks(pCallbacksProvider, region, cacheType, ipVersion, endpointCachingPeriod, controlPlaneUrl, certPath, userAgentName,
+                                      customUserAgent, &pCurlApiCallbacks));
+
+CleanUp:
+
+    if (STATUS_FAILED(retStatus)) {
+        freeCurlApiCallbacks(&pCurlApiCallbacks);
+        freeStreamCallbacks(&pStreamCallbacks);
+        freeCallbacksProvider((PClientCallbacks*) &pCallbacksProvider);
+
+        pCallbacksProvider = NULL;
+    }
+
+    // Set the return value if it's not NULL
+    if (ppClientCallbacks != NULL) {
+        *ppClientCallbacks = (PClientCallbacks) pCallbacksProvider;
+    }
+
+    LEAVES();
+    return retStatus;
+}
+
 
 STATUS createAbstractDefaultCallbacksProvider(UINT32 callbackChainCount, API_CALL_CACHE_TYPE cacheType, UINT64 endpointCachingPeriod, PCHAR region,
                                               PCHAR controlPlaneUrl, PCHAR certPath, PCHAR userAgentName, PCHAR customUserAgent,

@@ -242,7 +242,7 @@ STATUS iotCurlHandler(PIotCredentialProvider pIotCredentialProvider)
 
     // Form a new request info based on the params
     CHK_STATUS(createRequestInfo(serviceUrl, NULL, DEFAULT_AWS_REGION, pIotCredentialProvider->caCertPath, pIotCredentialProvider->certPath,
-                                 pIotCredentialProvider->privateKeyPath, SSL_CERTIFICATE_TYPE_PEM, IPv4_ONLY, DEFAULT_USER_AGENT_NAME,
+                                 pIotCredentialProvider->privateKeyPath, SSL_CERTIFICATE_TYPE_PEM, pIotCredentialProvider->ipVersion, DEFAULT_USER_AGENT_NAME,
                                  pIotCredentialProvider->connectionTimeout, pIotCredentialProvider->completionTimeout, DEFAULT_LOW_SPEED_LIMIT,
                                  DEFAULT_LOW_SPEED_TIME_LIMIT, pIotCredentialProvider->pAwsCredentials, &pRequestInfo));
 
