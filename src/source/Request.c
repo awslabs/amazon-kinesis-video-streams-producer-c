@@ -7,7 +7,7 @@
 /**
  * Create request object
  */
-STATUS createCurlRequest(HTTP_REQUEST_VERB curlVerb, PCHAR url, PCHAR body, STREAM_HANDLE streamHandle, PCHAR region, UINT64 currentTime,
+STATUS createCurlRequest(HTTP_REQUEST_VERB curlVerb, PCHAR url, PCHAR body, STREAM_HANDLE streamHandle, PCHAR region, IP_VERSION ipVersion, UINT64 currentTime,
                          UINT64 connectionTimeout, UINT64 completionTimeout, UINT64 callAfter, PCHAR certPath, PAwsCredentials pAwsCredentials,
                          PCurlApiCallbacks pCurlApiCallbacks, PCurlRequest* ppCurlRequest)
 {
@@ -39,6 +39,7 @@ STATUS createCurlRequest(HTTP_REQUEST_VERB curlVerb, PCHAR url, PCHAR body, STRE
     pCurlRequest->requestInfo.connectionTimeout = connectionTimeout;
     pCurlRequest->requestInfo.callAfter = callAfter;
     pCurlRequest->pCurlApiCallbacks = pCurlApiCallbacks;
+    pCurlRequest->requestInfo.ipVersion = ipVersion;
     ATOMIC_STORE_BOOL(&pCurlRequest->requestInfo.terminating, FALSE);
     ATOMIC_STORE_BOOL(&pCurlRequest->blockedInCurl, FALSE);
     pCurlRequest->threadId = INVALID_TID_VALUE;

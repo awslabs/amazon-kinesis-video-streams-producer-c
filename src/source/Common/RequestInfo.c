@@ -2,7 +2,7 @@
 #include "Include_i.h"
 
 STATUS createRequestInfo(PCHAR url, PCHAR body, PCHAR region, PCHAR certPath, PCHAR sslCertPath, PCHAR sslPrivateKeyPath,
-                         SSL_CERTIFICATE_TYPE certType, PCHAR userAgent, UINT64 connectionTimeout, UINT64 completionTimeout, UINT64 lowSpeedLimit,
+                         SSL_CERTIFICATE_TYPE certType, IP_VERSION ipVersion, PCHAR userAgent, UINT64 connectionTimeout, UINT64 completionTimeout, UINT64 lowSpeedLimit,
                          UINT64 lowSpeedTimeLimit, PAwsCredentials pAwsCredentials, PRequestInfo* ppRequestInfo)
 {
     ENTERS();
@@ -26,6 +26,7 @@ STATUS createRequestInfo(PCHAR url, PCHAR body, PCHAR region, PCHAR certPath, PC
     pRequestInfo->verb = HTTP_REQUEST_VERB_POST;
     pRequestInfo->completionTimeout = completionTimeout;
     pRequestInfo->connectionTimeout = connectionTimeout;
+    pRequestInfo->ipVersion = ipVersion;
     ATOMIC_STORE_BOOL(&pRequestInfo->terminating, FALSE);
     pRequestInfo->bodySize = bodySize;
     pRequestInfo->currentTime = GETTIME();

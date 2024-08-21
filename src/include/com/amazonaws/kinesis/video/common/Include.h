@@ -438,6 +438,16 @@ typedef enum {
 } HTTP_REQUEST_VERB;
 
 /**
+ * Type of caching implementation to use with the callbacks provider
+ */
+typedef enum {
+    IPv4_ONLY,
+    IPv6_ONLY,
+    DUAL_STACK,
+} IP_VERSION;
+/*!@} */
+
+/**
  * @brief Request SSL certificate type Not specified, "DER", "PEM", "ENG"
  */
 typedef enum {
@@ -504,6 +514,7 @@ struct __RequestInfo {
     CHAR sslPrivateKeyPath[MAX_PATH_LEN + 1]; //!< SSL Certificate private key file path to use - optional
     SSL_CERTIFICATE_TYPE certType;            //!< One of the following types "DER", "PEM", "ENG"
     CHAR region[MAX_REGION_NAME_LEN + 1];     //!< Region
+    IP_VERSION ipVersion;
     UINT64 currentTime;                       //!< Current time when request was created
     UINT64 completionTimeout;                 //!< Call completion timeout
     UINT64 connectionTimeout;                 //!< Connection completion timeout
@@ -767,7 +778,7 @@ PUBLIC_API STATUS freeFileCredentialProvider(PAwsCredentialProvider*);
  *
  * @return STATUS code of the execution. STATUS_SUCCESS on success
  */
-PUBLIC_API STATUS createRequestInfo(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, SSL_CERTIFICATE_TYPE, PCHAR, UINT64, UINT64, UINT64, UINT64,
+PUBLIC_API STATUS createRequestInfo(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, SSL_CERTIFICATE_TYPE, IP_VERSION, PCHAR, UINT64, UINT64, UINT64, UINT64,
                                     PAwsCredentials, PRequestInfo*);
 
 /**

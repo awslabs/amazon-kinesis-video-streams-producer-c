@@ -7,7 +7,7 @@
 /**
  * Creates CURL based API callbacks provider
  */
-STATUS createCurlApiCallbacks(PCallbacksProvider pCallbacksProvider, PCHAR region, API_CALL_CACHE_TYPE cacheType, UINT64 endpointCachingPeriod,
+STATUS createCurlApiCallbacks(PCallbacksProvider pCallbacksProvider, PCHAR region, API_CALL_CACHE_TYPE cacheType, IP_VERSION ipVersion, UINT64 endpointCachingPeriod,
                               PCHAR controlPlaneUrl, PCHAR certPath, PCHAR userAgentNamePostfix, PCHAR customUserAgent,
                               PCurlApiCallbacks* ppCurlApiCallbacks)
 {
@@ -45,6 +45,9 @@ STATUS createCurlApiCallbacks(PCallbacksProvider pCallbacksProvider, PCHAR regio
     // API call caching type
     pCurlApiCallbacks->cacheType = cacheType;
 
+    // IP version
+    pCurlApiCallbacks->ipVersion = ipVersion;
+
     // Set invalid guard locks
     pCurlApiCallbacks->activeRequestsLock = INVALID_MUTEX_VALUE;
     pCurlApiCallbacks->activeUploadsLock = INVALID_MUTEX_VALUE;
@@ -78,6 +81,7 @@ STATUS createCurlApiCallbacks(PCallbacksProvider pCallbacksProvider, PCHAR regio
     }
 
     // Set the control plane URL
+    // use ipVersion to construct URLs
     if (controlPlaneUrl == NULL || controlPlaneUrl[0] == '\0') {
         if (0 == STRNCMP(pCurlApiCallbacks->region, AWS_ISO_B_REGION_PREFIX, STRLEN(AWS_ISO_B_REGION_PREFIX))) {
             SNPRINTF(pCurlApiCallbacks->controlPlaneUrl, MAX_URI_CHAR_LEN, "%s%s%s.%s%s", CONTROL_PLANE_URI_PREFIX, KINESIS_VIDEO_SERVICE_NAME,
@@ -971,7 +975,7 @@ STATUS createStreamCurl(UINT64 customData, PCHAR deviceName, PCHAR streamName, P
 
     // Create a request object
     currentTime = pCallbacksProvider->clientCallbacks.getCurrentTimeFn(pCallbacksProvider->clientCallbacks.customData);
-    CHK_STATUS(createCurlRequest(HTTP_REQUEST_VERB_POST, url, paramsJson, streamHandle, pCurlApiCallbacks->region, currentTime,
+    CHK_STATUS(createCurlRequest(HTTP_REQUEST_VERB_POST, url, paramsJson, streamHandle, pCurlApiCallbacks->region, pCurlApiCallbacks->ipVersion, currentTime,
                                  pServiceCallContext->connectionTimeout, pServiceCallContext->timeout, pServiceCallContext->callAfter,
                                  pCurlApiCallbacks->certPath, pCredentials, pCurlApiCallbacks, &pCurlRequest));
 
@@ -1206,7 +1210,7 @@ STATUS describeStreamCurl(UINT64 customData, PCHAR streamName, PServiceCallConte
 
     // Create a request object
     currentTime = pCallbacksProvider->clientCallbacks.getCurrentTimeFn(pCallbacksProvider->clientCallbacks.customData);
-    CHK_STATUS(createCurlRequest(HTTP_REQUEST_VERB_POST, url, paramsJson, streamHandle, pCurlApiCallbacks->region, currentTime,
+    CHK_STATUS(createCurlRequest(HTTP_REQUEST_VERB_POST, url, paramsJson, streamHandle, pCurlApiCallbacks->region, pCurlApiCallbacks->ipVersion, currentTime,
                                  pServiceCallContext->connectionTimeout, pServiceCallContext->timeout, pServiceCallContext->callAfter,
                                  pCurlApiCallbacks->certPath, pCredentials, pCurlApiCallbacks, &pCurlRequest));
 
@@ -1519,7 +1523,7 @@ STATUS getStreamingEndpointCurl(UINT64 customData, PCHAR streamName, PCHAR apiNa
 
     // Create a request object
     currentTime = pCallbacksProvider->clientCallbacks.getCurrentTimeFn(pCallbacksProvider->clientCallbacks.customData);
-    CHK_STATUS(createCurlRequest(HTTP_REQUEST_VERB_POST, url, paramsJson, streamHandle, pCurlApiCallbacks->region, currentTime,
+    CHK_STATUS(createCurlRequest(HTTP_REQUEST_VERB_POST, url, paramsJson, streamHandle, pCurlApiCallbacks->region, pCurlApiCallbacks->ipVersion, currentTime,
                                  pServiceCallContext->connectionTimeout, pServiceCallContext->timeout, pServiceCallContext->callAfter,
                                  pCurlApiCallbacks->certPath, pCredentials, pCurlApiCallbacks, &pCurlRequest));
 
@@ -1851,7 +1855,7 @@ STATUS tagResourceCurl(UINT64 customData, PCHAR streamArn, UINT32 tagCount, PTag
 
     // Create a request object
     currentTime = pCallbacksProvider->clientCallbacks.getCurrentTimeFn(pCallbacksProvider->clientCallbacks.customData);
-    CHK_STATUS(createCurlRequest(HTTP_REQUEST_VERB_POST, url, paramsJson, streamHandle, pCurlApiCallbacks->region, currentTime,
+    CHK_STATUS(createCurlRequest(HTTP_REQUEST_VERB_POST, url, paramsJson, streamHandle, pCurlApiCallbacks->region, pCurlApiCallbacks->ipVersion, currentTime,
                                  pServiceCallContext->connectionTimeout, pServiceCallContext->timeout, pServiceCallContext->callAfter,
                                  pCurlApiCallbacks->certPath, pCredentials, pCurlApiCallbacks, &pCurlRequest));
 
@@ -2068,7 +2072,7 @@ STATUS putStreamCurl(UINT64 customData, PCHAR streamName, PCHAR containerType, U
     // Create a request object
     currentTime = pCallbacksProvider->clientCallbacks.getCurrentTimeFn(pCallbacksProvider->clientCallbacks.customData);
     CHK_STATUS(createCurlRequest(HTTP_REQUEST_VERB_POST, url, NULL, (STREAM_HANDLE) pServiceCallContext->customData, pCurlApiCallbacks->region,
-                                 currentTime, pServiceCallContext->connectionTimeout, pServiceCallContext->timeout, pServiceCallContext->callAfter,
+                                 pCurlApiCallbacks->ipVersion, currentTime, pServiceCallContext->connectionTimeout, pServiceCallContext->timeout, pServiceCallContext->callAfter,
                                  pCurlApiCallbacks->certPath, pCredentials, pCurlApiCallbacks, &pCurlRequest));
 
     // Set the necessary headers

@@ -77,7 +77,7 @@ typedef struct __CurlRequest* PCurlRequest;
  *
  * @return - STATUS code of the execution
  */
-STATUS createCurlRequest(HTTP_REQUEST_VERB, PCHAR, PCHAR, STREAM_HANDLE, PCHAR, UINT64, UINT64, UINT64, UINT64, PCHAR, PAwsCredentials,
+STATUS createCurlRequest(HTTP_REQUEST_VERB, PCHAR, PCHAR, STREAM_HANDLE, PCHAR, IP_VERSION, UINT64, UINT64, UINT64, UINT64, PCHAR, PAwsCredentials,
                          struct __CurlApiCallbacks*, PCurlRequest*);
 
 /**

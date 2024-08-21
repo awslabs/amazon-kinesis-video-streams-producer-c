@@ -58,6 +58,8 @@ struct __IotCredentialProvider {
 
     UINT64 completionTimeout;
 
+    IP_VERSION ipVersion;
+
     // Static Aws Credentials structure with the pointer following the main allocation
     PAwsCredentials pAwsCredentials;
 

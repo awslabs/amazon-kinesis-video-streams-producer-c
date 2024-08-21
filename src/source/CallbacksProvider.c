@@ -326,7 +326,7 @@ STATUS createAbstractDefaultCallbacksProvider(UINT32 callbackChainCount, API_CAL
     CHK_STATUS(setDefaultPlatformCallbacks(pCallbacksProvider));
 
     // Create the default Curl API callbacks
-    CHK_STATUS(createCurlApiCallbacks(pCallbacksProvider, region, cacheType, endpointCachingPeriod, controlPlaneUrl, certPath, userAgentName,
+    CHK_STATUS(createCurlApiCallbacks(pCallbacksProvider, region, cacheType, IPv4_ONLY, endpointCachingPeriod, controlPlaneUrl, certPath, userAgentName,
                                       customUserAgent, &pCurlApiCallbacks));
 
 CleanUp:

@@ -148,6 +148,8 @@ struct __CurlApiCallbacks {
     // Caching mode
     API_CALL_CACHE_TYPE cacheType;
 
+    IP_VERSION ipVersion;
+
     // Cached endpoints: STREAM_HANDLE -> EndpointTracker
     PHashTable pStreamsShuttingDown;
 
@@ -176,7 +178,7 @@ typedef struct __CurlApiCallbacks* PCurlApiCallbacks;
 //////////////////////////////////////////////////////////////////////
 // Curl API Callbacks main functionality
 //////////////////////////////////////////////////////////////////////
-STATUS createCurlApiCallbacks(struct __CallbacksProvider*, PCHAR, API_CALL_CACHE_TYPE, UINT64, PCHAR, PCHAR, PCHAR, PCHAR, PCurlApiCallbacks*);
+STATUS createCurlApiCallbacks(struct __CallbacksProvider*, PCHAR, API_CALL_CACHE_TYPE, IP_VERSION, UINT64, PCHAR, PCHAR, PCHAR, PCHAR, PCurlApiCallbacks*);
 STATUS freeCurlApiCallbacks(PCurlApiCallbacks*);
 STATUS curlApiCallbacksShutdownActiveRequests(PCurlApiCallbacks, STREAM_HANDLE, UINT64, BOOL, BOOL);
 STATUS curlApiCallbacksShutdownCachedEndpoints(PCurlApiCallbacks, STREAM_HANDLE, BOOL);
