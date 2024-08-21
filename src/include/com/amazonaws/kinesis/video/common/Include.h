@@ -682,6 +682,10 @@ PUBLIC_API STATUS createLwsIotCredentialProvider(PCHAR, PCHAR, PCHAR, PCHAR, PCH
 PUBLIC_API STATUS createCurlIotCredentialProviderWithTimeAndTimeout(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, UINT64, UINT64, GetCurrentTimeFunc,
                                                                     UINT64, PAwsCredentialProvider*);
 
+
+PUBLIC_API STATUS createCurlIotCredentialProviderWithTimeAndTimeoutAndIPVersion(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, UINT64, UINT64, IP_VERSION, GetCurrentTimeFunc,
+                                                                    UINT64, PAwsCredentialProvider*);
+
 /**
  * @brief Creates an IoT based AWS credential provider object with time function which is based on libCurl
  *

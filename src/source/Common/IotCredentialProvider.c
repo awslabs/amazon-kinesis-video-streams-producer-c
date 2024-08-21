@@ -4,8 +4,8 @@
 #define LOG_CLASS "IotCredentialProvider"
 #include "Include_i.h"
 
-STATUS createIotCredentialProviderWithTime(PCHAR iotGetCredentialEndpoint, PCHAR certPath, PCHAR privateKeyPath, PCHAR caCertPath, PCHAR roleAlias,
-                                           PCHAR thingName, UINT64 connectionTimeout, UINT64 completionTimeout, GetCurrentTimeFunc getCurrentTimeFn,
+STATUS createIotCredentialProviderWithTimeAndIPVersion(PCHAR iotGetCredentialEndpoint, PCHAR certPath, PCHAR privateKeyPath, PCHAR caCertPath, PCHAR roleAlias,
+                                           PCHAR thingName, UINT64 connectionTimeout, UINT64 completionTimeout, IP_VERSION ipVersion, GetCurrentTimeFunc getCurrentTimeFn,
                                            UINT64 customData, BlockingServiceCallFunc serviceCallFn, PAwsCredentialProvider* ppCredentialProvider)
 {
     ENTERS();
@@ -47,7 +47,7 @@ STATUS createIotCredentialProviderWithTime(PCHAR iotGetCredentialEndpoint, PCHAR
 
     pIotCredentialProvider->serviceCallFn = serviceCallFn;
 
-    pIotCredentialProvider->ipVersion = IPv4_ONLY;
+    pIotCredentialProvider->ipVersion = ipVersion;
 
     if (completionTimeout < connectionTimeout) {
         DLOGW("Setting defaults for connection and completion timeout since completion timeout is less than connection timeout");

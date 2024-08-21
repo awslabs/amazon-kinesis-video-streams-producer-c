@@ -15,6 +15,6 @@ STATUS createLwsIotCredentialProviderWithTime(PCHAR iotGetCredentialEndpoint, PC
                                               PCHAR thingName, GetCurrentTimeFunc getCurrentTimeFn, UINT64 customData,
                                               PAwsCredentialProvider* ppCredentialProvider)
 {
-    return createIotCredentialProviderWithTime(iotGetCredentialEndpoint, certPath, privateKeyPath, caCertPath, roleAlias, thingName, 0, 0,
+    return createIotCredentialProviderWithTimeAndIPVersion(iotGetCredentialEndpoint, certPath, privateKeyPath, caCertPath, roleAlias, thingName, 0, 0, IPv4_ONLY,
                                                getCurrentTimeFn, customData, blockingLwsCall, ppCredentialProvider);
 }

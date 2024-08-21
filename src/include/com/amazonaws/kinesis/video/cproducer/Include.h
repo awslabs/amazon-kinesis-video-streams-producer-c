@@ -366,6 +366,9 @@ PUBLIC_API STATUS createDefaultCallbacksProviderWithIotCertificate(PCHAR, PCHAR,
 PUBLIC_API STATUS createDefaultCallbacksProviderWithIotCertificateAndTimeouts(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, UINT64,
                                                                               UINT64, PClientCallbacks*);
 
+PUBLIC_API STATUS createDefaultCallbacksProviderWithIotCertificateAndTimeoutsAndIPVersion(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, UINT64,
+                                                                              UINT64, IP_VERSION, PClientCallbacks*);
+
 /**
  * Creates a default callbacks provider that uses file-based certificate as auth method.
  *
@@ -734,6 +737,8 @@ PUBLIC_API STATUS createIotAuthCallbacks(PClientCallbacks, PCHAR, PCHAR, PCHAR, 
  * @return STATUS status of operation
  */
 PUBLIC_API STATUS createIotAuthCallbacksWithTimeouts(PClientCallbacks, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, UINT64, UINT64, PAuthCallbacks*);
+
+PUBLIC_API STATUS createIotAuthCallbacksWithTimeoutsAndIPVersion(PClientCallbacks, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, UINT64, UINT64, IP_VERSION, PAuthCallbacks*);
 
 /**
  * Frees the Iot Credential auth callbacks

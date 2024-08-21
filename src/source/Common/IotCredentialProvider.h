@@ -71,7 +71,7 @@ typedef struct __IotCredentialProvider* PIotCredentialProvider;
 ////////////////////////////////////////////////////////////////////////
 // Callback function implementations
 ////////////////////////////////////////////////////////////////////////
-STATUS createIotCredentialProviderWithTime(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, UINT64, UINT64, GetCurrentTimeFunc, UINT64,
+STATUS createIotCredentialProviderWithTimeAndIPVersion(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, UINT64, UINT64, IP_VERSION, GetCurrentTimeFunc, UINT64,
                                            BlockingServiceCallFunc, PAwsCredentialProvider*);
 STATUS getIotCredentials(PAwsCredentialProvider, PAwsCredentials*);
 

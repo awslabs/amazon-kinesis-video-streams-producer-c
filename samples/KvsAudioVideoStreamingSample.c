@@ -7,6 +7,8 @@
 #define DEFAULT_FPS_VALUE               25
 #define DEFAULT_STREAM_DURATION         20 * HUNDREDS_OF_NANOS_IN_A_SECOND
 #define SAMPLE_AUDIO_FRAME_DURATION     (20 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND)
+#define IOT_REQUEST_CONNECTION_TIMEOUT (3 * HUNDREDS_OF_NANOS_IN_A_SECOND)
+#define IOT_REQUEST_COMPLETION_TIMEOUT (5 * HUNDREDS_OF_NANOS_IN_A_SECOND)
 #define SAMPLE_VIDEO_FRAME_DURATION     (HUNDREDS_OF_NANOS_IN_A_SECOND / DEFAULT_FPS_VALUE)
 #define AAC_AUDIO_TRACK_SAMPLING_RATE   48000
 #define ALAW_AUDIO_TRACK_SAMPLING_RATE  8000
@@ -325,8 +327,8 @@ INT32 main(INT32 argc, CHAR* argv[])
     data.startTime = GETTIME();
     data.firstFrame = TRUE;
 #ifdef IOT_CORE_ENABLE_CREDENTIALS
-    CHK_STATUS(createDefaultCallbacksProviderWithIotCertificate(pIotCoreCredentialEndpoint, pIotCoreCert, pIotCorePrivateKey, cacertPath,
-                                                                pIotCoreRoleAlias, pIotCoreThingName, region, NULL, NULL, &pClientCallbacks));
+    CHK_STATUS(createDefaultCallbacksProviderWithIotCertificateAndTimeoutsAndIPVersion(pIotCoreCredentialEndpoint, pIotCoreCert, pIotCorePrivateKey, cacertPath,
+                                                                pIotCoreRoleAlias, pIotCoreThingName, region, NULL, NULL, IOT_REQUEST_CONNECTION_TIMEOUT, IOT_REQUEST_COMPLETION_TIMEOUT, IPv4_ONLY, &pClientCallbacks));
 #else
     CHK_STATUS(createDefaultCallbacksProviderWithAwsCredentials(accessKey, secretKey, sessionToken, MAX_UINT64, region, cacertPath, NULL, NULL,
                                                                 &pClientCallbacks));

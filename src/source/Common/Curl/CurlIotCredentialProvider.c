@@ -15,8 +15,8 @@ STATUS createCurlIotCredentialProviderWithTime(PCHAR iotGetCredentialEndpoint, P
                                                PCHAR roleAlias, PCHAR thingName, GetCurrentTimeFunc getCurrentTimeFn, UINT64 customData,
                                                PAwsCredentialProvider* ppCredentialProvider)
 {
-    return createIotCredentialProviderWithTime(iotGetCredentialEndpoint, certPath, privateKeyPath, caCertPath, roleAlias, thingName,
-                                               IOT_REQUEST_CONNECTION_TIMEOUT, IOT_REQUEST_COMPLETION_TIMEOUT, getCurrentTimeFn, customData,
+    return createIotCredentialProviderWithTimeAndIPVersion(iotGetCredentialEndpoint, certPath, privateKeyPath, caCertPath, roleAlias, thingName,
+                                               IOT_REQUEST_CONNECTION_TIMEOUT, IOT_REQUEST_COMPLETION_TIMEOUT,  IPv4_ONLY, getCurrentTimeFn, customData,
                                                blockingCurlCall, ppCredentialProvider);
 }
 
@@ -25,7 +25,17 @@ STATUS createCurlIotCredentialProviderWithTimeAndTimeout(PCHAR iotGetCredentialE
                                                          GetCurrentTimeFunc getCurrentTimeFn, UINT64 customData,
                                                          PAwsCredentialProvider* ppCredentialProvider)
 {
-    return createIotCredentialProviderWithTime(iotGetCredentialEndpoint, certPath, privateKeyPath, caCertPath, roleAlias, thingName,
-                                               connectionTimeout, completionTimeout, getCurrentTimeFn, customData, blockingCurlCall,
+    return createIotCredentialProviderWithTimeAndIPVersion(iotGetCredentialEndpoint, certPath, privateKeyPath, caCertPath, roleAlias, thingName,
+                                               connectionTimeout, completionTimeout, IPv4_ONLY, getCurrentTimeFn, customData, blockingCurlCall,
+                                               ppCredentialProvider);
+}
+
+STATUS createCurlIotCredentialProviderWithTimeAndTimeoutAndIPVersion(PCHAR iotGetCredentialEndpoint, PCHAR certPath, PCHAR privateKeyPath, PCHAR caCertPath,
+                                                         PCHAR roleAlias, PCHAR thingName, UINT64 connectionTimeout, UINT64 completionTimeout, IP_VERSION ipVersion, 
+                                                         GetCurrentTimeFunc getCurrentTimeFn, UINT64 customData,
+                                                         PAwsCredentialProvider* ppCredentialProvider)
+{
+    return createIotCredentialProviderWithTimeAndIPVersion(iotGetCredentialEndpoint, certPath, privateKeyPath, caCertPath, roleAlias, thingName,
+                                               connectionTimeout, completionTimeout, ipVersion, getCurrentTimeFn, customData, blockingCurlCall,
                                                ppCredentialProvider);
 }
