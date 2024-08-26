@@ -511,6 +511,7 @@ struct __RequestInfo {
     UINT64 lowSpeedLimit;                     //!< Low-speed limit
     UINT64 lowSpeedTimeLimit;                 //!< Low-time limit
     PAwsCredentials pAwsCredentials;          //!< AWS Credentials
+    IP_VERSION ipVersion;
     PSingleList pRequestHeaders;              //!< Request headers
 };
 typedef struct __RequestInfo* PRequestInfo;
@@ -671,6 +672,9 @@ PUBLIC_API STATUS createLwsIotCredentialProvider(PCHAR, PCHAR, PCHAR, PCHAR, PCH
 PUBLIC_API STATUS createCurlIotCredentialProviderWithTimeAndTimeout(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, UINT64, UINT64, GetCurrentTimeFunc,
                                                                     UINT64, PAwsCredentialProvider*);
 
+PUBLIC_API STATUS createCurlIotCredentialProviderWithTimeAndTimeoutAndIpVersion(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, UINT64, UINT64, GetCurrentTimeFunc, IP_VERSION,
+                                                                    UINT64, PAwsCredentialProvider*);
+
 /**
  * @brief Creates an IoT based AWS credential provider object with time function which is based on libCurl
  *
@@ -769,6 +773,9 @@ PUBLIC_API STATUS freeFileCredentialProvider(PAwsCredentialProvider*);
  */
 PUBLIC_API STATUS createRequestInfo(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, SSL_CERTIFICATE_TYPE, PCHAR, UINT64, UINT64, UINT64, UINT64,
                                     PAwsCredentials, PRequestInfo*);
+
+PUBLIC_API STATUS createRequestInfoWithIpVersion(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, SSL_CERTIFICATE_TYPE, PCHAR, UINT64, UINT64, UINT64, UINT64,
+                                    PAwsCredentials, IP_VERSION, PRequestInfo*);
 
 /**
  * @brief Frees a Request Info object

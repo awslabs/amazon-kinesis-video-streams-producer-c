@@ -63,13 +63,15 @@ struct __IotCredentialProvider {
 
     // Service call functionality
     BlockingServiceCallFunc serviceCallFn;
+
+    IP_VERSION ipVersion;
 };
 typedef struct __IotCredentialProvider* PIotCredentialProvider;
 
 ////////////////////////////////////////////////////////////////////////
 // Callback function implementations
 ////////////////////////////////////////////////////////////////////////
-STATUS createIotCredentialProviderWithTime(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, UINT64, UINT64, GetCurrentTimeFunc, UINT64,
+STATUS createIotCredentialProviderWithTime(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, UINT64, UINT64, GetCurrentTimeFunc, IP_VERSION, UINT64,
                                            BlockingServiceCallFunc, PAwsCredentialProvider*);
 STATUS getIotCredentials(PAwsCredentialProvider, PAwsCredentials*);
 

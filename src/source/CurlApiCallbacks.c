@@ -973,7 +973,7 @@ STATUS createStreamCurl(UINT64 customData, PCHAR deviceName, PCHAR streamName, P
     currentTime = pCallbacksProvider->clientCallbacks.getCurrentTimeFn(pCallbacksProvider->clientCallbacks.customData);
     CHK_STATUS(createCurlRequest(HTTP_REQUEST_VERB_POST, url, paramsJson, streamHandle, pCurlApiCallbacks->region, currentTime,
                                  pServiceCallContext->connectionTimeout, pServiceCallContext->timeout, pServiceCallContext->callAfter,
-                                 pCurlApiCallbacks->certPath, pCredentials, pCurlApiCallbacks, &pCurlRequest));
+                                 pCurlApiCallbacks->certPath, pCredentials, pServiceCallContext->ipVersion, pCurlApiCallbacks, &pCurlRequest));
 
     // Set the necessary headers
     CHK_STATUS(setRequestHeader(&pCurlRequest->requestInfo, (PCHAR) "user-agent", 0, pCurlApiCallbacks->userAgent, 0));
@@ -1208,7 +1208,7 @@ STATUS describeStreamCurl(UINT64 customData, PCHAR streamName, PServiceCallConte
     currentTime = pCallbacksProvider->clientCallbacks.getCurrentTimeFn(pCallbacksProvider->clientCallbacks.customData);
     CHK_STATUS(createCurlRequest(HTTP_REQUEST_VERB_POST, url, paramsJson, streamHandle, pCurlApiCallbacks->region, currentTime,
                                  pServiceCallContext->connectionTimeout, pServiceCallContext->timeout, pServiceCallContext->callAfter,
-                                 pCurlApiCallbacks->certPath, pCredentials, pCurlApiCallbacks, &pCurlRequest));
+                                 pCurlApiCallbacks->certPath, pCredentials, pServiceCallContext->ipVersion, pCurlApiCallbacks, &pCurlRequest));
 
     // Set the necessary headers
     CHK_STATUS(setRequestHeader(&pCurlRequest->requestInfo, (PCHAR) "user-agent", 0, pCurlApiCallbacks->userAgent, 0));
@@ -1521,7 +1521,7 @@ STATUS getStreamingEndpointCurl(UINT64 customData, PCHAR streamName, PCHAR apiNa
     currentTime = pCallbacksProvider->clientCallbacks.getCurrentTimeFn(pCallbacksProvider->clientCallbacks.customData);
     CHK_STATUS(createCurlRequest(HTTP_REQUEST_VERB_POST, url, paramsJson, streamHandle, pCurlApiCallbacks->region, currentTime,
                                  pServiceCallContext->connectionTimeout, pServiceCallContext->timeout, pServiceCallContext->callAfter,
-                                 pCurlApiCallbacks->certPath, pCredentials, pCurlApiCallbacks, &pCurlRequest));
+                                 pCurlApiCallbacks->certPath, pCredentials, pServiceCallContext->ipVersion, pCurlApiCallbacks, &pCurlRequest));
 
     // Set the necessary headers
     CHK_STATUS(setRequestHeader(&pCurlRequest->requestInfo, (PCHAR) "user-agent", 0, pCurlApiCallbacks->userAgent, 0));
@@ -1853,7 +1853,7 @@ STATUS tagResourceCurl(UINT64 customData, PCHAR streamArn, UINT32 tagCount, PTag
     currentTime = pCallbacksProvider->clientCallbacks.getCurrentTimeFn(pCallbacksProvider->clientCallbacks.customData);
     CHK_STATUS(createCurlRequest(HTTP_REQUEST_VERB_POST, url, paramsJson, streamHandle, pCurlApiCallbacks->region, currentTime,
                                  pServiceCallContext->connectionTimeout, pServiceCallContext->timeout, pServiceCallContext->callAfter,
-                                 pCurlApiCallbacks->certPath, pCredentials, pCurlApiCallbacks, &pCurlRequest));
+                                 pCurlApiCallbacks->certPath, pCredentials, pServiceCallContext->ipVersion, pCurlApiCallbacks, &pCurlRequest));
 
     // Set the necessary headers
     CHK_STATUS(setRequestHeader(&pCurlRequest->requestInfo, (PCHAR) "user-agent", 0, pCurlApiCallbacks->userAgent, 0));
@@ -2069,7 +2069,7 @@ STATUS putStreamCurl(UINT64 customData, PCHAR streamName, PCHAR containerType, U
     currentTime = pCallbacksProvider->clientCallbacks.getCurrentTimeFn(pCallbacksProvider->clientCallbacks.customData);
     CHK_STATUS(createCurlRequest(HTTP_REQUEST_VERB_POST, url, NULL, (STREAM_HANDLE) pServiceCallContext->customData, pCurlApiCallbacks->region,
                                  currentTime, pServiceCallContext->connectionTimeout, pServiceCallContext->timeout, pServiceCallContext->callAfter,
-                                 pCurlApiCallbacks->certPath, pCredentials, pCurlApiCallbacks, &pCurlRequest));
+                                 pCurlApiCallbacks->certPath, pCredentials, pServiceCallContext->ipVersion, pCurlApiCallbacks, &pCurlRequest));
 
     // Set the necessary headers
     CHK_STATUS(setRequestHeader(&pCurlRequest->requestInfo, (PCHAR) "user-agent", 0, pCurlApiCallbacks->userAgent, 0));

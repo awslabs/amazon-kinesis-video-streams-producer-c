@@ -108,6 +108,83 @@ CleanUp:
     return retStatus;
 }
 
+STATUS createRequestInfoWithIpVersion(PCHAR url, PCHAR body, PCHAR region, PCHAR certPath, PCHAR sslCertPath, PCHAR sslPrivateKeyPath,
+                         SSL_CERTIFICATE_TYPE certType, PCHAR userAgent, UINT64 connectionTimeout, UINT64 completionTimeout, UINT64 lowSpeedLimit,
+                         UINT64 lowSpeedTimeLimit, PAwsCredentials pAwsCredentials, IP_VERSION ipVersion, PRequestInfo* ppRequestInfo)
+{
+    ENTERS();
+    STATUS retStatus = STATUS_SUCCESS;
+    PRequestInfo pRequestInfo = NULL;
+    UINT32 size = SIZEOF(RequestInfo), bodySize = 0;
+
+    CHK(region != NULL && url != NULL && ppRequestInfo != NULL, STATUS_NULL_ARG);
+
+    // Add body to the size excluding NULL terminator
+    if (body != NULL) {
+        bodySize = (UINT32) (STRLEN(body) * SIZEOF(CHAR));
+        size += bodySize;
+    }
+
+    // Allocate the entire structure
+    pRequestInfo = (PRequestInfo) MEMCALLOC(1, size);
+    CHK(pRequestInfo != NULL, STATUS_NOT_ENOUGH_MEMORY);
+
+    pRequestInfo->pAwsCredentials = pAwsCredentials;
+    pRequestInfo->verb = HTTP_REQUEST_VERB_POST;
+    pRequestInfo->ipVersion = ipVersion;
+    pRequestInfo->completionTimeout = completionTimeout;
+    pRequestInfo->connectionTimeout = connectionTimeout;
+    ATOMIC_STORE_BOOL(&pRequestInfo->terminating, FALSE);
+    pRequestInfo->bodySize = bodySize;
+    pRequestInfo->currentTime = GETTIME();
+    pRequestInfo->callAfter = pRequestInfo->currentTime;
+    STRNCPY(pRequestInfo->region, region, MAX_REGION_NAME_LEN);
+    STRNCPY(pRequestInfo->url, url, MAX_URI_CHAR_LEN);
+    if (certPath != NULL) {
+        STRNCPY(pRequestInfo->certPath, certPath, MAX_PATH_LEN);
+    }
+
+    if (sslCertPath != NULL) {
+        STRNCPY(pRequestInfo->sslCertPath, sslCertPath, MAX_PATH_LEN);
+    }
+
+    if (sslPrivateKeyPath != NULL) {
+        STRNCPY(pRequestInfo->sslPrivateKeyPath, sslPrivateKeyPath, MAX_PATH_LEN);
+    }
+
+    pRequestInfo->certType = certType;
+    pRequestInfo->lowSpeedLimit = lowSpeedLimit;
+    pRequestInfo->lowSpeedTimeLimit = lowSpeedTimeLimit;
+
+    // If the body is specified then it will be a request/response call
+    // Otherwise we are streaming
+    if (body != NULL) {
+        pRequestInfo->body = (PCHAR) (pRequestInfo + 1);
+        MEMCPY(pRequestInfo->body, body, bodySize);
+    }
+
+    // Create a list of headers
+    CHK_STATUS(singleListCreate(&pRequestInfo->pRequestHeaders));
+
+    // Set user agent header
+    CHK_STATUS(setRequestHeader(pRequestInfo, (PCHAR) "user-agent", 0, userAgent, 0));
+
+CleanUp:
+
+    if (STATUS_FAILED(retStatus)) {
+        freeRequestInfo(&pRequestInfo);
+        pRequestInfo = NULL;
+    }
+
+    // Set the return value if it's not NULL
+    if (ppRequestInfo != NULL) {
+        *ppRequestInfo = pRequestInfo;
+    }
+
+    LEAVES();
+    return retStatus;
+}
+
 STATUS requestRequiresSecureConnection(PCHAR pUrl, PBOOL pSecure)
 {
     STATUS retStatus = STATUS_SUCCESS;

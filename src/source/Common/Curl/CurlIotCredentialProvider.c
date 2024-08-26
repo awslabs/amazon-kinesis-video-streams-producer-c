@@ -16,7 +16,7 @@ STATUS createCurlIotCredentialProviderWithTime(PCHAR iotGetCredentialEndpoint, P
                                                PAwsCredentialProvider* ppCredentialProvider)
 {
     return createIotCredentialProviderWithTime(iotGetCredentialEndpoint, certPath, privateKeyPath, caCertPath, roleAlias, thingName,
-                                               IOT_REQUEST_CONNECTION_TIMEOUT, IOT_REQUEST_COMPLETION_TIMEOUT, getCurrentTimeFn, customData,
+                                               IOT_REQUEST_CONNECTION_TIMEOUT, IOT_REQUEST_COMPLETION_TIMEOUT, getCurrentTimeFn, IPv4_ONLY, customData,
                                                blockingCurlCall, ppCredentialProvider);
 }
 
@@ -26,6 +26,16 @@ STATUS createCurlIotCredentialProviderWithTimeAndTimeout(PCHAR iotGetCredentialE
                                                          PAwsCredentialProvider* ppCredentialProvider)
 {
     return createIotCredentialProviderWithTime(iotGetCredentialEndpoint, certPath, privateKeyPath, caCertPath, roleAlias, thingName,
-                                               connectionTimeout, completionTimeout, getCurrentTimeFn, customData, blockingCurlCall,
+                                               connectionTimeout, completionTimeout, getCurrentTimeFn, IPv4_ONLY, customData, blockingCurlCall,
+                                               ppCredentialProvider);
+}
+
+STATUS createCurlIotCredentialProviderWithTimeAndTimeoutAndIpVersion(PCHAR iotGetCredentialEndpoint, PCHAR certPath, PCHAR privateKeyPath, PCHAR caCertPath,
+                                                         PCHAR roleAlias, PCHAR thingName, UINT64 connectionTimeout, UINT64 completionTimeout,
+                                                         GetCurrentTimeFunc getCurrentTimeFn, IP_VERSION ipVersion, UINT64 customData,
+                                                         PAwsCredentialProvider* ppCredentialProvider)
+{
+    return createIotCredentialProviderWithTime(iotGetCredentialEndpoint, certPath, privateKeyPath, caCertPath, roleAlias, thingName,
+                                               connectionTimeout, completionTimeout, getCurrentTimeFn, ipVersion, customData, blockingCurlCall,
                                                ppCredentialProvider);
 }

@@ -9,7 +9,7 @@
  */
 STATUS createCurlRequest(HTTP_REQUEST_VERB curlVerb, PCHAR url, PCHAR body, STREAM_HANDLE streamHandle, PCHAR region, UINT64 currentTime,
                          UINT64 connectionTimeout, UINT64 completionTimeout, UINT64 callAfter, PCHAR certPath, PAwsCredentials pAwsCredentials,
-                         PCurlApiCallbacks pCurlApiCallbacks, PCurlRequest* ppCurlRequest)
+                         IP_VERSION ipVersion, PCurlApiCallbacks pCurlApiCallbacks, PCurlRequest* ppCurlRequest)
 {
     ENTERS();
     STATUS retStatus = STATUS_SUCCESS;
@@ -38,6 +38,7 @@ STATUS createCurlRequest(HTTP_REQUEST_VERB curlVerb, PCHAR url, PCHAR body, STRE
     pCurlRequest->requestInfo.completionTimeout = completionTimeout;
     pCurlRequest->requestInfo.connectionTimeout = connectionTimeout;
     pCurlRequest->requestInfo.callAfter = callAfter;
+    pCurlRequest->requestInfo.ipVersion = ipVersion;
     pCurlRequest->pCurlApiCallbacks = pCurlApiCallbacks;
     ATOMIC_STORE_BOOL(&pCurlRequest->requestInfo.terminating, FALSE);
     ATOMIC_STORE_BOOL(&pCurlRequest->blockedInCurl, FALSE);

@@ -286,6 +286,7 @@ INT32 main(INT32 argc, CHAR* argv[])
     CHK_STATUS(createDefaultDeviceInfo(&pDeviceInfo));
     // adjust members of pDeviceInfo here if needed
     pDeviceInfo->clientInfo.loggerLogLevel = LOG_LEVEL_DEBUG;
+    pDeviceInfo->clientInfo.ipVersion = IPv4_ONLY;
 
     // generate audio cpd
     if (!STRCMP(audioCodec, AUDIO_CODEC_NAME_ALAW)) {
@@ -325,8 +326,9 @@ INT32 main(INT32 argc, CHAR* argv[])
     data.startTime = GETTIME();
     data.firstFrame = TRUE;
 #ifdef IOT_CORE_ENABLE_CREDENTIALS
-    CHK_STATUS(createDefaultCallbacksProviderWithIotCertificate(pIotCoreCredentialEndpoint, pIotCoreCert, pIotCorePrivateKey, cacertPath,
-                                                                pIotCoreRoleAlias, pIotCoreThingName, region, NULL, NULL, &pClientCallbacks));
+    CHK_STATUS(createDefaultCallbacksProviderWithIotCertificateAndTimeoutsAndIpVersion(pIotCoreCredentialEndpoint, pIotCoreCert, pIotCorePrivateKey, cacertPath,
+                                                                pIotCoreRoleAlias, pIotCoreThingName, region, NULL, NULL, IOT_REQUEST_CONNECTION_TIMEOUT, 
+                                                                IOT_REQUEST_COMPLETION_TIMEOUT, IPv4_ONLY, &pClientCallbacks));
 #else
     CHK_STATUS(createDefaultCallbacksProviderWithAwsCredentials(accessKey, secretKey, sessionToken, MAX_UINT64, region, cacertPath, NULL, NULL,
                                                                 &pClientCallbacks));

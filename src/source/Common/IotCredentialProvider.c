@@ -6,7 +6,7 @@
 
 STATUS createIotCredentialProviderWithTime(PCHAR iotGetCredentialEndpoint, PCHAR certPath, PCHAR privateKeyPath, PCHAR caCertPath, PCHAR roleAlias,
                                            PCHAR thingName, UINT64 connectionTimeout, UINT64 completionTimeout, GetCurrentTimeFunc getCurrentTimeFn,
-                                           UINT64 customData, BlockingServiceCallFunc serviceCallFn, PAwsCredentialProvider* ppCredentialProvider)
+                                           IP_VERSION ipVersion, UINT64 customData, BlockingServiceCallFunc serviceCallFn, PAwsCredentialProvider* ppCredentialProvider)
 {
     ENTERS();
     STATUS retStatus = STATUS_SUCCESS;
@@ -24,6 +24,7 @@ STATUS createIotCredentialProviderWithTime(PCHAR iotGetCredentialEndpoint, PCHAR
     // Store the time functionality and specify default if NULL
     pIotCredentialProvider->getCurrentTimeFn = (getCurrentTimeFn == NULL) ? commonDefaultGetCurrentTimeFunc : getCurrentTimeFn;
     pIotCredentialProvider->customData = customData;
+    pIotCredentialProvider->ipVersion = ipVersion;
 
     CHK(STRNLEN(iotGetCredentialEndpoint, MAX_URI_CHAR_LEN + 1) <= MAX_URI_CHAR_LEN, STATUS_INVALID_ARG);
     STRNCPY(pIotCredentialProvider->iotGetCredentialEndpoint, iotGetCredentialEndpoint, MAX_URI_CHAR_LEN);
@@ -239,10 +240,10 @@ STATUS iotCurlHandler(PIotCredentialProvider pIotCredentialProvider)
     CHK(formatLen > 0 && formatLen < MAX_URI_CHAR_LEN, STATUS_IOT_INVALID_URI_LEN);
 
     // Form a new request info based on the params
-    CHK_STATUS(createRequestInfo(serviceUrl, NULL, DEFAULT_AWS_REGION, pIotCredentialProvider->caCertPath, pIotCredentialProvider->certPath,
+    CHK_STATUS(createRequestInfoWithIpVersion(serviceUrl, NULL, DEFAULT_AWS_REGION, pIotCredentialProvider->caCertPath, pIotCredentialProvider->certPath,
                                  pIotCredentialProvider->privateKeyPath, SSL_CERTIFICATE_TYPE_PEM, DEFAULT_USER_AGENT_NAME,
                                  pIotCredentialProvider->connectionTimeout, pIotCredentialProvider->completionTimeout, DEFAULT_LOW_SPEED_LIMIT,
-                                 DEFAULT_LOW_SPEED_TIME_LIMIT, pIotCredentialProvider->pAwsCredentials, &pRequestInfo));
+                                 DEFAULT_LOW_SPEED_TIME_LIMIT, pIotCredentialProvider->pAwsCredentials, pIotCredentialProvider->ipVersion, &pRequestInfo));
 
     callInfo.pRequestInfo = pRequestInfo;
 

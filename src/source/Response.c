@@ -223,6 +223,19 @@ STATUS initializeCurlSession(PRequestInfo pRequestInfo, PCallInfo pCallInfo, CUR
             break;
     }
 
+    switch (pRequestInfo->ipVersion) {
+        case IPv6_ONLY:
+            curl_easy_setopt(pCurl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V6);
+            break;
+        case DUAL_STACK:
+            curl_easy_setopt(pCurl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_WHATEVER);
+            break;
+        case IPv4_ONLY:
+        default:
+            curl_easy_setopt(pCurl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+            break;
+    }
+
     // Create the response headers list
     CHK_STATUS(stackQueueCreate(&pCallInfo->pResponseHeaders));
 

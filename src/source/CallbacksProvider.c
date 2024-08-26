@@ -204,6 +204,54 @@ CleanUp:
     return retStatus;
 }
 
+STATUS createDefaultCallbacksProviderWithIotCertificateAndTimeoutsAndIpVersion(PCHAR endpoint, PCHAR iotCertPath, PCHAR privateKeyPath, PCHAR caCertPath,
+                                                                   PCHAR roleAlias, PCHAR streamName, PCHAR region, PCHAR userAgentPostfix,
+                                                                   PCHAR customUserAgent, UINT64 connectionTimeout, UINT64 completionTimeout, IP_VERSION ipVersion,
+                                                                   PClientCallbacks* ppClientCallbacks)
+{
+    ENTERS();
+    STATUS retStatus = STATUS_SUCCESS;
+    PCallbacksProvider pCallbacksProvider = NULL;
+    PAuthCallbacks pAuthCallbacks = NULL;
+    PStreamCallbacks pStreamCallbacks = NULL;
+
+    CHK_STATUS(createAbstractDefaultCallbacksProvider(DEFAULT_CALLBACK_CHAIN_COUNT, API_CALL_CACHE_TYPE_ALL, ENDPOINT_UPDATE_PERIOD_SENTINEL_VALUE,
+                                                      region, EMPTY_STRING, caCertPath, userAgentPostfix, customUserAgent, ppClientCallbacks));
+
+    pCallbacksProvider = (PCallbacksProvider) *ppClientCallbacks;
+
+    CHK_STATUS(createIotAuthCallbacksWithTimeoutsWithIpVersion((PClientCallbacks) pCallbacksProvider, endpoint, iotCertPath, privateKeyPath, caCertPath, roleAlias,
+                                                  streamName, connectionTimeout, completionTimeout, ipVersion, &pAuthCallbacks));
+
+    CHK_STATUS(createContinuousRetryStreamCallbacks((PClientCallbacks) pCallbacksProvider, &pStreamCallbacks));
+
+CleanUp:
+
+    if (STATUS_FAILED(retStatus)) {
+        if (pCallbacksProvider != NULL) {
+            freeCallbacksProvider((PClientCallbacks*) &pCallbacksProvider);
+        }
+
+        if (pAuthCallbacks != NULL) {
+            freeIotAuthCallbacks(&pAuthCallbacks);
+        }
+
+        if (pStreamCallbacks != NULL) {
+            freeContinuousRetryStreamCallbacks(&pStreamCallbacks);
+        }
+
+        pCallbacksProvider = NULL;
+    }
+
+    // Set the return value if it's not NULL
+    if (ppClientCallbacks != NULL) {
+        *ppClientCallbacks = (PClientCallbacks) pCallbacksProvider;
+    }
+
+    LEAVES();
+    return retStatus;
+}
+
 STATUS createDefaultCallbacksProviderWithFileAuth(PCHAR credentialsFilePath, PCHAR region, PCHAR caCertPath, PCHAR userAgentPostfix,
                                                   PCHAR customUserAgent, PClientCallbacks* ppClientCallbacks)
 {

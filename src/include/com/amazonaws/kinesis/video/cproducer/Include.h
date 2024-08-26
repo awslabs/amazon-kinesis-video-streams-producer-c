@@ -734,6 +734,7 @@ PUBLIC_API STATUS createIotAuthCallbacks(PClientCallbacks, PCHAR, PCHAR, PCHAR, 
  * @return STATUS status of operation
  */
 PUBLIC_API STATUS createIotAuthCallbacksWithTimeouts(PClientCallbacks, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, UINT64, UINT64, PAuthCallbacks*);
+PUBLIC_API STATUS createIotAuthCallbacksWithTimeoutsWithIpVersion(PClientCallbacks, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, UINT64, UINT64, IP_VERSION, PAuthCallbacks*);
 
 /**
  * Frees the Iot Credential auth callbacks

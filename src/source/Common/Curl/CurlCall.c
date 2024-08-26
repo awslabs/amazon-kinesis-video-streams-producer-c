@@ -64,6 +64,19 @@ STATUS blockingCurlCall(PRequestInfo pRequestInfo, PCallInfo pCallInfo)
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCurlResponseCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, pCallInfo);
 
+    switch (pRequestInfo->ipVersion) {
+        case IPv6_ONLY:
+            curl_easy_setopt(curl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V6);
+            break;
+        case DUAL_STACK:
+            curl_easy_setopt(curl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_WHATEVER);
+            break;
+        case IPv4_ONLY:
+        default:
+            curl_easy_setopt(curl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+            break;
+    }
+
     curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, pRequestInfo->connectionTimeout / HUNDREDS_OF_NANOS_IN_A_MILLISECOND);
     if (pRequestInfo->completionTimeout != SERVICE_CALL_INFINITE_TIMEOUT) {
         curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, pRequestInfo->completionTimeout / HUNDREDS_OF_NANOS_IN_A_MILLISECOND);
