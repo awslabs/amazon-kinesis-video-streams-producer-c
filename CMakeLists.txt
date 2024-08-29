@@ -272,9 +272,15 @@ set(PRODUCER_CRYPTO_LIBRARY
         OpenSSL::SSL)
 if (USE_MBEDTLS)
     set(CPRODUCER_COMMON_TLS_OPTION KVS_USE_MBEDTLS)
-    set(PRODUCER_CRYPTO_LIBRARY
-            MbedTLS
-            MbedCrypto)
+    if(PARENT_PROJ_BUILD_DEPENDENCIES)
+      set(LWS_MBEDTLS_LIBRARIES ${OPEN_SRC_INSTALL_PREFIX}/lib/libmbedtls.dylib ${OPEN_SRC_INSTALL_PREFIX}/lib/libmbedx509.dylib ${OPEN_SRC_INSTALL_PREFIX}/lib/libmbedcrypto.dylib)
+      message("KVS LWS_MBEDTLS_LIBRARIES is: ${LWS_MBEDTLS_LIBRARIES}")
+      set(PRODUCER_CRYPTO_LIBRARY LWS_MBEDTLS_LIBRARIES)
+    else()
+      set(PRODUCER_CRYPTO_LIBRARY
+              MbedTLS
+              MbedCrypto)
+    endif()
 endif()
 
 install(
