@@ -286,6 +286,7 @@ INT32 main(INT32 argc, CHAR* argv[])
     CHK_STATUS(createDefaultDeviceInfo(&pDeviceInfo));
     // adjust members of pDeviceInfo here if needed
     pDeviceInfo->clientInfo.loggerLogLevel = LOG_LEVEL_DEBUG;
+    pDeviceInfo->clientInfo.dualStackEnabled = TRUE;
 
     // generate audio cpd
     if (!STRCMP(audioCodec, AUDIO_CODEC_NAME_ALAW)) {

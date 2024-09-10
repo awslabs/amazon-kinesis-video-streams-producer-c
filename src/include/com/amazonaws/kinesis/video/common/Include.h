@@ -512,6 +512,7 @@ struct __RequestInfo {
     UINT64 lowSpeedTimeLimit;                 //!< Low-time limit
     PAwsCredentials pAwsCredentials;          //!< AWS Credentials
     PSingleList pRequestHeaders;              //!< Request headers
+    BOOL dualStackEnabled;
 };
 typedef struct __RequestInfo* PRequestInfo;
 
