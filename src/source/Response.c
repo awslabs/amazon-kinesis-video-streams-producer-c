@@ -223,6 +223,10 @@ STATUS initializeCurlSession(PRequestInfo pRequestInfo, PCallInfo pCallInfo, CUR
             break;
     }
 
+    if (!pRequestInfo->dualStackEnabled) {
+        curl_easy_setopt(pCurl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+    }
+
     // Create the response headers list
     CHK_STATUS(stackQueueCreate(&pCallInfo->pResponseHeaders));
 

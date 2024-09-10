@@ -9,7 +9,7 @@
  */
 STATUS createCurlRequest(HTTP_REQUEST_VERB curlVerb, PCHAR url, PCHAR body, STREAM_HANDLE streamHandle, PCHAR region, UINT64 currentTime,
                          UINT64 connectionTimeout, UINT64 completionTimeout, UINT64 callAfter, PCHAR certPath, PAwsCredentials pAwsCredentials,
-                         PCurlApiCallbacks pCurlApiCallbacks, PCurlRequest* ppCurlRequest)
+                         BOOL dualStackEnabled, PCurlApiCallbacks pCurlApiCallbacks, PCurlRequest* ppCurlRequest)
 {
     ENTERS();
     STATUS retStatus = STATUS_SUCCESS;
@@ -44,6 +44,7 @@ STATUS createCurlRequest(HTTP_REQUEST_VERB curlVerb, PCHAR url, PCHAR body, STRE
     pCurlRequest->threadId = INVALID_TID_VALUE;
     pCurlRequest->requestInfo.bodySize = bodySize;
     pCurlRequest->requestInfo.currentTime = currentTime;
+    pCurlRequest->requestInfo.dualStackEnabled = dualStackEnabled;
 
     STRNCPY(pCurlRequest->requestInfo.region, region, MAX_REGION_NAME_LEN);
     STRNCPY(pCurlRequest->requestInfo.url, url, MAX_URI_CHAR_LEN);
