@@ -405,7 +405,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Install dependencies
         run: |
-          choco install nasm strawberryperl
+          choco install nasm strawberryperl pkgconfiglite
       - name: Build repository
         run: |
           $env:Path += ';C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;C:\Program Files\NASM;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\lib;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\bin'
