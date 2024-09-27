@@ -30,7 +30,7 @@ jobs:
       contents: read
     env:
       CC: gcc-13
-      CXX: gcc-13
+      CXX: g++-13
       AWS_KVS_LOG_LEVEL: 2
     steps:
       - name: Clone repository
@@ -116,7 +116,7 @@ jobs:
     runs-on: macos-latest-xlarge
     env:
       CC: gcc-13
-      CXX: gcc-13
+      CXX: g++-13
       AWS_KVS_LOG_LEVEL: 2
     permissions:
       id-token: write
