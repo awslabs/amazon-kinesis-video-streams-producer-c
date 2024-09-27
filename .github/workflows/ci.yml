@@ -24,13 +24,13 @@ jobs:
   #         bash scripts/check-clang.sh
 
   mac-os-build-gcc:
-    runs-on: macos-11
+    runs-on: macos-12
     permissions:
       id-token: write
       contents: read
     env:
-      CC: gcc-12
-      CXX: gcc-12
+      CC: gcc-13
+      CXX: gcc-13
       AWS_KVS_LOG_LEVEL: 2
     steps:
       - name: Clone repository
@@ -115,8 +115,8 @@ jobs:
   mac-os-m1-build-gcc:
     runs-on: macos-14-xlarge
     env:
-      CC: gcc-12
-      CXX: gcc-12
+      CC: gcc-13
+      CXX: gcc-13
       AWS_KVS_LOG_LEVEL: 2
     permissions:
       id-token: write
