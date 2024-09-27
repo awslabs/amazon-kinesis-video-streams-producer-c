@@ -29,8 +29,8 @@ jobs:
       id-token: write
       contents: read
     env:
-      CC: /usr/local/bin/gcc-13
-      CXX: /usr/local/bin/g++-13
+      CC: gcc-14
+      CXX: gcc-14
       AWS_KVS_LOG_LEVEL: 2
     steps:
       - name: Clone repository
@@ -115,8 +115,8 @@ jobs:
   mac-os-m1-build-gcc:
     runs-on: macos-13-xlarge
     env:
-      CC: /opt/homebrew/bin/gcc-13
-      CXX: /opt/homebrew/bin/g++-13
+      CC: gcc-14
+      CXX: gcc-14
       AWS_KVS_LOG_LEVEL: 2
     permissions:
       id-token: write
