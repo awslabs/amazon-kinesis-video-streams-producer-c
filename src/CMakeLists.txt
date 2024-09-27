@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.6.3)
-
+#test
 project(KinesisVideoProducerC LANGUAGES C)
 
 file(GLOB_RECURSE HEADERS "include/*.h")
