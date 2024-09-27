@@ -245,7 +245,8 @@ STATUS removeRequestHeader(PRequestInfo pRequestInfo, PCHAR headerName)
 
         if (STRCMPI(pCurrentHeader->pName, headerName) == 0) {
             CHK_STATUS(singleListDeleteNode(pRequestInfo->pRequestHeaders, pCurNode));
-
+            // Free only if found
+            SAFE_MEMFREE(pCurrentHeader);
             // Early return
             CHK(FALSE, retStatus);
         }
@@ -254,8 +255,6 @@ STATUS removeRequestHeader(PRequestInfo pRequestInfo, PCHAR headerName)
     }
 
 CleanUp:
-
-    SAFE_MEMFREE(pCurrentHeader);
 
     return retStatus;
 }

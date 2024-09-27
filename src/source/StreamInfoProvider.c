@@ -112,7 +112,7 @@ STATUS createVideoTrackInfo(VIDEO_CODEC_ID videoCodecId, PCHAR contentType, PTra
             break;
         default:
             STRCPY(pTrackInfo->codecId, MKV_H264_AVC_CODEC_ID);
-            STRCAT(contentType, MKV_H265_CONTENT_TYPE);
+            STRCAT(contentType, MKV_H264_CONTENT_TYPE);
     }
     STRCPY(pTrackInfo->trackName, DEFAULT_VIDEO_TRACK_NAME);
     pTrackInfo->trackType = MKV_TRACK_INFO_TYPE_VIDEO;

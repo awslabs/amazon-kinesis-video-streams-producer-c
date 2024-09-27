@@ -52,6 +52,7 @@ jobs:
       - name: Run tests
         run: |
           cd build
+          source ../scripts/get-iot-certs.sh ci
           ./tst/producer_test
 
   mac-os-build-clang:
@@ -81,6 +82,37 @@ jobs:
       - name: Run tests
         run: |
           cd build
+          source ../scripts/get-iot-certs.sh ci
+          ./tst/producer_test
+
+  mac-os-m1-build-clang:
+    runs-on: macos-13-xlarge
+    env:
+      AWS_KVS_LOG_LEVEL: 2
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+      - name: Build repository
+        run: |
+          brew install pkgconfig
+          brew unlink openssl # it seems the libcurl is trying to access this openssl despite explicitly setting it to our build
+          mkdir build && cd build
+          sh -c 'cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DCMAKE_C_COMPILER=$(brew --prefix llvm@15)/bin/clang -DCMAKE_CXX_COMPILER=$(brew --prefix llvm@15)/bin/clang++;cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DCMAKE_C_COMPILER=$(brew --prefix llvm@15)/bin/clang -DCMAKE_CXX_COMPILER=$(brew --prefix llvm@15)/bin/clang++'
+          make
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-duration-seconds: 10800
+      - name: Run tests
+        run: |
+          cd build
+          source ../scripts/get-iot-certs.sh ci
           ./tst/producer_test
 
   mac-os-m1-build-clang:
@@ -178,6 +210,7 @@ jobs:
       - name: Run tests
         run: |
           cd build
+          source ../scripts/get-iot-certs.sh ci
           ./tst/producer_test
 
   mac-os-build-clang-local-openssl:
@@ -209,40 +242,30 @@ jobs:
       - name: Run tests
         run: |
           cd build
+          source ../scripts/get-iot-certs.sh ci
           ./tst/producer_test
 
-  linux-gcc-code-coverage:
+  ubuntu-os-gcc-build-lws-mbedtls:
     runs-on: ubuntu-20.04
     env:
       AWS_KVS_LOG_LEVEL: 2
+      CC: gcc
+      CXX: g++
     permissions:
       id-token: write
       contents: read
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
+      - name: Install dependencies
+        run: |
+          sudo apt clean && sudo apt update
+          sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'
       - name: Build repository
         run: |
           mkdir build && cd build
-          cmake .. -DCODE_COVERAGE=TRUE -DBUILD_TEST=TRUE -DBUILD_COMMON_LWS=TRUE
+          cmake .. -DBUILD_COMMON_LWS=ON -DBUILD_COMMON_CURL=OFF -DUSE_OPENSSL=OFF -DUSE_MBEDTLS=ON
           make
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-          aws-region: ${{ secrets.AWS_REGION }}
-          role-duration-seconds: 10800
-      - name: Run tests
-        run: |
-          cd build
-          ulimit -c unlimited -S
-          timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
-      - name: Code coverage
-        run: |
-          cd build
-          for test_file in $(find cproducer.dir kvsCommonCurl.dir kvsCommonLws.dir -name '*.gcno'); do gcov $test_file; done
-          bash <(curl -s https://codecov.io/bash)
 
   address-sanitizer:
     runs-on: ubuntu-20.04
@@ -253,6 +276,10 @@ jobs:
       CC: clang
       CXX: clang++
       AWS_KVS_LOG_LEVEL: 2
+      # The unit tests will have both LWS and CURL enabled, both linking to globalMemCalloc. Our PIC is
+      # has quite a few global definitions that get linked twice. TODO: see if we can list common dependency
+      # to remove this option
+      ASAN_OPTIONS: detect_odr_violation=0
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
@@ -272,6 +299,7 @@ jobs:
         run: |
           cd build
           ulimit -c unlimited -S
+          source ../scripts/get-iot-certs.sh ci
           timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
 
   undefined-behavior-sanitizer:
@@ -302,7 +330,9 @@ jobs:
         run: |
           cd build
           ulimit -c unlimited -S
+          source ../scripts/get-iot-certs.sh ci
           timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
+
 
   # memory-sanitizer:
   #   runs-on: ubuntu-20.04
@@ -378,7 +408,7 @@ jobs:
       - name: Build repository
         run: |
           mkdir build && cd build
-          cmake .. -DBUILD_TEST=TRUE
+          cmake .. -DBUILD_TEST=TRUE -DBUILD_COMMON_LWS=ON
           make
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -391,6 +421,7 @@ jobs:
         run: |
           cd build
           ulimit -c unlimited -S
+          source ../scripts/get-iot-certs.sh ci
           timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
 
   windows-msvc:
@@ -405,7 +436,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Install dependencies
         run: |
-          choco install nasm strawberryperl
+          choco install nasm strawberryperl pkgconfiglite
       - name: Build repository
         run: |
           $env:Path += ';C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;C:\Program Files\NASM;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\lib;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\bin'
@@ -421,7 +452,7 @@ jobs:
       - name: Run tests
         run: |
           $env:Path += ';C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;C:\Program Files\NASM;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\lib;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\bin'
-          & "D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\build\tst\producer_test.exe" --gtest_filter="-ProducerFunctionalityTest.pressure_on_buffer_duration_fail_new_connection_at_token_rotation"
+          & "D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\build\tst\producer_test.exe" --gtest_filter="-IoTCredentialTest.*:ProducerFunctionalityTest.pressure_on_buffer_duration_fail_new_connection_at_token_rotation"
 
   arm64-cross-compilation:
     runs-on: ubuntu-20.04

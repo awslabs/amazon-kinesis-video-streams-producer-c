@@ -142,6 +142,7 @@ To run the samples with IoT credential provider:
 3. Build the changes: `make`
 4. Run the sample using the instructions in previous section.
 
+
 ### Fragment metadata
 
 `./kvsVideoOnlyRealtimeStreamingSample` is the only sample that has the [fragment metadata](https://docs.aws.amazon.com/kinesisvideostreams/latest/dg/how-meta.html) implemented out of the box.

@@ -4,6 +4,7 @@
 #include "RotatingStaticAuthCallbacks.h"
 
 #define TEST_AUTH_FILE_PATH      (PCHAR) "TEST_KVS_AUTH_FILE_PATH"
+#define SAMPLE_AUTH_FILE_PATH    (PCHAR) "./tst/sample_file_creds.txt"
 #define TEST_STREAM_NAME         (PCHAR) "ScaryTestStream_0"
 #define TEST_DEVICE_INFO_NAME    (PCHAR) "TestDeviceName"
 #define TEST_USER_AGENT          (PCHAR) "Test User Agent"
@@ -59,6 +60,13 @@
 #define TEST_IOT_ROLE_ALIAS            (PCHAR) "TestRoleAlias"
 #define TEST_IOT_THING_NAME            (PCHAR) "TestThingName"
 #define TEST_USER_AGENT_POSTFIX        (PCHAR) "Postfix"
+
+// IoT related envs
+#define AWS_IOT_CORE_CREDENTIAL_ENDPOINT_ENV_VAR ((PCHAR) "AWS_IOT_CORE_CREDENTIAL_ENDPOINT")
+#define AWS_IOT_CORE_CERT_ENV_VAR                ((PCHAR) "AWS_IOT_CORE_CERT")
+#define AWS_IOT_CORE_PRIVATE_KEY_ENV_VAR         ((PCHAR) "AWS_IOT_CORE_PRIVATE_KEY")
+#define AWS_IOT_CORE_ROLE_ALIAS_ENV_VAR          ((PCHAR) "AWS_IOT_CORE_ROLE_ALIAS")
+#define AWS_IOT_CORE_THING_NAME_ENV_VAR          ((PCHAR) "AWS_IOT_CORE_THING_NAME")
 
 #ifdef _WIN32
 #define TEST_TEMP_DIR_PATH                    (PCHAR) "C:\\Windows\\Temp\\"

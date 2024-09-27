@@ -230,7 +230,7 @@ CleanUp:
         }
 
         if (pAuthCallbacks != NULL) {
-            freeIotAuthCallbacks(&pAuthCallbacks);
+            freeFileAuthCallbacks(&pAuthCallbacks);
         }
 
         if (pStreamCallbacks != NULL) {

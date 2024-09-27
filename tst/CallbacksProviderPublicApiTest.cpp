@@ -639,6 +639,16 @@ TEST_F(CallbacksProviderPublicApiTest, createDefaultCallbacksProviderWithFileAut
             TEST_USER_AGENT,
             &pClientCallbacks));
     EXPECT_EQ(NULL, pClientCallbacks);
+
+    EXPECT_EQ(STATUS_SUCCESS, createDefaultCallbacksProviderWithFileAuth(
+            SAMPLE_AUTH_FILE_PATH,
+            (PCHAR) DEFAULT_AWS_REGION,
+            TEST_CA_CERT_PATH,
+            TEST_USER_AGENT_POSTFIX,
+            TEST_USER_AGENT,
+            &pClientCallbacks));
+
+    EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks));
 }
 
 TEST_F(CallbacksProviderPublicApiTest, createDefaultCallbacksProviderWithAuthCallbacks)

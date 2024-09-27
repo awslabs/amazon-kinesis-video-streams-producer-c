@@ -282,6 +282,7 @@ VOID terminateCurlSession(PCurlResponse pCurlResponse, UINT64 timeout)
     }
 }
 
+/* UNCOMMENT if required to use for CURL debugging. Not used at the moment.
 VOID dumpResponseCurlEasyInfo(PCurlResponse pCurlResponse)
 {
     DOUBLE time;
@@ -353,6 +354,7 @@ VOID dumpResponseCurlEasyInfo(PCurlResponse pCurlResponse)
         }
     }
 }
+ */
 
 SERVICE_CALL_RESULT getServiceCallResultFromCurlStatus(CURLcode curlStatus)
 {

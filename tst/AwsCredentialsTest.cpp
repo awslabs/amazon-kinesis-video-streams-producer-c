@@ -237,6 +237,8 @@ TEST_F(AwsCredentialsTest, TestFileCredentialsWriteWithoutSession) {
     CHAR fileContent[10000];
     UINT32 length = ARRAY_SIZE(fileContent);
 
+    EXPECT_EQ(STATUS_NULL_ARG, createFileCredentialProvider(TEST_FILE_CREDENTIALS_FILE_PATH, NULL));
+    EXPECT_EQ(STATUS_INVALID_ARG, createFileCredentialProvider(EMPTY_STRING, &pAwsCredentialProvider));
     // Store the credentials in a file under the current dir
     length = SNPRINTF(fileContent, length, "CREDENTIALS %s %s", mAccessKey, mSecretKey);
     ASSERT_GT(ARRAY_SIZE(fileContent), length);
@@ -244,6 +246,7 @@ TEST_F(AwsCredentialsTest, TestFileCredentialsWriteWithoutSession) {
 
     // Create file creds provider from the file
     EXPECT_EQ(STATUS_SUCCESS, createFileCredentialProvider(TEST_FILE_CREDENTIALS_FILE_PATH, &pAwsCredentialProvider));
+    EXPECT_EQ(STATUS_NULL_ARG, freeFileCredentialProvider(NULL));
     EXPECT_EQ(STATUS_SUCCESS, freeFileCredentialProvider(&pAwsCredentialProvider));
 }
 
