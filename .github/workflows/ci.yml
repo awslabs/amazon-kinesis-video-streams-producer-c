@@ -24,13 +24,13 @@ jobs:
           bash scripts/check-clang.sh
 
   mac-os-build-gcc:
-    runs-on: macos-12
+    runs-on: macos-latest
     permissions:
       id-token: write
       contents: read
     env:
-      CC: /usr/local/bin/gcc-13
-      CXX: /usr/local/bin/g++-13
+      CC: gcc-13
+      CXX: g++-13
       AWS_KVS_LOG_LEVEL: 2
     steps:
       - name: Clone repository
@@ -113,10 +113,10 @@ jobs:
           ./tst/producer_test
 
   mac-os-m1-build-gcc:
-    runs-on: macos-13-xlarge
+    runs-on: macos-latest-xlarge
     env:
-      CC: /opt/homebrew/bin/gcc-13
-      CXX: /opt/homebrew/bin/g++-13
+      CC: gcc-13
+      CXX: g++-13
       AWS_KVS_LOG_LEVEL: 2
     permissions:
       id-token: write
@@ -330,7 +330,7 @@ jobs:
   #         ulimit -c unlimited -S
   #         timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
 
-  #thread-sanitizer:
+  # thread-sanitizer:
   #  runs-on: ubuntu-20.04
   #  permissions:
   #    id-token: write
@@ -405,7 +405,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Install dependencies
         run: |
-          choco install nasm strawberryperl
+          choco install nasm strawberryperl pkgconfiglite
       - name: Build repository
         run: |
           $env:Path += ';C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;C:\Program Files\NASM;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\lib;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\bin'
