@@ -5,12 +5,10 @@ on:
     branches:
       - develop
       - master
-      - update-runners
   pull_request:
     branches:
       - develop
       - master
-      - update-runners
 jobs:
   clang-format-check:
     runs-on: macos-latest
