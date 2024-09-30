@@ -5,10 +5,12 @@ on:
     branches:
       - develop
       - master
+      - more-ci-fixes
   pull_request:
     branches:
       - develop
       - master
+      - more-ci-fixes
 jobs:
   clang-format-check:
     runs-on: macos-latest
