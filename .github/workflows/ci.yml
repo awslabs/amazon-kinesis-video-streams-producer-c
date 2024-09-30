@@ -31,8 +31,8 @@ jobs:
       id-token: write
       contents: read
     env:
-      CC: gcc-13
-      CXX: g++-13
+      CC: gcc-12
+      CXX: g++-12
       AWS_KVS_LOG_LEVEL: 2
     steps:
       - name: Clone repository
@@ -155,8 +155,8 @@ jobs:
       id-token: write
       contents: read
     env:
-      CC: gcc-13
-      CXX: g++-13
+      CC: gcc-14
+      CXX: g++-14
       AWS_KVS_LOG_LEVEL: 2
       LDFLAGS: -L/usr/local/opt/openssl@3/lib
       CPPFLAGS: -I/usr/local/opt/openssl@3/include
