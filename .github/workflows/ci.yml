@@ -24,13 +24,13 @@ jobs:
           bash scripts/check-clang.sh
 
   mac-os-build-gcc:
-    runs-on: macos-latest
+    runs-on: macos-12
     permissions:
       id-token: write
       contents: read
     env:
-      CC: gcc-13
-      CXX: g++-13
+      CC: gcc-12
+      CXX: g++-12
       AWS_KVS_LOG_LEVEL: 2
     steps:
       - name: Clone repository
@@ -55,7 +55,7 @@ jobs:
           ./tst/producer_test
 
   mac-os-build-clang:
-    runs-on: macos-latest
+    runs-on: macos-12
     env:
       AWS_KVS_LOG_LEVEL: 2
     permissions:
@@ -84,7 +84,7 @@ jobs:
           ./tst/producer_test
 
   mac-os-m1-build-clang:
-    runs-on: macos-13-xlarge
+    runs-on: macos-latest
     env:
       AWS_KVS_LOG_LEVEL: 2
     permissions:
@@ -113,7 +113,7 @@ jobs:
           ./tst/producer_test
 
   mac-os-m1-build-gcc:
-    runs-on: macos-latest-xlarge
+    runs-on: macos-latest
     env:
       CC: gcc-13
       CXX: g++-13
@@ -122,10 +122,6 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - name: Setup XCode version 15.2
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: '15.2'
       - name: Clone repository
         uses: actions/checkout@v3
       - name: Build repository
@@ -148,13 +144,13 @@ jobs:
           ./tst/producer_test
 
   mac-os-build-gcc-local-openssl:
-    runs-on: macos-latest
+    runs-on: macos-12
     permissions:
       id-token: write
       contents: read
     env:
-      CC: gcc-13
-      CXX: g++-13
+      CC: gcc-14
+      CXX: g++-14
       AWS_KVS_LOG_LEVEL: 2
       LDFLAGS: -L/usr/local/opt/openssl@3/lib
       CPPFLAGS: -I/usr/local/opt/openssl@3/include
@@ -181,7 +177,7 @@ jobs:
           ./tst/producer_test
 
   mac-os-build-clang-local-openssl:
-    runs-on: macos-latest
+    runs-on: macos-12
     env:
       AWS_KVS_LOG_LEVEL: 2
       LDFLAGS: -L/usr/local/opt/openssl@3/lib
