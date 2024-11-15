@@ -176,7 +176,7 @@ typedef struct __CurlApiCallbacks* PCurlApiCallbacks;
 //////////////////////////////////////////////////////////////////////
 // Curl API Callbacks main functionality
 //////////////////////////////////////////////////////////////////////
-STATUS createCurlApiCallbacks(struct __CallbacksProvider*, PCHAR, API_CALL_CACHE_TYPE, UINT64, PCHAR, PCHAR, PCHAR, PCHAR, PCurlApiCallbacks*);
+STATUS createCurlApiCallbacks(struct __CallbacksProvider*, PCHAR, API_CALL_CACHE_TYPE, UINT64, PCHAR, PCHAR, PCHAR, PCHAR, BOOL, PCurlApiCallbacks*);
 STATUS freeCurlApiCallbacks(PCurlApiCallbacks*);
 STATUS curlApiCallbacksShutdownActiveRequests(PCurlApiCallbacks, STREAM_HANDLE, UINT64, BOOL, BOOL);
 STATUS curlApiCallbacksShutdownCachedEndpoints(PCurlApiCallbacks, STREAM_HANDLE, BOOL);

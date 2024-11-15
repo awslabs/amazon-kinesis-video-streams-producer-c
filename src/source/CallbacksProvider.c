@@ -67,15 +67,24 @@ STATUS createDefaultCallbacksProviderWithAwsCredentials(PCHAR accessKeyId, PCHAR
                                                         PCHAR caCertPath, PCHAR userAgentPostfix, PCHAR customUserAgent,
                                                         PClientCallbacks* ppClientCallbacks)
 {
+    // Call the dual-stack variant with isDualStack set to FALSE
+    return createDualStackCallbacksProviderWithAwsCredentials(accessKeyId, secretKey, sessionToken, expiration, region, caCertPath,
+                                                                          userAgentPostfix, customUserAgent, FALSE, ppClientCallbacks);
+}
+
+STATUS createDualStackCallbacksProviderWithAwsCredentials(PCHAR accessKeyId, PCHAR secretKey, PCHAR sessionToken, UINT64 expiration, PCHAR region,
+                                                        PCHAR caCertPath, PCHAR userAgentPostfix, PCHAR customUserAgent, BOOL isDualStack,
+                                                        PClientCallbacks* ppClientCallbacks)
+{
     ENTERS();
     STATUS retStatus = STATUS_SUCCESS;
     PCallbacksProvider pCallbacksProvider = NULL;
     PAuthCallbacks pAuthCallbacks = NULL;
     PStreamCallbacks pStreamCallbacks = NULL;
 
-    CHK_STATUS(createAbstractDefaultCallbacksProvider(DEFAULT_CALLBACK_CHAIN_COUNT, API_CALL_CACHE_TYPE_ALL, ENDPOINT_UPDATE_PERIOD_SENTINEL_VALUE,
-                                                      region, EMPTY_STRING, caCertPath, userAgentPostfix, customUserAgent, ppClientCallbacks));
-
+    CHK_STATUS(createAbstractDualStackCallbacksProvider(DEFAULT_CALLBACK_CHAIN_COUNT, API_CALL_CACHE_TYPE_ALL, ENDPOINT_UPDATE_PERIOD_SENTINEL_VALUE,
+                                                      region, EMPTY_STRING, caCertPath, userAgentPostfix, customUserAgent, isDualStack, ppClientCallbacks));
+    
     pCallbacksProvider = (PCallbacksProvider) *ppClientCallbacks;
 
     CHK_STATUS(createStaticAuthCallbacks((PClientCallbacks) pCallbacksProvider, accessKeyId, secretKey, sessionToken, expiration, &pAuthCallbacks));
@@ -290,6 +299,16 @@ STATUS createAbstractDefaultCallbacksProvider(UINT32 callbackChainCount, API_CAL
                                               PCHAR controlPlaneUrl, PCHAR certPath, PCHAR userAgentName, PCHAR customUserAgent,
                                               PClientCallbacks* ppClientCallbacks)
 {
+    // Call the dual-stack variant with isDualStack set to FALSE
+    return createAbstractDualStackCallbacksProvider(callbackChainCount, cacheType, endpointCachingPeriod, region,
+                                                                       controlPlaneUrl, certPath, userAgentName, customUserAgent,
+                                                                       FALSE, ppClientCallbacks);
+}
+
+STATUS createAbstractDualStackCallbacksProvider(UINT32 callbackChainCount, API_CALL_CACHE_TYPE cacheType, UINT64 endpointCachingPeriod, PCHAR region,
+                                              PCHAR controlPlaneUrl, PCHAR certPath, PCHAR userAgentName, PCHAR customUserAgent, BOOL isDualStack,
+                                              PClientCallbacks* ppClientCallbacks)
+{
     ENTERS();
     STATUS retStatus = STATUS_SUCCESS;
     PCallbacksProvider pCallbacksProvider = NULL;
@@ -327,7 +346,7 @@ STATUS createAbstractDefaultCallbacksProvider(UINT32 callbackChainCount, API_CAL
 
     // Create the default Curl API callbacks
     CHK_STATUS(createCurlApiCallbacks(pCallbacksProvider, region, cacheType, endpointCachingPeriod, controlPlaneUrl, certPath, userAgentName,
-                                      customUserAgent, &pCurlApiCallbacks));
+                                      customUserAgent, isDualStack, &pCurlApiCallbacks));
 
 CleanUp:
 

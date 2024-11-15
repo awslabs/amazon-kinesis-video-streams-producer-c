@@ -322,6 +322,28 @@ typedef enum {
 PUBLIC_API STATUS createDefaultCallbacksProviderWithAwsCredentials(PCHAR, PCHAR, PCHAR, UINT64, PCHAR, PCHAR, PCHAR, PCHAR, PClientCallbacks*);
 
 /**
+ * Creates a default callbacks provider based on static AWS credentials
+ *
+ * NOTE: The caller is responsible for releasing the structure by calling
+ * the corresponding {@link freeCallbackProvider} API.
+ *
+ * @param[in] PCHAR Access Key Id
+ * @param[in] PCHAR Secret Key
+ * @param[in,opt] PCHAR Session Token
+ * @param[in] UINT64 Expiration of the token. MAX_UINT64 if non-expiring
+ * @param[in,opt] PCHAR AWS region
+ * @param[in,opt] PCHAR CA Cert Path
+ * @param[in,opt] PCHAR User agent name (Use NULL)
+ * @param[in,out] PCHAR Custom user agent to be used in the API calls
+ * @param[in] BOOL set to true for using dualstack endpoints
+ * @param[out] PClientCallbacks* Returned pointer to callbacks provider
+ *
+ * @return STATUS code of the execution
+ */
+PUBLIC_API STATUS createDualStackCallbacksProviderWithAwsCredentials(PCHAR, PCHAR, PCHAR, UINT64, PCHAR, PCHAR, PCHAR, PCHAR, BOOL, PClientCallbacks*);
+
+
+/**
  * Creates a default callbacks provider that uses iot certificate as auth method.
  *
  * NOTE: The caller is responsible for releasing the structure by calling
@@ -879,6 +901,24 @@ PUBLIC_API STATUS freeContinuousRetryStreamCallbacks(PStreamCallbacks*);
  * @return STATUS code of the execution
  */
 PUBLIC_API STATUS createAbstractDefaultCallbacksProvider(UINT32, API_CALL_CACHE_TYPE, UINT64, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PClientCallbacks*);
+
+/**
+ * Create abstract callback provider that can hook with other callbacks
+ *
+ * @param[in] UINT32 Length of callback provider calling chain
+ * @param[in] API_CALL_CACHE_TYPE Backend API call caching mode
+ * @param[in] UINT64 Cached endpoint update period
+ * @param[in,opt] PCHAR AWS region
+ * @param[in] PCHAR Specific Control Plane Uri as endpoint to be called
+ * @param[in,opt] PCHAR CA Cert path
+ * @param[in,opt] PCHAR User agent name (Use NULL)
+ * @param[in,opt] PCHAR Custom user agent to be used in the API calls
+ * @param[in] BOOL set to true for using dualstack endpoints
+ * @param[out] PClientCallbacks* Returned pointer to callbacks provider
+ *
+ * @return STATUS code of the execution
+ */
+PUBLIC_API STATUS createAbstractDualStackCallbacksProvider(UINT32, API_CALL_CACHE_TYPE, UINT64, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, BOOL, PClientCallbacks*);
 
 /**
  * Use file logger instead of default logger which log to stdout. The underlying objects are automatically freed
