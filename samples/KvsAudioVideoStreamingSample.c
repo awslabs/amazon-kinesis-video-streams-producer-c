@@ -286,6 +286,7 @@ INT32 main(INT32 argc, CHAR* argv[])
     CHK_STATUS(createDefaultDeviceInfo(&pDeviceInfo));
     // adjust members of pDeviceInfo here if needed
     pDeviceInfo->clientInfo.loggerLogLevel = LOG_LEVEL_DEBUG;
+    pDeviceInfo->clientInfo.dualStackEnabled = TRUE;
 
     // generate audio cpd
     if (!STRCMP(audioCodec, AUDIO_CODEC_NAME_ALAW)) {
@@ -328,8 +329,8 @@ INT32 main(INT32 argc, CHAR* argv[])
     CHK_STATUS(createDefaultCallbacksProviderWithIotCertificate(pIotCoreCredentialEndpoint, pIotCoreCert, pIotCorePrivateKey, cacertPath,
                                                                 pIotCoreRoleAlias, pIotCoreThingName, region, NULL, NULL, &pClientCallbacks));
 #else
-    CHK_STATUS(createDefaultCallbacksProviderWithAwsCredentials(accessKey, secretKey, sessionToken, MAX_UINT64, region, cacertPath, NULL, NULL,
-                                                                &pClientCallbacks));
+    CHK_STATUS(createDualStackCallbacksProviderWithAwsCredentials(accessKey, secretKey, sessionToken, MAX_UINT64, region, cacertPath, NULL, NULL,
+                                                                pDeviceInfo->clientInfo.dualStackEnabled, &pClientCallbacks));
 #endif
 
     if (NULL != GETENV(ENABLE_FILE_LOGGING)) {
