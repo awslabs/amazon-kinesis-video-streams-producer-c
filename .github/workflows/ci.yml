@@ -246,12 +246,15 @@ jobs:
       id-token: write
       contents: read
     env:
-      CC: clang
-      CXX: clang++
+      CC: clang-11
+      CXX: clang++-11
       AWS_KVS_LOG_LEVEL: 2
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
+      - name: Install clang 11
+        run: |
+          sudo apt-get install clang-11 libc++-11-dev libc++abi-11-dev
       - name: Build repository
         run: |
           mkdir build && cd build
@@ -276,12 +279,15 @@ jobs:
       id-token: write
       contents: read
     env:
-      CC: clang
-      CXX: clang++
+      CC: clang-11
+      CXX: clang++-11
       AWS_KVS_LOG_LEVEL: 2
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
+      - name: Install clang 11
+        run: |
+          sudo apt-get install clang-11 libc++-11-dev libc++abi-11-dev
       - name: Build repository
         run: |
           mkdir build && cd build
