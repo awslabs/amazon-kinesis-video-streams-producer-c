@@ -43,7 +43,7 @@ jobs:
           cmake .. --trace -DBUILD_TEST=TRUE
           make
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
@@ -72,7 +72,7 @@ jobs:
           cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE
           make
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
@@ -101,7 +101,7 @@ jobs:
           cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DCMAKE_C_COMPILER=$(brew --prefix llvm@15)/bin/clang -DCMAKE_CXX_COMPILER=$(brew --prefix llvm@15)/bin/clang++
           make
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
@@ -132,7 +132,7 @@ jobs:
           cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE
           make
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
@@ -165,7 +165,7 @@ jobs:
           cmake .. -DBUILD_TEST=TRUE -DLOCAL_OPENSSL_BUILD=ON
           make
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
@@ -196,7 +196,7 @@ jobs:
           cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DLOCAL_OPENSSL_BUILD=ON
           make
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
@@ -223,7 +223,7 @@ jobs:
           cmake .. -DCODE_COVERAGE=TRUE -DBUILD_TEST=TRUE -DBUILD_COMMON_LWS=TRUE
           make
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
@@ -258,7 +258,7 @@ jobs:
           cmake .. -DBUILD_TEST=TRUE -DADDRESS_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
           make
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
@@ -288,7 +288,7 @@ jobs:
           cmake .. -DBUILD_TEST=TRUE -DUNDEFINED_BEHAVIOR_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
           make
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
@@ -313,7 +313,7 @@ jobs:
   #     - name: Clone repository
   #       uses: actions/checkout@v3
   #     - name: Configure AWS Credentials
-  #       uses: aws-actions/configure-aws-credentials@v1-node16
+  #       uses: aws-actions/configure-aws-credentials@v4
   #       with:
   #         role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
   #         role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
@@ -339,7 +339,7 @@ jobs:
   #    - name: Clone repository
   #      uses: actions/checkout@v3
   #    - name: Configure AWS Credentials
-  #      uses: aws-actions/configure-aws-credentials@v1-node16
+  #      uses: aws-actions/configure-aws-credentials@v4
   #      with:
   #        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
   #        role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
@@ -377,7 +377,7 @@ jobs:
           cmake .. -DBUILD_TEST=TRUE
           make
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
@@ -408,7 +408,7 @@ jobs:
           git config --system core.longpaths true
           .github/build_windows.bat
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
