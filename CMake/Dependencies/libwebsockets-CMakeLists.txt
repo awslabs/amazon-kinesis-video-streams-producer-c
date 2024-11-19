@@ -18,13 +18,17 @@ else()
   set(LWS_WITH_MBEDTLS OFF)
 endif()
 
+# -- v3.2.3 of LWS does not support DISABLE_WERROR flag. Needed for Clang-14. --
+# Save original CMAKE_C_FLAGS and append -Wno-error to CMAKE_C_FLAGS
+set(ORIGINAL_CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-error")
+
 ExternalProject_Add(project_libwebsockets
     GIT_REPOSITORY    https://github.com/warmcat/libwebsockets.git
     GIT_TAG           v3.2.3
     PREFIX            ${CMAKE_CURRENT_BINARY_DIR}/build
     CMAKE_ARGS
         -DCMAKE_INSTALL_PREFIX=${OPEN_SRC_INSTALL_PREFIX}
-        -DDISABLE_WERROR=1
         -DLWS_WITH_HTTP2=1
         -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
         -DLWS_HAVE_HMAC_CTX_new=1
@@ -47,3 +51,6 @@ ExternalProject_Add(project_libwebsockets
         BUILD_ALWAYS      TRUE
     TEST_COMMAND      ""
 )
+
+# Revert CMAKE_C_FLAGS afterwards
+set(CMAKE_C_FLAGS "${ORIGINAL_CMAKE_C_FLAGS}")
