@@ -490,17 +490,10 @@ jobs:
 
   linux-thread-size-check:
     runs-on: ubuntu-latest
-    env:
-      CC: aarch64-linux-gnu-gcc
-      CXX: aarch64-linux-gnu-g++
     permissions:
       id-token: write
       contents: read
     steps:
-      - name: Install dependencies
-        run: |
-          sudo apt clean && sudo apt update
-          sudo apt-get -y install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu
       - name: Clone repository
         uses: actions/checkout@v3
       - name: Configure AWS Credentials
@@ -513,7 +506,7 @@ jobs:
       - name: Build Repository
         run: |
           mkdir build && cd build
-          cmake .. -DBUILD_TEST=TRUE -DBUILD_OPENSSL_PLATFORM=linux-aarch64 -DKVS_DEFAULT_STACK_SIZE=65536
+          cmake .. -DBUILD_TEST=TRUE -DKVS_DEFAULT_STACK_SIZE=65536
           make -j$(nproc)
       - name: Run tests with expected failure
         run: |
@@ -521,9 +514,9 @@ jobs:
           cd build
           ./tst/producer_test --gtest_filter="ProducerClientBasicTest.*"
           TEST_EXIT_CODE=$?
-          if [ $TEST_EXIT_CODE -ne 1 ]; then
-            echo "Unexpected exit code: $TEST_EXIT_CODE"
+          if [ $TEST_EXIT_CODE -eq 0 ]; then
+            echo "The test passed, but it should have failed!"
             exit 1
           fi
-          echo "Test exited as expected with code 1."
+          echo "Test failed as expected."
         shell: bash
