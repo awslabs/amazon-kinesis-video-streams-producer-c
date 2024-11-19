@@ -518,6 +518,7 @@ jobs:
       - name: Run tests with expected failure
         run: |
           set +e
+          cd build
           ./tst/producer_test --gtest_filter="ProducerClientBasicTest.*"
           TEST_EXIT_CODE=$?
           if [ $TEST_EXIT_CODE -ne 1 ]; then
