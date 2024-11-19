@@ -512,13 +512,13 @@ jobs:
         run: |
           set +e
           cd build
-          TEST_OUTPUT=$(./tst/producer_test --gtest_filter="ProducerClientBasicTest.*" 2>&1)
-          echo "$TEST_OUTPUT"
-
-          if echo "$TEST_OUTPUT" | grep -q "Segmentation fault"; then
-            echo "The tests failed with a segmentation fault detected as expected."
-          else
-            echo "The test did not fail with a segmentation fault as expected!"
+          ./tst/producer_test --gtest_filter="ProducerClientBasicTest.*"
+          TEST_EXIT_CODE=$?
+          
+          # 128 (abnormal exit) + 11 (segmentation fault) = 139
+          if [ $TEST_EXIT_CODE -ne 139 ]; then
+            echo "Unexpected exit code: $TEST_EXIT_CODE"
             exit 1
           fi
+          echo "Test exited as expected with code $TEST_EXIT_CODE."
         shell: bash
