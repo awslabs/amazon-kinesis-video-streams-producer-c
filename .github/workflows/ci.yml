@@ -500,6 +500,11 @@ jobs:
           sudo apt-get -y install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu
       - name: Clone repository
         uses: actions/checkout@v3
+      - name: Build Repository
+        run: |
+          mkdir build && cd build
+          cmake .. -DBUILD_TEST=TRUE -DBUILD_OPENSSL_PLATFORM=linux-aarch64 -DKVS_DEFAULT_STACK_SIZE=65536
+          make -j$(nproc)
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -507,14 +512,10 @@ jobs:
           role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
           aws-region: ${{ secrets.AWS_REGION }}
           role-duration-seconds: 10800
-      - name: Build Repository
-        run: |
-          mkdir build && cd build
-          cmake .. -DBUILD_TEST=TRUE -DBUILD_OPENSSL_PLATFORM=linux-aarch64 -DKVS_DEFAULT_STACK_SIZE=65536
-          make -j$(nproc)
       - name: Run tests with expected failure
         run: |
           set +e
+          cd build
           ./tst/producer_test --gtest_filter="ProducerClientBasicTest.*"
           TEST_EXIT_CODE=$?
           if [ $TEST_EXIT_CODE -ne 1 ]; then
