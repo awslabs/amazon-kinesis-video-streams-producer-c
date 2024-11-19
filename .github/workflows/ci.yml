@@ -512,11 +512,13 @@ jobs:
         run: |
           set +e
           cd build
-          ./tst/producer_test --gtest_filter="ProducerClientBasicTest.*"
-          TEST_EXIT_CODE=$?
-          if [ $TEST_EXIT_CODE -eq 0 ]; then
-            echo "The test passed, but it should have failed!"
+          TEST_OUTPUT=$(./tst/producer_test --gtest_filter="ProducerClientBasicTest.*" 2>&1)
+          echo "$TEST_OUTPUT"
+
+          if echo "$TEST_OUTPUT" | grep -q "Segmentation fault"; then
+            echo "The tests failed with a segmentation fault detected as expected."
+          else
+            echo "The test did not fail with a segmentation fault as expected!"
             exit 1
           fi
-          echo "Test failed as expected."
         shell: bash
