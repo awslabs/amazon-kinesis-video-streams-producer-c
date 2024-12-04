@@ -205,6 +205,8 @@ STATUS getSecurityTokenIotFunc(UINT64 customData, PBYTE* ppBuffer, PUINT32 pSize
     PAwsCredentials pAwsCredentials;
     PAwsCredentialProvider pCredentialProvider;
 
+    DLOGE("[test] Fetching credentials!");
+
     PIotAuthCallbacks pIotAuthCallbacks = (PIotAuthCallbacks) customData;
     CHK(pIotAuthCallbacks != NULL && ppBuffer != NULL && pSize != NULL && pExpiration != NULL, STATUS_NULL_ARG);
 
@@ -214,6 +216,9 @@ STATUS getSecurityTokenIotFunc(UINT64 customData, PBYTE* ppBuffer, PUINT32 pSize
     *pExpiration = pAwsCredentials->expiration;
     *pSize = pAwsCredentials->size;
     *ppBuffer = (PBYTE) pAwsCredentials;
+
+    DLOGE("[test] Received credentials! Expiration epoch seconds: %lu", *pExpiration / HUNDREDS_OF_NANOS_IN_A_SECOND);
+    DLOGE("Creds: %s, %s, %s\n", pAwsCredentials->accessKeyId, pAwsCredentials->secretKey, pAwsCredentials->sessionToken);
 
 CleanUp:
 
