@@ -249,6 +249,7 @@ STATUS iotCurlHandler(PIotCredentialProvider pIotCredentialProvider)
     // Append the IoT header
     CHK_STATUS(setRequestHeader(pRequestInfo, IOT_THING_NAME_HEADER, 0, pIotCredentialProvider->thingName, 0));
 
+    DLOGD("[test] Calling pIotCredentialProvider->serviceCallFn");
     // Perform a blocking call
     CHK_STATUS(pIotCredentialProvider->serviceCallFn(pRequestInfo, &callInfo));
 
