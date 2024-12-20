@@ -176,6 +176,7 @@ if(BUILD_COMMON_CURL)
   if (WIN32)
     set(CURL_LIBRARIES CURL::libcurl)
   else()
+    set(CURL_LIBRARIES curl)
     set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${CURL_INCLUDE_DIR})
   endif()
 
