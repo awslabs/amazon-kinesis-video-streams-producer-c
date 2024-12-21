@@ -169,6 +169,7 @@ endif()
 
 if(BUILD_COMMON_CURL)
   if (OPEN_SRC_INSTALL_PREFIX)
+    set(CMAKE_PREFIX_PATH "${OPEN_SRC_INSTALL_PREFIX}/lib/cmake/curl" ${CMAKE_PREFIX_PATH})
     find_package(CURL REQUIRED PATHS ${OPEN_SRC_INSTALL_PREFIX})
   else()
     find_package(CURL REQUIRED)
