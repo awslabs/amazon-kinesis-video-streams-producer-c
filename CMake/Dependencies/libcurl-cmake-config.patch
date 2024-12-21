@@ -1,0 +1,13 @@
+diff --git a/CMake/curl-config.cmake.in b/CMake/curl-config.cmake.in
+index 1294e173a..99c1e535f 100644
+--- a/CMake/curl-config.cmake.in
++++ b/CMake/curl-config.cmake.in
+@@ -10,3 +10,7 @@ endif()
+ 
+ include("${CMAKE_CURRENT_LIST_DIR}/@TARGETS_EXPORT_NAME@.cmake")
+ check_required_components("@PROJECT_NAME@")
++
++# For compatibility with CMake's FindCURL.cmake
++set(CURL_LIBRARIES @PROJECT_NAME@::libcurl)
++set_and_check(CURL_INCLUDE_DIR ${OPEN_SRC_INSTALL_PREFIX}/include)
+\ No newline at end of file
