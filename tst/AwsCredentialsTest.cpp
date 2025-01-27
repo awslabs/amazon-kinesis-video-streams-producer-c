@@ -1,177 +1,70 @@
 #include "ProducerTestFixture.h"
 
-namespace com { namespace amazonaws { namespace kinesis { namespace video {
+namespace com {
+namespace amazonaws {
+namespace kinesis {
+namespace video {
 
-class AwsCredentialsTest : public ProducerClientTestBase {
-};
+class AwsCredentialsTest : public ProducerClientTestBase {};
 
 TEST_F(AwsCredentialsTest, createAwsCredentials)
 {
     PAwsCredentials pAwsCredentials = NULL;
     CHAR authStr[MAX_AUTH_LEN + 2];
-    
+
     MEMSET(authStr, 'a', ARRAY_SIZE(authStr));
     authStr[MAX_AUTH_LEN + 1] = '\0';
 
     // Positive case permutations
 
-    EXPECT_EQ(STATUS_SUCCESS, createAwsCredentials(
-            TEST_ACCESS_KEY,
-            0,
-            TEST_SECRET_KEY,
-            0,
-            TEST_SESSION_TOKEN,
-            0,
-            MAX_UINT64,
-            &pAwsCredentials));
+    EXPECT_EQ(STATUS_SUCCESS, createAwsCredentials(TEST_ACCESS_KEY, 0, TEST_SECRET_KEY, 0, TEST_SESSION_TOKEN, 0, MAX_UINT64, &pAwsCredentials));
     EXPECT_GE(MAX_AUTH_LEN, pAwsCredentials->size);
     EXPECT_EQ(STATUS_SUCCESS, freeAwsCredentials(&pAwsCredentials));
     EXPECT_EQ(STATUS_SUCCESS, freeAwsCredentials(&pAwsCredentials));
 
-    EXPECT_EQ(STATUS_SUCCESS, createAwsCredentials(
-            TEST_ACCESS_KEY,
-            STRLEN(TEST_ACCESS_KEY),
-            TEST_SECRET_KEY,
-            STRLEN(TEST_SECRET_KEY),
-            TEST_SESSION_TOKEN,
-            STRLEN(TEST_SESSION_TOKEN),
-            MAX_UINT64,
-            &pAwsCredentials));
+    EXPECT_EQ(STATUS_SUCCESS,
+              createAwsCredentials(TEST_ACCESS_KEY, STRLEN(TEST_ACCESS_KEY), TEST_SECRET_KEY, STRLEN(TEST_SECRET_KEY), TEST_SESSION_TOKEN,
+                                   STRLEN(TEST_SESSION_TOKEN), MAX_UINT64, &pAwsCredentials));
     EXPECT_EQ(STATUS_SUCCESS, freeAwsCredentials(&pAwsCredentials));
     EXPECT_EQ(STATUS_SUCCESS, freeAwsCredentials(&pAwsCredentials));
 
-    EXPECT_EQ(STATUS_SUCCESS, createAwsCredentials(
-            TEST_ACCESS_KEY,
-            0,
-            TEST_SECRET_KEY,
-            0,
-            TEST_SESSION_TOKEN,
-            0,
-            0,
-            &pAwsCredentials));
+    EXPECT_EQ(STATUS_SUCCESS, createAwsCredentials(TEST_ACCESS_KEY, 0, TEST_SECRET_KEY, 0, TEST_SESSION_TOKEN, 0, 0, &pAwsCredentials));
     EXPECT_EQ(STATUS_SUCCESS, freeAwsCredentials(&pAwsCredentials));
     EXPECT_EQ(STATUS_SUCCESS, freeAwsCredentials(&pAwsCredentials));
 
     // Negative cases
 
-    EXPECT_EQ(STATUS_INVALID_ARG, createAwsCredentials(
-            EMPTY_STRING,
-            0,
-            EMPTY_STRING,
-            0,
-            EMPTY_STRING,
-            0,
-            0,
-            &pAwsCredentials));
+    EXPECT_EQ(STATUS_INVALID_ARG, createAwsCredentials(EMPTY_STRING, 0, EMPTY_STRING, 0, EMPTY_STRING, 0, 0, &pAwsCredentials));
     EXPECT_EQ(STATUS_SUCCESS, freeAwsCredentials(&pAwsCredentials));
     EXPECT_EQ(STATUS_SUCCESS, freeAwsCredentials(&pAwsCredentials));
 
-    EXPECT_EQ(STATUS_INVALID_ARG, createAwsCredentials(
-            EMPTY_STRING,
-            0,
-            TEST_SECRET_KEY,
-            0,
-            TEST_SESSION_TOKEN,
-            0,
-            0,
-            &pAwsCredentials));
+    EXPECT_EQ(STATUS_INVALID_ARG, createAwsCredentials(EMPTY_STRING, 0, TEST_SECRET_KEY, 0, TEST_SESSION_TOKEN, 0, 0, &pAwsCredentials));
 
-    EXPECT_EQ(STATUS_INVALID_ARG, createAwsCredentials(
-            EMPTY_STRING,
-            0,
-            EMPTY_STRING,
-            0,
-            TEST_SESSION_TOKEN,
-            0,
-            0,
-            &pAwsCredentials));
+    EXPECT_EQ(STATUS_INVALID_ARG, createAwsCredentials(EMPTY_STRING, 0, EMPTY_STRING, 0, TEST_SESSION_TOKEN, 0, 0, &pAwsCredentials));
 
-    EXPECT_EQ(STATUS_NULL_ARG, createAwsCredentials(
-            NULL,
-            0,
-            EMPTY_STRING,
-            0,
-            TEST_SESSION_TOKEN,
-            0,
-            0,
-            &pAwsCredentials));
+    EXPECT_EQ(STATUS_NULL_ARG, createAwsCredentials(NULL, 0, EMPTY_STRING, 0, TEST_SESSION_TOKEN, 0, 0, &pAwsCredentials));
 
-
-    EXPECT_EQ(STATUS_NULL_ARG, createAwsCredentials(
-            NULL,
-            0,
-            TEST_SECRET_KEY,
-            0,
-            TEST_SESSION_TOKEN,
-            0,
-            MAX_UINT64,
-            &pAwsCredentials));
+    EXPECT_EQ(STATUS_NULL_ARG, createAwsCredentials(NULL, 0, TEST_SECRET_KEY, 0, TEST_SESSION_TOKEN, 0, MAX_UINT64, &pAwsCredentials));
     EXPECT_EQ(NULL, pAwsCredentials);
 
-    EXPECT_EQ(STATUS_NULL_ARG, createAwsCredentials(
-            TEST_ACCESS_KEY,
-            0,
-            NULL,
-            0,
-            TEST_SESSION_TOKEN,
-            0,
-            MAX_UINT64,
-            &pAwsCredentials));
+    EXPECT_EQ(STATUS_NULL_ARG, createAwsCredentials(TEST_ACCESS_KEY, 0, NULL, 0, TEST_SESSION_TOKEN, 0, MAX_UINT64, &pAwsCredentials));
     EXPECT_EQ(NULL, pAwsCredentials);
 
-    EXPECT_EQ(STATUS_INVALID_AUTH_LEN, createAwsCredentials(
-            authStr,
-            0,
-            TEST_SECRET_KEY,
-            0,
-            TEST_SESSION_TOKEN,
-            0,
-            MAX_UINT64,
-            &pAwsCredentials));
+    EXPECT_EQ(STATUS_INVALID_AUTH_LEN, createAwsCredentials(authStr, 0, TEST_SECRET_KEY, 0, TEST_SESSION_TOKEN, 0, MAX_UINT64, &pAwsCredentials));
     EXPECT_EQ(NULL, pAwsCredentials);
 
-    EXPECT_EQ(STATUS_INVALID_AUTH_LEN, createAwsCredentials(
-            TEST_ACCESS_KEY,
-            0,
-            authStr,
-            0,
-            TEST_SESSION_TOKEN,
-            0,
-            MAX_UINT64,
-            &pAwsCredentials));
+    EXPECT_EQ(STATUS_INVALID_AUTH_LEN, createAwsCredentials(TEST_ACCESS_KEY, 0, authStr, 0, TEST_SESSION_TOKEN, 0, MAX_UINT64, &pAwsCredentials));
     EXPECT_EQ(NULL, pAwsCredentials);
 
-    EXPECT_EQ(STATUS_INVALID_AUTH_LEN, createAwsCredentials(
-            TEST_ACCESS_KEY,
-            0,
-            TEST_SECRET_KEY,
-            0,
-            authStr,
-            0,
-            MAX_UINT64,
-            &pAwsCredentials));
+    EXPECT_EQ(STATUS_INVALID_AUTH_LEN, createAwsCredentials(TEST_ACCESS_KEY, 0, TEST_SECRET_KEY, 0, authStr, 0, MAX_UINT64, &pAwsCredentials));
     EXPECT_EQ(NULL, pAwsCredentials);
 
-    EXPECT_EQ(STATUS_INVALID_AUTH_LEN, createAwsCredentials(
-            TEST_ACCESS_KEY,
-            MAX_AUTH_LEN / 3,
-            TEST_SECRET_KEY,
-            MAX_AUTH_LEN / 3,
-            TEST_SESSION_TOKEN,
-            MAX_AUTH_LEN / 3,
-            MAX_UINT64,
-            &pAwsCredentials));
+    EXPECT_EQ(STATUS_INVALID_AUTH_LEN,
+              createAwsCredentials(TEST_ACCESS_KEY, MAX_AUTH_LEN / 3, TEST_SECRET_KEY, MAX_AUTH_LEN / 3, TEST_SESSION_TOKEN, MAX_AUTH_LEN / 3,
+                                   MAX_UINT64, &pAwsCredentials));
     EXPECT_EQ(NULL, pAwsCredentials);
 
-    EXPECT_EQ(STATUS_NULL_ARG, createAwsCredentials(
-            TEST_ACCESS_KEY,
-            0,
-            TEST_SECRET_KEY,
-            0,
-            TEST_SESSION_TOKEN,
-            0,
-            MAX_UINT64,
-            NULL));
+    EXPECT_EQ(STATUS_NULL_ARG, createAwsCredentials(TEST_ACCESS_KEY, 0, TEST_SECRET_KEY, 0, TEST_SESSION_TOKEN, 0, MAX_UINT64, NULL));
 }
 
 TEST_F(AwsCredentialsTest, freeAwsCredentials)
@@ -188,15 +81,7 @@ TEST_F(AwsCredentialsTest, deserializeAwsCredentials)
     EXPECT_EQ(STATUS_NULL_ARG, deserializeAwsCredentials(NULL));
 
     // Create valid credentials, roundtrip.
-    EXPECT_EQ(STATUS_SUCCESS, createAwsCredentials(
-            TEST_ACCESS_KEY,
-            0,
-            TEST_SECRET_KEY,
-            0,
-            TEST_SESSION_TOKEN,
-            0,
-            MAX_UINT64,
-            &pAwsCredentials));
+    EXPECT_EQ(STATUS_SUCCESS, createAwsCredentials(TEST_ACCESS_KEY, 0, TEST_SECRET_KEY, 0, TEST_SESSION_TOKEN, 0, MAX_UINT64, &pAwsCredentials));
 
     // Copy forward the bits
     MEMCPY(tempBuff, pAwsCredentials, pAwsCredentials->size);
@@ -232,7 +117,8 @@ TEST_F(AwsCredentialsTest, deserializeAwsCredentials)
     pDeserialized->sessionToken = pStored;
 }
 
-TEST_F(AwsCredentialsTest, TestFileCredentialsWriteWithoutSession) {
+TEST_F(AwsCredentialsTest, TestFileCredentialsWriteWithoutSession)
+{
     PAwsCredentialProvider pAwsCredentialProvider = NULL;
     CHAR fileContent[10000];
     UINT32 length = ARRAY_SIZE(fileContent);
@@ -247,7 +133,8 @@ TEST_F(AwsCredentialsTest, TestFileCredentialsWriteWithoutSession) {
     EXPECT_EQ(STATUS_SUCCESS, freeFileCredentialProvider(&pAwsCredentialProvider));
 }
 
-TEST_F(AwsCredentialsTest, TestFileCredentialsWriteWithSession) {
+TEST_F(AwsCredentialsTest, TestFileCredentialsWriteWithSession)
+{
     PAwsCredentialProvider pAwsCredentialProvider = NULL;
     CHAR fileContent[10000];
     UINT32 length = ARRAY_SIZE(fileContent);
@@ -262,7 +149,7 @@ TEST_F(AwsCredentialsTest, TestFileCredentialsWriteWithSession) {
     EXPECT_EQ(STATUS_SUCCESS, freeFileCredentialProvider(&pAwsCredentialProvider));
 }
 
-}  // namespace video
-}  // namespace kinesis
-}  // namespace amazonaws
-}  // namespace com;
+} // namespace video
+} // namespace kinesis
+} // namespace amazonaws
+} // namespace com

@@ -1,13 +1,16 @@
 #include "ProducerTestFixture.h"
 
-namespace com { namespace amazonaws { namespace kinesis { namespace video {
-    
-class ProducerContinuousRetryTest : public ProducerClientTestBase {
-};
+namespace com {
+namespace amazonaws {
+namespace kinesis {
+namespace video {
+
+class ProducerContinuousRetryTest : public ProducerClientTestBase {};
 
 extern ProducerClientTestBase* gProducerClientTestBase;
 
-TEST_F(ProducerContinuousRetryTest, test_stream_callbacks_connection_stale_triggered) {
+TEST_F(ProducerContinuousRetryTest, test_stream_callbacks_connection_stale_triggered)
+{
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     UINT32 i;
     UINT32 totalFragments = 10; // 130s in total duration
@@ -27,7 +30,7 @@ TEST_F(ProducerContinuousRetryTest, test_stream_callbacks_connection_stale_trigg
     streamHandle = mStreams[0];
     EXPECT_TRUE(streamHandle != INVALID_STREAM_HANDLE_VALUE);
 
-    for(i = 0; i < totalFrames; ++i) {
+    for (i = 0; i < totalFrames; ++i) {
         EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
         updateFrame();
         THREAD_SLEEP(mFrame.duration / 2); // speed up test
@@ -45,7 +48,8 @@ TEST_F(ProducerContinuousRetryTest, test_stream_callbacks_connection_stale_trigg
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
 
-TEST_F(ProducerContinuousRetryTest, test_stream_callbacks_stream_latency_triggered) {
+TEST_F(ProducerContinuousRetryTest, test_stream_callbacks_stream_latency_triggered)
+{
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     UINT32 i;
     UINT32 totalFragments = 10; // 10s in total duration
@@ -63,7 +67,7 @@ TEST_F(ProducerContinuousRetryTest, test_stream_callbacks_stream_latency_trigger
     streamHandle = mStreams[0];
     EXPECT_TRUE(streamHandle != INVALID_STREAM_HANDLE_VALUE);
 
-    for(i = 0; i < totalFrames - 1; ++i) {
+    for (i = 0; i < totalFrames - 1; ++i) {
         EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
         updateFrame();
     }
@@ -83,7 +87,8 @@ TEST_F(ProducerContinuousRetryTest, test_stream_callbacks_stream_latency_trigger
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
 
-TEST_F(ProducerContinuousRetryTest, test_stream_recover_after_reset_connnection) {
+TEST_F(ProducerContinuousRetryTest, test_stream_recover_after_reset_connnection)
+{
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     UINT32 i;
     UINT32 totalFragments = 10; // 10s in total duration
@@ -97,7 +102,7 @@ TEST_F(ProducerContinuousRetryTest, test_stream_recover_after_reset_connnection)
     streamHandle = mStreams[0];
     EXPECT_TRUE(streamHandle != INVALID_STREAM_HANDLE_VALUE);
 
-    for(i = 0; i < totalFrames; ++i) {
+    for (i = 0; i < totalFrames; ++i) {
         EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
         updateFrame();
         THREAD_SLEEP(mFrame.duration / 2); // speed up test
@@ -106,7 +111,7 @@ TEST_F(ProducerContinuousRetryTest, test_stream_recover_after_reset_connnection)
     kinesisVideoStreamResetConnection(streamHandle);
 
     THREAD_SLEEP(1 * HUNDREDS_OF_NANOS_IN_A_SECOND);
-    for(i = 0; i < totalFrames; ++i) {
+    for (i = 0; i < totalFrames; ++i) {
         EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
         updateFrame();
         THREAD_SLEEP(mFrame.duration / 2); // speed up test
@@ -119,7 +124,8 @@ TEST_F(ProducerContinuousRetryTest, test_stream_recover_after_reset_connnection)
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
 
-TEST_F(ProducerContinuousRetryTest, test_stream_recover_after_reset_connnection_stream_session_timeout) {
+TEST_F(ProducerContinuousRetryTest, test_stream_recover_after_reset_connnection_stream_session_timeout)
+{
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     UINT32 i;
     UINT32 totalFragments = 10; // 10s in total duration
@@ -133,7 +139,7 @@ TEST_F(ProducerContinuousRetryTest, test_stream_recover_after_reset_connnection_
     streamHandle = mStreams[0];
     EXPECT_TRUE(streamHandle != INVALID_STREAM_HANDLE_VALUE);
 
-    for(i = 0; i < totalFrames; ++i) {
+    for (i = 0; i < totalFrames; ++i) {
         EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
         updateFrame();
         THREAD_SLEEP(mFrame.duration / 2); // speed up test
@@ -142,7 +148,7 @@ TEST_F(ProducerContinuousRetryTest, test_stream_recover_after_reset_connnection_
     kinesisVideoStreamResetConnection(streamHandle);
 
     THREAD_SLEEP(31 * HUNDREDS_OF_NANOS_IN_A_SECOND);
-    for(i = 0; i < totalFrames; ++i) {
+    for (i = 0; i < totalFrames; ++i) {
         EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
         updateFrame();
         THREAD_SLEEP(mFrame.duration / 2); // speed up test
@@ -155,7 +161,8 @@ TEST_F(ProducerContinuousRetryTest, test_stream_recover_after_reset_connnection_
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
 
-TEST_F(ProducerContinuousRetryTest, recover_on_retriable_producer_error) {
+TEST_F(ProducerContinuousRetryTest, recover_on_retriable_producer_error)
+{
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     UINT32 i;
     UINT32 totalFragments = 10;
@@ -182,7 +189,7 @@ TEST_F(ProducerContinuousRetryTest, recover_on_retriable_producer_error) {
     pAuth->recoverCount = 3; // 1 for main token, 1 for the security token for the first session
     // and only then should fail for the last token.
 
-    for(i = 0; i < totalFrames; ++i) {
+    for (i = 0; i < totalFrames; ++i) {
         EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
         updateFrame();
         THREAD_SLEEP(mFrame.duration / 2); // speed up test
@@ -202,7 +209,8 @@ TEST_F(ProducerContinuousRetryTest, recover_on_retriable_producer_error) {
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
 
-TEST_F(ProducerContinuousRetryTest, no_recovery_on_non_retriable_producer_error) {
+TEST_F(ProducerContinuousRetryTest, no_recovery_on_non_retriable_producer_error)
+{
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     UINT32 i;
     UINT32 totalFragments = 10;
@@ -229,7 +237,7 @@ TEST_F(ProducerContinuousRetryTest, no_recovery_on_non_retriable_producer_error)
     pAuth->recoverCount = 3; // 1 for main token, 1 for the security token for the first session
     // and only then should fail for the last token.
 
-    for(i = 0; i < totalFrames; ++i) {
+    for (i = 0; i < totalFrames; ++i) {
         EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
         updateFrame();
         THREAD_SLEEP(mFrame.duration / 2); // speed up test
@@ -246,7 +254,8 @@ TEST_F(ProducerContinuousRetryTest, no_recovery_on_non_retriable_producer_error)
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
 
-TEST_F(ProducerContinuousRetryTest, recover_on_retriable_common_lib_error) {
+TEST_F(ProducerContinuousRetryTest, recover_on_retriable_common_lib_error)
+{
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     UINT32 i;
     UINT32 totalFragments = 10;
@@ -273,7 +282,7 @@ TEST_F(ProducerContinuousRetryTest, recover_on_retriable_common_lib_error) {
     pAuth->recoverCount = 3; // 1 for main token, 1 for the security token for the first session
     // and only then should fail for the last token.
 
-    for(i = 0; i < totalFrames; ++i) {
+    for (i = 0; i < totalFrames; ++i) {
         EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
         updateFrame();
         THREAD_SLEEP(mFrame.duration / 2); // speed up test
@@ -290,7 +299,8 @@ TEST_F(ProducerContinuousRetryTest, recover_on_retriable_common_lib_error) {
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
 
-TEST_F(ProducerContinuousRetryTest, no_recovery_on_non_retriable_common_lib_error) {
+TEST_F(ProducerContinuousRetryTest, no_recovery_on_non_retriable_common_lib_error)
+{
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     UINT32 i;
     UINT32 totalFragments = 10;
@@ -317,7 +327,7 @@ TEST_F(ProducerContinuousRetryTest, no_recovery_on_non_retriable_common_lib_erro
     pAuth->recoverCount = 3; // 1 for main token, 1 for the security token for the first session
     // and only then should fail for the last token.
 
-    for(i = 0; i < totalFrames; ++i) {
+    for (i = 0; i < totalFrames; ++i) {
         EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
         updateFrame();
         THREAD_SLEEP(mFrame.duration / 2); // speed up test
@@ -334,7 +344,8 @@ TEST_F(ProducerContinuousRetryTest, no_recovery_on_non_retriable_common_lib_erro
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
 
-TEST_F(ProducerContinuousRetryTest, contrinuous_retry_reset_failure) {
+TEST_F(ProducerContinuousRetryTest, contrinuous_retry_reset_failure)
+{
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     UINT32 i;
     UINT32 totalFragments = 10;
@@ -364,7 +375,7 @@ TEST_F(ProducerContinuousRetryTest, contrinuous_retry_reset_failure) {
     mDescribeRecoverCount = 1000;
     mDescribeRetStatus = STATUS_DESCRIBE_STREAM_CALL_FAILED;
 
-    for(i = 0; i < totalFrames; ++i) {
+    for (i = 0; i < totalFrames; ++i) {
         EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
         updateFrame();
         THREAD_SLEEP(mFrame.duration / 2); // speed up test
@@ -393,7 +404,7 @@ TEST_F(ProducerContinuousRetryTest, contrinuous_retry_reset_failure) {
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
 
-}
-}
-}
-}
+} // namespace video
+} // namespace kinesis
+} // namespace amazonaws
+} // namespace com
