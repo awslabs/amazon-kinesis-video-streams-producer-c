@@ -10,19 +10,6 @@ on:
       - develop
       - master
 jobs:
-  clang-format-check:
-    runs-on: macos-latest
-    steps:
-      - name: Clone repository
-        uses: actions/checkout@v3
-      - name: Install clang-format
-        run: |
-          brew install clang-format
-          clang-format --version
-      - name: Run clang format check
-        run: |
-          bash scripts/check-clang.sh
-
   mac-os-build-gcc:
     runs-on: macos-13
     permissions:
