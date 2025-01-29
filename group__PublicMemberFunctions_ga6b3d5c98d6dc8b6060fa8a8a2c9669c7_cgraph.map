@@ -1,8 +1,13 @@
 <map id="addAuthCallbacks" name="addAuthCallbacks">
-<area shape="rect" id="node1" title=" " alt="" coords="5,107,144,133"/>
-<area shape="rect" id="node2" href="$CallbacksProvider_8c.html#ad12c94ae140c934f01effa3c122bd735" title=" " alt="" coords="199,5,410,32"/>
-<area shape="rect" id="node3" href="$CallbacksProvider_8c.html#a8744dc5e9cc05cb24af5e62123f90205" title=" " alt="" coords="193,56,416,83"/>
-<area shape="rect" id="node4" href="$CallbacksProvider_8c.html#a5e3f4330afe31e4329e7415e764a762c" title=" " alt="" coords="192,107,417,133"/>
-<area shape="rect" id="node5" href="$CallbacksProvider_8c.html#add9bf6e3a774069651a149f299c9cd0e" title=" " alt="" coords="205,157,405,184"/>
-<area shape="rect" id="node6" href="$CallbacksProvider_8c.html#ae3e9564183aef54c638217b317359189" title=" " alt="" coords="197,208,412,235"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,104,144,129"/>
+<area shape="rect" id="Node000002" href="$CallbacksProvider_8c.html#ad12c94ae140c934f01effa3c122bd735" title=" " alt="" coords="199,5,410,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="90,102,134,70,191,40,213,32,214,37,193,44,137,75,93,106"/>
+<area shape="rect" id="Node000003" href="$CallbacksProvider_8c.html#a8744dc5e9cc05cb24af5e62123f90205" title=" " alt="" coords="193,55,416,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="134,101,191,89,230,80,232,85,193,94,135,106"/>
+<area shape="rect" id="Node000004" href="$CallbacksProvider_8c.html#a5e3f4330afe31e4329e7415e764a762c" title=" " alt="" coords="192,104,417,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="144,114,178,114,178,119,144,119"/>
+<area shape="rect" id="Node000005" href="$CallbacksProvider_8c.html#add9bf6e3a774069651a149f299c9cd0e" title=" " alt="" coords="205,153,405,179"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="135,127,232,148,231,153,134,132"/>
+<area shape="rect" id="Node000006" href="$CallbacksProvider_8c.html#ae3e9564183aef54c638217b317359189" title=" " alt="" coords="197,203,412,228"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="94,127,137,158,193,188,219,197,217,202,191,192,134,162,91,132"/>
 </map>

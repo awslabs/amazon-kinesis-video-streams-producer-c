@@ -1,7 +1,12 @@
 <map id="createStaticCredentialProvider" name="createStaticCredentialProvider">
-<area shape="rect" id="node1" title="Creates a Static AWS credential provider object." alt="" coords="5,56,227,83"/>
-<area shape="rect" id="node2" href="$group__PublicMemberFunctions.html#ga91f39f496f456f5cfd1c68924edb3c29" title="Creates an AWS credentials object." alt="" coords="296,5,460,32"/>
-<area shape="rect" id="node4" href="$group__PublicMemberFunctions.html#ga94a14bb7bbda0b12bd2afb55da9374ce" title="Frees a Static Aws credential provider object." alt="" coords="275,56,481,83"/>
-<area shape="rect" id="node5" href="$StaticCredentialProvider_8c.html#a2f5490ab05f15466a4218788806af6d5" title=" " alt="" coords="301,107,455,133"/>
-<area shape="rect" id="node3" href="$group__PublicMemberFunctions.html#ga3c6cf4b6ce6b8188234420b5e83e4b60" title="Frees an Aws credentials object." alt="" coords="529,31,679,57"/>
+<area shape="rect" id="Node000001" title="Creates a Static AWS credential provider object." alt="" coords="5,55,227,80"/>
+<area shape="rect" id="Node000002" href="$group__PublicMemberFunctions.html#ga91f39f496f456f5cfd1c68924edb3c29" title="Creates an AWS credentials object." alt="" coords="296,5,460,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="184,52,296,31,297,36,185,57"/>
+<area shape="rect" id="Node000004" href="$group__PublicMemberFunctions.html#ga94a14bb7bbda0b12bd2afb55da9374ce" title="Frees a Static Aws credential provider object." alt="" coords="275,55,481,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="227,65,261,65,261,70,227,70"/>
+<area shape="rect" id="Node000005" href="$StaticCredentialProvider_8c.html#a2f5490ab05f15466a4218788806af6d5" title=" " alt="" coords="301,104,455,129"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="185,77,297,99,296,104,184,83"/>
+<area shape="rect" id="Node000003" href="$group__PublicMemberFunctions.html#ga3c6cf4b6ce6b8188234420b5e83e4b60" title="Frees an Aws credentials object." alt="" coords="529,31,679,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="461,25,516,31,515,36,460,30"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="482,54,515,50,516,55,482,59"/>
 </map>

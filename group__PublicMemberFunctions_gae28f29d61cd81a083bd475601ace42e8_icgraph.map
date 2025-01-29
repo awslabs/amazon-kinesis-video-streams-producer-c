@@ -1,4 +1,5 @@
 <map id="createLwsIotCredentialProviderWithTime" name="createLwsIotCredentialProviderWithTime">
-<area shape="rect" id="node1" title="Creates an IoT based AWS credential provider object with time function which is based on libWebSocket..." alt="" coords="280,5,507,47"/>
-<area shape="rect" id="node2" href="$group__PublicMemberFunctions.html#ga3f966d72311ebdfc66dfcf77aaf41684" title="Creates an IoT based AWS credential provider object using libWebSockets." alt="" coords="5,13,232,39"/>
+<area shape="rect" id="Node000001" title="Creates an IoT based AWS credential provider object with time function which is based on libWebSocket..." alt="" coords="280,5,507,45"/>
+<area shape="rect" id="Node000002" href="$group__PublicMemberFunctions.html#ga3f966d72311ebdfc66dfcf77aaf41684" title="Creates an IoT based AWS credential provider object using libWebSockets." alt="" coords="5,13,232,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="266,28,232,28,232,23,266,23"/>
 </map>

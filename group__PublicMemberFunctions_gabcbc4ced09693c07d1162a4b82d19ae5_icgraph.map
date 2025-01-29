@@ -1,11 +1,19 @@
 <map id="addProducerCallbacks" name="addProducerCallbacks">
-<area shape="rect" id="node1" title=" " alt="" coords="779,163,945,189"/>
-<area shape="rect" id="node2" href="$CurlApiCallbacks_8c.html#a130e64adf86a4615c3e31fe7044c014a" title=" " alt="" coords="557,163,731,189"/>
-<area shape="rect" id="node3" href="$group__PublicMemberFunctions.html#ga6c195173d4fd6f942260e2b81c0d4e83" title=" " alt="" coords="281,155,509,197"/>
-<area shape="rect" id="node4" href="$CallbacksProvider_8c.html#a020c62e1ff193d474681bef1c94bdcee" title=" " alt="" coords="5,5,233,32"/>
-<area shape="rect" id="node5" href="$group__PublicMemberFunctions.html#ga42ffcf860b92e764b2ba56bc5d72fd71" title=" " alt="" coords="5,57,233,98"/>
-<area shape="rect" id="node6" href="$group__PublicMemberFunctions.html#gabace8323412b6bd8019502f1f7d13c6a" title=" " alt="" coords="5,122,233,163"/>
-<area shape="rect" id="node7" href="$group__PublicMemberFunctions.html#gafcd18610ba9ef3d8a4ce62539ddfc2e9" title=" " alt="" coords="5,187,233,229"/>
-<area shape="rect" id="node8" href="$group__PublicMemberFunctions.html#ga750983add758649af12b8317d8483c3e" title=" " alt="" coords="5,253,233,294"/>
-<area shape="rect" id="node9" href="$group__PublicMemberFunctions.html#gacab2eb7cb8bc4a0337c9e257b5933688" title=" " alt="" coords="5,318,233,359"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="779,159,945,184"/>
+<area shape="rect" id="Node000002" href="$CurlApiCallbacks_8c.html#a130e64adf86a4615c3e31fe7044c014a" title=" " alt="" coords="557,159,731,184"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="765,174,731,174,731,169,765,169"/>
+<area shape="rect" id="Node000003" href="$group__PublicMemberFunctions.html#ga6c195173d4fd6f942260e2b81c0d4e83" title=" " alt="" coords="281,151,509,191"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="544,174,510,174,510,169,544,169"/>
+<area shape="rect" id="Node000004" href="$CallbacksProvider_8c.html#a020c62e1ff193d474681bef1c94bdcee" title=" " alt="" coords="5,5,233,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="363,143,305,93,270,67,232,46,198,33,200,28,234,41,273,63,309,88,367,139"/>
+<area shape="rect" id="Node000005" href="$group__PublicMemberFunctions.html#ga42ffcf860b92e764b2ba56bc5d72fd71" title=" " alt="" coords="5,55,233,95"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="334,149,232,110,195,98,196,93,234,105,336,144"/>
+<area shape="rect" id="Node000006" href="$group__PublicMemberFunctions.html#gabace8323412b6bd8019502f1f7d13c6a" title=" " alt="" coords="5,119,233,159"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="268,159,233,155,234,150,268,154"/>
+<area shape="rect" id="Node000007" href="$group__PublicMemberFunctions.html#gafcd18610ba9ef3d8a4ce62539ddfc2e9" title=" " alt="" coords="5,183,233,223"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="268,189,234,193,233,187,268,183"/>
+<area shape="rect" id="Node000008" href="$group__PublicMemberFunctions.html#ga750983add758649af12b8317d8483c3e" title=" " alt="" coords="5,247,233,287"/>
+<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="336,199,234,238,196,250,195,245,232,233,334,194"/>
+<area shape="rect" id="Node000009" href="$group__PublicMemberFunctions.html#gacab2eb7cb8bc4a0337c9e257b5933688" title=" " alt="" coords="5,311,233,351"/>
+<area shape="poly" id="edge8_Node000003_Node000009" title=" " alt="" coords="366,203,308,254,272,279,235,302,207,314,205,309,232,297,269,275,305,249,362,199"/>
 </map>

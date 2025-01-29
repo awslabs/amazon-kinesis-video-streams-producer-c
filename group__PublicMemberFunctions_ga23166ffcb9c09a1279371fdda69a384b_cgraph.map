@@ -1,14 +1,26 @@
 <map id="createCredentialProviderAuthCallbacks" name="createCredentialProviderAuthCallbacks">
-<area shape="rect" id="node1" title=" " alt="" coords="5,259,189,301"/>
-<area shape="rect" id="node2" href="$group__PublicMemberFunctions.html#ga6b3d5c98d6dc8b6060fa8a8a2c9669c7" title=" " alt="" coords="275,132,414,159"/>
-<area shape="rect" id="node8" href="$group__PublicMemberFunctions.html#gad6f01a89a7aecb3daf603a17ae4ac97a" title=" " alt="" coords="513,259,712,301"/>
-<area shape="rect" id="node9" href="$CredentialProviderAuthCallbacks_8c.html#a933c49053642415072f719a851b58086" title=" " alt="" coords="245,259,444,301"/>
-<area shape="rect" id="node10" href="$CredentialProviderAuthCallbacks_8c.html#a5ff17d5407940807a20ab2d34454f6e1" title=" " alt="" coords="245,325,445,366"/>
-<area shape="rect" id="node11" href="$CredentialProviderAuthCallbacks_8c.html#a298af077fba413b6b505eb38e396e805" title=" " alt="" coords="237,390,452,431"/>
-<area shape="rect" id="node3" href="$CallbacksProvider_8c.html#ad12c94ae140c934f01effa3c122bd735" title=" " alt="" coords="507,5,718,32"/>
-<area shape="rect" id="node4" href="$CallbacksProvider_8c.html#a8744dc5e9cc05cb24af5e62123f90205" title=" " alt="" coords="501,56,724,83"/>
-<area shape="rect" id="node5" href="$CallbacksProvider_8c.html#a5e3f4330afe31e4329e7415e764a762c" title=" " alt="" coords="500,107,725,133"/>
-<area shape="rect" id="node6" href="$CallbacksProvider_8c.html#add9bf6e3a774069651a149f299c9cd0e" title=" " alt="" coords="513,157,713,184"/>
-<area shape="rect" id="node7" href="$CallbacksProvider_8c.html#ae3e9564183aef54c638217b317359189" title=" " alt="" coords="505,208,720,235"/>
-<area shape="rect" id="node12" href="$CurlApiCallbacks_8c.html#a5de89df93a74674899c68cae2b860e4f" title=" " alt="" coords="550,397,675,424"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,253,189,293"/>
+<area shape="rect" id="Node000002" href="$group__PublicMemberFunctions.html#ga6b3d5c98d6dc8b6060fa8a8a2c9669c7" title=" " alt="" coords="275,128,414,153"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="134,250,236,194,306,157,308,162,239,199,136,255"/>
+<area shape="rect" id="Node000008" href="$group__PublicMemberFunctions.html#gad6f01a89a7aecb3daf603a17ae4ac97a" title=" " alt="" coords="513,253,712,293"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="171,250,237,238,345,230,452,238,515,247,514,253,452,243,345,236,238,243,172,255"/>
+<area shape="rect" id="Node000009" href="$CredentialProviderAuthCallbacks_8c.html#a933c49053642415072f719a851b58086" title=" " alt="" coords="245,253,444,293"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="189,270,232,270,232,275,189,275"/>
+<area shape="rect" id="Node000010" href="$CredentialProviderAuthCallbacks_8c.html#a5ff17d5407940807a20ab2d34454f6e1" title=" " alt="" coords="245,317,445,357"/>
+<area shape="poly" id="edge10_Node000001_Node000010" title=" " alt="" coords="176,290,254,311,253,316,175,295"/>
+<area shape="rect" id="Node000011" href="$CredentialProviderAuthCallbacks_8c.html#a298af077fba413b6b505eb38e396e805" title=" " alt="" coords="237,381,452,421"/>
+<area shape="poly" id="edge11_Node000001_Node000011" title=" " alt="" coords="124,291,175,329,239,366,255,373,253,378,236,371,172,333,121,295"/>
+<area shape="rect" id="Node000003" href="$CallbacksProvider_8c.html#ad12c94ae140c934f01effa3c122bd735" title=" " alt="" coords="507,5,718,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="360,126,419,83,458,60,499,40,521,32,522,37,501,44,460,64,422,88,363,130"/>
+<area shape="rect" id="Node000004" href="$CallbacksProvider_8c.html#a8744dc5e9cc05cb24af5e62123f90205" title=" " alt="" coords="501,55,724,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="382,125,499,89,533,80,534,86,501,94,383,130"/>
+<area shape="rect" id="Node000005" href="$CallbacksProvider_8c.html#a5e3f4330afe31e4329e7415e764a762c" title=" " alt="" coords="500,104,725,129"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="414,132,486,125,486,131,415,137"/>
+<area shape="rect" id="Node000006" href="$CallbacksProvider_8c.html#add9bf6e3a774069651a149f299c9cd0e" title=" " alt="" coords="513,153,713,179"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="415,145,499,153,498,158,414,150"/>
+<area shape="rect" id="Node000007" href="$CallbacksProvider_8c.html#ae3e9564183aef54c638217b317359189" title=" " alt="" coords="505,203,720,228"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="384,151,501,187,539,197,537,202,499,193,382,156"/>
+<area shape="poly" id="edge9_Node000009_Node000008" title=" " alt="" coords="444,270,500,270,500,275,444,275"/>
+<area shape="rect" id="Node000012" href="$CurlApiCallbacks_8c.html#a5de89df93a74674899c68cae2b860e4f" title=" " alt="" coords="550,388,675,413"/>
+<area shape="poly" id="edge12_Node000011_Node000012" title=" " alt="" coords="452,398,536,398,536,403,452,403"/>
 </map>

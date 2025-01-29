@@ -1,7 +1,11 @@
 <map id="createOfflineVideoStreamInfoProvider" name="createOfflineVideoStreamInfoProvider">
-<area shape="rect" id="node1" title=" " alt="" coords="5,49,196,90"/>
-<area shape="rect" id="node2" href="$StreamInfoProvider_8c.html#a5c26f8d9518a9c6d3dcf2baccf97a9c7" title=" " alt="" coords="244,56,416,83"/>
-<area shape="rect" id="node3" href="$StreamInfoProvider_8c.html#ad5f6df119c04cc525d42cf3c40a6cc59" title=" " alt="" coords="472,5,631,32"/>
-<area shape="rect" id="node4" href="$group__PublicMemberFunctions.html#gac6ee2669ba7255b501b631f6f6117249" title=" " alt="" coords="464,56,639,83"/>
-<area shape="rect" id="node5" href="$StreamInfoProvider_8c.html#a4b2dccb57947255c377bfa22bdb7ca3e" title=" " alt="" coords="467,107,636,133"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,47,196,87"/>
+<area shape="rect" id="Node000002" href="$StreamInfoProvider_8c.html#a5c26f8d9518a9c6d3dcf2baccf97a9c7" title=" " alt="" coords="244,55,416,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="196,65,230,65,230,70,196,70"/>
+<area shape="rect" id="Node000003" href="$StreamInfoProvider_8c.html#ad5f6df119c04cc525d42cf3c40a6cc59" title=" " alt="" coords="472,5,631,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="387,52,480,31,481,36,388,57"/>
+<area shape="rect" id="Node000004" href="$group__PublicMemberFunctions.html#gac6ee2669ba7255b501b631f6f6117249" title=" " alt="" coords="464,55,639,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="417,65,450,65,450,70,417,70"/>
+<area shape="rect" id="Node000005" href="$StreamInfoProvider_8c.html#a4b2dccb57947255c377bfa22bdb7ca3e" title=" " alt="" coords="467,104,636,129"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="388,77,481,98,480,104,387,83"/>
 </map>

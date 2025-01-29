@@ -1,5 +1,0 @@
-<map id="blockingLwsCall" name="blockingLwsCall">
-<area shape="rect" id="node1" title=" " alt="" coords="555,13,681,39"/>
-<area shape="rect" id="node2" href="$group__PublicMemberFunctions.html#gae28f29d61cd81a083bd475601ace42e8" title="Creates an IoT based AWS credential provider object with time function which is based on libWebSocket..." alt="" coords="280,5,507,47"/>
-<area shape="rect" id="node3" href="$group__PublicMemberFunctions.html#ga3f966d72311ebdfc66dfcf77aaf41684" title="Creates an IoT based AWS credential provider object using libWebSockets." alt="" coords="5,13,232,39"/>
-</map>

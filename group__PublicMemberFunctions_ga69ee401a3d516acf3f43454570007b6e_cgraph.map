@@ -1,19 +1,38 @@
 <map id="createStaticAuthCallbacks" name="createStaticAuthCallbacks">
-<area shape="rect" id="node1" title=" " alt="" coords="5,309,199,336"/>
-<area shape="rect" id="node2" href="$group__PublicMemberFunctions.html#ga6b3d5c98d6dc8b6060fa8a8a2c9669c7" title=" " alt="" coords="285,132,423,159"/>
-<area shape="rect" id="node8" href="$group__PublicMemberFunctions.html#ga76944b3c59fd2fad4348349a00c1bc49" title="Creates a Static AWS credential provider object." alt="" coords="511,259,733,285"/>
-<area shape="rect" id="node13" href="$group__PublicMemberFunctions.html#ga5d6efb4bcce7b45136d21dd7c21b05d3" title=" " alt="" coords="533,309,711,336"/>
-<area shape="rect" id="node14" href="$StaticAuthCallbacks_8c.html#a6ed8933ffce03b0b35f1a6fc5afaa943" title=" " alt="" coords="250,335,458,361"/>
-<area shape="rect" id="node15" href="$StaticAuthCallbacks_8c.html#ae40218d7597a2dbf04c65657b36baf25" title=" " alt="" coords="254,385,454,412"/>
-<area shape="rect" id="node16" href="$StaticAuthCallbacks_8c.html#a210eaa03571b74e4ca79dad52d98d4b0" title=" " alt="" coords="247,436,461,463"/>
-<area shape="rect" id="node3" href="$CallbacksProvider_8c.html#ad12c94ae140c934f01effa3c122bd735" title=" " alt="" coords="517,5,727,32"/>
-<area shape="rect" id="node4" href="$CallbacksProvider_8c.html#a8744dc5e9cc05cb24af5e62123f90205" title=" " alt="" coords="511,56,733,83"/>
-<area shape="rect" id="node5" href="$CallbacksProvider_8c.html#a5e3f4330afe31e4329e7415e764a762c" title=" " alt="" coords="509,107,735,133"/>
-<area shape="rect" id="node6" href="$CallbacksProvider_8c.html#add9bf6e3a774069651a149f299c9cd0e" title=" " alt="" coords="522,157,722,184"/>
-<area shape="rect" id="node7" href="$CallbacksProvider_8c.html#ae3e9564183aef54c638217b317359189" title=" " alt="" coords="515,208,729,235"/>
-<area shape="rect" id="node9" href="$group__PublicMemberFunctions.html#ga91f39f496f456f5cfd1c68924edb3c29" title="Creates an AWS credentials object." alt="" coords="804,208,968,235"/>
-<area shape="rect" id="node11" href="$group__PublicMemberFunctions.html#ga94a14bb7bbda0b12bd2afb55da9374ce" title="Frees a Static Aws credential provider object." alt="" coords="783,309,989,336"/>
-<area shape="rect" id="node12" href="$StaticCredentialProvider_8c.html#a2f5490ab05f15466a4218788806af6d5" title=" " alt="" coords="809,259,963,285"/>
-<area shape="rect" id="node10" href="$group__PublicMemberFunctions.html#ga3c6cf4b6ce6b8188234420b5e83e4b60" title="Frees an Aws credentials object." alt="" coords="1037,259,1187,285"/>
-<area shape="rect" id="node17" href="$CurlApiCallbacks_8c.html#a5de89df93a74674899c68cae2b860e4f" title=" " alt="" coords="559,436,685,463"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,301,199,327"/>
+<area shape="rect" id="Node000002" href="$group__PublicMemberFunctions.html#ga6b3d5c98d6dc8b6060fa8a8a2c9669c7" title=" " alt="" coords="285,127,423,152"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="120,299,321,158,324,162,123,303"/>
+<area shape="rect" id="Node000008" href="$group__PublicMemberFunctions.html#ga76944b3c59fd2fad4348349a00c1bc49" title="Creates a Static AWS credential provider object." alt="" coords="511,252,733,277"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="195,299,246,293,498,271,498,276,247,298,196,304"/>
+<area shape="rect" id="Node000013" href="$group__PublicMemberFunctions.html#ga5d6efb4bcce7b45136d21dd7c21b05d3" title=" " alt="" coords="533,301,711,327"/>
+<area shape="poly" id="edge13_Node000001_Node000013" title=" " alt="" coords="199,311,519,311,519,317,199,317"/>
+<area shape="rect" id="Node000014" href="$StaticAuthCallbacks_8c.html#a6ed8933ffce03b0b35f1a6fc5afaa943" title=" " alt="" coords="250,327,458,352"/>
+<area shape="poly" id="edge15_Node000001_Node000014" title=" " alt="" coords="199,321,237,325,236,330,199,326"/>
+<area shape="rect" id="Node000015" href="$StaticAuthCallbacks_8c.html#ae40218d7597a2dbf04c65657b36baf25" title=" " alt="" coords="254,376,454,401"/>
+<area shape="poly" id="edge17_Node000001_Node000015" title=" " alt="" coords="138,324,247,361,282,370,281,375,246,366,136,329"/>
+<area shape="rect" id="Node000016" href="$StaticAuthCallbacks_8c.html#a210eaa03571b74e4ca79dad52d98d4b0" title=" " alt="" coords="247,425,461,451"/>
+<area shape="poly" id="edge18_Node000001_Node000016" title=" " alt="" coords="119,325,173,368,209,391,248,412,267,419,265,424,246,416,207,396,170,372,116,329"/>
+<area shape="rect" id="Node000003" href="$CallbacksProvider_8c.html#ad12c94ae140c934f01effa3c122bd735" title=" " alt="" coords="517,5,727,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="370,124,429,83,467,59,508,40,530,32,532,37,510,44,470,64,431,87,373,129"/>
+<area shape="rect" id="Node000004" href="$CallbacksProvider_8c.html#a8744dc5e9cc05cb24af5e62123f90205" title=" " alt="" coords="511,55,733,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="392,124,509,89,543,80,544,86,510,94,394,129"/>
+<area shape="rect" id="Node000005" href="$CallbacksProvider_8c.html#a5e3f4330afe31e4329e7415e764a762c" title=" " alt="" coords="509,104,735,129"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="423,131,495,125,496,130,424,136"/>
+<area shape="rect" id="Node000006" href="$CallbacksProvider_8c.html#add9bf6e3a774069651a149f299c9cd0e" title=" " alt="" coords="522,153,722,179"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="424,144,508,152,508,157,423,149"/>
+<area shape="rect" id="Node000007" href="$CallbacksProvider_8c.html#ae3e9564183aef54c638217b317359189" title=" " alt="" coords="515,203,729,228"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="392,150,510,187,547,197,546,202,509,193,390,155"/>
+<area shape="rect" id="Node000009" href="$group__PublicMemberFunctions.html#ga91f39f496f456f5cfd1c68924edb3c29" title="Creates an AWS credentials object." alt="" coords="804,203,968,228"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="690,249,803,228,804,233,691,255"/>
+<area shape="rect" id="Node000011" href="$group__PublicMemberFunctions.html#ga94a14bb7bbda0b12bd2afb55da9374ce" title="Frees a Static Aws credential provider object." alt="" coords="783,301,989,327"/>
+<area shape="poly" id="edge10_Node000008_Node000011" title=" " alt="" coords="691,275,804,296,803,301,690,280"/>
+<area shape="rect" id="Node000012" href="$StaticCredentialProvider_8c.html#a2f5490ab05f15466a4218788806af6d5" title=" " alt="" coords="809,252,963,277"/>
+<area shape="poly" id="edge12_Node000008_Node000012" title=" " alt="" coords="733,262,795,262,795,267,733,267"/>
+<area shape="rect" id="Node000010" href="$group__PublicMemberFunctions.html#ga3c6cf4b6ce6b8188234420b5e83e4b60" title="Frees an Aws credentials object." alt="" coords="1037,252,1187,277"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="945,225,1040,246,1039,252,944,231"/>
+<area shape="poly" id="edge11_Node000011_Node000010" title=" " alt="" coords="944,299,1039,278,1040,283,945,304"/>
+<area shape="poly" id="edge14_Node000013_Node000011" title=" " alt="" coords="711,311,769,311,769,317,711,317"/>
+<area shape="poly" id="edge16_Node000014_Node000013" title=" " alt="" coords="458,327,519,321,519,326,459,332"/>
+<area shape="rect" id="Node000017" href="$CurlApiCallbacks_8c.html#a5de89df93a74674899c68cae2b860e4f" title=" " alt="" coords="559,425,685,451"/>
+<area shape="poly" id="edge19_Node000016_Node000017" title=" " alt="" coords="461,435,546,435,546,441,461,441"/>
 </map>

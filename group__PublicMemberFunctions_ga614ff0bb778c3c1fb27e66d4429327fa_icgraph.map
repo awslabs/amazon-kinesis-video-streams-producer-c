@@ -1,6 +1,9 @@
 <map id="createCurlIotCredentialProviderWithTime" name="createCurlIotCredentialProviderWithTime">
-<area shape="rect" id="node1" title="Creates an IoT based AWS credential provider object with time function which is based on libCurl." alt="" coords="556,23,783,65"/>
-<area shape="rect" id="node2" href="$group__PublicMemberFunctions.html#gab4a9b009056672dbeeea6c79bfc6a797" title="Creates an IoT based AWS credential provider object using libCurl." alt="" coords="281,5,508,32"/>
-<area shape="rect" id="node3" href="$group__PublicMemberFunctions.html#ga8a84bd94812cefeab5b52176e5d7401c" title=" " alt="" coords="308,56,481,83"/>
-<area shape="rect" id="node4" href="$group__PublicMemberFunctions.html#ga750983add758649af12b8317d8483c3e" title=" " alt="" coords="5,49,233,90"/>
+<area shape="rect" id="Node000001" title="Creates an IoT based AWS credential provider object with time function which is based on libCurl." alt="" coords="556,23,783,63"/>
+<area shape="rect" id="Node000002" href="$group__PublicMemberFunctions.html#gab4a9b009056672dbeeea6c79bfc6a797" title="Creates an IoT based AWS credential provider object using libCurl." alt="" coords="281,5,508,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="542,34,508,31,509,26,543,29"/>
+<area shape="rect" id="Node000003" href="$group__PublicMemberFunctions.html#ga8a84bd94812cefeab5b52176e5d7401c" title=" " alt="" coords="308,55,481,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="543,57,482,62,481,57,542,52"/>
+<area shape="rect" id="Node000004" href="$group__PublicMemberFunctions.html#ga750983add758649af12b8317d8483c3e" title=" " alt="" coords="5,47,233,87"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="294,70,233,70,233,65,294,65"/>
 </map>

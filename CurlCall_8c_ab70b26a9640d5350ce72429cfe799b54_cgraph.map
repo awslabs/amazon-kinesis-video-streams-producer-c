@@ -1,7 +1,0 @@
-<map id="blockingCurlCall" name="blockingCurlCall">
-<area shape="rect" id="node1" title=" " alt="" coords="5,81,133,108"/>
-<area shape="rect" id="node2" href="$CurlCall_8c.html#a2d3ad015231b4c7cbd36007e36c42c10" title=" " alt="" coords="225,5,383,32"/>
-<area shape="rect" id="node3" href="$Util_8c.html#a94b854e99ce8a65db46338c9dd12c5d1" title=" " alt="" coords="209,56,399,83"/>
-<area shape="rect" id="node4" href="$group__PublicMemberFunctions.html#ga32ae8a6f5f3ec7fae0d7840e74203053" title="Checks whether the request URL requires a secure connection." alt="" coords="181,107,427,133"/>
-<area shape="rect" id="node5" href="$CurlCall_8c.html#a254799a28ddab568cda7b34c83abfb3f" title=" " alt="" coords="204,157,404,184"/>
-</map>

@@ -1,10 +1,20 @@
 <map id="createFileCredentialProviderWithTime" name="createFileCredentialProviderWithTime">
-<area shape="rect" id="node1" title="Creates a File based AWS credential provider object." alt="" coords="5,74,212,115"/>
-<area shape="rect" id="node2" href="$Util_8c.html#a479029902f6c9e304dc9432451ac7312" title=" " alt="" coords="260,5,521,32"/>
-<area shape="rect" id="node3" href="$group__PublicMemberFunctions.html#gae05e583babc3bd248a2cd26572fa8d8e" title="Frees a File based Aws credential provider object." alt="" coords="569,56,761,83"/>
-<area shape="rect" id="node5" href="$FileCredentialProvider_8c.html#a0779e047c0dca4a0ddc7353192990d23" title=" " alt="" coords="321,107,461,133"/>
-<area shape="rect" id="node6" href="$FileCredentialProvider_8c.html#a4e590690d8509794518c76f11bd9dcf3" title=" " alt="" coords="591,157,739,184"/>
-<area shape="rect" id="node4" href="$group__PublicMemberFunctions.html#ga3c6cf4b6ce6b8188234420b5e83e4b60" title="Frees an Aws credentials object." alt="" coords="1056,107,1205,133"/>
-<area shape="rect" id="node7" href="$group__PublicMemberFunctions.html#gadd4141a2d6a95d3e4191489a69f9f433" title="Converts the timestamp string to time." alt="" coords="809,157,1008,184"/>
-<area shape="rect" id="node8" href="$group__PublicMemberFunctions.html#ga91f39f496f456f5cfd1c68924edb3c29" title="Creates an AWS credentials object." alt="" coords="827,208,991,235"/>
+<area shape="rect" id="Node000001" title="Creates a File based AWS credential provider object." alt="" coords="5,74,212,114"/>
+<area shape="rect" id="Node000002" href="$Util_8c.html#a479029902f6c9e304dc9432451ac7312" title=" " alt="" coords="260,5,521,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="176,71,259,47,322,31,323,37,261,53,177,76"/>
+<area shape="rect" id="Node000003" href="$group__PublicMemberFunctions.html#gae05e583babc3bd248a2cd26572fa8d8e" title="Frees a File based Aws credential provider object." alt="" coords="569,56,761,81"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="212,87,555,71,556,76,212,92"/>
+<area shape="rect" id="Node000005" href="$FileCredentialProvider_8c.html#a0779e047c0dca4a0ddc7353192990d23" title=" " alt="" coords="321,107,461,132"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="212,101,307,109,307,115,212,106"/>
+<area shape="rect" id="Node000006" href="$FileCredentialProvider_8c.html#a4e590690d8509794518c76f11bd9dcf3" title=" " alt="" coords="591,157,739,183"/>
+<area shape="poly" id="edge10_Node000001_Node000006" title=" " alt="" coords="160,112,208,128,261,142,344,155,428,163,577,168,577,174,428,168,343,160,259,147,206,134,158,117"/>
+<area shape="rect" id="Node000004" href="$group__PublicMemberFunctions.html#ga3c6cf4b6ce6b8188234420b5e83e4b60" title="Frees an Aws credentials object." alt="" coords="1056,107,1205,132"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="762,73,1008,98,1043,103,1042,108,1008,103,761,79"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="461,129,583,152,582,157,460,135"/>
+<area shape="poly" id="edge9_Node000006_Node000004" title=" " alt="" coords="735,155,809,143,1042,122,1042,127,810,149,735,160"/>
+<area shape="rect" id="Node000007" href="$group__PublicMemberFunctions.html#gadd4141a2d6a95d3e4191489a69f9f433" title="Converts the timestamp string to time." alt="" coords="809,157,1008,183"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="740,167,795,167,795,173,740,173"/>
+<area shape="rect" id="Node000008" href="$group__PublicMemberFunctions.html#ga91f39f496f456f5cfd1c68924edb3c29" title="Creates an AWS credentials object." alt="" coords="827,207,991,232"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="729,180,832,201,831,206,728,185"/>
+<area shape="poly" id="edge8_Node000008_Node000004" title=" " alt="" coords="974,204,1007,193,1057,167,1100,138,1103,143,1060,171,1009,198,976,209"/>
 </map>

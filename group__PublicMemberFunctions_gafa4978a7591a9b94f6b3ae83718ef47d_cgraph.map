@@ -1,9 +1,15 @@
 <map id="addApiCallbacks" name="addApiCallbacks">
-<area shape="rect" id="node1" title=" " alt="" coords="5,132,136,159"/>
-<area shape="rect" id="node2" href="$CallbacksProvider_8c.html#ae091ccbc4a587bf7af181e3d6c21cb60" title=" " alt="" coords="214,5,389,32"/>
-<area shape="rect" id="node3" href="$CallbacksProvider_8c.html#a141069aa0f8841ee1a58e9a40d387b7c" title=" " alt="" coords="213,56,390,83"/>
-<area shape="rect" id="node4" href="$CallbacksProvider_8c.html#abd733908187f9e4f2f49e9e9f2290cf9" title=" " alt="" coords="206,107,397,133"/>
-<area shape="rect" id="node5" href="$CallbacksProvider_8c.html#a8223219816d48805165bb7e742851995" title=" " alt="" coords="184,157,419,184"/>
-<area shape="rect" id="node6" href="$CallbacksProvider_8c.html#a426940565968ccf4b5282a96f80dde7a" title=" " alt="" coords="223,208,380,235"/>
-<area shape="rect" id="node7" href="$CallbacksProvider_8c.html#a8d0238586a9fb09c555cdde12278db2b" title=" " alt="" coords="216,259,387,285"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,129,136,155"/>
+<area shape="rect" id="Node000002" href="$CallbacksProvider_8c.html#ae091ccbc4a587bf7af181e3d6c21cb60" title=" " alt="" coords="214,5,389,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="80,127,122,84,151,60,183,40,200,32,202,37,185,44,154,64,125,88,84,131"/>
+<area shape="rect" id="Node000003" href="$CallbacksProvider_8c.html#a141069aa0f8841ee1a58e9a40d387b7c" title=" " alt="" coords="213,55,390,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="95,127,136,107,183,89,213,81,214,86,185,94,138,112,97,132"/>
+<area shape="rect" id="Node000004" href="$CallbacksProvider_8c.html#abd733908187f9e4f2f49e9e9f2290cf9" title=" " alt="" coords="206,104,397,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="136,132,192,126,193,131,136,138"/>
+<area shape="rect" id="Node000005" href="$CallbacksProvider_8c.html#a8223219816d48805165bb7e742851995" title=" " alt="" coords="184,153,419,179"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="136,146,171,150,170,155,136,151"/>
+<area shape="rect" id="Node000006" href="$CallbacksProvider_8c.html#a426940565968ccf4b5282a96f80dde7a" title=" " alt="" coords="223,203,380,228"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="99,152,185,187,219,197,218,202,183,193,97,157"/>
+<area shape="rect" id="Node000007" href="$CallbacksProvider_8c.html#a8d0238586a9fb09c555cdde12278db2b" title=" " alt="" coords="216,252,387,277"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="85,153,126,195,154,218,185,237,205,245,203,250,183,242,151,222,122,199,81,157"/>
 </map>

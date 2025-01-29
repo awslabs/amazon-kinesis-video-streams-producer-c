@@ -1,5 +1,7 @@
 <map id="freeFileAuthCallbacks" name="freeFileAuthCallbacks">
-<area shape="rect" id="node1" title=" " alt="" coords="5,5,169,32"/>
-<area shape="rect" id="node2" href="$group__PublicMemberFunctions.html#gae05e583babc3bd248a2cd26572fa8d8e" title="Frees a File based Aws credential provider object." alt="" coords="217,5,409,32"/>
-<area shape="rect" id="node3" href="$group__PublicMemberFunctions.html#ga3c6cf4b6ce6b8188234420b5e83e4b60" title="Frees an Aws credentials object." alt="" coords="457,5,607,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,169,31"/>
+<area shape="rect" id="Node000002" href="$group__PublicMemberFunctions.html#gae05e583babc3bd248a2cd26572fa8d8e" title="Frees a File based Aws credential provider object." alt="" coords="217,5,409,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="170,15,204,15,204,21,170,21"/>
+<area shape="rect" id="Node000003" href="$group__PublicMemberFunctions.html#ga3c6cf4b6ce6b8188234420b5e83e4b60" title="Frees an Aws credentials object." alt="" coords="457,5,607,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="409,15,443,15,443,21,409,21"/>
 </map>

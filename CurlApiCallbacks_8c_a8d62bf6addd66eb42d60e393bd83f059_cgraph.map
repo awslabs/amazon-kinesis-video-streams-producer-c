@@ -1,7 +1,0 @@
-<map id="curlCallApi" name="curlCallApi">
-<area shape="rect" id="node1" title=" " alt="" coords="5,64,97,91"/>
-<area shape="rect" id="node2" href="$Response_8c.html#a778548cc501d3cb0b9668e702f9773be" title=" " alt="" coords="145,64,285,91"/>
-<area shape="rect" id="node3" href="$Response_8c.html#a2d3ad015231b4c7cbd36007e36c42c10" title=" " alt="" coords="349,5,508,32"/>
-<area shape="rect" id="node4" href="$Response_8c.html#acfb13a87640fc1c4f0a38962c5afcb57" title=" " alt="" coords="333,57,524,98"/>
-<area shape="rect" id="node5" href="$group__PublicMemberFunctions.html#ga0ca638859f728108fa47b2db3729907b" title="Convenience method to convert HTTP statuses to SERVICE_CALL_RESULT status." alt="" coords="333,122,524,163"/>
-</map>

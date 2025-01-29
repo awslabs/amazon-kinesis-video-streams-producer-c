@@ -1,6 +1,0 @@
-<map id="freeIotAuthCallbacksFunc" name="freeIotAuthCallbacksFunc">
-<area shape="rect" id="node1" title=" " alt="" coords="5,5,193,32"/>
-<area shape="rect" id="node2" href="$group__PublicMemberFunctions.html#gaefb55592d3e82672a97d95005e9510ea" title=" " alt="" coords="241,5,400,32"/>
-<area shape="rect" id="node3" href="$group__PublicMemberFunctions.html#ga30de0853f7b9ceadd1971a45a3d0d12d" title="Frees an IoT based Aws credential provider object." alt="" coords="448,5,635,32"/>
-<area shape="rect" id="node4" href="$group__PublicMemberFunctions.html#ga3c6cf4b6ce6b8188234420b5e83e4b60" title="Frees an Aws credentials object." alt="" coords="683,5,832,32"/>
-</map>

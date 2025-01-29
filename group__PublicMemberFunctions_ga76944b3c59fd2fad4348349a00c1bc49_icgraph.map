@@ -1,6 +1,9 @@
 <map id="createStaticCredentialProvider" name="createStaticCredentialProvider">
-<area shape="rect" id="node1" title="Creates a Static AWS credential provider object." alt="" coords="523,35,744,61"/>
-<area shape="rect" id="node2" href="$group__PublicMemberFunctions.html#ga69ee401a3d516acf3f43454570007b6e" title=" " alt="" coords="281,35,475,61"/>
-<area shape="rect" id="node3" href="$CallbacksProvider_8c.html#a020c62e1ff193d474681bef1c94bdcee" title=" " alt="" coords="5,5,233,32"/>
-<area shape="rect" id="node4" href="$group__PublicMemberFunctions.html#gabace8323412b6bd8019502f1f7d13c6a" title=" " alt="" coords="5,57,233,98"/>
+<area shape="rect" id="Node000001" title="Creates a Static AWS credential provider object." alt="" coords="523,35,744,60"/>
+<area shape="rect" id="Node000002" href="$group__PublicMemberFunctions.html#ga69ee401a3d516acf3f43454570007b6e" title=" " alt="" coords="281,35,475,60"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="509,50,475,50,475,45,509,45"/>
+<area shape="rect" id="Node000003" href="$CallbacksProvider_8c.html#a020c62e1ff193d474681bef1c94bdcee" title=" " alt="" coords="5,5,233,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="267,37,231,33,232,28,268,32"/>
+<area shape="rect" id="Node000004" href="$group__PublicMemberFunctions.html#gabace8323412b6bd8019502f1f7d13c6a" title=" " alt="" coords="5,55,233,95"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="268,62,234,66,233,60,267,57"/>
 </map>

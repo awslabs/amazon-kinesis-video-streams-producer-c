@@ -1,6 +1,0 @@
-<map id="continuousRetryStreamReadyHandler" name="continuousRetryStreamReadyHandler">
-<area shape="rect" id="node1" title=" " alt="" coords="5,23,221,65"/>
-<area shape="rect" id="node2" href="$ContinuousRetryStreamCallbacks_8c.html#af0e14170d264a7633b9c248fb70d6319" title=" " alt="" coords="269,31,416,57"/>
-<area shape="rect" id="node3" href="$ConnectionStaleStateMachine_8c.html#a54b6d386f1d1ba4db7064d30ada5561a" title=" " alt="" coords="464,5,701,32"/>
-<area shape="rect" id="node4" href="$StreamLatencyStateMachine_8c.html#a8e92a612c27580d5a86d96c9f8d929b3" title=" " alt="" coords="468,56,697,83"/>
-</map>

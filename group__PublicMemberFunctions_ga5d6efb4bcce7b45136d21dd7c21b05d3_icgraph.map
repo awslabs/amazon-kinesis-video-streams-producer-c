@@ -1,7 +1,14 @@
 <map id="freeStaticAuthCallbacks" name="freeStaticAuthCallbacks">
-<area shape="rect" id="node1" title=" " alt="" coords="779,33,957,60"/>
-<area shape="rect" id="node2" href="$CallbacksProvider_8c.html#a020c62e1ff193d474681bef1c94bdcee" title=" " alt="" coords="5,5,233,32"/>
-<area shape="rect" id="node3" href="$group__PublicMemberFunctions.html#gabace8323412b6bd8019502f1f7d13c6a" title=" " alt="" coords="5,78,233,119"/>
-<area shape="rect" id="node4" href="$group__PublicMemberFunctions.html#ga69ee401a3d516acf3f43454570007b6e" title=" " alt="" coords="281,31,475,57"/>
-<area shape="rect" id="node5" href="$StaticAuthCallbacks_8c.html#a6ed8933ffce03b0b35f1a6fc5afaa943" title=" " alt="" coords="523,59,731,85"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="779,32,957,57"/>
+<area shape="rect" id="Node000002" href="$CallbacksProvider_8c.html#a020c62e1ff193d474681bef1c94bdcee" title=" " alt="" coords="5,5,233,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="771,33,730,29,597,20,463,17,234,17,234,12,463,11,598,15,731,23,771,28"/>
+<area shape="rect" id="Node000003" href="$group__PublicMemberFunctions.html#gabace8323412b6bd8019502f1f7d13c6a" title=" " alt="" coords="5,77,233,117"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="830,65,783,84,731,98,598,114,464,120,339,117,233,111,234,106,339,112,464,114,598,109,730,93,782,79,828,61"/>
+<area shape="rect" id="Node000004" href="$group__PublicMemberFunctions.html#ga69ee401a3d516acf3f43454570007b6e" title=" " alt="" coords="281,31,475,56"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="765,47,475,46,475,41,765,42"/>
+<area shape="rect" id="Node000005" href="$StaticAuthCallbacks_8c.html#a6ed8933ffce03b0b35f1a6fc5afaa943" title=" " alt="" coords="523,57,731,83"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="765,58,731,62,730,56,765,53"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="267,35,233,32,234,27,268,30"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="303,61,218,79,216,74,302,56"/>
+<area shape="poly" id="edge7_Node000005_Node000004" title=" " alt="" coords="509,60,474,56,475,51,509,55"/>
 </map>

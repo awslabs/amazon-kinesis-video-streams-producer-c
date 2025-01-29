@@ -1,4 +1,5 @@
 <map id="createAwsCredentials" name="createAwsCredentials">
-<area shape="rect" id="node1" title="Creates an AWS credentials object." alt="" coords="5,5,169,32"/>
-<area shape="rect" id="node2" href="$group__PublicMemberFunctions.html#ga3c6cf4b6ce6b8188234420b5e83e4b60" title="Frees an Aws credentials object." alt="" coords="217,5,367,32"/>
+<area shape="rect" id="Node000001" title="Creates an AWS credentials object." alt="" coords="5,5,169,31"/>
+<area shape="rect" id="Node000002" href="$group__PublicMemberFunctions.html#ga3c6cf4b6ce6b8188234420b5e83e4b60" title="Frees an Aws credentials object." alt="" coords="217,5,367,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="170,15,203,15,203,21,170,21"/>
 </map>

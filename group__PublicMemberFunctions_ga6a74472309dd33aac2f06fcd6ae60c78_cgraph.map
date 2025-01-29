@@ -1,4 +1,5 @@
 <map id="setRequestHeader" name="setRequestHeader">
-<area shape="rect" id="node1" title="Sets a header in the request info." alt="" coords="5,5,148,32"/>
-<area shape="rect" id="node2" href="$group__PublicMemberFunctions.html#ga3bcd06b33fcbc9619f81e3920fca97a2" title="Creates a request header." alt="" coords="196,5,359,32"/>
+<area shape="rect" id="Node000001" title="Sets a header in the request info." alt="" coords="5,5,148,31"/>
+<area shape="rect" id="Node000002" href="$group__PublicMemberFunctions.html#ga3bcd06b33fcbc9619f81e3920fca97a2" title="Creates a request header." alt="" coords="196,5,359,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="148,15,182,15,182,21,148,21"/>
 </map>

@@ -1,6 +1,0 @@
-<map id="freeStaticAuthCallbacksFunc" name="freeStaticAuthCallbacksFunc">
-<area shape="rect" id="node1" title=" " alt="" coords="5,5,213,32"/>
-<area shape="rect" id="node2" href="$group__PublicMemberFunctions.html#ga5d6efb4bcce7b45136d21dd7c21b05d3" title=" " alt="" coords="261,5,440,32"/>
-<area shape="rect" id="node3" href="$group__PublicMemberFunctions.html#ga94a14bb7bbda0b12bd2afb55da9374ce" title="Frees a Static Aws credential provider object." alt="" coords="488,5,695,32"/>
-<area shape="rect" id="node4" href="$group__PublicMemberFunctions.html#ga3c6cf4b6ce6b8188234420b5e83e4b60" title="Frees an Aws credentials object." alt="" coords="743,5,892,32"/>
-</map>

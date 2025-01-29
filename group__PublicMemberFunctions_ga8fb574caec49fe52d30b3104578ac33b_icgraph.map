@@ -1,6 +1,9 @@
 <map id="createFileCredentialProviderWithTime" name="createFileCredentialProviderWithTime">
-<area shape="rect" id="node1" title="Creates a File based AWS credential provider object." alt="" coords="536,31,743,72"/>
-<area shape="rect" id="node2" href="$group__PublicMemberFunctions.html#ga5559131631ed15d509483f06e87164e4" title=" " alt="" coords="295,13,474,39"/>
-<area shape="rect" id="node4" href="$group__PublicMemberFunctions.html#ga13aa89a1f31bc9eec655117c30bcf0df" title="Creates a File based AWS credential provider object." alt="" coords="281,63,488,90"/>
-<area shape="rect" id="node3" href="$group__PublicMemberFunctions.html#gafcd18610ba9ef3d8a4ce62539ddfc2e9" title=" " alt="" coords="5,5,233,47"/>
+<area shape="rect" id="Node000001" title="Creates a File based AWS credential provider object." alt="" coords="536,31,743,71"/>
+<area shape="rect" id="Node000002" href="$group__PublicMemberFunctions.html#ga5559131631ed15d509483f06e87164e4" title=" " alt="" coords="295,13,474,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="522,42,474,37,474,32,523,36"/>
+<area shape="rect" id="Node000004" href="$group__PublicMemberFunctions.html#ga13aa89a1f31bc9eec655117c30bcf0df" title="Creates a File based AWS credential provider object." alt="" coords="281,62,488,87"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="523,64,489,68,488,62,522,59"/>
+<area shape="rect" id="Node000003" href="$group__PublicMemberFunctions.html#gafcd18610ba9ef3d8a4ce62539ddfc2e9" title=" " alt="" coords="5,5,233,45"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="281,28,233,28,233,23,281,23"/>
 </map>

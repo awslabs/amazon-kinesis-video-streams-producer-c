@@ -1,52 +1,110 @@
 <map id="createDefaultCallbacksProviderWithIotCertificateAndTimeouts" name="createDefaultCallbacksProviderWithIotCertificateAndTimeouts">
-<area shape="rect" id="node1" title=" " alt="" coords="5,814,233,855"/>
-<area shape="rect" id="node2" href="$group__PublicMemberFunctions.html#ga6c195173d4fd6f942260e2b81c0d4e83" title=" " alt="" coords="281,772,509,814"/>
-<area shape="rect" id="node30" href="$group__PublicMemberFunctions.html#ga94409ce8098c602112f4bb5cb485b6b1" title=" " alt="" coords="599,1026,764,1053"/>
-<area shape="rect" id="node33" href="$group__PublicMemberFunctions.html#ga769a5282a044b423310983b1550694d9" title=" " alt="" coords="286,318,505,359"/>
-<area shape="rect" id="node38" href="$group__PublicMemberFunctions.html#ga99c0565d394e4916abf5f2783c1d9799" title=" " alt="" coords="875,30,1077,71"/>
-<area shape="rect" id="node43" href="$group__PublicMemberFunctions.html#ga4235d1df60b4f123b7b55570f78f1087" title=" " alt="" coords="294,1222,497,1263"/>
-<area shape="rect" id="node46" href="$group__PublicMemberFunctions.html#gaefb55592d3e82672a97d95005e9510ea" title=" " alt="" coords="897,1153,1055,1180"/>
-<area shape="rect" id="node3" href="$CurlApiCallbacks_8c.html#a130e64adf86a4615c3e31fe7044c014a" title=" " alt="" coords="595,698,768,725"/>
-<area shape="rect" id="node21" href="$CurlApiCallbacks_8c.html#a10e534d63b733b314d9f997bbfd0b7e2" title=" " alt="" coords="1191,640,1349,666"/>
-<area shape="rect" id="node31" href="$group__PublicMemberFunctions.html#gafc9985a8cd0c6a9e3628fea648618cf2" title=" " alt="" coords="602,597,761,624"/>
-<area shape="rect" id="node32" href="$CallbacksProvider_8c.html#ab921bc3782b61af01aeedd218fa5192e" title=" " alt="" coords="577,648,786,674"/>
-<area shape="rect" id="node4" href="$group__PublicMemberFunctions.html#gafa4978a7591a9b94f6b3ae83718ef47d" title=" " alt="" coords="911,444,1041,470"/>
-<area shape="rect" id="node5" href="$group__PublicMemberFunctions.html#gabcbc4ced09693c07d1162a4b82d19ae5" title=" " alt="" coords="893,494,1059,521"/>
-<area shape="rect" id="node6" href="$group__PublicMemberFunctions.html#ga7c6d83d21ff7aede4391a52df20f4ff6" title=" " alt="" coords="898,190,1054,217"/>
-<area shape="rect" id="node13" href="$CurlApiCallbacks_8c.html#a6448ee57c3dfd1ea8050a6bfe3fee5fc" title=" " alt="" coords="1196,552,1344,578"/>
-<area shape="rect" id="node15" href="$CurlApiCallbacks_8c.html#a87c1fa56b986bd8f1a81dc9dff1ed298" title=" " alt="" coords="909,697,1043,724"/>
-<area shape="rect" id="node16" href="$CurlApiCallbacks_8c.html#ae625942029492c5222a76c99a93692d2" title=" " alt="" coords="882,748,1070,774"/>
-<area shape="rect" id="node17" href="$CurlApiCallbacks_8c.html#a67ad0be1e07b676a939ced486fe5424e" title=" " alt="" coords="907,798,1045,825"/>
-<area shape="rect" id="node18" href="$CurlApiCallbacks_8c.html#a04ab4aae7ba1f0b0be9d009beb7d7eb2" title=" " alt="" coords="875,849,1077,876"/>
-<area shape="rect" id="node19" href="$CurlApiCallbacks_8c.html#a875a1ade6f5260815397bd24bd55f411" title=" " alt="" coords="880,900,1072,926"/>
-<area shape="rect" id="node20" href="$CurlApiCallbacks_8c.html#af4cf7130463f33140b7643b9f61b7cba" title=" " alt="" coords="897,646,1055,673"/>
-<area shape="rect" id="node23" href="$CurlApiCallbacks_8c.html#a7f57a0cc68e64ec20ffa294d4e0bd0f5" title=" " alt="" coords="853,950,1099,977"/>
-<area shape="rect" id="node24" href="$group__PublicMemberFunctions.html#ga30d52b573e074f5a4b59fe5acfefb290" title="Creates a user agent string." alt="" coords="901,1001,1051,1028"/>
-<area shape="rect" id="node25" href="$common_2Include_8h.html#acf13ac9f766763993252a14b512c9f0d" title=" " alt="" coords="896,1052,1056,1078"/>
-<area shape="rect" id="node26" href="$CurlApiCallbacks_8c.html#a7f8ceaabce616c9c2eb4f8656319e6f3" title=" " alt="" coords="918,241,1034,268"/>
-<area shape="rect" id="node27" href="$CurlApiCallbacks_8c.html#a54eeb7b2833819eb844cc2c581c51cfd" title=" " alt="" coords="897,292,1055,318"/>
-<area shape="rect" id="node28" href="$CurlApiCallbacks_8c.html#ae1a894ff85c0479d831251134ac2d624" title=" " alt="" coords="907,342,1045,369"/>
-<area shape="rect" id="node29" href="$CurlApiCallbacks_8c.html#a68d690aafbaab0598ee193006d9189e0" title=" " alt="" coords="885,393,1067,420"/>
-<area shape="rect" id="node7" href="$CallbacksProvider_8c.html#a13f5f8dc42637b273925c635d45498d4" title=" " alt="" coords="1155,242,1385,283"/>
-<area shape="rect" id="node8" href="$CallbacksProvider_8c.html#a42ba4d2ba593715d0f5e7693bf85e626" title=" " alt="" coords="1147,308,1393,334"/>
-<area shape="rect" id="node9" href="$CallbacksProvider_8c.html#a3ef0c33a3ad6467612417fb6c8899f5d" title=" " alt="" coords="1157,358,1383,385"/>
-<area shape="rect" id="node10" href="$CallbacksProvider_8c.html#ac32242e6ab64ad9f572775ce3c61a5c7" title=" " alt="" coords="1153,89,1387,116"/>
-<area shape="rect" id="node11" href="$CallbacksProvider_8c.html#a5a0521281a8cb9a39ea11bfad7a9f5eb" title=" " alt="" coords="1181,140,1359,166"/>
-<area shape="rect" id="node12" href="$CallbacksProvider_8c.html#a18865fb052450938938f4c617a49e9b0" title=" " alt="" coords="1149,190,1391,217"/>
-<area shape="rect" id="node14" href="$CurlApiCallbacks_8c.html#a2f0510dbf519a786a4c8418418983ac1" title=" " alt="" coords="1441,564,1636,590"/>
-<area shape="rect" id="node22" href="$common_2Include_8h.html#ab3f57e718242495d70c73269568b89ca" title=" " alt="" coords="1463,640,1615,666"/>
-<area shape="rect" id="node34" href="$ContinuousRetryStreamCallbacks_8c.html#ae297e1913bfa318910eb0c3d7e5d68ef" title=" " alt="" coords="572,350,791,391"/>
-<area shape="rect" id="node35" href="$ContinuousRetryStreamCallbacks_8c.html#a06402d7452dbaa80d1e8c81a966de2c5" title=" " alt="" coords="557,415,805,456"/>
-<area shape="rect" id="node36" href="$ContinuousRetryStreamCallbacks_8c.html#aacc5bf5c8a9993de5a7384d68f4d2c7f" title=" " alt="" coords="578,480,785,522"/>
-<area shape="rect" id="node37" href="$ContinuousRetryStreamCallbacks_8c.html#a8d3708af4b12cbac177b0e03c1e80ff7" title=" " alt="" coords="580,219,783,260"/>
-<area shape="rect" id="node40" href="$ContinuousRetryStreamCallbacks_8c.html#ac84d4452452b2fe316532650776584b5" title=" " alt="" coords="568,88,795,130"/>
-<area shape="rect" id="node41" href="$ContinuousRetryStreamCallbacks_8c.html#aaaf77b8bab0917abbad83093298025e6" title=" " alt="" coords="573,154,789,195"/>
-<area shape="rect" id="node42" href="$ContinuousRetryStreamCallbacks_8c.html#ae7cd262cbf2fda4d2e8d70e280b22fa1" title=" " alt="" coords="562,284,801,326"/>
-<area shape="rect" id="node39" href="$ContinuousRetryStreamCallbacks_8c.html#a4d3d81a4628f84b0c4a672ba59166dfa" title=" " alt="" coords="1161,37,1379,64"/>
-<area shape="rect" id="node44" href="$group__PublicMemberFunctions.html#ga6b3d5c98d6dc8b6060fa8a8a2c9669c7" title=" " alt="" coords="612,1330,751,1357"/>
-<area shape="rect" id="node45" href="$group__PublicMemberFunctions.html#gacc88aa81762b337b7156cb587abb5dfe" title="Creates an IoT based AWS credential provider object with time function which is based on libCurl." alt="" coords="568,1382,795,1423"/>
-<area shape="rect" id="node48" href="$IotAuthCallback_8c.html#a00b2b8c4aa2fc9deaa8ceec2dce32c06" title=" " alt="" coords="587,1128,775,1154"/>
-<area shape="rect" id="node49" href="$IotAuthCallback_8c.html#a878b8105f7b05b6575a49ecad0f59f2a" title=" " alt="" coords="591,1229,771,1256"/>
-<area shape="rect" id="node50" href="$IotAuthCallback_8c.html#abe4ebd53d9d646684f5bb74d7703c8be" title=" " alt="" coords="584,1280,779,1306"/>
-<area shape="rect" id="node47" href="$group__PublicMemberFunctions.html#ga30de0853f7b9ceadd1971a45a3d0d12d" title="Frees an IoT based Aws credential provider object." alt="" coords="1177,1153,1363,1180"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,798,233,838"/>
+<area shape="rect" id="Node000002" href="$group__PublicMemberFunctions.html#ga6c195173d4fd6f942260e2b81c0d4e83" title=" " alt="" coords="281,758,509,798"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="233,799,267,794,268,799,234,804"/>
+<area shape="rect" id="Node000099" href="$group__PublicMemberFunctions.html#ga94409ce8098c602112f4bb5cb485b6b1" title=" " alt="" coords="599,1004,764,1030"/>
+<area shape="poly" id="edge56_Node000001_Node000099" title=" " alt="" coords="170,836,340,904,558,982,614,998,612,1003,557,987,338,909,168,841"/>
+<area shape="rect" id="Node000102" href="$group__PublicMemberFunctions.html#ga769a5282a044b423310983b1550694d9" title=" " alt="" coords="286,312,505,352"/>
+<area shape="poly" id="edge35_Node000001_Node000102" title=" " alt="" coords="130,797,374,363,378,365,134,799"/>
+<area shape="rect" id="Node000114" href="$group__PublicMemberFunctions.html#ga99c0565d394e4916abf5f2783c1d9799" title=" " alt="" coords="875,30,1077,70"/>
+<area shape="poly" id="edge57_Node000001_Node000114" title=" " alt="" coords="121,797,134,713,163,586,184,514,210,440,242,367,279,298,338,204,364,167,392,134,422,105,459,79,503,54,556,30,599,17,643,8,732,3,818,11,891,24,891,30,817,16,732,9,643,13,600,22,558,35,505,59,461,83,426,109,395,138,368,170,342,207,284,301,247,369,215,442,189,515,168,588,140,714,126,798"/>
+<area shape="rect" id="Node000124" href="$group__PublicMemberFunctions.html#ga4235d1df60b4f123b7b55570f78f1087" title=" " alt="" coords="294,1200,497,1240"/>
+<area shape="poly" id="edge47_Node000001_Node000124" title=" " alt="" coords="134,837,194,945,237,1015,283,1085,327,1140,368,1187,364,1191,323,1143,279,1088,232,1018,189,948,129,840"/>
+<area shape="rect" id="Node000146" href="$group__PublicMemberFunctions.html#gaefb55592d3e82672a97d95005e9510ea" title=" " alt="" coords="897,1131,1055,1156"/>
+<area shape="poly" id="edge58_Node000001_Node000146" title=" " alt="" coords="137,837,196,905,237,942,283,973,356,1008,420,1030,480,1042,537,1048,657,1058,727,1070,806,1092,854,1113,897,1125,895,1130,852,1118,804,1097,726,1075,657,1063,536,1053,479,1047,419,1035,354,1013,280,978,234,946,192,908,133,840"/>
+<area shape="rect" id="Node000003" href="$CurlApiCallbacks_8c.html#a130e64adf86a4615c3e31fe7044c014a" title=" " alt="" coords="595,686,768,711"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="467,756,621,712,622,717,469,761"/>
+<area shape="rect" id="Node000085" href="$CurlApiCallbacks_8c.html#a10e534d63b733b314d9f997bbfd0b7e2" title=" " alt="" coords="1191,628,1349,654"/>
+<area shape="poly" id="edge32_Node000002_Node000085" title=" " alt="" coords="458,796,534,825,625,868,720,923,765,955,807,990,823,1011,830,1032,837,1050,855,1065,920,1096,950,1104,978,1108,1006,1106,1035,1098,1065,1085,1097,1065,1144,1025,1181,975,1210,919,1231,860,1246,802,1256,749,1265,667,1270,667,1262,750,1251,804,1236,862,1215,921,1185,977,1148,1028,1100,1070,1067,1090,1037,1103,1007,1111,978,1113,949,1109,918,1101,852,1070,833,1053,825,1033,818,1013,803,993,762,959,717,927,623,872,532,830,456,801"/>
+<area shape="poly" id="edge31_Node000002_Node000099" title=" " alt="" coords="409,797,431,837,464,887,507,939,532,962,559,983,588,997,586,1002,556,987,529,966,503,943,460,890,426,839,404,800"/>
+<area shape="rect" id="Node000100" href="$group__PublicMemberFunctions.html#gafc9985a8cd0c6a9e3628fea648618cf2" title=" " alt="" coords="602,587,761,612"/>
+<area shape="poly" id="edge33_Node000002_Node000100" title=" " alt="" coords="409,756,468,689,509,652,556,621,588,609,590,614,559,626,513,656,472,692,413,760"/>
+<area shape="rect" id="Node000101" href="$CallbacksProvider_8c.html#ab921bc3782b61af01aeedd218fa5192e" title=" " alt="" coords="577,636,786,662"/>
+<area shape="poly" id="edge34_Node000002_Node000101" title=" " alt="" coords="419,756,479,712,517,690,556,670,579,663,580,668,558,675,519,694,482,717,422,760"/>
+<area shape="rect" id="Node000004" href="$group__PublicMemberFunctions.html#gafa4978a7591a9b94f6b3ae83718ef47d" title=" " alt="" coords="911,434,1041,459"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="767,691,787,683,803,671,821,647,829,623,829,597,827,572,824,546,824,519,832,494,851,468,872,454,896,446,898,451,875,459,855,472,837,496,830,520,829,545,832,571,835,597,834,623,826,649,807,675,789,688,769,696"/>
+<area shape="rect" id="Node000011" href="$group__PublicMemberFunctions.html#gabcbc4ced09693c07d1162a4b82d19ae5" title=" " alt="" coords="893,483,1059,508"/>
+<area shape="poly" id="edge4_Node000003_Node000011" title=" " alt="" coords="768,690,787,682,804,671,818,654,825,637,827,601,829,563,837,544,852,526,878,508,881,513,855,530,841,547,835,564,832,601,830,638,822,657,807,675,789,687,770,695"/>
+<area shape="rect" id="Node000015" href="$group__PublicMemberFunctions.html#ga7c6d83d21ff7aede4391a52df20f4ff6" title=" " alt="" coords="898,187,1054,212"/>
+<area shape="poly" id="edge5_Node000003_Node000015" title=" " alt="" coords="767,692,787,684,803,671,824,644,838,616,846,588,848,561,841,505,827,449,812,392,805,335,808,307,815,278,830,250,851,222,866,209,884,201,886,206,869,214,855,225,834,253,820,280,813,308,810,335,817,391,832,447,847,504,853,561,851,589,843,618,829,646,807,675,790,689,770,697"/>
+<area shape="rect" id="Node000028" href="$CurlApiCallbacks_8c.html#a6448ee57c3dfd1ea8050a6bfe3fee5fc" title=" " alt="" coords="1196,540,1344,566"/>
+<area shape="poly" id="edge12_Node000003_Node000028" title=" " alt="" coords="767,688,804,671,820,651,826,630,833,608,852,588,891,567,933,552,977,541,1021,534,1107,531,1183,536,1182,542,1107,537,1022,540,978,546,935,557,893,572,855,592,838,611,831,632,825,654,807,675,770,693"/>
+<area shape="rect" id="Node000041" href="$CurlApiCallbacks_8c.html#a87c1fa56b986bd8f1a81dc9dff1ed298" title=" " alt="" coords="909,684,1043,710"/>
+<area shape="poly" id="edge14_Node000003_Node000041" title=" " alt="" coords="768,695,895,695,895,700,768,700"/>
+<area shape="rect" id="Node000042" href="$CurlApiCallbacks_8c.html#ae625942029492c5222a76c99a93692d2" title=" " alt="" coords="882,734,1070,759"/>
+<area shape="poly" id="edge15_Node000003_Node000042" title=" " alt="" coords="760,708,884,729,883,734,759,714"/>
+<area shape="rect" id="Node000076" href="$CurlApiCallbacks_8c.html#a67ad0be1e07b676a939ced486fe5424e" title=" " alt="" coords="907,783,1045,808"/>
+<area shape="poly" id="edge16_Node000003_Node000076" title=" " alt="" coords="710,709,775,738,854,768,895,778,894,784,853,773,773,743,708,713"/>
+<area shape="rect" id="Node000079" href="$CurlApiCallbacks_8c.html#a04ab4aae7ba1f0b0be9d009beb7d7eb2" title=" " alt="" coords="875,832,1077,858"/>
+<area shape="poly" id="edge17_Node000003_Node000079" title=" " alt="" coords="698,709,763,762,807,792,854,817,879,826,877,831,852,822,804,797,759,766,695,713"/>
+<area shape="rect" id="Node000083" href="$CurlApiCallbacks_8c.html#a875a1ade6f5260815397bd24bd55f411" title=" " alt="" coords="880,882,1072,907"/>
+<area shape="poly" id="edge18_Node000003_Node000083" title=" " alt="" coords="693,709,718,742,754,785,801,829,855,867,872,875,870,880,852,871,798,834,750,789,713,745,689,713"/>
+<area shape="rect" id="Node000084" href="$CurlApiCallbacks_8c.html#af4cf7130463f33140b7643b9f61b7cba" title=" " alt="" coords="897,635,1055,660"/>
+<area shape="poly" id="edge19_Node000003_Node000084" title=" " alt="" coords="756,683,888,660,888,665,756,688"/>
+<area shape="poly" id="edge23_Node000003_Node000085" title=" " alt="" coords="767,685,804,671,818,659,827,645,836,631,852,620,900,604,949,595,1000,591,1050,593,1142,605,1217,622,1215,627,1141,610,1049,598,1000,597,950,600,901,609,855,625,840,635,831,648,822,662,807,675,769,690"/>
+<area shape="rect" id="Node000087" href="$CurlApiCallbacks_8c.html#a7f57a0cc68e64ec20ffa294d4e0bd0f5" title=" " alt="" coords="853,931,1099,956"/>
+<area shape="poly" id="edge24_Node000003_Node000087" title=" " alt="" coords="691,710,712,751,748,807,796,867,824,893,855,916,869,923,866,928,852,920,820,897,792,870,743,810,708,754,686,712"/>
+<area shape="rect" id="Node000090" href="$group__PublicMemberFunctions.html#ga30d52b573e074f5a4b59fe5acfefb290" title="Creates a user agent string." alt="" coords="901,980,1051,1006"/>
+<area shape="poly" id="edge25_Node000003_Node000090" title=" " alt="" coords="689,710,707,759,741,829,763,866,790,903,820,937,855,965,889,981,887,986,852,970,817,941,786,907,759,869,736,831,703,761,684,712"/>
+<area shape="rect" id="Node000091" href="$SslInit_8c.html#a8c95bd672890a83f903ec3a05f89356f" title=" " alt="" coords="896,1030,1056,1055"/>
+<area shape="poly" id="edge26_Node000003_Node000091" title=" " alt="" coords="691,710,773,876,822,967,841,998,855,1015,884,1030,882,1035,852,1019,837,1002,817,970,768,878,686,712"/>
+<area shape="rect" id="Node000092" href="$CurlApiCallbacks_8c.html#a7f8ceaabce616c9c2eb4f8656319e6f3" title=" " alt="" coords="918,236,1034,262"/>
+<area shape="poly" id="edge27_Node000003_Node000092" title=" " alt="" coords="767,692,787,684,803,671,822,647,835,622,842,598,844,573,839,523,827,473,814,423,809,372,811,347,819,321,832,296,851,271,875,254,903,246,905,251,878,259,855,275,836,299,824,323,817,348,814,372,819,422,832,472,844,523,850,573,847,599,840,624,827,650,807,675,790,689,769,697"/>
+<area shape="rect" id="Node000094" href="$CurlApiCallbacks_8c.html#a54eeb7b2833819eb844cc2c581c51cfd" title=" " alt="" coords="897,286,1055,311"/>
+<area shape="poly" id="edge28_Node000003_Node000094" title=" " alt="" coords="767,692,787,684,803,671,820,650,831,629,838,607,840,586,837,542,827,498,816,454,813,409,815,387,822,364,834,342,851,320,866,309,882,301,884,306,869,313,855,324,838,345,827,366,821,388,818,409,822,453,832,497,842,541,846,586,843,608,836,631,825,653,807,675,790,688,769,697"/>
+<area shape="rect" id="Node000095" href="$CurlApiCallbacks_8c.html#ae1a894ff85c0479d831251134ac2d624" title=" " alt="" coords="907,335,1045,360"/>
+<area shape="poly" id="edge29_Node000003_Node000095" title=" " alt="" coords="767,692,787,684,803,671,818,653,828,635,836,598,834,561,827,523,819,484,817,446,826,408,836,388,851,370,870,356,892,347,894,352,873,360,855,373,841,391,831,409,822,446,824,484,832,522,840,560,842,598,833,637,822,656,807,675,790,688,769,697"/>
+<area shape="rect" id="Node000096" href="$CurlApiCallbacks_8c.html#a68d690aafbaab0598ee193006d9189e0" title=" " alt="" coords="885,384,1067,410"/>
+<area shape="poly" id="edge30_Node000003_Node000096" title=" " alt="" coords="767,692,787,683,803,671,825,641,833,610,832,579,827,547,821,515,821,483,829,450,851,419,871,405,874,409,855,423,834,453,826,483,827,515,832,546,837,579,838,611,829,643,807,675,790,688,769,696"/>
+<area shape="rect" id="Node000016" href="$CallbacksProvider_8c.html#a13f5f8dc42637b273925c635d45498d4" title=" " alt="" coords="1155,237,1385,277"/>
+<area shape="poly" id="edge6_Node000015_Node000016" title=" " alt="" coords="1043,210,1154,232,1153,237,1041,215"/>
+<area shape="rect" id="Node000017" href="$CallbacksProvider_8c.html#a42ba4d2ba593715d0f5e7693bf85e626" title=" " alt="" coords="1147,302,1393,327"/>
+<area shape="poly" id="edge7_Node000015_Node000017" title=" " alt="" coords="1055,203,1078,210,1100,221,1117,238,1125,255,1133,272,1148,287,1161,294,1159,299,1145,291,1128,275,1120,257,1113,241,1097,226,1076,215,1054,208"/>
+<area shape="rect" id="Node000018" href="$CallbacksProvider_8c.html#a3ef0c33a3ad6467612417fb6c8899f5d" title=" " alt="" coords="1157,351,1383,376"/>
+<area shape="poly" id="edge8_Node000015_Node000018" title=" " alt="" coords="1055,201,1079,208,1100,221,1113,236,1121,250,1125,280,1130,310,1136,323,1148,336,1157,342,1154,347,1145,340,1132,326,1125,311,1120,281,1116,252,1109,239,1097,226,1077,213,1053,206"/>
+<area shape="rect" id="Node000019" href="$CallbacksProvider_8c.html#ac32242e6ab64ad9f572775ce3c61a5c7" title=" " alt="" coords="1153,88,1387,114"/>
+<area shape="poly" id="edge9_Node000015_Node000019" title=" " alt="" coords="1001,184,1065,153,1146,122,1177,114,1178,119,1147,127,1067,158,1003,189"/>
+<area shape="rect" id="Node000020" href="$CallbacksProvider_8c.html#a5a0521281a8cb9a39ea11bfad7a9f5eb" title=" " alt="" coords="1181,138,1359,163"/>
+<area shape="poly" id="edge10_Node000015_Node000020" title=" " alt="" coords="1052,184,1179,163,1180,168,1053,189"/>
+<area shape="rect" id="Node000021" href="$CallbacksProvider_8c.html#a18865fb052450938938f4c617a49e9b0" title=" " alt="" coords="1149,187,1391,212"/>
+<area shape="poly" id="edge11_Node000015_Node000021" title=" " alt="" coords="1054,197,1135,197,1135,202,1054,202"/>
+<area shape="rect" id="Node000029" href="$CurlApiCallbacks_8c.html#a2f0510dbf519a786a4c8418418983ac1" title=" " alt="" coords="1441,554,1636,579"/>
+<area shape="poly" id="edge13_Node000028_Node000029" title=" " alt="" coords="1344,554,1428,558,1427,563,1344,559"/>
+<area shape="poly" id="edge20_Node000084_Node000085" title=" " alt="" coords="1055,643,1177,640,1177,646,1055,648"/>
+<area shape="poly" id="edge21_Node000085_Node000029" title=" " alt="" coords="1316,625,1478,580,1480,585,1318,631"/>
+<area shape="rect" id="Node000086" href="$SslInit_8c.html#aad83b73f60caf85a4c54a99aadeb002c" title=" " alt="" coords="1463,628,1615,654"/>
+<area shape="poly" id="edge22_Node000085_Node000086" title=" " alt="" coords="1349,638,1449,638,1449,644,1349,644"/>
+<area shape="poly" id="edge36_Node000102_Node000015" title=" " alt="" coords="408,350,430,390,462,438,506,485,531,505,559,521,627,551,658,560,688,565,716,565,744,558,773,544,804,522,820,505,831,488,840,453,838,416,830,378,821,338,818,299,826,260,836,241,851,222,866,210,884,202,886,207,869,214,855,225,841,243,831,262,823,299,827,338,835,377,844,415,846,454,835,491,824,508,807,526,776,548,746,563,717,570,687,571,657,566,625,556,556,526,528,510,502,489,458,441,425,392,404,353"/>
+<area shape="rect" id="Node000103" href="$ContinuousRetryStreamCallbacks_8c.html#ae297e1913bfa318910eb0c3d7e5d68ef" title=" " alt="" coords="572,344,791,384"/>
+<area shape="poly" id="edge37_Node000102_Node000103" title=" " alt="" coords="505,341,559,347,558,352,505,346"/>
+<area shape="rect" id="Node000105" href="$ContinuousRetryStreamCallbacks_8c.html#a06402d7452dbaa80d1e8c81a966de2c5" title=" " alt="" coords="557,408,805,448"/>
+<area shape="poly" id="edge38_Node000102_Node000105" title=" " alt="" coords="443,349,558,393,585,401,583,406,556,398,442,354"/>
+<area shape="rect" id="Node000111" href="$ContinuousRetryStreamCallbacks_8c.html#aacc5bf5c8a9993de5a7384d68f4d2c7f" title=" " alt="" coords="578,472,785,512"/>
+<area shape="poly" id="edge39_Node000102_Node000111" title=" " alt="" coords="418,350,478,403,517,432,559,457,574,464,572,469,556,462,514,437,474,407,414,354"/>
+<area shape="rect" id="Node000113" href="$ContinuousRetryStreamCallbacks_8c.html#a8d3708af4b12cbac177b0e03c1e80ff7" title=" " alt="" coords="580,216,783,256"/>
+<area shape="poly" id="edge40_Node000102_Node000113" title=" " alt="" coords="442,309,556,265,583,257,585,262,558,270,443,314"/>
+<area shape="poly" id="edge46_Node000102_Node000114" title=" " alt="" coords="400,310,418,260,449,194,470,159,494,127,523,97,556,73,592,55,630,42,710,26,789,23,861,28,861,33,789,28,710,32,632,47,594,60,559,78,527,101,498,130,474,162,453,196,423,262,405,312"/>
+<area shape="rect" id="Node000116" href="$ContinuousRetryStreamCallbacks_8c.html#ac84d4452452b2fe316532650776584b5" title=" " alt="" coords="568,88,795,128"/>
+<area shape="poly" id="edge43_Node000102_Node000116" title=" " alt="" coords="406,310,429,273,462,226,505,178,556,137,567,131,570,136,559,142,509,182,466,229,433,276,410,313"/>
+<area shape="rect" id="Node000122" href="$ContinuousRetryStreamCallbacks_8c.html#aaaf77b8bab0917abbad83093298025e6" title=" " alt="" coords="573,152,789,192"/>
+<area shape="poly" id="edge44_Node000102_Node000122" title=" " alt="" coords="414,310,474,256,514,226,556,201,572,194,574,199,559,206,517,231,478,260,418,314"/>
+<area shape="rect" id="Node000123" href="$ContinuousRetryStreamCallbacks_8c.html#ae7cd262cbf2fda4d2e8d70e280b22fa1" title=" " alt="" coords="562,280,801,320"/>
+<area shape="poly" id="edge45_Node000102_Node000123" title=" " alt="" coords="505,317,548,312,549,317,505,322"/>
+<area shape="poly" id="edge41_Node000113_Node000114" title=" " alt="" coords="777,213,804,201,847,174,886,142,947,79,951,83,889,145,850,178,807,206,779,218"/>
+<area shape="rect" id="Node000115" href="$ContinuousRetryStreamCallbacks_8c.html#a4d3d81a4628f84b0c4a672ba59166dfa" title=" " alt="" coords="1161,38,1379,63"/>
+<area shape="poly" id="edge42_Node000114_Node000115" title=" " alt="" coords="1078,48,1147,48,1147,53,1078,53"/>
+<area shape="rect" id="Node000125" href="$group__PublicMemberFunctions.html#ga6b3d5c98d6dc8b6060fa8a8a2c9669c7" title=" " alt="" coords="612,1306,751,1331"/>
+<area shape="poly" id="edge48_Node000124_Node000125" title=" " alt="" coords="434,1237,492,1265,558,1292,599,1303,598,1308,556,1297,490,1270,432,1242"/>
+<area shape="rect" id="Node000131" href="$group__PublicMemberFunctions.html#gacc88aa81762b337b7156cb587abb5dfe" title="Creates an IoT based AWS credential provider object with time function which is based on libCurl." alt="" coords="568,1356,795,1396"/>
+<area shape="poly" id="edge49_Node000124_Node000131" title=" " alt="" coords="419,1238,479,1290,517,1317,559,1341,575,1348,573,1353,556,1346,514,1322,475,1294,415,1242"/>
+<area shape="poly" id="edge50_Node000124_Node000146" title=" " alt="" coords="497,1202,557,1193,882,1152,883,1157,558,1198,497,1207"/>
+<area shape="rect" id="Node000147" href="$IotAuthCallback_8c.html#a00b2b8c4aa2fc9deaa8ceec2dce32c06" title=" " alt="" coords="587,1106,775,1131"/>
+<area shape="poly" id="edge52_Node000124_Node000147" title=" " alt="" coords="437,1197,493,1172,556,1148,610,1132,611,1137,558,1153,495,1177,439,1202"/>
+<area shape="rect" id="Node000148" href="$IotAuthCallback_8c.html#a878b8105f7b05b6575a49ecad0f59f2a" title=" " alt="" coords="591,1207,771,1232"/>
+<area shape="poly" id="edge54_Node000124_Node000148" title=" " alt="" coords="497,1217,578,1217,578,1222,497,1222"/>
+<area shape="rect" id="Node000149" href="$IotAuthCallback_8c.html#abe4ebd53d9d646684f5bb74d7703c8be" title=" " alt="" coords="584,1256,779,1282"/>
+<area shape="poly" id="edge55_Node000124_Node000149" title=" " alt="" coords="497,1234,594,1251,593,1256,497,1240"/>
+<area shape="rect" id="Node000137" href="$group__PublicMemberFunctions.html#ga30de0853f7b9ceadd1971a45a3d0d12d" title="Frees an IoT based Aws credential provider object." alt="" coords="1177,1131,1363,1156"/>
+<area shape="poly" id="edge51_Node000146_Node000137" title=" " alt="" coords="1055,1141,1163,1141,1163,1146,1055,1146"/>
+<area shape="poly" id="edge53_Node000147_Node000146" title=" " alt="" coords="776,1124,883,1133,883,1138,775,1129"/>
 </map>

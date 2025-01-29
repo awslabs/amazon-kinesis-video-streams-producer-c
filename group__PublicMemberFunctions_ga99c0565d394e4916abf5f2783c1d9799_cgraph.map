@@ -1,5 +1,7 @@
 <map id="freeContinuousRetryStreamCallbacks" name="freeContinuousRetryStreamCallbacks">
-<area shape="rect" id="node1" title=" " alt="" coords="5,5,208,47"/>
-<area shape="rect" id="node2" href="$ContinuousRetryStreamCallbacks_8c.html#a4d3d81a4628f84b0c4a672ba59166dfa" title=" " alt="" coords="256,13,475,39"/>
-<area shape="rect" id="node3" href="$ContinuousRetryStreamCallbacks_8c.html#a61057cd50c7d6fdb184ebcb0ceaffe3b" title=" " alt="" coords="523,13,673,39"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,208,45"/>
+<area shape="rect" id="Node000002" href="$ContinuousRetryStreamCallbacks_8c.html#a4d3d81a4628f84b0c4a672ba59166dfa" title=" " alt="" coords="256,13,475,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="208,23,242,23,242,28,208,28"/>
+<area shape="rect" id="Node000003" href="$ContinuousRetryStreamCallbacks_8c.html#a61057cd50c7d6fdb184ebcb0ceaffe3b" title=" " alt="" coords="523,13,673,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="475,23,509,23,509,28,475,28"/>
 </map>

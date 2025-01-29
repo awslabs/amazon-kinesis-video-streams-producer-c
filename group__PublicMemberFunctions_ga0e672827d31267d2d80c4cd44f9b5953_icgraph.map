@@ -1,6 +1,10 @@
 <map id="freeFileAuthCallbacks" name="freeFileAuthCallbacks">
-<area shape="rect" id="node1" title=" " alt="" coords="751,13,915,39"/>
-<area shape="rect" id="node2" href="$group__PublicMemberFunctions.html#ga5559131631ed15d509483f06e87164e4" title=" " alt="" coords="281,13,460,39"/>
-<area shape="rect" id="node4" href="$FileAuthCallbacks_8c.html#a83c00fa1949700679507728344fdb1fe" title=" " alt="" coords="508,38,703,65"/>
-<area shape="rect" id="node3" href="$group__PublicMemberFunctions.html#gafcd18610ba9ef3d8a4ce62539ddfc2e9" title=" " alt="" coords="5,5,233,47"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="751,13,915,38"/>
+<area shape="rect" id="Node000002" href="$group__PublicMemberFunctions.html#ga5559131631ed15d509483f06e87164e4" title=" " alt="" coords="281,13,460,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="737,28,460,28,460,23,737,23"/>
+<area shape="rect" id="Node000004" href="$FileAuthCallbacks_8c.html#a83c00fa1949700679507728344fdb1fe" title=" " alt="" coords="508,38,703,63"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="737,39,703,42,703,37,736,33"/>
+<area shape="rect" id="Node000003" href="$group__PublicMemberFunctions.html#gafcd18610ba9ef3d8a4ce62539ddfc2e9" title=" " alt="" coords="5,5,233,45"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="268,28,233,28,233,23,268,23"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="494,41,460,38,460,32,495,36"/>
 </map>

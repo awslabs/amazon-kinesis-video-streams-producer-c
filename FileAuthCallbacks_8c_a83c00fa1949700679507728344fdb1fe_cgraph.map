@@ -1,6 +1,0 @@
-<map id="freeFileAuthCallbacksFunc" name="freeFileAuthCallbacksFunc">
-<area shape="rect" id="node1" title=" " alt="" coords="5,5,200,32"/>
-<area shape="rect" id="node2" href="$group__PublicMemberFunctions.html#ga0e672827d31267d2d80c4cd44f9b5953" title=" " alt="" coords="248,5,412,32"/>
-<area shape="rect" id="node3" href="$group__PublicMemberFunctions.html#gae05e583babc3bd248a2cd26572fa8d8e" title="Frees a File based Aws credential provider object." alt="" coords="460,5,652,32"/>
-<area shape="rect" id="node4" href="$group__PublicMemberFunctions.html#ga3c6cf4b6ce6b8188234420b5e83e4b60" title="Frees an Aws credentials object." alt="" coords="700,5,849,32"/>
-</map>

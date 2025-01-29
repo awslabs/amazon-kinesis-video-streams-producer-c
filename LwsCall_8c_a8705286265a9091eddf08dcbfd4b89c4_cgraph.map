@@ -1,6 +1,0 @@
-<map id="blockingLwsCall" name="blockingLwsCall">
-<area shape="rect" id="node1" title=" " alt="" coords="5,31,132,57"/>
-<area shape="rect" id="node2" href="$group__PublicMemberFunctions.html#ga848d2d791114303aabea0c784ac5c144" title="Gets a request host string." alt="" coords="200,5,327,32"/>
-<area shape="rect" id="node3" href="$LwsCall_8c.html#ab52935f5f34b082652b563e77bded2b5" title=" " alt="" coords="180,56,347,83"/>
-<area shape="rect" id="node4" href="$group__PublicMemberFunctions.html#ga0ca638859f728108fa47b2db3729907b" title="Convenience method to convert HTTP statuses to SERVICE_CALL_RESULT status." alt="" coords="395,49,585,90"/>
-</map>

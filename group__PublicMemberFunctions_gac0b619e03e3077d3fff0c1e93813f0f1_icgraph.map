@@ -1,6 +1,11 @@
 <map id="freeFileLogger" name="freeFileLogger">
-<area shape="rect" id="node1" title="Frees the static file logger object and resets the global logging function if it was previously set b..." alt="" coords="597,54,712,81"/>
-<area shape="rect" id="node2" href="$group__PublicMemberFunctions.html#ga6c756db8510b65b24a817519b19e5ee2" title=" " alt="" coords="5,5,237,47"/>
-<area shape="rect" id="node3" href="$group__PublicMemberFunctions.html#ga3699db3e21ea25c1efa068ab4f7f2f55" title=" " alt="" coords="23,80,219,121"/>
-<area shape="rect" id="node4" href="$FileLoggerPlatformCallbackProvider_8c.html#a8e9a96f80abeaf11869a3d095403df50" title=" " alt="" coords="285,54,549,81"/>
+<area shape="rect" id="Node000001" title="Frees the static file logger object and resets the global logging function if it was previously set b..." alt="" coords="597,54,712,79"/>
+<area shape="rect" id="Node000002" href="$group__PublicMemberFunctions.html#ga6c756db8510b65b24a817519b19e5ee2" title=" " alt="" coords="5,5,237,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="596,53,549,44,386,30,238,26,238,21,387,24,550,39,597,48"/>
+<area shape="rect" id="Node000003" href="$group__PublicMemberFunctions.html#ga3699db3e21ea25c1efa068ab4f7f2f55" title=" " alt="" coords="23,79,219,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="598,85,550,95,463,103,375,107,220,106,220,101,375,101,462,98,549,89,597,80"/>
+<area shape="rect" id="Node000004" href="$FileLoggerPlatformCallbackProvider_8c.html#a8e9a96f80abeaf11869a3d095403df50" title=" " alt="" coords="285,54,549,79"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="584,69,550,69,550,64,584,64"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="312,55,237,44,238,39,313,49"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="286,84,220,91,219,85,286,78"/>
 </map>

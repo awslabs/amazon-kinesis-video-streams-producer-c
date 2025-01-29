@@ -1,6 +1,9 @@
 <map id="__CallInfo" name="__CallInfo">
-<area shape="rect" id="node1" title=" " alt="" coords="85,549,247,700"/>
-<area shape="rect" id="node2" href="$struct____RequestInfo.html" title=" " alt="" coords="5,263,159,487"/>
-<area shape="rect" id="node3" href="$struct____AwsCredentials.html" title=" " alt="" coords="9,5,155,200"/>
-<area shape="rect" id="node4" href="$struct____RequestHeader.html" title=" " alt="" coords="183,314,319,435"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="81,621,235,787"/>
+<area shape="rect" id="Node000002" href="$struct____RequestInfo.html" title=" " alt="" coords="5,293,151,559"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="101,558,111,597,114,605,109,607,106,598,96,560"/>
+<area shape="rect" id="Node000003" href="$struct____AwsCredentials.html" title=" " alt="" coords="9,5,147,231"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="81,231,81,277,75,277,75,231"/>
+<area shape="rect" id="Node000004" href="$struct____RequestHeader.html" title=" " alt="" coords="175,363,303,489"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="236,489,227,543,213,598,210,607,205,605,207,597,222,542,230,489"/>
 </map>

@@ -1,12 +1,22 @@
 <map id="freeStreamCallbacks" name="freeStreamCallbacks">
-<area shape="rect" id="node1" title=" " alt="" coords="557,333,716,360"/>
-<area shape="rect" id="node2" href="$group__PublicMemberFunctions.html#ga6c195173d4fd6f942260e2b81c0d4e83" title=" " alt="" coords="281,187,509,229"/>
-<area shape="rect" id="node9" href="$group__PublicMemberFunctions.html#gade9fafd94a04eebb2be0f3222b9bbb2c" title=" " alt="" coords="33,384,206,411"/>
-<area shape="rect" id="node10" href="$StreamCallbacksProvider_8c.html#a5d70791ff8cfac819eda2fe32624be96" title=" " alt="" coords="284,384,507,411"/>
-<area shape="rect" id="node3" href="$CallbacksProvider_8c.html#a020c62e1ff193d474681bef1c94bdcee" title=" " alt="" coords="5,5,233,32"/>
-<area shape="rect" id="node4" href="$group__PublicMemberFunctions.html#ga42ffcf860b92e764b2ba56bc5d72fd71" title=" " alt="" coords="5,57,233,98"/>
-<area shape="rect" id="node5" href="$group__PublicMemberFunctions.html#gabace8323412b6bd8019502f1f7d13c6a" title=" " alt="" coords="5,122,233,163"/>
-<area shape="rect" id="node6" href="$group__PublicMemberFunctions.html#gafcd18610ba9ef3d8a4ce62539ddfc2e9" title=" " alt="" coords="5,187,233,229"/>
-<area shape="rect" id="node7" href="$group__PublicMemberFunctions.html#ga750983add758649af12b8317d8483c3e" title=" " alt="" coords="5,253,233,294"/>
-<area shape="rect" id="node8" href="$group__PublicMemberFunctions.html#gacab2eb7cb8bc4a0337c9e257b5933688" title=" " alt="" coords="5,318,233,359"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="557,325,716,351"/>
+<area shape="rect" id="Node000002" href="$group__PublicMemberFunctions.html#ga6c195173d4fd6f942260e2b81c0d4e83" title=" " alt="" coords="281,183,509,223"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="600,321,431,226,434,221,602,316"/>
+<area shape="rect" id="Node000009" href="$group__PublicMemberFunctions.html#gade9fafd94a04eebb2be0f3222b9bbb2c" title=" " alt="" coords="33,376,206,401"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="544,346,282,367,198,379,197,373,281,362,543,340"/>
+<area shape="rect" id="Node000010" href="$StreamCallbacksProvider_8c.html#a5d70791ff8cfac819eda2fe32624be96" title=" " alt="" coords="284,376,507,401"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="563,356,457,379,456,373,561,351"/>
+<area shape="rect" id="Node000003" href="$CallbacksProvider_8c.html#a020c62e1ff193d474681bef1c94bdcee" title=" " alt="" coords="5,5,233,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="369,174,312,108,274,74,232,46,202,33,204,28,235,41,277,70,316,104,373,170"/>
+<area shape="rect" id="Node000004" href="$group__PublicMemberFunctions.html#ga42ffcf860b92e764b2ba56bc5d72fd71" title=" " alt="" coords="5,55,233,95"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="353,178,297,143,232,110,200,98,202,93,234,105,300,138,356,173"/>
+<area shape="rect" id="Node000005" href="$group__PublicMemberFunctions.html#gabace8323412b6bd8019502f1f7d13c6a" title=" " alt="" coords="5,119,233,159"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="294,183,205,162,207,157,296,178"/>
+<area shape="rect" id="Node000006" href="$group__PublicMemberFunctions.html#gafcd18610ba9ef3d8a4ce62539ddfc2e9" title=" " alt="" coords="5,183,233,223"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="268,206,234,206,234,201,268,201"/>
+<area shape="rect" id="Node000007" href="$group__PublicMemberFunctions.html#ga750983add758649af12b8317d8483c3e" title=" " alt="" coords="5,247,233,287"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="296,229,207,250,205,245,294,224"/>
+<area shape="rect" id="Node000008" href="$group__PublicMemberFunctions.html#gacab2eb7cb8bc4a0337c9e257b5933688" title=" " alt="" coords="5,311,233,351"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="356,233,300,268,234,302,202,314,200,309,232,297,297,264,353,229"/>
+<area shape="poly" id="edge10_Node000010_Node000009" title=" " alt="" coords="270,391,206,391,206,386,270,386"/>
 </map>

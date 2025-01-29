@@ -1,4 +1,5 @@
 <map id="freeRequestInfo" name="freeRequestInfo">
-<area shape="rect" id="node1" title="Frees a Request Info object." alt="" coords="5,5,132,32"/>
-<area shape="rect" id="node2" href="$group__PublicMemberFunctions.html#ga78fbbf4618d7ecb4e883ff1cc31b9a7f" title="Removes and deletes all headers." alt="" coords="180,5,359,32"/>
+<area shape="rect" id="Node000001" title="Frees a Request Info object." alt="" coords="5,5,132,31"/>
+<area shape="rect" id="Node000002" href="$group__PublicMemberFunctions.html#ga78fbbf4618d7ecb4e883ff1cc31b9a7f" title="Removes and deletes all headers." alt="" coords="180,5,359,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="132,15,166,15,166,21,132,21"/>
 </map>

@@ -1,8 +1,13 @@
 <map id="createRealtimeAudioVideoStreamInfoProviderWithCodecs" name="createRealtimeAudioVideoStreamInfoProviderWithCodecs">
-<area shape="rect" id="node1" title=" " alt="" coords="5,74,231,115"/>
-<area shape="rect" id="node2" href="$StreamInfoProvider_8c.html#aa23defed686418bae50b0d19deb73bce" title=" " alt="" coords="279,81,488,108"/>
-<area shape="rect" id="node3" href="$StreamInfoProvider_8c.html#acabe2f99f2e1937b598bf55fa4655757" title=" " alt="" coords="544,5,703,32"/>
-<area shape="rect" id="node4" href="$StreamInfoProvider_8c.html#ad5f6df119c04cc525d42cf3c40a6cc59" title=" " alt="" coords="544,56,703,83"/>
-<area shape="rect" id="node5" href="$group__PublicMemberFunctions.html#gac6ee2669ba7255b501b631f6f6117249" title=" " alt="" coords="536,107,711,133"/>
-<area shape="rect" id="node6" href="$StreamInfoProvider_8c.html#a4b2dccb57947255c377bfa22bdb7ca3e" title=" " alt="" coords="539,157,708,184"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,73,231,113"/>
+<area shape="rect" id="Node000002" href="$StreamInfoProvider_8c.html#aa23defed686418bae50b0d19deb73bce" title=" " alt="" coords="279,80,488,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="231,90,265,90,265,95,231,95"/>
+<area shape="rect" id="Node000003" href="$StreamInfoProvider_8c.html#acabe2f99f2e1937b598bf55fa4655757" title=" " alt="" coords="544,5,703,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="420,77,535,39,561,32,562,37,537,45,422,82"/>
+<area shape="rect" id="Node000004" href="$StreamInfoProvider_8c.html#ad5f6df119c04cc525d42cf3c40a6cc59" title=" " alt="" coords="544,55,703,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="488,79,530,74,531,80,488,84"/>
+<area shape="rect" id="Node000005" href="$group__PublicMemberFunctions.html#gac6ee2669ba7255b501b631f6f6117249" title=" " alt="" coords="536,104,711,129"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="488,100,523,104,522,109,488,106"/>
+<area shape="rect" id="Node000006" href="$StreamInfoProvider_8c.html#a4b2dccb57947255c377bfa22bdb7ca3e" title=" " alt="" coords="539,153,708,179"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="425,103,537,138,566,147,564,152,535,143,424,108"/>
 </map>

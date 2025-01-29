@@ -1,7 +1,11 @@
 <map id="createRealtimeVideoStreamInfoProviderWithCodecs" name="createRealtimeVideoStreamInfoProviderWithCodecs">
-<area shape="rect" id="node1" title=" " alt="" coords="5,49,212,90"/>
-<area shape="rect" id="node2" href="$StreamInfoProvider_8c.html#a5c26f8d9518a9c6d3dcf2baccf97a9c7" title=" " alt="" coords="260,56,432,83"/>
-<area shape="rect" id="node3" href="$StreamInfoProvider_8c.html#ad5f6df119c04cc525d42cf3c40a6cc59" title=" " alt="" coords="488,5,647,32"/>
-<area shape="rect" id="node4" href="$group__PublicMemberFunctions.html#gac6ee2669ba7255b501b631f6f6117249" title=" " alt="" coords="480,56,655,83"/>
-<area shape="rect" id="node5" href="$StreamInfoProvider_8c.html#a4b2dccb57947255c377bfa22bdb7ca3e" title=" " alt="" coords="483,107,652,133"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,47,212,87"/>
+<area shape="rect" id="Node000002" href="$StreamInfoProvider_8c.html#a5c26f8d9518a9c6d3dcf2baccf97a9c7" title=" " alt="" coords="260,55,432,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="212,65,246,65,246,70,212,70"/>
+<area shape="rect" id="Node000003" href="$StreamInfoProvider_8c.html#ad5f6df119c04cc525d42cf3c40a6cc59" title=" " alt="" coords="488,5,647,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="403,52,496,31,497,36,404,57"/>
+<area shape="rect" id="Node000004" href="$group__PublicMemberFunctions.html#gac6ee2669ba7255b501b631f6f6117249" title=" " alt="" coords="480,55,655,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="433,65,466,65,466,70,433,70"/>
+<area shape="rect" id="Node000005" href="$StreamInfoProvider_8c.html#a4b2dccb57947255c377bfa22bdb7ca3e" title=" " alt="" coords="483,104,652,129"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="404,77,497,98,496,104,403,83"/>
 </map>

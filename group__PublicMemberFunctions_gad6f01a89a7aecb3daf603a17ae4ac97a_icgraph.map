@@ -1,5 +1,8 @@
 <map id="freeCredentialProviderAuthCallbacks" name="freeCredentialProviderAuthCallbacks">
-<area shape="rect" id="node1" title=" " alt="" coords="484,5,683,47"/>
-<area shape="rect" id="node2" href="$group__PublicMemberFunctions.html#ga23166ffcb9c09a1279371fdda69a384b" title=" " alt="" coords="5,5,189,47"/>
-<area shape="rect" id="node3" href="$CredentialProviderAuthCallbacks_8c.html#a933c49053642415072f719a851b58086" title=" " alt="" coords="237,35,436,76"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="484,5,683,45"/>
+<area shape="rect" id="Node000002" href="$group__PublicMemberFunctions.html#ga23166ffcb9c09a1279371fdda69a384b" title=" " alt="" coords="5,5,189,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="470,25,436,24,237,24,190,25,190,20,237,19,436,19,470,19"/>
+<area shape="rect" id="Node000003" href="$CredentialProviderAuthCallbacks_8c.html#a933c49053642415072f719a851b58086" title=" " alt="" coords="237,33,436,73"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="471,41,437,45,436,39,470,35"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="223,43,189,39,190,33,224,37"/>
 </map>

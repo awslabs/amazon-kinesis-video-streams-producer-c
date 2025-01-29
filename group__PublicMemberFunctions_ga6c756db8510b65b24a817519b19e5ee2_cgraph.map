@@ -1,19 +1,36 @@
 <map id="addFileLoggerPlatformCallbacksProvider" name="addFileLoggerPlatformCallbacksProvider">
-<area shape="rect" id="node1" title=" " alt="" coords="5,74,237,115"/>
-<area shape="rect" id="node2" href="$group__PublicMemberFunctions.html#ga651aa6a154bfb8de98db911c59ed5d69" title="Creates a file based logger object and installs the global logger callback function." alt="" coords="352,5,483,32"/>
-<area shape="rect" id="node3" href="$group__PublicMemberFunctions.html#gac0b619e03e3077d3fff0c1e93813f0f1" title="Frees the static file logger object and resets the global logging function if it was previously set b..." alt="" coords="663,56,777,83"/>
-<area shape="rect" id="node4" href="$FileLoggerPlatformCallbackProvider_8c.html#a8e9a96f80abeaf11869a3d095403df50" title=" " alt="" coords="285,107,549,133"/>
-<area shape="rect" id="node5" href="$group__PublicMemberFunctions.html#gaf84f4dacd79bfbd1ec32a68b635cf825" title=" " alt="" coords="337,376,498,403"/>
-<area shape="rect" id="node6" href="$CallbacksProvider_8c.html#a011d0b1f4ac5719842c5903aa3f292ee" title=" " alt="" coords="619,107,821,149"/>
-<area shape="rect" id="node7" href="$CallbacksProvider_8c.html#a8978faa06831db4467422ce4ddcfac78" title=" " alt="" coords="597,173,843,200"/>
-<area shape="rect" id="node8" href="$CallbacksProvider_8c.html#a49a419aaa35c2f278a7a625f810a9324" title=" " alt="" coords="635,224,805,251"/>
-<area shape="rect" id="node9" href="$CallbacksProvider_8c.html#a60225b462b12c52d2c4bd3e39772ad08" title=" " alt="" coords="605,275,835,301"/>
-<area shape="rect" id="node10" href="$CallbacksProvider_8c.html#a7acd6f4e9bec44e3ac80a20b5f9f4cb9" title=" " alt="" coords="642,325,798,352"/>
-<area shape="rect" id="node11" href="$CallbacksProvider_8c.html#afafaac5937e050839aec9efac5a5778c" title=" " alt="" coords="625,376,815,403"/>
-<area shape="rect" id="node12" href="$CallbacksProvider_8c.html#a3c2aae771e35c0873f21f027274dea11" title=" " alt="" coords="612,427,828,453"/>
-<area shape="rect" id="node13" href="$CallbacksProvider_8c.html#a2b645b0903a16a6821b7df89318ba075" title=" " alt="" coords="641,477,799,504"/>
-<area shape="rect" id="node14" href="$CallbacksProvider_8c.html#a20c7d90422cfa9a86c4ecf698aebae3c" title=" " alt="" coords="599,528,841,555"/>
-<area shape="rect" id="node15" href="$CallbacksProvider_8c.html#ad0f06085ed4c849d90f58783f4e6b76b" title=" " alt="" coords="631,579,809,605"/>
-<area shape="rect" id="node16" href="$CallbacksProvider_8c.html#a841230c6467e08c5e04e59bd941fbd39" title=" " alt="" coords="633,629,807,656"/>
-<area shape="rect" id="node17" href="$CallbacksProvider_8c.html#ab39eafe3e4f46b8e9b1a3227c0675ea3" title=" " alt="" coords="604,680,836,707"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,74,237,114"/>
+<area shape="rect" id="Node000002" href="$group__PublicMemberFunctions.html#ga651aa6a154bfb8de98db911c59ed5d69" title="Creates a file based logger object and installs the global logger callback function." alt="" coords="352,5,483,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="195,71,285,47,349,31,350,37,286,53,196,76"/>
+<area shape="rect" id="Node000003" href="$group__PublicMemberFunctions.html#gac0b619e03e3077d3fff0c1e93813f0f1" title="Frees the static file logger object and resets the global logging function if it was previously set b..." alt="" coords="663,56,777,81"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="237,86,649,69,649,74,238,92"/>
+<area shape="rect" id="Node000004" href="$FileLoggerPlatformCallbackProvider_8c.html#a8e9a96f80abeaf11869a3d095403df50" title=" " alt="" coords="285,107,549,132"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="238,101,272,104,271,110,237,107"/>
+<area shape="rect" id="Node000005" href="$group__PublicMemberFunctions.html#gaf84f4dacd79bfbd1ec32a68b635cf825" title=" " alt="" coords="337,368,498,393"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="145,112,395,357,391,360,141,116"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="494,104,649,78,649,83,494,109"/>
+<area shape="rect" id="Node000006" href="$CallbacksProvider_8c.html#a011d0b1f4ac5719842c5903aa3f292ee" title=" " alt="" coords="619,106,821,146"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="423,366,446,325,484,268,534,208,564,180,596,156,607,149,609,154,599,160,567,184,538,211,488,271,450,328,427,369"/>
+<area shape="rect" id="Node000007" href="$CallbacksProvider_8c.html#a8978faa06831db4467422ce4ddcfac78" title=" " alt="" coords="597,171,843,196"/>
+<area shape="poly" id="edge7_Node000005_Node000007" title=" " alt="" coords="426,366,451,333,490,289,539,243,596,205,612,198,614,203,599,210,543,247,494,292,455,336,430,369"/>
+<area shape="rect" id="Node000008" href="$CallbacksProvider_8c.html#a49a419aaa35c2f278a7a625f810a9324" title=" " alt="" coords="635,220,805,245"/>
+<area shape="poly" id="edge8_Node000005_Node000008" title=" " alt="" coords="431,366,499,311,546,280,596,254,620,246,622,251,598,259,548,285,502,316,434,370"/>
+<area shape="rect" id="Node000009" href="$CallbacksProvider_8c.html#a60225b462b12c52d2c4bd3e39772ad08" title=" " alt="" coords="605,269,835,295"/>
+<area shape="poly" id="edge9_Node000005_Node000009" title=" " alt="" coords="444,365,512,335,597,303,628,295,629,300,598,309,514,340,446,370"/>
+<area shape="rect" id="Node000010" href="$CallbacksProvider_8c.html#a7acd6f4e9bec44e3ac80a20b5f9f4cb9" title=" " alt="" coords="642,319,798,344"/>
+<area shape="poly" id="edge10_Node000005_Node000010" title=" " alt="" coords="495,365,628,344,629,349,496,371"/>
+<area shape="rect" id="Node000011" href="$CallbacksProvider_8c.html#afafaac5937e050839aec9efac5a5778c" title=" " alt="" coords="625,368,815,393"/>
+<area shape="poly" id="edge11_Node000005_Node000011" title=" " alt="" coords="498,378,611,378,611,383,498,383"/>
+<area shape="rect" id="Node000012" href="$CallbacksProvider_8c.html#a3c2aae771e35c0873f21f027274dea11" title=" " alt="" coords="612,417,828,443"/>
+<area shape="poly" id="edge12_Node000005_Node000012" title=" " alt="" coords="496,391,628,412,627,418,495,396"/>
+<area shape="rect" id="Node000013" href="$CallbacksProvider_8c.html#a2b645b0903a16a6821b7df89318ba075" title=" " alt="" coords="641,467,799,492"/>
+<area shape="poly" id="edge13_Node000005_Node000013" title=" " alt="" coords="446,391,514,421,598,451,634,461,633,466,597,457,512,426,444,396"/>
+<area shape="rect" id="Node000014" href="$CallbacksProvider_8c.html#a20c7d90422cfa9a86c4ecf698aebae3c" title=" " alt="" coords="599,516,841,541"/>
+<area shape="poly" id="edge14_Node000005_Node000014" title=" " alt="" coords="435,392,503,445,549,475,598,501,624,510,622,515,596,506,546,480,499,449,432,396"/>
+<area shape="rect" id="Node000015" href="$CallbacksProvider_8c.html#ad0f06085ed4c849d90f58783f4e6b76b" title=" " alt="" coords="631,565,809,591"/>
+<area shape="poly" id="edge15_Node000005_Node000015" title=" " alt="" coords="430,392,455,425,494,468,543,513,599,550,619,559,617,564,596,555,540,517,490,472,451,428,426,395"/>
+<area shape="rect" id="Node000016" href="$CallbacksProvider_8c.html#a841230c6467e08c5e04e59bd941fbd39" title=" " alt="" coords="633,615,807,640"/>
+<area shape="poly" id="edge16_Node000005_Node000016" title=" " alt="" coords="427,392,450,434,487,490,538,550,567,577,599,600,621,611,619,615,596,604,564,581,534,554,483,494,445,436,423,395"/>
+<area shape="rect" id="Node000017" href="$CallbacksProvider_8c.html#ab39eafe3e4f46b8e9b1a3227c0675ea3" title=" " alt="" coords="604,664,836,689"/>
+<area shape="poly" id="edge17_Node000005_Node000017" title=" " alt="" coords="425,393,445,442,480,513,504,551,532,588,563,622,599,650,608,656,605,660,596,655,560,626,528,591,500,554,476,515,440,444,420,395"/>
 </map>
