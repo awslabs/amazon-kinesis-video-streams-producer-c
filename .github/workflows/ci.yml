@@ -9,7 +9,21 @@ on:
     branches:
       - develop
       - master
+  workflow_dispatch:
+
 jobs:
+
+  # Set the PIC tag if the job is dispatched by PIC CI.
+  set-pic-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set KVS PIC Tag for PIC-CI-Triggered Runs
+        id: set_pic_tag
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          echo "KVS_PIC_TAG=${{ github.event.inputs.pic_tag }}" >> $GITHUB_ENV
+          fi
+
   clang-format-check:
     runs-on: macos-latest
     steps:
@@ -25,6 +39,8 @@ jobs:
 
   mac-os-build-gcc:
     runs-on: macos-13
+    # TODO: WIll need to set this for all the jobs we want to run upon the PIC dispatch.
+    needs: set-pic-tag
     permissions:
       id-token: write
       contents: read
@@ -40,7 +56,17 @@ jobs:
           brew install pkgconfig
           brew unlink openssl # it seems the libcurl is trying to access this openssl despite explicitly setting it to our build
           mkdir build && cd build
-          cmake .. --trace -DBUILD_TEST=TRUE
+
+          # Setting PIC dependency tag if it is provided by a PIC-CI-triggered job.
+          CMAKE_ARGS="-DBUILD_TEST=TRUE"
+          if [ -n "${KVS_PIC_TAG}" ]; then
+            echo "Setting -DKVS_PIC_TAG to: ${KVS_PIC_TAG}"
+            CMAKE_ARGS="${CMAKE_ARGS} -DKVS_PIC_TAG=${KVS_PIC_TAG}"
+          else
+            echo "Not setting -DKVS_PIC_TAG."
+          fi
+          
+          cmake .. --trace $CMAKE_ARGS
           make
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
