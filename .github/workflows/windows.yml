@@ -41,8 +41,17 @@ jobs:
           $env:Path += ';C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;C:\Program Files\NASM;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\lib;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\bin'
           & "D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\build\tst\producer_test.exe" --gtest_filter="-ProducerFunctionalityTest.pressure_on_buffer_duration_fail_new_connection_at_token_rotation"
 
-  VideoOnlyRealtimeStreamingSample:
+  sample-checks:
+    name: ${{ matrix.sample-executable }}
     runs-on: windows-2022
+    strategy:
+      matrix:
+        sample-executable:
+          - kvsAudioOnlyStreamingSample.exe
+          - kvsAudioVideoStreamingSample.exe
+          - kvsVideoOnlyOfflineStreamingSample.exe
+          - kvsVideoOnlyRealtimeStreamingSample.exe
+      fail-fast: false
     env:
       AWS_KVS_LOG_LEVEL: 2
       KVS_DEBUG_DUMP_DATA_FILE_DIR: D:\debug_output
@@ -67,7 +76,7 @@ jobs:
           role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
           aws-region: ${{ secrets.AWS_REGION }}
           role-duration-seconds: 10800
-      - name: Run tests
+      - name: Run ${{ matrix.sample }}
         working-directory: ./build
         run: |
           # Equivalent to set -x
@@ -82,8 +91,8 @@ jobs:
           dir
 
           # Stream for 20s (default)
-          $exePath = Join-Path $PWD "kvsVideoOnlyRealtimeStreamingSample.exe"
-          & $exePath demo-stream
+          $exePath = Join-Path $PWD ${{ matrix.sample-executable }}
+          & $exePath demo-stream-producer-c-windows-ci-${{ matrix.sample-executable }}
 
       - name: Verify MKV dump
         working-directory: ./build
@@ -95,8 +104,8 @@ jobs:
             exit 1
           }
       
-            # Run mkvinfo on each MKV file
-            foreach ($file in $mkvFiles) {
-            Write-Output "Verifying $($file.FullName) with mkvinfo:"
-            mkvinfo.exe "$($file.FullName)"
+          # Run mkvinfo on each MKV file
+          foreach ($file in $mkvFiles) {
+            Write-Output "Verifying $($file.FullName) with mkvinfo (verbose and hexdump):"
+            mkvinfo.exe -v -X "$($file.FullName)"
           }
