@@ -1,0 +1,71 @@
+name: Linux sanitizers
+
+on:
+  push:
+    branches:
+      - develop
+      - master
+  pull_request:
+    branches:
+      - develop
+      - master
+
+jobs:
+  linux-sanitizers:
+    strategy:
+      matrix:
+        sanitizer:
+          - ADDRESS_SANITIZER
+          - UNDEFINED_BEHAVIOR_SANITIZER
+          #  - THREAD_SANITIZER
+          #  - MEMORY_SANITIZER
+        config:
+          - name: With Common LWS
+            cmake_flags: "-DBUILD_TEST=ON -DBUILD_COMMON_LWS=ON"
+
+      fail-fast: false
+
+    runs-on: ubuntu-latest
+    container:
+      image: public.ecr.aws/ubuntu/ubuntu:20.04_stable
+
+    timeout-minutes: 80
+
+    env:
+      CC: clang
+      CXX: clang++
+      AWS_KVS_LOG_LEVEL: 7
+      DEBIAN_FRONTEND: noninteractive
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get -y install git build-essential automake pkg-config cmake clang
+
+      - name: Build repository - ${{ matrix.config.name }}
+        run: |
+          mkdir -p build
+          cd build
+          cmake .. -D${{ matrix.sanitizer }}=ON ${{ matrix.config.cmake_flags }}
+          make -j$(nproc)
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-duration-seconds: 10800
+
+      - name: Run tests - ${{ matrix.config.name }}
+        working-directory: ./build
+        run: |
+          timeout --signal=SIGABRT 150m ./tst/producer_test
