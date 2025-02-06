@@ -99,7 +99,7 @@ jobs:
         run: |
           $env:PATH += ";C:\Program Files\MKVToolNix"
           $mkvFiles = Get-ChildItem -Path $env:KVS_DEBUG_DUMP_DATA_FILE_DIR -Filter *.mkv
-            if ($mkvFiles.Count -eq 0) {
+          if ($mkvFiles.Count -eq 0) {
             Write-Error "No MKV files found in $env:KVS_DEBUG_DUMP_DATA_FILE_DIR"
             exit 1
           }

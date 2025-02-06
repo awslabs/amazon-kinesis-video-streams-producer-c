@@ -1,0 +1,94 @@
+name: Producer C Samples on Mac and Linux
+
+on:
+  push:
+    branches:
+      - develop
+      - master
+  pull_request:
+    branches:
+      - develop
+      - master
+
+jobs:
+  sample-checks:
+    name: ${{ matrix.runner.id }} - ${{ matrix.sample-executable }}
+    strategy:
+      matrix:
+        sample-executable:
+          - kvsAudioOnlyStreamingSample
+          - kvsAudioVideoStreamingSample
+          - kvsVideoOnlyOfflineStreamingSample
+          - kvsVideoOnlyRealtimeStreamingSample
+        runner:
+          - id: macos-latest
+            image: macos-latest
+
+          - id: ubuntu-22.04
+            image: ubuntu-latest
+            docker: public.ecr.aws/ubuntu/ubuntu:22.04_stable
+
+          - id: ubuntu-20.04
+            image: ubuntu-latest
+            docker: public.ecr.aws/ubuntu/ubuntu:20.04_stable
+
+      fail-fast: false
+
+    runs-on: ${{ matrix.runner.image }}
+    container: ${{ matrix.runner.docker || '' }}
+
+    env:
+      AWS_KVS_LOG_LEVEL: 2
+      KVS_DEBUG_DUMP_DATA_FILE_DIR: ./debug_output
+      DEBIAN_FRONTEND: noninteractive
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: brew install mkvtoolnix
+
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          apt-get update
+          apt-get install -y git cmake build-essential pkg-config libssl-dev libcurl4-openssl-dev mkvtoolnix
+
+      - name: Build repository
+        run: |
+          mkdir build && cd build
+          cmake .. -DBUILD_DEPENDENCIES=OFF
+          make -j$(nproc)
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-duration-seconds: 900
+
+      - name: Run ${{ matrix.sample-executable }}
+        working-directory: ./build
+        run: |
+          mkdir -p $KVS_DEBUG_DUMP_DATA_FILE_DIR
+          ./${{ matrix.sample-executable }} demo-stream-producer-c-${{ matrix.runner.id }}-ci-${{ matrix.sample-executable }}
+
+      - name: Verify MKV dump
+        working-directory: ./build
+        run: |
+          if [ -z "$(ls -A $KVS_DEBUG_DUMP_DATA_FILE_DIR/*.mkv 2>/dev/null)" ]; then
+            echo "No MKV files found in $KVS_DEBUG_DUMP_DATA_FILE_DIR"
+            exit 1
+          fi
+
+          for file in $KVS_DEBUG_DUMP_DATA_FILE_DIR/*.mkv; do
+            echo "Verifying $file with mkvinfo (verbose and hexdump):"
+            mkvinfo -v -X "$file"
+          done
