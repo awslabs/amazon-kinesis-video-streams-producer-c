@@ -191,8 +191,8 @@ INT32 main(INT32 argc, CHAR* argv[])
 
     MEMSET(&data, 0x00, SIZEOF(SampleCustomData));
 
-    STRCPY(audioCodec, AUDIO_CODEC_NAME_AAC);  // aac audio by default
-    STRCPY(videoCodec, VIDEO_CODEC_NAME_H264); // h264 video by default
+    SNPRINTF(audioCodec, SIZEOF(audioCodec), "%s", AUDIO_CODEC_NAME_AAC);  // aac audio by default
+    SNPRINTF(videoCodec, SIZEOF(videoCodec), "%s", VIDEO_CODEC_NAME_H264); // h264 video by default
 
 #ifdef IOT_CORE_ENABLE_CREDENTIALS
     PCHAR pIotCoreCredentialEndpoint, pIotCoreCert, pIotCorePrivateKey, pIotCoreRoleAlias, pIotCoreThingName;
@@ -223,7 +223,7 @@ INT32 main(INT32 argc, CHAR* argv[])
     }
     if (argc >= 6) {
         if (!STRCMP(argv[4], AUDIO_CODEC_NAME_ALAW)) {
-            STRCPY(audioCodec, AUDIO_CODEC_NAME_ALAW);
+            SNPRINTF(audioCodec, SIZEOF(audioCodec), "%s", AUDIO_CODEC_NAME_ALAW);
         }
         if (!STRCMP(argv[5], VIDEO_CODEC_NAME_H265)) {
             STRCPY(videoCodec, VIDEO_CODEC_NAME_H265);

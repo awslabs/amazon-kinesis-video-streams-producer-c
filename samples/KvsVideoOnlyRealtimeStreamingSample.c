@@ -69,7 +69,7 @@ INT32 main(INT32 argc, CHAR* argv[])
     BOOL firstFrame = TRUE;
     UINT64 startTime;
     CHAR videoCodec[VIDEO_CODEC_NAME_MAX_LENGTH];
-    STRCPY(videoCodec, VIDEO_CODEC_NAME_H264); // h264 video by default
+    SNPRINTF(videoCodec, SIZEOF(videoCodec), "%s", VIDEO_CODEC_NAME_H264); // h264 video by default
     VIDEO_CODEC_ID videoCodecID = VIDEO_CODEC_ID_H264;
 
 #ifdef IOT_CORE_ENABLE_CREDENTIALS
@@ -107,7 +107,7 @@ INT32 main(INT32 argc, CHAR* argv[])
 
     if (argc >= 3 && !IS_EMPTY_STRING(argv[2])) {
         if (!STRCMP(argv[2], VIDEO_CODEC_NAME_H265)) {
-            STRCPY(videoCodec, VIDEO_CODEC_NAME_H265);
+            SNPRINTF(videoCodec, SIZEOF(videoCodec), "%s", VIDEO_CODEC_NAME_H265);
             videoCodecID = VIDEO_CODEC_ID_H265;
         }
     }
