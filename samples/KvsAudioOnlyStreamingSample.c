@@ -107,7 +107,7 @@ INT32 main(INT32 argc, CHAR* argv[])
 
     MEMSET(&data, 0x00, SIZEOF(SampleCustomData));
 
-    STRNCPY(audioCodec, AUDIO_CODEC_NAME_AAC, STRLEN(AUDIO_CODEC_NAME_AAC)); // aac audio by default
+    SNPRINTF(audioCodec, SIZEOF(audioCodec), "%s", AUDIO_CODEC_NAME_AAC); // aac audio by default
 
 #ifdef IOT_CORE_ENABLE_CREDENTIALS
     PCHAR pIotCoreCredentialEndpoint, pIotCoreCert, pIotCorePrivateKey, pIotCoreRoleAlias, pIotCoreThingName;
@@ -132,7 +132,7 @@ INT32 main(INT32 argc, CHAR* argv[])
 
     if (argc >= 5) {
         if (!STRCMP(argv[2], AUDIO_CODEC_NAME_ALAW)) {
-            STRNCPY(audioCodec, AUDIO_CODEC_NAME_ALAW, STRLEN(AUDIO_CODEC_NAME_ALAW));
+            SNPRINTF(audioCodec, SIZEOF(audioCodec), "%s", AUDIO_CODEC_NAME_ALAW);
         }
     }
 
