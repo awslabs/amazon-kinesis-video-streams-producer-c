@@ -7,9 +7,8 @@
 /**
  * Creates Static Rotating Auth callbacks
  */
-STATUS createRotatingStaticAuthCallbacks(PClientCallbacks pCallbacksProvider, PCHAR accessKeyId, PCHAR secretKey,
-                                         PCHAR sessionToken, UINT64 expiration, UINT64 rotationPeriod,
-                                         PAuthCallbacks *ppStaticAuthCallbacks)
+STATUS createRotatingStaticAuthCallbacks(PClientCallbacks pCallbacksProvider, PCHAR accessKeyId, PCHAR secretKey, PCHAR sessionToken,
+                                         UINT64 expiration, UINT64 rotationPeriod, PAuthCallbacks* ppStaticAuthCallbacks)
 {
     ENTERS();
     STATUS retStatus = STATUS_SUCCESS;
@@ -45,15 +44,14 @@ STATUS createRotatingStaticAuthCallbacks(PClientCallbacks pCallbacksProvider, PC
     pStaticAuthCallbacks->recoverCount = 0;
 
     // Create the credentials object
-    CHK_STATUS(createAwsCredentials(accessKeyId, 0, secretKey, 0, sessionToken, 0, expiration,
-                                    &pStaticAuthCallbacks->pAwsCredentials));
+    CHK_STATUS(createAwsCredentials(accessKeyId, 0, secretKey, 0, sessionToken, 0, expiration, &pStaticAuthCallbacks->pAwsCredentials));
 
     CHK_STATUS(addAuthCallbacks(pCallbacksProvider, (PAuthCallbacks) pStaticAuthCallbacks));
 
 CleanUp:
 
     if (STATUS_FAILED(retStatus)) {
-        freeRotatingStaticAuthCallbacks((PAuthCallbacks *) &pStaticAuthCallbacks);
+        freeRotatingStaticAuthCallbacks((PAuthCallbacks*) &pStaticAuthCallbacks);
         pStaticAuthCallbacks = NULL;
     }
 
@@ -71,7 +69,7 @@ CleanUp:
  *
  * NOTE: The caller should have passed a pointer which was previously created by the corresponding function
  */
-STATUS freeRotatingStaticAuthCallbacks(PAuthCallbacks *ppStaticAuthCallbacks)
+STATUS freeRotatingStaticAuthCallbacks(PAuthCallbacks* ppStaticAuthCallbacks)
 {
     ENTERS();
     STATUS retStatus = STATUS_SUCCESS;
@@ -116,8 +114,7 @@ CleanUp:
     return retStatus;
 }
 
-STATUS getStreamingTokenEnvVarFunc(UINT64 customData, PCHAR streamName, STREAM_ACCESS_MODE accessMode,
-                                   PServiceCallContext pServiceCallContext)
+STATUS getStreamingTokenEnvVarFunc(UINT64 customData, PCHAR streamName, STREAM_ACCESS_MODE accessMode, PServiceCallContext pServiceCallContext)
 {
     UNUSED_PARAM(streamName);
     UNUSED_PARAM(accessMode);
@@ -144,11 +141,8 @@ STATUS getStreamingTokenEnvVarFunc(UINT64 customData, PCHAR streamName, STREAM_A
     // expiration is now time plus rotation period
     expirationTime = currentTime + pStaticAuthCallbacks->rotationPeriod;
 
-    retStatus = getStreamingTokenResultEvent(pServiceCallContext->customData,
-                                             SERVICE_CALL_RESULT_OK,
-                                             (PBYTE) pStaticAuthCallbacks->pAwsCredentials,
-                                             pStaticAuthCallbacks->pAwsCredentials->size,
-                                             expirationTime);
+    retStatus = getStreamingTokenResultEvent(pServiceCallContext->customData, SERVICE_CALL_RESULT_OK, (PBYTE) pStaticAuthCallbacks->pAwsCredentials,
+                                             pStaticAuthCallbacks->pAwsCredentials->size, expirationTime);
 
 CleanUp:
 
@@ -157,11 +151,7 @@ CleanUp:
 
         if (STATUS_FAILED(retStatus) && pServiceCallContext != NULL) {
             // Notify PIC on failure
-            getStreamingTokenResultEvent(pServiceCallContext->customData,
-                                         SERVICE_CALL_UNKNOWN,
-                                         NULL,
-                                         0,
-                                         0);
+            getStreamingTokenResultEvent(pServiceCallContext->customData, SERVICE_CALL_UNKNOWN, NULL, 0, 0);
 
             // Notify clients
             notifyCallResult(pCallbacksProvider, retStatus, pServiceCallContext->customData);
@@ -170,10 +160,9 @@ CleanUp:
 
     LEAVES();
     return retStatus;
-
 }
 
-STATUS getSecurityTokenEnvVarFunc(UINT64 customData, PBYTE *ppBuffer, PUINT32 pSize, PUINT64 pExpiration)
+STATUS getSecurityTokenEnvVarFunc(UINT64 customData, PBYTE* ppBuffer, PUINT32 pSize, PUINT64 pExpiration)
 {
     ENTERS();
     STATUS retStatus = STATUS_SUCCESS;

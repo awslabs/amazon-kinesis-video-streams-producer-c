@@ -1,9 +1,11 @@
 #include "ProducerTestFixture.h"
 
-namespace com { namespace amazonaws { namespace kinesis { namespace video {
+namespace com {
+namespace amazonaws {
+namespace kinesis {
+namespace video {
 
-class ProducerApiCallCacheTest : public ProducerClientTestBase {
-};
+class ProducerApiCallCacheTest : public ProducerClientTestBase {};
 
 TEST_F(ProducerApiCallCacheTest, basicValidateNoCaching)
 {
@@ -143,7 +145,7 @@ TEST_F(ProducerApiCallCacheTest, basicValidateCachingAllApis)
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
 
-}
-}
-}
-}
+} // namespace video
+} // namespace kinesis
+} // namespace amazonaws
+} // namespace com
