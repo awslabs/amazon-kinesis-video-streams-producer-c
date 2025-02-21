@@ -1,9 +1,11 @@
 #include "ProducerTestFixture.h"
 
-namespace com { namespace amazonaws { namespace kinesis { namespace video {
+namespace com {
+namespace amazonaws {
+namespace kinesis {
+namespace video {
 
-class ProducerBasicUsageTest : public ProducerClientTestBase {
-};
+class ProducerBasicUsageTest : public ProducerClientTestBase {};
 
 TEST_F(ProducerBasicUsageTest, videoOnlyUsage)
 {
@@ -57,7 +59,7 @@ CleanUp:
     EXPECT_EQ(STATUS_SUCCESS, retStatus);
 }
 
-}
-}
-}
-}
+} // namespace video
+} // namespace kinesis
+} // namespace amazonaws
+} // namespace com
