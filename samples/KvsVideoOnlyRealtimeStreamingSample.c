@@ -63,7 +63,7 @@ INT32 main(INT32 argc, CHAR* argv[])
     CHAR frameFilePath[MAX_PATH_LEN + 1], metadataKey[METADATA_MAX_KEY_LENGTH + 1], metadataValue[METADATA_MAX_VALUE_LENGTH + 1];
     Frame frame;
     BYTE frameBuffer[200000]; // Assuming this is enough
-    UINT32 frameSize = SIZEOF(frameBuffer), frameIndex = 0, fileIndex = 0, n = 0, numMetadata = 10;
+    UINT32 frameSize = SIZEOF(frameBuffer), frameIndex = 0, fileIndex = 0, n = 0, numMetadata = 9;
     UINT64 streamStopTime, streamingDuration = DEFAULT_STREAM_DURATION;
     DOUBLE startUpLatency;
     BOOL firstFrame = TRUE;
@@ -84,7 +84,7 @@ INT32 main(INT32 argc, CHAR* argv[])
 #else
     if (argc < 2) {
         DLOGE("Usage: AWS_ACCESS_KEY_ID=SAMPLEKEY AWS_SECRET_ACCESS_KEY=SAMPLESECRET %s <stream_name>"
-              "<codec> <duration_in_seconds> <frame_files_path> [num_metadata = 10]\n",
+              "<codec> <duration_in_seconds> <frame_files_path> [num_metadata = 9]\n",
               argv[0]);
         CHK(FALSE, STATUS_INVALID_ARG);
     }
@@ -128,7 +128,7 @@ INT32 main(INT32 argc, CHAR* argv[])
     if (argc >= 6 && !IS_EMPTY_STRING(argv[5])) {
         numMetadata = STRTOUL(argv[5], NULL, 10);
         DLOGD("numMetadata: %d\n", numMetadata);
-        CHK(numMetadata <= MAX_METADATA_PER_FRAGMENT, STATUS_INVALID_ARG);
+        CHK(numMetadata <= MAX_METADATA_PER_FRAGMENT - 1, STATUS_INVALID_ARG);
     }
 
     streamStopTime = GETTIME() + streamingDuration;
@@ -183,17 +183,6 @@ INT32 main(INT32 argc, CHAR* argv[])
 
         CHK_STATUS(readFrameData(&frame, frameFilePath, videoCodec));
 
-        // Add the fragment metadata key-value pairs
-        // For limits, refer to https://docs.aws.amazon.com/kinesisvideostreams/latest/dg/limits.html#limits-streaming-metadata
-        if (numMetadata > 0 && frame.flags == FRAME_FLAG_KEY_FRAME) {
-            DLOGD("Adding metadata! frameIndex: %d", frame.index);
-            for (n = 1; n <= numMetadata; n++) {
-                SNPRINTF(metadataKey, METADATA_MAX_KEY_LENGTH, "TEST_KEY_%d", n);
-                SNPRINTF(metadataValue, METADATA_MAX_VALUE_LENGTH, "TEST_VALUE_%d", frame.index + n);
-                CHK_STATUS(putKinesisVideoFragmentMetadata(streamHandle, metadataKey, metadataValue, TRUE));
-            }
-        }
-
         CHK_STATUS(putKinesisVideoFrame(streamHandle, &frame));
         if (firstFrame) {
             startUpLatency = (DOUBLE) (GETTIME() - startTime) / (DOUBLE) HUNDREDS_OF_NANOS_IN_A_MILLISECOND;
@@ -201,6 +190,16 @@ INT32 main(INT32 argc, CHAR* argv[])
             firstFrame = FALSE;
         }
         defaultThreadSleep(frame.duration);
+
+        // Add the fragment metadata key-value pairs
+        // For limits, refer to https://docs.aws.amazon.com/kinesisvideostreams/latest/dg/limits.html#limits-streaming-metadata
+        if (frame.flags == FRAME_FLAG_KEY_FRAME) {
+            for (n = 1; n <= numMetadata; n++) {
+                SNPRINTF(metadataKey, METADATA_MAX_KEY_LENGTH, "TEST_KEY_%d", n);
+                SNPRINTF(metadataValue, METADATA_MAX_VALUE_LENGTH, "TEST_VALUE_%d", frame.index + n);
+                CHK_STATUS(putKinesisVideoFragmentMetadata(streamHandle, metadataKey, metadataValue, FALSE));
+            }
+        }
 
         frame.decodingTs += frame.duration;
         frame.presentationTs = frame.decodingTs;

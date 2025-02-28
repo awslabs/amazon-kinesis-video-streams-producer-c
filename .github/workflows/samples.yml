@@ -41,6 +41,7 @@ jobs:
       AWS_KVS_LOG_LEVEL: 2
       KVS_DEBUG_DUMP_DATA_FILE_DIR: ./debug_output
       DEBIAN_FRONTEND: noninteractive
+      KVS_STREAM_NAME: demo-stream-producer-c-${{ matrix.runner.id }}-ci-${{ matrix.sample-executable }}
 
     permissions:
       id-token: write
@@ -58,7 +59,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           apt-get update
-          apt-get install -y git cmake build-essential pkg-config libssl-dev libcurl4-openssl-dev mkvtoolnix
+          apt-get install -y git cmake build-essential pkg-config libssl-dev libcurl4-openssl-dev mkvtoolnix curl unzip
 
       - name: Build repository
         run: |
@@ -78,30 +79,61 @@ jobs:
         working-directory: ./build
         run: |
           mkdir -p $KVS_DEBUG_DUMP_DATA_FILE_DIR
-          ./${{ matrix.sample-executable }} demo-stream-producer-c-${{ matrix.runner.id }}-ci-${{ matrix.sample-executable }}
+          
+          set -o pipefail
+          ./${{ matrix.sample-executable }} "$KVS_STREAM_NAME" | tee output.log
+          exit_code=${PIPESTATUS[0]}
+          if [ "$exit_code" -ne 0 ]; then
+            echo "${{ matrix.sample-executable }} exited with code: $exit_code"
+            exit 1
+          fi
+        shell: bash
 
       - name: Save MKV file list
         working-directory: ./build
         run: |
-          FILE_LIST=$(ls -A $KVS_DEBUG_DUMP_DATA_FILE_DIR/*.mkv 2>/dev/null || true)
+          FILE_LIST=$(find "$KVS_DEBUG_DUMP_DATA_FILE_DIR" -type f -name "*.mkv" -size +0c 2>/dev/null)
           if [ -z "$FILE_LIST" ]; then
             echo "No MKV files found in $KVS_DEBUG_DUMP_DATA_FILE_DIR"
             exit 1
           fi
-          echo "MKV_FILES=$FILE_LIST" >> $GITHUB_ENV
+          echo "$FILE_LIST" >> mkv_files.txt
 
       - name: Print MKV dump (non-verbose)
         working-directory: ./build
         run: |
-          for file in $MKV_FILES; do
-            echo "Verifying $file with mkvinfo:"
-            mkvinfo -v "$file"
-          done
+          while read -r mkvFile; do
+            echo "Verifying $mkvFile with mkvinfo:"
+            mkvinfo -v "$mkvFile"
+          done < mkv_files.txt
 
       - name: Print MKV dump (verbose)
         working-directory: ./build
         run: |
-          for file in $MKV_FILES; do
-            echo "Verifying $file with mkvinfo (hexdump):"
-            mkvinfo -v -X "$file"
-          done
+          while read -r mkvFile; do
+            echo "Verifying $mkvFile with mkvinfo:"
+            mkvinfo -v -X "$mkvFile"
+          done < mkv_files.txt
+
+      - name: Install AWS CLI (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          ./aws/install
+
+      - name: Check persisted fragments
+        working-directory: ./build
+        run: |
+          sleep 20 # To let the fragments settle (worst-case scenario)
+                    
+          # Extract fragments from the log
+          grep '"EventType":"PERSISTED"' output.log | awk -F'"FragmentNumber":"' '{print $2}' | awk -F'"' '{print $1}' >> fragments.txt 
+          
+          data_endpoint=$(aws kinesisvideo get-data-endpoint --api-name GET_MEDIA_FOR_FRAGMENT_LIST --stream-name "$KVS_STREAM_NAME" --output text --no-cli-pager)
+          
+          while read -r fragment; do
+            echo "Downloading fragment: $fragment"
+            aws kinesis-video-archived-media get-media-for-fragment-list "$fragment".webm --stream-name "$KVS_STREAM_NAME" --endpoint-url "$data_endpoint" --fragments "[\"$fragment\"]" --no-cli-pager
+            mkvinfo -v "$fragment".webm
+          done < fragments.txt
