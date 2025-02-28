@@ -80,15 +80,28 @@ jobs:
           mkdir -p $KVS_DEBUG_DUMP_DATA_FILE_DIR
           ./${{ matrix.sample-executable }} demo-stream-producer-c-${{ matrix.runner.id }}-ci-${{ matrix.sample-executable }}
 
-      - name: Verify MKV dump
+      - name: Save MKV file list
         working-directory: ./build
         run: |
-          if [ -z "$(ls -A $KVS_DEBUG_DUMP_DATA_FILE_DIR/*.mkv 2>/dev/null)" ]; then
+          FILE_LIST=$(ls -A $KVS_DEBUG_DUMP_DATA_FILE_DIR/*.mkv 2>/dev/null || true)
+          if [ -z "$FILE_LIST" ]; then
             echo "No MKV files found in $KVS_DEBUG_DUMP_DATA_FILE_DIR"
             exit 1
           fi
+          echo "MKV_FILES=$FILE_LIST" >> $GITHUB_ENV
 
-          for file in $KVS_DEBUG_DUMP_DATA_FILE_DIR/*.mkv; do
-            echo "Verifying $file with mkvinfo (verbose and hexdump):"
+      - name: Print MKV dump (non-verbose)
+        working-directory: ./build
+        run: |
+          for file in $MKV_FILES; do
+            echo "Verifying $file with mkvinfo:"
+            mkvinfo -v "$file"
+          done
+
+      - name: Print MKV dump (verbose)
+        working-directory: ./build
+        run: |
+          for file in $MKV_FILES; do
+            echo "Verifying $file with mkvinfo (hexdump):"
             mkvinfo -v -X "$file"
           done
