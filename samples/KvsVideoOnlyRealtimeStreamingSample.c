@@ -5,7 +5,7 @@
 #define DEFAULT_CALLBACK_CHAIN_COUNT      5
 #define DEFAULT_KEY_FRAME_INTERVAL        45
 #define DEFAULT_FPS_VALUE                 25
-#define DEFAULT_STREAM_DURATION           20 * HUNDREDS_OF_NANOS_IN_A_SECOND
+#define DEFAULT_STREAM_DURATION           2 * HUNDREDS_OF_NANOS_IN_A_MINUTE
 #define DEFAULT_STORAGE_SIZE              20 * 1024 * 1024
 #define RECORDED_FRAME_AVG_BITRATE_BIT_PS 3800000
 #define VIDEO_CODEC_NAME_H264             "h264"
@@ -182,6 +182,11 @@ INT32 main(INT32 argc, CHAR* argv[])
         frame.size = SIZEOF(frameBuffer);
 
         CHK_STATUS(readFrameData(&frame, frameFilePath, videoCodec));
+
+        if (frame.flags == FRAME_FLAG_KEY_FRAME && !firstFrame) {
+            Frame eofr = EOFR_FRAME_INITIALIZER;
+            putKinesisVideoFrame(streamHandle, &eofr);
+        }
 
         CHK_STATUS(putKinesisVideoFrame(streamHandle, &frame));
         if (firstFrame) {
