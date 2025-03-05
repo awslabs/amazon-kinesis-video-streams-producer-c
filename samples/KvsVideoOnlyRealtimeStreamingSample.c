@@ -5,7 +5,7 @@
 #define DEFAULT_CALLBACK_CHAIN_COUNT      5
 #define DEFAULT_KEY_FRAME_INTERVAL        45
 #define DEFAULT_FPS_VALUE                 25
-#define DEFAULT_STREAM_DURATION           2 * HUNDREDS_OF_NANOS_IN_A_MINUTE
+#define DEFAULT_STREAM_DURATION           20 * HUNDREDS_OF_NANOS_IN_A_SECOND
 #define DEFAULT_STORAGE_SIZE              20 * 1024 * 1024
 #define RECORDED_FRAME_AVG_BITRATE_BIT_PS 3800000
 #define VIDEO_CODEC_NAME_H264             "h264"
@@ -61,7 +61,7 @@ INT32 main(INT32 argc, CHAR* argv[])
     STATUS retStatus = STATUS_SUCCESS;
     PCHAR accessKey = NULL, secretKey = NULL, sessionToken = NULL, streamName = NULL, region = NULL, cacertPath = NULL;
     CHAR frameFilePath[MAX_PATH_LEN + 1], metadataKey[METADATA_MAX_KEY_LENGTH + 1], metadataValue[METADATA_MAX_VALUE_LENGTH + 1];
-    Frame frame;
+    Frame frame, eofr = EOFR_FRAME_INITIALIZER;
     BYTE frameBuffer[200000]; // Assuming this is enough
     UINT32 frameSize = SIZEOF(frameBuffer), frameIndex = 0, fileIndex = 0, n = 0, numMetadata = 9;
     UINT64 streamStopTime, streamingDuration = DEFAULT_STREAM_DURATION;
@@ -184,7 +184,6 @@ INT32 main(INT32 argc, CHAR* argv[])
         CHK_STATUS(readFrameData(&frame, frameFilePath, videoCodec));
 
         if (frame.flags == FRAME_FLAG_KEY_FRAME && !firstFrame) {
-            Frame eofr = EOFR_FRAME_INITIALIZER;
             putKinesisVideoFrame(streamHandle, &eofr);
         }
 
@@ -212,6 +211,8 @@ INT32 main(INT32 argc, CHAR* argv[])
         fileIndex++;
         fileIndex = fileIndex % NUMBER_OF_FRAME_FILES;
     }
+
+    putKinesisVideoFrame(streamHandle, &eofr);
 
     CHK_STATUS(stopKinesisVideoStreamSync(streamHandle));
     CHK_STATUS(freeKinesisVideoStream(&streamHandle));
