@@ -59,6 +59,11 @@ You can pass the following options to `cmake ..`.
 * `-DALIGNED_MEMORY_MODEL` Build for aligned memory model only devices. Default is OFF.
 * `-DLOCAL_OPENSSL_BUILD` Whether or not to use local OpenSSL build. Default is OFF.
 * `-DCONSTRAINED_DEVICE` -- Change thread stack size to 0.5Mb, needed for Alpine.
+* `-DAWS_KVS_USE_LEGACY_ENDPOINT_ONLY` -- Use only legacy IPV4-only endpoints (ignores env vars). Default is OFF.
+* `-DAWS_KVS_USE_DUAL_STACK_ENDPOINT_ONLY` -- Use only dual-stack endpoints (ignores env vars). Default is OFF.
+* `-DAWS_KVS_IPV4_ONLY` -- Use only IPv4 addresses from DNS (ignores env vars). Default is OFF.
+* `-DAWS_KVS_IPV6_ONLY` -- Use only IPv6 addresses from DNS (ignores env vars). Default is OFF.
+* `-DAWS_KVS_DUAL_STACK_ONLY` -- Use both IPv4 and IPv6 addresses from DNS (ignores env vars). Default is OFF.
 
 
 DMEMORY_SANITIZER, DTHREAD_SANITIZER etc. flags works only with clang compiler 
@@ -196,6 +201,23 @@ For video only: `createOfflineVideoStreamInfoProviderWithCodecs()`
 For video and audio: `createOfflineAudioVideoStreamInfoProviderWithCodecs()`
 
 The 2 APIs are available in [this](https://github.com/awslabs/amazon-kinesis-video-streams-producer-c/blob/412aab82c99a72f9dbde975f5fea81ffdc844ae5/src/include/com/amazonaws/kinesis/video/cproducer/Include.h) header file.
+
+### KVS Endpoints and DNS resolution
+The default endpoints and DNS resolution chain is implemented by the SDK. It sequentially checks each place where you can set the configuration for these parameters, and then selects the first one you set. The predefined sequence is as follows:
+
+#### Endpoint Configuration
+1. The `controlPlaneUrl` parameter for `createAbstractDefaultCallbacksProvider`.
+2. Endpoint configuration CMake parameters: (`-DAWS_KVS_USE_LEGACY_ENDPOINT_ONLY=TRUE`, `-DAWS_KVS_USE_DUAL_STACK_ENDPOINT_ONLY=TRUE`)
+3. Environment variables: (`export AWS_USE_DUALSTACK_ENDPOINT=TRUE`)
+  - If `AWS_USE_DUALSTACK_ENDPOINT` is `TRUE` (case-insensitive), the dual-stack endpoint will be used.
+4. Otherwise, the legacy endpoint will be constructed.
+
+With 2, 3, and 4, the endpoint will be constructed based on the region provided to `createAbstractDefaultCallbacksProvider`.
+
+#### DNS filtering
+1. DNS resolution CMake parameters: (`-DAWS_KVS_IPV4_ONLY=TRUE`, `-DAWS_KVS_IPV6_ONLY=TRUE`, `-DAWS_KVS_DUAL_STACK_ONLY=TRUE`)
+2. Environment variables (`export AWS_KVS_USE_IPV4=TRUE`, `export AWS_KVS_USE_IPV6=TRUE`)
+3. Otherwise, no filtering will take place. Both IPv4 and IPv6 IP addresses, if returned by DNS, may be used.
 
 ## DEBUG
 * When building OpenSSL during `cmake ..`, if you encounter an architecture error such as `ld: symbol(s) not found for architecture i386`, building with a local OpenSSL build may help. First install OpenSSL 1.1 (for Mac: `brew install openssl@1.1`). Next set `export PKG_CONFIG_PATH="<YOUR-PATH>/openssl@1.1/lib/pkgconfig"` (your path can be printed to terminal using `which openssl` on Linux/Mac). Now set the following flag to ON when building: `cmake .. -DLOCAL_OPENSSL_BUILD=ON`. If there are still errors regarding locating the local OpenSSL library:

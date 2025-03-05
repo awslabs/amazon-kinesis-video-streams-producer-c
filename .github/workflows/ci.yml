@@ -527,7 +527,7 @@ jobs:
           cd build
           ./tst/producer_test --gtest_filter="ProducerClientBasicTest.*"
           TEST_EXIT_CODE=$?
-          
+
           # 128 (abnormal exit) + 11 (segmentation fault) = 139
           if [ $TEST_EXIT_CODE -ne 139 ]; then
             echo "Unexpected exit code: $TEST_EXIT_CODE"
@@ -535,3 +535,20 @@ jobs:
           fi
           echo "Test exited as expected with code $TEST_EXIT_CODE."
         shell: bash
+
+  cmake-flags-test:
+    runs-on: ubuntu-22.04
+    container: public.ecr.aws/ubuntu/ubuntu:22.04_stable
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y git cmake build-essential pkg-config libssl-dev libcurl4-openssl-dev
+
+      - name: Run CMake Flag Combination Test
+        run: |
+          ./tst/scripts/test_cmake_flags.sh >> $GITHUB_STEP_SUMMARY

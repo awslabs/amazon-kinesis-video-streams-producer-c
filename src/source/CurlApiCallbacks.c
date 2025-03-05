@@ -14,6 +14,7 @@ STATUS createCurlApiCallbacks(PCallbacksProvider pCallbacksProvider, PCHAR regio
     ENTERS();
     STATUS retStatus = STATUS_SUCCESS, status;
     PCurlApiCallbacks pCurlApiCallbacks = NULL;
+    BOOL useDualStackEndpoint;
 
     CHK(pCallbacksProvider != NULL && ppCurlApiCallbacks != NULL, STATUS_NULL_ARG);
     CHK(certPath == NULL || STRNLEN(certPath, MAX_PATH_LEN + 1) <= MAX_PATH_LEN, STATUS_INVALID_CERT_PATH_LENGTH);
@@ -77,26 +78,21 @@ STATUS createCurlApiCallbacks(PCallbacksProvider pCallbacksProvider, PCHAR regio
         DLOGW("Failed to generate user agent string with error 0x%08x.", status);
     }
 
-    // Set the control plane URL
-    if (controlPlaneUrl == NULL || controlPlaneUrl[0] == '\0') {
-        if (0 == STRNCMP(pCurlApiCallbacks->region, AWS_ISO_B_REGION_PREFIX, STRLEN(AWS_ISO_B_REGION_PREFIX))) {
-            SNPRINTF(pCurlApiCallbacks->controlPlaneUrl, MAX_URI_CHAR_LEN, "%s%s%s.%s%s", CONTROL_PLANE_URI_PREFIX, KINESIS_VIDEO_SERVICE_NAME,
-                     AWS_KVS_FIPS_ENDPOINT_POSTFIX, pCurlApiCallbacks->region, CONTROL_PLANE_URI_POSTFIX_ISO_B);
-            // Region is in "aws-iso" partition
-        } else if (0 == STRNCMP(pCurlApiCallbacks->region, AWS_ISO_REGION_PREFIX, STRLEN(AWS_ISO_REGION_PREFIX))) {
-            SNPRINTF(pCurlApiCallbacks->controlPlaneUrl, MAX_URI_CHAR_LEN, "%s%s%s.%s%s", CONTROL_PLANE_URI_PREFIX, KINESIS_VIDEO_SERVICE_NAME,
-                     AWS_KVS_FIPS_ENDPOINT_POSTFIX, pCurlApiCallbacks->region, CONTROL_PLANE_URI_POSTFIX_ISO);
-        } else if (0 == STRNCMP(pCurlApiCallbacks->region, AWS_GOV_CLOUD_REGION_PREFIX, STRLEN(AWS_GOV_CLOUD_REGION_PREFIX))) {
-            SNPRINTF(pCurlApiCallbacks->controlPlaneUrl, MAX_URI_CHAR_LEN, "%s%s%s.%s%s", CONTROL_PLANE_URI_PREFIX, KINESIS_VIDEO_SERVICE_NAME,
-                     AWS_KVS_FIPS_ENDPOINT_POSTFIX, pCurlApiCallbacks->region, CONTROL_PLANE_URI_POSTFIX);
-        } else if (0 == STRNCMP(pCurlApiCallbacks->region, AWS_CN_REGION_PREFIX, STRLEN(AWS_CN_REGION_PREFIX))) {
-            SNPRINTF(pCurlApiCallbacks->controlPlaneUrl, MAX_URI_CHAR_LEN, "%s%s.%s%s", CONTROL_PLANE_URI_PREFIX, KINESIS_VIDEO_SERVICE_NAME,
-                     pCurlApiCallbacks->region, CONTROL_PLANE_URI_POSTFIX_CN);
-        } else {
-            // Create a fully qualified URI
-            SNPRINTF(pCurlApiCallbacks->controlPlaneUrl, MAX_URI_CHAR_LEN, "%s%s.%s%s", CONTROL_PLANE_URI_PREFIX, KINESIS_VIDEO_SERVICE_NAME,
-                     pCurlApiCallbacks->region, CONTROL_PLANE_URI_POSTFIX);
-        }
+    // Construct Control Plane URL
+    if (IS_NULL_OR_EMPTY_STRING(controlPlaneUrl)) {
+#if defined(AWS_KVS_USE_LEGACY_ENDPOINT_ONLY)
+        useDualStackEndpoint = FALSE;
+        DLOGI("Using legacy endpoint from AWS_KVS_USE_LEGACY_ENDPOINT_ONLY")
+#elif defined(AWS_KVS_USE_DUAL_STACK_ENDPOINT_ONLY)
+        useDualStackEndpoint = TRUE;
+        DLOGI("Using dual stack endpoint from AWS_KVS_USE_DUAL_STACK_ENDPOINT_ONLY")
+#else
+        useDualStackEndpoint = (GETENV(CONTROL_PLANE_USE_DUAL_STACK_ENDPOINT_ENV_VAR) != NULL) &&
+            (0 == STRNCMPI(GETENV(CONTROL_PLANE_USE_DUAL_STACK_ENDPOINT_ENV_VAR), "true", 4));
+        DLOGI("Using %s endpoint from environment", useDualStackEndpoint ? "dual stack" : "legacy");
+#endif
+
+        constructControlPlaneUrl(pCurlApiCallbacks->controlPlaneUrl, MAX_URI_CHAR_LEN, pCurlApiCallbacks->region, !useDualStackEndpoint);
     } else {
         STRNCPY(pCurlApiCallbacks->controlPlaneUrl, controlPlaneUrl, MAX_URI_CHAR_LEN);
     }
@@ -189,6 +185,46 @@ CleanUp:
     if (ppCurlApiCallbacks != NULL) {
         *ppCurlApiCallbacks = pCurlApiCallbacks;
     }
+
+    LEAVES();
+    return retStatus;
+}
+
+STATUS constructControlPlaneUrl(const char* buffer, SIZE_T bufferSize, const char* region, BOOL useLegacyEndpoint)
+{
+    ENTERS();
+    STATUS retStatus = STATUS_SUCCESS;
+    const char* serviceNamePostfix = "";
+    const char* postfix;
+
+    CHK(buffer != NULL && region != NULL, STATUS_NULL_ARG);
+    CHK(bufferSize > 0, STATUS_INVALID_ARG_LEN);
+
+    if (0 == STRNCMP(region, AWS_ISO_B_REGION_PREFIX, STRLEN(AWS_ISO_B_REGION_PREFIX))) {
+        // Top Secret Cloud regions: https://kinesisvideo-fips.us-isob-east-1.sc2s.sgov.gov
+        serviceNamePostfix = AWS_KVS_FIPS_ENDPOINT_POSTFIX;
+        postfix = useLegacyEndpoint ? CONTROL_PLANE_URI_POSTFIX_ISO_B : CONTROL_PLANE_URI_POSTFIX_ISO_B_DUAL_STACK;
+    } else if (0 == STRNCMP(region, AWS_ISO_REGION_PREFIX, STRLEN(AWS_ISO_REGION_PREFIX))) {
+        // Secret Cloud regions: https://kinesisvideo-fips.us-iso-east-1.c2s.ic.gov
+        serviceNamePostfix = AWS_KVS_FIPS_ENDPOINT_POSTFIX;
+        postfix = useLegacyEndpoint ? CONTROL_PLANE_URI_POSTFIX_ISO : CONTROL_PLANE_URI_POSTFIX_ISO_DUAL_STACK;
+    } else if (0 == STRNCMP(region, AWS_GOV_CLOUD_REGION_PREFIX, STRLEN(AWS_GOV_CLOUD_REGION_PREFIX))) {
+        // US Govcloud regions: https://kinesisvideo-fips.us-gov-east-1.amazonaws.com
+        serviceNamePostfix = AWS_KVS_FIPS_ENDPOINT_POSTFIX;
+        postfix = useLegacyEndpoint ? CONTROL_PLANE_URI_POSTFIX : CONTROL_PLANE_URI_POSTFIX_DUAL_STACK;
+    } else if (0 == STRNCMP(region, AWS_CN_REGION_PREFIX, STRLEN(AWS_CN_REGION_PREFIX))) {
+        // China regions: https://kinesisvideo.cn-north-1.amazonaws.com.cn"
+        postfix = useLegacyEndpoint ? CONTROL_PLANE_URI_POSTFIX_CN : CONTROL_PLANE_URI_POSTFIX_CN_DUAL_STACK;
+    } else {
+        // Standard regions: https://kinesisvideo.us-west-2.amazonaws.com
+        postfix = useLegacyEndpoint ? CONTROL_PLANE_URI_POSTFIX : CONTROL_PLANE_URI_POSTFIX_DUAL_STACK;
+    }
+
+    // Create a fully qualified URI
+    SNPRINTF((PCHAR) buffer, bufferSize, "%s%s%s.%s%s", CONTROL_PLANE_URI_PREFIX, KINESIS_VIDEO_SERVICE_NAME, serviceNamePostfix, region, postfix);
+
+CleanUp:
+    CHK_LOG_ERR(retStatus);
 
     LEAVES();
     return retStatus;
