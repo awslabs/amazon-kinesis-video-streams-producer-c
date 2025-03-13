@@ -204,6 +204,8 @@ STATUS initializeCurlSession(PRequestInfo pRequestInfo, PCallInfo pCallInfo, CUR
 
 #ifndef NDEBUG
     // Only available in debug build
+    // This setting will have curl print out the IP address that it resolved and connected to
+    // More info: https://everything.curl.dev/usingcurl/verbose/index.html
     if (!IS_NULL_OR_EMPTY_STRING(GETENV(KVS_CURL_DEBUG_ENV_VAR))) {
         curl_easy_setopt(pCurl, CURLOPT_VERBOSE, 1L);
     }

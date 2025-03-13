@@ -48,7 +48,7 @@ TEST_F(ProducerCallbackProviderApiTest, AddProducerCallbackProvider_Returns_Vali
 struct ControlPlaneUrlTestParam {
     std::string region;
     std::string expectedUrl;
-    BOOL isLegacyEndpoint;
+    KvsControlPlaneEndpointType endpointType;
 };
 
 // Test fixture class for parameterized tests
@@ -60,7 +60,7 @@ TEST_P(ControlPlaneUrlTest, GeneratesCorrectUrls)
     char buffer[MAX_URI_CHAR_LEN] = {0};
     const ControlPlaneUrlTestParam& param = GetParam();
 
-    constructControlPlaneUrl(buffer, MAX_URI_CHAR_LEN, param.region.c_str(), param.isLegacyEndpoint);
+    constructControlPlaneUrl(buffer, MAX_URI_CHAR_LEN, param.region.c_str(), param.endpointType);
     EXPECT_STREQ(buffer, param.expectedUrl.c_str());
 }
 
@@ -75,60 +75,60 @@ std::string ControlPlaneUrlTestName(const testing::TestParamInfo<ControlPlaneUrl
     std::string region = param.region;
     std::replace(region.begin(), region.end(), '-', '_');
 
-    return region + "_" + (param.isLegacyEndpoint ? "Legacy" : "New");
+    return region + "_" + (param.endpointType == ENDPOINT_TYPE_LEGACY ? "Legacy" : "New");
 }
 
 // Instantiate the test suite with multiple test cases
 INSTANTIATE_TEST_SUITE_P(ControlPlaneUrlTests, ControlPlaneUrlTest,
                          ::testing::Values(
                              // Legacy endpoints
-                             ControlPlaneUrlTestParam{"us-east-1", "https://kinesisvideo.us-east-1.amazonaws.com", TRUE},
-                             ControlPlaneUrlTestParam{"us-west-2", "https://kinesisvideo.us-west-2.amazonaws.com", TRUE},
-                             ControlPlaneUrlTestParam{"ap-northeast-1", "https://kinesisvideo.ap-northeast-1.amazonaws.com", TRUE},
-                             ControlPlaneUrlTestParam{"ap-southeast-2", "https://kinesisvideo.ap-southeast-2.amazonaws.com", TRUE},
-                             ControlPlaneUrlTestParam{"eu-central-1", "https://kinesisvideo.eu-central-1.amazonaws.com", TRUE},
-                             ControlPlaneUrlTestParam{"eu-west-1", "https://kinesisvideo.eu-west-1.amazonaws.com", TRUE},
-                             ControlPlaneUrlTestParam{"ap-northeast-2", "https://kinesisvideo.ap-northeast-2.amazonaws.com", TRUE},
-                             ControlPlaneUrlTestParam{"ap-south-1", "https://kinesisvideo.ap-south-1.amazonaws.com", TRUE},
-                             ControlPlaneUrlTestParam{"ap-southeast-1", "https://kinesisvideo.ap-southeast-1.amazonaws.com", TRUE},
-                             ControlPlaneUrlTestParam{"ca-central-1", "https://kinesisvideo.ca-central-1.amazonaws.com", TRUE},
-                             ControlPlaneUrlTestParam{"eu-north-1", "https://kinesisvideo.eu-north-1.amazonaws.com", TRUE},
-                             ControlPlaneUrlTestParam{"eu-west-2", "https://kinesisvideo.eu-west-2.amazonaws.com", TRUE},
-                             ControlPlaneUrlTestParam{"sa-east-1", "https://kinesisvideo.sa-east-1.amazonaws.com", TRUE},
-                             ControlPlaneUrlTestParam{"us-east-2", "https://kinesisvideo.us-east-2.amazonaws.com", TRUE},
-                             ControlPlaneUrlTestParam{"ap-east-1", "https://kinesisvideo.ap-east-1.amazonaws.com", TRUE},
-                             ControlPlaneUrlTestParam{"af-south-1", "https://kinesisvideo.af-south-1.amazonaws.com", TRUE},
-                             ControlPlaneUrlTestParam{"us-iso-east-1", "https://kinesisvideo-fips.us-iso-east-1.c2s.ic.gov", TRUE},
-                             ControlPlaneUrlTestParam{"us-iso-west-1", "https://kinesisvideo-fips.us-iso-west-1.c2s.ic.gov", TRUE},
-                             ControlPlaneUrlTestParam{"us-isob-east-1", "https://kinesisvideo-fips.us-isob-east-1.sc2s.sgov.gov", TRUE},
-                             ControlPlaneUrlTestParam{"us-gov-west-1", "https://kinesisvideo-fips.us-gov-west-1.amazonaws.com", TRUE},
-                             ControlPlaneUrlTestParam{"us-gov-east-1", "https://kinesisvideo-fips.us-gov-east-1.amazonaws.com", TRUE},
-                             ControlPlaneUrlTestParam{"cn-north-1", "https://kinesisvideo.cn-north-1.amazonaws.com.cn", TRUE},
-                             ControlPlaneUrlTestParam{"cn-northwest-1", "https://kinesisvideo.cn-northwest-1.amazonaws.com.cn", TRUE},
+                             ControlPlaneUrlTestParam{"us-east-1", "https://kinesisvideo.us-east-1.amazonaws.com", ENDPOINT_TYPE_LEGACY},
+                             ControlPlaneUrlTestParam{"us-west-2", "https://kinesisvideo.us-west-2.amazonaws.com", ENDPOINT_TYPE_LEGACY},
+                             ControlPlaneUrlTestParam{"ap-northeast-1", "https://kinesisvideo.ap-northeast-1.amazonaws.com", ENDPOINT_TYPE_LEGACY},
+                             ControlPlaneUrlTestParam{"ap-southeast-2", "https://kinesisvideo.ap-southeast-2.amazonaws.com", ENDPOINT_TYPE_LEGACY},
+                             ControlPlaneUrlTestParam{"eu-central-1", "https://kinesisvideo.eu-central-1.amazonaws.com", ENDPOINT_TYPE_LEGACY},
+                             ControlPlaneUrlTestParam{"eu-west-1", "https://kinesisvideo.eu-west-1.amazonaws.com", ENDPOINT_TYPE_LEGACY},
+                             ControlPlaneUrlTestParam{"ap-northeast-2", "https://kinesisvideo.ap-northeast-2.amazonaws.com", ENDPOINT_TYPE_LEGACY},
+                             ControlPlaneUrlTestParam{"ap-south-1", "https://kinesisvideo.ap-south-1.amazonaws.com", ENDPOINT_TYPE_LEGACY},
+                             ControlPlaneUrlTestParam{"ap-southeast-1", "https://kinesisvideo.ap-southeast-1.amazonaws.com", ENDPOINT_TYPE_LEGACY},
+                             ControlPlaneUrlTestParam{"ca-central-1", "https://kinesisvideo.ca-central-1.amazonaws.com", ENDPOINT_TYPE_LEGACY},
+                             ControlPlaneUrlTestParam{"eu-north-1", "https://kinesisvideo.eu-north-1.amazonaws.com", ENDPOINT_TYPE_LEGACY},
+                             ControlPlaneUrlTestParam{"eu-west-2", "https://kinesisvideo.eu-west-2.amazonaws.com", ENDPOINT_TYPE_LEGACY},
+                             ControlPlaneUrlTestParam{"sa-east-1", "https://kinesisvideo.sa-east-1.amazonaws.com", ENDPOINT_TYPE_LEGACY},
+                             ControlPlaneUrlTestParam{"us-east-2", "https://kinesisvideo.us-east-2.amazonaws.com", ENDPOINT_TYPE_LEGACY},
+                             ControlPlaneUrlTestParam{"ap-east-1", "https://kinesisvideo.ap-east-1.amazonaws.com", ENDPOINT_TYPE_LEGACY},
+                             ControlPlaneUrlTestParam{"af-south-1", "https://kinesisvideo.af-south-1.amazonaws.com", ENDPOINT_TYPE_LEGACY},
+                             ControlPlaneUrlTestParam{"us-iso-east-1", "https://kinesisvideo-fips.us-iso-east-1.c2s.ic.gov", ENDPOINT_TYPE_LEGACY},
+                             ControlPlaneUrlTestParam{"us-iso-west-1", "https://kinesisvideo-fips.us-iso-west-1.c2s.ic.gov", ENDPOINT_TYPE_LEGACY},
+                             ControlPlaneUrlTestParam{"us-isob-east-1", "https://kinesisvideo-fips.us-isob-east-1.sc2s.sgov.gov", ENDPOINT_TYPE_LEGACY},
+                             ControlPlaneUrlTestParam{"us-gov-west-1", "https://kinesisvideo-fips.us-gov-west-1.amazonaws.com", ENDPOINT_TYPE_LEGACY},
+                             ControlPlaneUrlTestParam{"us-gov-east-1", "https://kinesisvideo-fips.us-gov-east-1.amazonaws.com", ENDPOINT_TYPE_LEGACY},
+                             ControlPlaneUrlTestParam{"cn-north-1", "https://kinesisvideo.cn-north-1.amazonaws.com.cn", ENDPOINT_TYPE_LEGACY},
+                             ControlPlaneUrlTestParam{"cn-northwest-1", "https://kinesisvideo.cn-northwest-1.amazonaws.com.cn", ENDPOINT_TYPE_LEGACY},
 
                              // Dual-Stack endpoints
-                             ControlPlaneUrlTestParam{"us-west-2", "https://kinesisvideo.us-west-2.api.aws", FALSE},
-                             ControlPlaneUrlTestParam{"ap-northeast-1", "https://kinesisvideo.ap-northeast-1.api.aws", FALSE},
-                             ControlPlaneUrlTestParam{"ap-southeast-2", "https://kinesisvideo.ap-southeast-2.api.aws", FALSE},
-                             ControlPlaneUrlTestParam{"eu-central-1", "https://kinesisvideo.eu-central-1.api.aws", FALSE},
-                             ControlPlaneUrlTestParam{"eu-west-1", "https://kinesisvideo.eu-west-1.api.aws", FALSE},
-                             ControlPlaneUrlTestParam{"ap-northeast-2", "https://kinesisvideo.ap-northeast-2.api.aws", FALSE},
-                             ControlPlaneUrlTestParam{"ap-south-1", "https://kinesisvideo.ap-south-1.api.aws", FALSE},
-                             ControlPlaneUrlTestParam{"ap-southeast-1", "https://kinesisvideo.ap-southeast-1.api.aws", FALSE},
-                             ControlPlaneUrlTestParam{"ca-central-1", "https://kinesisvideo.ca-central-1.api.aws", FALSE},
-                             ControlPlaneUrlTestParam{"eu-north-1", "https://kinesisvideo.eu-north-1.api.aws", FALSE},
-                             ControlPlaneUrlTestParam{"eu-west-2", "https://kinesisvideo.eu-west-2.api.aws", FALSE},
-                             ControlPlaneUrlTestParam{"sa-east-1", "https://kinesisvideo.sa-east-1.api.aws", FALSE},
-                             ControlPlaneUrlTestParam{"us-east-2", "https://kinesisvideo.us-east-2.api.aws", FALSE},
-                             ControlPlaneUrlTestParam{"ap-east-1", "https://kinesisvideo.ap-east-1.api.aws", FALSE},
-                             ControlPlaneUrlTestParam{"af-south-1", "https://kinesisvideo.af-south-1.api.aws", FALSE},
-                             ControlPlaneUrlTestParam{"us-iso-east-1", "https://kinesisvideo-fips.us-iso-east-1.api.aws.ic.gov", FALSE},
-                             ControlPlaneUrlTestParam{"us-iso-west-1", "https://kinesisvideo-fips.us-iso-west-1.api.aws.ic.gov", FALSE},
-                             ControlPlaneUrlTestParam{"us-isob-east-1", "https://kinesisvideo-fips.us-isob-east-1.api.aws.scloud", FALSE},
-                             ControlPlaneUrlTestParam{"us-gov-west-1", "https://kinesisvideo-fips.us-gov-west-1.api.aws", FALSE},
-                             ControlPlaneUrlTestParam{"us-gov-east-1", "https://kinesisvideo-fips.us-gov-east-1.api.aws", FALSE},
-                             ControlPlaneUrlTestParam{"cn-north-1", "https://kinesisvideo.cn-north-1.api.amazonwebservices.com.cn", FALSE},
-                             ControlPlaneUrlTestParam{"cn-northwest-1", "https://kinesisvideo.cn-northwest-1.api.amazonwebservices.com.cn", FALSE}),
+                             ControlPlaneUrlTestParam{"us-west-2", "https://kinesisvideo.us-west-2.api.aws", ENDPOINT_TYPE_DUAL_STACK},
+                             ControlPlaneUrlTestParam{"ap-northeast-1", "https://kinesisvideo.ap-northeast-1.api.aws", ENDPOINT_TYPE_DUAL_STACK},
+                             ControlPlaneUrlTestParam{"ap-southeast-2", "https://kinesisvideo.ap-southeast-2.api.aws", ENDPOINT_TYPE_DUAL_STACK},
+                             ControlPlaneUrlTestParam{"eu-central-1", "https://kinesisvideo.eu-central-1.api.aws", ENDPOINT_TYPE_DUAL_STACK},
+                             ControlPlaneUrlTestParam{"eu-west-1", "https://kinesisvideo.eu-west-1.api.aws", ENDPOINT_TYPE_DUAL_STACK},
+                             ControlPlaneUrlTestParam{"ap-northeast-2", "https://kinesisvideo.ap-northeast-2.api.aws", ENDPOINT_TYPE_DUAL_STACK},
+                             ControlPlaneUrlTestParam{"ap-south-1", "https://kinesisvideo.ap-south-1.api.aws", ENDPOINT_TYPE_DUAL_STACK},
+                             ControlPlaneUrlTestParam{"ap-southeast-1", "https://kinesisvideo.ap-southeast-1.api.aws", ENDPOINT_TYPE_DUAL_STACK},
+                             ControlPlaneUrlTestParam{"ca-central-1", "https://kinesisvideo.ca-central-1.api.aws", ENDPOINT_TYPE_DUAL_STACK},
+                             ControlPlaneUrlTestParam{"eu-north-1", "https://kinesisvideo.eu-north-1.api.aws", ENDPOINT_TYPE_DUAL_STACK},
+                             ControlPlaneUrlTestParam{"eu-west-2", "https://kinesisvideo.eu-west-2.api.aws", ENDPOINT_TYPE_DUAL_STACK},
+                             ControlPlaneUrlTestParam{"sa-east-1", "https://kinesisvideo.sa-east-1.api.aws", ENDPOINT_TYPE_DUAL_STACK},
+                             ControlPlaneUrlTestParam{"us-east-2", "https://kinesisvideo.us-east-2.api.aws", ENDPOINT_TYPE_DUAL_STACK},
+                             ControlPlaneUrlTestParam{"ap-east-1", "https://kinesisvideo.ap-east-1.api.aws", ENDPOINT_TYPE_DUAL_STACK},
+                             ControlPlaneUrlTestParam{"af-south-1", "https://kinesisvideo.af-south-1.api.aws", ENDPOINT_TYPE_DUAL_STACK},
+                             ControlPlaneUrlTestParam{"us-iso-east-1", "https://kinesisvideo-fips.us-iso-east-1.api.aws.ic.gov", ENDPOINT_TYPE_DUAL_STACK},
+                             ControlPlaneUrlTestParam{"us-iso-west-1", "https://kinesisvideo-fips.us-iso-west-1.api.aws.ic.gov", ENDPOINT_TYPE_DUAL_STACK},
+                             ControlPlaneUrlTestParam{"us-isob-east-1", "https://kinesisvideo-fips.us-isob-east-1.api.aws.scloud", ENDPOINT_TYPE_DUAL_STACK},
+                             ControlPlaneUrlTestParam{"us-gov-west-1", "https://kinesisvideo-fips.us-gov-west-1.api.aws", ENDPOINT_TYPE_DUAL_STACK},
+                             ControlPlaneUrlTestParam{"us-gov-east-1", "https://kinesisvideo-fips.us-gov-east-1.api.aws", ENDPOINT_TYPE_DUAL_STACK},
+                             ControlPlaneUrlTestParam{"cn-north-1", "https://kinesisvideo.cn-north-1.api.amazonwebservices.com.cn", ENDPOINT_TYPE_DUAL_STACK},
+                             ControlPlaneUrlTestParam{"cn-northwest-1", "https://kinesisvideo.cn-northwest-1.api.amazonwebservices.com.cn", ENDPOINT_TYPE_DUAL_STACK}),
                          ControlPlaneUrlTestName);
 } // namespace video
 } // namespace kinesis
