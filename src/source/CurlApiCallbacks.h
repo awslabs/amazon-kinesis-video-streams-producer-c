@@ -22,10 +22,7 @@ extern "C" {
 
 #define CONTROL_PLANE_USE_DUAL_STACK_ENDPOINT_ENV_VAR "AWS_USE_DUALSTACK_ENDPOINT"
 
-typedef enum {
-    ENDPOINT_TYPE_LEGACY,
-    ENDPOINT_TYPE_DUAL_STACK
-} KvsControlPlaneEndpointType;
+typedef enum { ENDPOINT_TYPE_LEGACY, ENDPOINT_TYPE_DUAL_STACK } KvsControlPlaneEndpointType;
 typedef KvsControlPlaneEndpointType* PKvsControlPlaneEndpointType;
 
 #if defined(AWS_KVS_USE_LEGACY_ENDPOINT_ONLY) && defined(AWS_KVS_USE_DUAL_STACK_ENDPOINT_ONLY)

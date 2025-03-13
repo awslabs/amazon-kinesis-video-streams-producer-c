@@ -81,7 +81,8 @@ STATUS createCurlApiCallbacks(PCallbacksProvider pCallbacksProvider, PCHAR regio
     // Construct Control Plane URL
     if (IS_NULL_OR_EMPTY_STRING(controlPlaneUrl)) {
         CHK_STATUS(determineKvsControlPlaneEndpointType(&controlPlaneEndpointType));
-        CHK_STATUS(constructControlPlaneUrl(pCurlApiCallbacks->controlPlaneUrl, MAX_URI_CHAR_LEN, pCurlApiCallbacks->region, controlPlaneEndpointType));
+        CHK_STATUS(
+            constructControlPlaneUrl(pCurlApiCallbacks->controlPlaneUrl, MAX_URI_CHAR_LEN, pCurlApiCallbacks->region, controlPlaneEndpointType));
     } else {
         STRNCPY(pCurlApiCallbacks->controlPlaneUrl, controlPlaneUrl, MAX_URI_CHAR_LEN);
     }
@@ -212,7 +213,8 @@ CleanUp:
     return retStatus;
 }
 
-const char* endpointTypeToString(const KvsControlPlaneEndpointType type) {
+const char* endpointTypeToString(const KvsControlPlaneEndpointType type)
+{
     switch (type) {
         case ENDPOINT_TYPE_LEGACY:
             return "LEGACY";
