@@ -186,9 +186,9 @@ STATUS initializeCurlSession(PRequestInfo pRequestInfo, PCallInfo pCallInfo, CUR
 #elif defined(AWS_KVS_IPV6_ONLY)
     curl_easy_setopt(pCurl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V6);
     DLOGD("Curl resolving IPV6 through AWS_KVS_IPV6_ONLY");
-#elif defined(AWS_KVS_DUAL_STACK_ONLY)
+#elif defined(AWS_KVS_IPV4_AND_IPV6_ONLY)
     curl_easy_setopt(pCurl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_WHATEVER);
-    DLOGD("Curl resolving dual stack through AWS_KVS_DUAL_STACK_ONLY");
+    DLOGD("Curl resolving dual stack through AWS_KVS_IPV4_AND_IPV6_ONLY");
 #else
     if (!IS_NULL_OR_EMPTY_STRING(GETENV(KVS_CURL_IPRESOLVE_V4_ENV_VAR))) {
         curl_easy_setopt(pCurl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);

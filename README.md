@@ -63,7 +63,7 @@ You can pass the following options to `cmake ..`.
 * `-DAWS_KVS_USE_DUAL_STACK_ENDPOINT_ONLY` -- Use only dual-stack endpoints (ignores env vars). Default is OFF.
 * `-DAWS_KVS_IPV4_ONLY` -- Use only IPv4 addresses from DNS (ignores env vars). Default is OFF.
 * `-DAWS_KVS_IPV6_ONLY` -- Use only IPv6 addresses from DNS (ignores env vars). Default is OFF.
-* `-DAWS_KVS_DUAL_STACK_ONLY` -- Use both IPv4 and IPv6 addresses from DNS (ignores env vars). Default is OFF.
+* `-DAWS_KVS_IPV4_AND_IPV6_ONLY` -- Use both IPv4 and IPv6 addresses from DNS (ignores env vars). Default is OFF.
 
 
 DMEMORY_SANITIZER, DTHREAD_SANITIZER etc. flags works only with clang compiler 
@@ -215,7 +215,7 @@ The default endpoints and DNS resolution chain is implemented by the SDK. It seq
 With 2, 3, and 4, the endpoint will be constructed based on the region provided to `createAbstractDefaultCallbacksProvider`.
 
 #### DNS filtering
-1. DNS resolution CMake parameters: (`-DAWS_KVS_IPV4_ONLY=TRUE`, `-DAWS_KVS_IPV6_ONLY=TRUE`, `-DAWS_KVS_DUAL_STACK_ONLY=TRUE`)
+1. DNS resolution CMake parameters: (`-DAWS_KVS_IPV4_ONLY=TRUE`, `-DAWS_KVS_IPV6_ONLY=TRUE`, `-DAWS_KVS_IPV4_AND_IPV6_ONLY=TRUE`)
 2. Environment variables (`export AWS_KVS_USE_IPV4=TRUE`, `export AWS_KVS_USE_IPV6=TRUE`)
 3. Otherwise, no filtering will take place. Both IPv4 and IPv6 IP addresses, if returned by DNS, may be used.
 
