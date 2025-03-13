@@ -81,7 +81,7 @@ endif()
 # Validate mutually exclusive IP resolution options
 set(IPV4_ONLY_FLAG 0)
 set(IPV6_ONLY_FLAG 0)
-set(DUAL_STACK_ONLY_FLAG 0)
+set(IPV4_AND_IPV6_FLAG 0)
 
 if(AWS_KVS_IPV4_ONLY)
     set(IPV4_ONLY_FLAG 1)
@@ -97,7 +97,7 @@ endif()
 
 # Sum the enabled flags
 math(EXPR IPV_OPTIONS_ENABLED_COUNT
-        "${IPV4_ONLY_FLAG}+${IPV6_ONLY_FLAG}+${DUAL_STACK_ONLY_FLAG}")
+        "${IPV4_ONLY_FLAG}+${IPV6_ONLY_FLAG}+${IPV4_AND_IPV6_FLAG}")
 
 # Check for conflicts
 if(IPV_OPTIONS_ENABLED_COUNT GREATER 1)
