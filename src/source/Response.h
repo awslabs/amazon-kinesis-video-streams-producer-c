@@ -30,7 +30,7 @@ extern "C" {
 #define KVS_CURL_IPRESOLVE_V6_ENV_VAR "AWS_KVS_USE_IPV6"
 #define KVS_CURL_DEBUG_ENV_VAR        "KVS_CURL_DEBUG"
 
-#if (defined(AWS_KVS_IPV4_ONLY) && defined(AWS_KVS_IPV6_ONLY)) || (defined(AWS_KVS_IPV4_ONLY) && defined(AWS_KVS_IPV4_AND_IPV6_ONLY)) ||                \
+#if (defined(AWS_KVS_IPV4_ONLY) && defined(AWS_KVS_IPV6_ONLY)) || (defined(AWS_KVS_IPV4_ONLY) && defined(AWS_KVS_IPV4_AND_IPV6_ONLY)) ||             \
     (defined(AWS_KVS_IPV6_ONLY) && defined(AWS_KVS_IPV4_AND_IPV6_ONLY))
 #error "Only one of AWS_KVS_IPV4_ONLY, AWS_KVS_IPV6_ONLY, or AWS_KVS_IPV4_AND_IPV6_ONLY can be defined"
 #endif
