@@ -113,7 +113,8 @@ if(BUILD_DEPENDENCIES)
     set(BUILD_ARGS  -DBUILD_STATIC=${BUILD_STATIC}
                     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                     -DUSE_OPENSSL=${USE_OPENSSL}
-                    -DUSE_MBEDTLS=${USE_MBEDTLS})
+                    -DUSE_MBEDTLS=${USE_MBEDTLS}
+                    -DCURL_POSITION_INDEPENDENT_CODE=${CURL_POSITION_INDEPENDENT_CODE})
     build_dependency(curl ${BUILD_ARGS})
 
   endif()
