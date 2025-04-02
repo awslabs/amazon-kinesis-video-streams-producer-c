@@ -22,6 +22,10 @@ jobs:
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.x'
       - name: Build repository
         run: |
           brew install pkgconfig
@@ -50,6 +54,10 @@ jobs:
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.x'
       - name: Build repository
         run: |
           brew install pkgconfig
@@ -78,6 +86,10 @@ jobs:
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.x'
       - name: Build repository
         run: |
           brew install pkgconfig
@@ -108,6 +120,10 @@ jobs:
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.x'
       - name: Build repository
         run: |
           brew install pkgconfig
@@ -141,6 +157,10 @@ jobs:
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.x'
       - name: Build repository
         run: |
           brew info openssl
@@ -172,6 +192,10 @@ jobs:
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.x'
       - name: Build repository
         run: |
           brew info openssl
@@ -200,6 +224,10 @@ jobs:
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.x'
       - name: Build repository
         run: |
           mkdir build && cd build
@@ -235,6 +263,10 @@ jobs:
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.x'
       - name: Build repository
         run: |
           mkdir build && cd build
@@ -265,6 +297,10 @@ jobs:
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.x'
       - name: Build repository
         run: |
           mkdir build && cd build
@@ -354,6 +390,10 @@ jobs:
         run: |
           sudo apt clean && sudo apt update
           sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.x'
       - name: Build repository
         run: |
           mkdir build && cd build
@@ -384,6 +424,10 @@ jobs:
           sudo apt-get -y install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu
       - name: Clone repository
         uses: actions/checkout@v3
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.x'
       - name: Build Repository
         run: |
           sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'
@@ -403,6 +447,10 @@ jobs:
           sudo apt-get -y install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu
       - name: Clone repository
         uses: actions/checkout@v3
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.x'
       - name: Build Repository
         run: |
           sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'
@@ -422,6 +470,10 @@ jobs:
           sudo apt-get -y install gcc-arm-linux-gnueabi g++-arm-linux-gnueabi binutils-arm-linux-gnueabi
       - name: Clone repository
         uses: actions/checkout@v3
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.x'
       - name: Build Repository
         run: |
           sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'
@@ -435,9 +487,10 @@ jobs:
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
-      - name: Check CMake version
-        run: |
-          cmake --version
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.x'
       - name: Build Repository
         run: |
           mkdir build && cd build
@@ -452,6 +505,10 @@ jobs:
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.x'
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:

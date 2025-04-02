@@ -21,6 +21,10 @@ jobs:
     steps:
       - name: Clone repository
         uses: actions/checkout@v4
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.x'
       - name: Install dependencies
         run: |
           choco install nasm strawberryperl pkgconfiglite
@@ -61,6 +65,10 @@ jobs:
     steps:
       - name: Clone repository
         uses: actions/checkout@v4
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.x'
       - name: Install dependencies
         run: |
           choco install nasm strawberryperl pkgconfiglite mkvtoolnix
@@ -94,18 +102,38 @@ jobs:
           $exePath = Join-Path $PWD ${{ matrix.sample-executable }}
           & $exePath demo-stream-producer-c-windows-ci-${{ matrix.sample-executable }}
 
-      - name: Verify MKV dump
+      - name: Save MKV file list
         working-directory: ./build
         run: |
-          $env:PATH += ";C:\Program Files\MKVToolNix"
           $mkvFiles = Get-ChildItem -Path $env:KVS_DEBUG_DUMP_DATA_FILE_DIR -Filter *.mkv
+          
           if ($mkvFiles.Count -eq 0) {
             Write-Error "No MKV files found in $env:KVS_DEBUG_DUMP_DATA_FILE_DIR"
             exit 1
           }
-      
-          # Run mkvinfo on each MKV file
+          
+          # Save the MKV file list to GITHUB_ENV
+          $fileList = $mkvFiles.FullName -join "`n"
+          "MKV_FILES=$fileList" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8
+
+      - name: Print MKV dump (non-verbose)
+        working-directory: ./build
+        run: |
+          $env:PATH += ";C:\Program Files\MKVToolNix"
+          $mkvFiles = $env:MKV_FILES -split "`n"
+          
           foreach ($file in $mkvFiles) {
-            Write-Output "Verifying $($file.FullName) with mkvinfo (verbose and hexdump):"
-            mkvinfo.exe -v -X "$($file.FullName)"
+            Write-Output "Verifying $file with mkvinfo:"
+            mkvinfo.exe -v "$file"
+          }
+
+      - name: Print MKV dump (verbose)
+        working-directory: ./build
+        run: |
+          $env:PATH += ";C:\Program Files\MKVToolNix"
+          $mkvFiles = $env:MKV_FILES -split "`n"
+          
+          foreach ($file in $mkvFiles) {
+            Write-Output "Verifying $file with mkvinfo (hexdump):"
+            mkvinfo.exe -v -X "$file"
           }
