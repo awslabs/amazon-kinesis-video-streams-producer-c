@@ -21,6 +21,10 @@ jobs:
     steps:
       - name: Clone repository
         uses: actions/checkout@v4
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.x'
       - name: Install dependencies
         run: |
           choco install nasm strawberryperl pkgconfiglite
@@ -61,6 +65,10 @@ jobs:
     steps:
       - name: Clone repository
         uses: actions/checkout@v4
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.x'
       - name: Install dependencies
         run: |
           choco install nasm strawberryperl pkgconfiglite mkvtoolnix
