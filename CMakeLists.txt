@@ -67,9 +67,14 @@ endif()
 if(BUILD_DEPENDENCIES)
   if (NOT OPEN_SRC_INSTALL_PREFIX)
     set(OPEN_SRC_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/open-source)
+
+    # Note: PKG_CONFIG_PATH is an environment variable. Should point to the
+    # folder containing the .pc files
+    # Needed for libcurl to find OpenSSL peer dependency
     set(ENV{PKG_CONFIG_PATH}
           "$ENV{PKG_CONFIG_PATH}:${OPEN_SRC_INSTALL_PREFIX}/lib/pkgconfig")
-    set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${OPEN_SRC_INSTALL_PREFIX})
+    set(CMAKE_PREFIX_PATH ${OPEN_SRC_INSTALL_PREFIX} ${CMAKE_PREFIX_PATH})
+    message(STATUS "PKG_CONFIG_PATH: $ENV{PKG_CONFIG_PATH}")
   endif()
 
   if(NOT EXISTS ${OPEN_SRC_INSTALL_PREFIX})
