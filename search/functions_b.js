@@ -1,10 +1,10 @@
 var searchData=
 [
-  ['readfilecredentials_0',['readFileCredentials',['../FileCredentialProvider_8c.html#a4e590690d8509794518c76f11bd9dcf3',1,'FileCredentialProvider.c']]],
-  ['releasecallinfo_1',['releasecallinfo',['../group__PublicMemberFunctions.html#ga990bf7f36204bd92eb9137f53c2d4118',1,'releaseCallInfo(PCallInfo):&#160;RequestInfo.c'],['../group__PublicMemberFunctions.html#ga990bf7f36204bd92eb9137f53c2d4118',1,'releaseCallInfo(PCallInfo pCallInfo):&#160;RequestInfo.c']]],
-  ['releasesslcallbacks_2',['releasesslcallbacks',['../common_2Include_8h.html#ab3f57e718242495d70c73269568b89ca',1,'releaseSslCallbacks():&#160;SslInit.c'],['../SslInit_8c.html#aad83b73f60caf85a4c54a99aadeb002c',1,'releaseSslCallbacks():&#160;SslInit.c']]],
-  ['removemappingentrycallback_3',['removeMappingEntryCallback',['../ContinuousRetryStreamCallbacks_8c.html#a4d3d81a4628f84b0c4a672ba59166dfa',1,'ContinuousRetryStreamCallbacks.c']]],
-  ['removerequestheader_4',['removerequestheader',['../group__PublicMemberFunctions.html#gabe3debb87be157b88bf34540a16007ca',1,'removeRequestHeader(PRequestInfo, PCHAR):&#160;RequestInfo.c'],['../group__PublicMemberFunctions.html#gabe3debb87be157b88bf34540a16007ca',1,'removeRequestHeader(PRequestInfo pRequestInfo, PCHAR headerName):&#160;RequestInfo.c']]],
-  ['removerequestheaders_5',['removerequestheaders',['../group__PublicMemberFunctions.html#ga78fbbf4618d7ecb4e883ff1cc31b9a7f',1,'removeRequestHeaders(PRequestInfo):&#160;RequestInfo.c'],['../group__PublicMemberFunctions.html#ga78fbbf4618d7ecb4e883ff1cc31b9a7f',1,'removeRequestHeaders(PRequestInfo pRequestInfo):&#160;RequestInfo.c']]],
-  ['requestrequiressecureconnection_6',['requestrequiressecureconnection',['../group__PublicMemberFunctions.html#ga32ae8a6f5f3ec7fae0d7840e74203053',1,'requestRequiresSecureConnection(PCHAR, PBOOL):&#160;RequestInfo.c'],['../group__PublicMemberFunctions.html#ga32ae8a6f5f3ec7fae0d7840e74203053',1,'requestRequiresSecureConnection(PCHAR pUrl, PBOOL pSecure):&#160;RequestInfo.c']]]
+  ['parseiotresponse_0',['parseIotResponse',['../IotCredentialProvider_8c.html#afb64cf9fde7be4db855766ba2854a26b',1,'IotCredentialProvider.c']]],
+  ['postreadcallback_1',['postReadCallback',['../Response_8c.html#a0d30c0d62aee74d9409fb11ef6625508',1,'Response.c']]],
+  ['postresponsewritecallback_2',['postResponseWriteCallback',['../Response_8c.html#a08b725da7af361ca8949ad90f0ef57ed',1,'Response.c']]],
+  ['postwritecallback_3',['postWriteCallback',['../Response_8c.html#a5abde17f661c4455a491b38624ecbd09',1,'Response.c']]],
+  ['putstreamaggregate_4',['putStreamAggregate',['../CallbacksProvider_8c.html#a426940565968ccf4b5282a96f80dde7a',1,'CallbacksProvider.c']]],
+  ['putstreamcurl_5',['putStreamCurl',['../CurlApiCallbacks_8c.html#a7f8ceaabce616c9c2eb4f8656319e6f3',1,'CurlApiCallbacks.c']]],
+  ['putstreamcurlhandler_6',['putStreamCurlHandler',['../CurlApiCallbacks_8c.html#a27728754fcd86034a116c4e8a5a4e5b8',1,'CurlApiCallbacks.c']]]
 ];

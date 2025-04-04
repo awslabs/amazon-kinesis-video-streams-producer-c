@@ -19,8 +19,9 @@ var searchData=
   ['describestreamcurl_16',['describeStreamCurl',['../CurlApiCallbacks_8c.html#a961f559e051708730e5962ba1292d763',1,'CurlApiCallbacks.c']]],
   ['describestreamcurlhandler_17',['describeStreamCurlHandler',['../CurlApiCallbacks_8c.html#a31ddca30104358dab145d9036d37664c',1,'CurlApiCallbacks.c']]],
   ['deserializeawscredentials_18',['deserializeawscredentials',['../group__PublicMemberFunctions.html#gaf0a1505f677d0197d1202caad5fbed29',1,'deserializeAwsCredentials(PBYTE):&#160;Auth.c'],['../group__PublicMemberFunctions.html#gaf0a1505f677d0197d1202caad5fbed29',1,'deserializeAwsCredentials(PBYTE token):&#160;Auth.c']]],
-  ['devicecerttotokenaggregate_19',['deviceCertToTokenAggregate',['../CallbacksProvider_8c.html#ad12c94ae140c934f01effa3c122bd735',1,'CallbacksProvider.c']]],
-  ['droppedfragmentreportaggregate_20',['droppedFragmentReportAggregate',['../CallbacksProvider_8c.html#a42ba4d2ba593715d0f5e7693bf85e626',1,'CallbacksProvider.c']]],
-  ['droppedframereportaggregate_21',['droppedFrameReportAggregate',['../CallbacksProvider_8c.html#a3ef0c33a3ad6467612417fb6c8899f5d',1,'CallbacksProvider.c']]],
-  ['dumpresponsecurleasyinfo_22',['dumpResponseCurlEasyInfo',['../Response_8c.html#a48340261a9f0dfc3caeb302b7ff8b8f1',1,'Response.c']]]
+  ['determinekvscontrolplaneendpointtype_19',['determineKvsControlPlaneEndpointType',['../CurlApiCallbacks_8c.html#a37e2be4f79a1f58da6459df43e9b8b56',1,'CurlApiCallbacks.c']]],
+  ['devicecerttotokenaggregate_20',['deviceCertToTokenAggregate',['../CallbacksProvider_8c.html#ad12c94ae140c934f01effa3c122bd735',1,'CallbacksProvider.c']]],
+  ['droppedfragmentreportaggregate_21',['droppedFragmentReportAggregate',['../CallbacksProvider_8c.html#a42ba4d2ba593715d0f5e7693bf85e626',1,'CallbacksProvider.c']]],
+  ['droppedframereportaggregate_22',['droppedFrameReportAggregate',['../CallbacksProvider_8c.html#a3ef0c33a3ad6467612417fb6c8899f5d',1,'CallbacksProvider.c']]],
+  ['dumpresponsecurleasyinfo_23',['dumpResponseCurlEasyInfo',['../Response_8c.html#a48340261a9f0dfc3caeb302b7ff8b8f1',1,'Response.c']]]
 ];

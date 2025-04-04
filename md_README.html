@@ -138,6 +138,11 @@ CMake Arguments</h4>
 <li><code>-DALIGNED_MEMORY_MODEL</code> Build for aligned memory model only devices. Default is OFF.</li>
 <li><code>-DLOCAL_OPENSSL_BUILD</code> Whether or not to use local OpenSSL build. Default is OFF.</li>
 <li><code>-DCONSTRAINED_DEVICE</code> &ndash; Change thread stack size to 0.5Mb, needed for Alpine.</li>
+<li><code>-DAWS_KVS_USE_LEGACY_ENDPOINT_ONLY</code> &ndash; Use only legacy IPV4-only endpoints (ignores env vars). Default is OFF.</li>
+<li><code>-DAWS_KVS_USE_DUAL_STACK_ENDPOINT_ONLY</code> &ndash; Use only dual-stack endpoints (ignores env vars). Default is OFF.</li>
+<li><code>-DAWS_KVS_IPV4_ONLY</code> &ndash; Use only IPv4 addresses from DNS (ignores env vars). Default is OFF.</li>
+<li><code>-DAWS_KVS_IPV6_ONLY</code> &ndash; Use only IPv6 addresses from DNS (ignores env vars). Default is OFF.</li>
+<li><code>-DAWS_KVS_IPV4_AND_IPV6_ONLY</code> &ndash; Use both IPv4 and IPv6 addresses from DNS (ignores env vars). Default is OFF.</li>
 </ul>
 <p>DMEMORY_SANITIZER, DTHREAD_SANITIZER etc. flags works only with clang compiler and not with gcc compiler. For using clang (on Ubuntu), do the following - </p><div class="fragment"><div class="line">sudo apt-get install clang</div>
 <div class="line">export CC=/usr/bin/clang</div>
@@ -226,7 +231,29 @@ Offline mode</h3>
 <p>The samples run in near real time mode by default. In order to set up offline mode, the following APIs can be used in the samples instead of the realtime variant:</p>
 <p>For video only: <code><a class="el" href="group__PublicMemberFunctions.html#ga6e083dfc57516c4efaa9951df09c6848">createOfflineVideoStreamInfoProviderWithCodecs()</a></code> For video and audio: <code><a class="el" href="group__PublicMemberFunctions.html#ga70f651dfddea8ff8e60c89571204be15">createOfflineAudioVideoStreamInfoProviderWithCodecs()</a></code></p>
 <p>The 2 APIs are available in <a href="https://github.com/awslabs/amazon-kinesis-video-streams-producer-c/blob/412aab82c99a72f9dbde975f5fea81ffdc844ae5/src/include/com/amazonaws/kinesis/video/cproducer/Include.h">this</a> header file.</p>
-<h2><a class="anchor" id="autotoc_md14"></a>
+<h3><a class="anchor" id="autotoc_md14"></a>
+KVS Endpoints and DNS resolution</h3>
+<p>The default endpoints and DNS resolution chain is implemented by the SDK. It sequentially checks each place where you can set the configuration for these parameters, and then selects the first one you set. The predefined sequence is as follows:</p>
+<h4><a class="anchor" id="autotoc_md15"></a>
+Endpoint Configuration</h4>
+<ol type="1">
+<li>The <code>controlPlaneUrl</code> parameter for <code>createAbstractDefaultCallbacksProvider</code>.</li>
+<li>Endpoint configuration CMake parameters: (<code>-DAWS_KVS_USE_LEGACY_ENDPOINT_ONLY=TRUE</code>, <code>-DAWS_KVS_USE_DUAL_STACK_ENDPOINT_ONLY=TRUE</code>)</li>
+<li>Environment variables: (<code>export AWS_USE_DUALSTACK_ENDPOINT=TRUE</code>)<ul>
+<li>If <code>AWS_USE_DUALSTACK_ENDPOINT</code> is <code>TRUE</code> (case-insensitive), the dual-stack endpoint will be used.</li>
+</ul>
+</li>
+<li>Otherwise, the legacy endpoint will be constructed.</li>
+</ol>
+<p>With 2, 3, and 4, the endpoint will be constructed based on the region provided to <code>createAbstractDefaultCallbacksProvider</code>.</p>
+<h4><a class="anchor" id="autotoc_md16"></a>
+DNS filtering</h4>
+<ol type="1">
+<li>DNS resolution CMake parameters: (<code>-DAWS_KVS_IPV4_ONLY=TRUE</code>, <code>-DAWS_KVS_IPV6_ONLY=TRUE</code>, <code>-DAWS_KVS_IPV4_AND_IPV6_ONLY=TRUE</code>)</li>
+<li>Environment variables (<code>export AWS_KVS_USE_IPV4=TRUE</code>, <code>export AWS_KVS_USE_IPV6=TRUE</code>)</li>
+<li>Otherwise, no filtering will take place. Both IPv4 and IPv6 IP addresses, if returned by DNS, may be used.</li>
+</ol>
+<h2><a class="anchor" id="autotoc_md17"></a>
 DEBUG</h2>
 <ul>
 <li>When building OpenSSL during <code>cmake ..</code>, if you encounter an architecture error such as <code>ld: symbol(s) not found for architecture i386</code>, building with a local OpenSSL build may help. First install OpenSSL 1.1 (for Mac: <code>brew install openssl@1.1</code>). Next set <code>export PKG_CONFIG_PATH="&lt;YOUR-PATH&gt;/openssl@1.1/lib/pkgconfig"</code> (your path can be printed to terminal using <code>which openssl</code> on Linux/Mac). Now set the following flag to ON when building: <code>cmake .. -DLOCAL_OPENSSL_BUILD=ON</code>. If there are still errors regarding locating the local OpenSSL library:<ul>
@@ -236,29 +263,29 @@ DEBUG</h2>
 </ul>
 </li>
 </ul>
-<h2><a class="anchor" id="autotoc_md15"></a>
+<h2><a class="anchor" id="autotoc_md18"></a>
 Development</h2>
 <p>The repository is using <code>develop</code> branch as the aggregation and all of the feature development is done in appropriate feature branches. The PRs (Pull Requests) are cut on a feature branch and once approved with all the checks passed they can be merged by a click of a button on the PR tool. The master branch should always be build-able and all the tests should be passing. We are welcoming any contribution to the code base. The master branch contains our most recent release cycle from <code>develop</code>.</p>
-<h3><a class="anchor" id="autotoc_md16"></a>
+<h3><a class="anchor" id="autotoc_md19"></a>
 Release</h3>
 <p>The repository is under active development and even with incremental unit test coverage where some of the tests are actually full integration tests, we require more rigorous internal testing in order to 'cut' release versions. The release is cut against a particular commit that gets approved. The general philosophy is to cut a release when a set of commits contribute to a self-containing feature or when we add major internal functionality improvements.</p>
-<h3><a class="anchor" id="autotoc_md17"></a>
+<h3><a class="anchor" id="autotoc_md20"></a>
 Versioning</h3>
 <p>We deploy 3 digit version strings in a form of 'Major.Minor.Revision' scheme.</p><ul>
 <li>Major version update - Major functionality changes. Might not have direct backward compatibility. For example, multiple public API parameter changes.</li>
 <li>Minor version update - Additional features. Major bug fixes. Might have some minor backward compatibility issues. For example, an extra parameter on a callback function.</li>
 <li>Revision version update - Minor features. Bug fixes. Full backward compatibility. For example, an extra fields added to the public structures with version bump.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md18"></a>
+<h2><a class="anchor" id="autotoc_md21"></a>
 Documentation</h2>
-<h2><a class="anchor" id="autotoc_md19"></a>
+<h2><a class="anchor" id="autotoc_md22"></a>
 Related</h2>
 <ul>
 <li><a href="https://github.com/awslabs/amazon-kinesis-video-streams-producer-sdk-cpp/">CPP SDK</a></li>
 <li><a href="https://github.com/awslabs/amazon-kinesis-video-streams-producer-sdk-java/">Java SDK</a></li>
 <li><a href="https://github.com/awslabs/amazon-kinesis-video-streams-pic/">PIC</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md20"></a>
+<h2><a class="anchor" id="autotoc_md23"></a>
 License</h2>
 <p>This library is licensed under the Apache 2.0 License. </p>
 </div></div><!-- contents -->
@@ -267,7 +294,7 @@ License</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Fri Apr 4 2025 05:39:42 for Amazon Kinesis Producer C SDK by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+    <li class="footer">Generated on Fri Apr 4 2025 20:27:00 for Amazon Kinesis Producer C SDK by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
   </ul>
 </div>
 </body>

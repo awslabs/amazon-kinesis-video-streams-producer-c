@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['notifycallresult_0',['notifyCallResult',['../CurlApiCallbacks_8c.html#a5de89df93a74674899c68cae2b860e4f',1,'CurlApiCallbacks.c']]],
-  ['notifydataavailable_1',['notifyDataAvailable',['../Response_8c.html#a4b9384e422bb3dcd4357d39be5642692',1,'Response.c']]]
+  ['lockmutexaggregate_0',['lockMutexAggregate',['../CallbacksProvider_8c.html#a2b645b0903a16a6821b7df89318ba075',1,'CallbacksProvider.c']]],
+  ['lwsiotcallbackroutine_1',['lwsIotCallbackRoutine',['../LwsCall_8c.html#ab52935f5f34b082652b563e77bded2b5',1,'LwsCall.c']]]
 ];

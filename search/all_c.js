@@ -1,7 +1,7 @@
 var searchData=
 [
   ['levels_0',['Setting log levels',['../md_README.html#autotoc_md10',1,'']]],
-  ['license_1',['License',['../md_README.html#autotoc_md20',1,'']]],
+  ['license_1',['License',['../md_README.html#autotoc_md23',1,'']]],
   ['limits_2',['Limits',['../group__Limits.html',1,'']]],
   ['lockmutexaggregate_3',['lockMutexAggregate',['../CallbacksProvider_8c.html#a2b645b0903a16a6821b7df89318ba075',1,'CallbacksProvider.c']]],
   ['lockmutexfn_4',['lockMutexFn',['../struct____PlatformCallbacks.html#a20314fe9e1b3368f026d08c95240cd36',1,'__PlatformCallbacks']]],

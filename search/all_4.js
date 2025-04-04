@@ -1,7 +1,7 @@
 var searchData=
 [
   ['dataavailablecurl_0',['dataAvailableCurl',['../CurlApiCallbacks_8c.html#a67ad0be1e07b676a939ced486fe5424e',1,'CurlApiCallbacks.c']]],
-  ['debug_1',['DEBUG',['../md_README.html#autotoc_md14',1,'']]],
+  ['debug_1',['DEBUG',['../md_README.html#autotoc_md17',1,'']]],
   ['debug_5flog_5flevel_5fenv_5fvar_2',['DEBUG_LOG_LEVEL_ENV_VAR',['../group__EnvironmentVariables.html#gafdc1db70cb9db17fcb97815944a236aa',1,'Include.h']]],
   ['default_5faudio_5fonly_5ftrack_5fid_3',['DEFAULT_AUDIO_ONLY_TRACK_ID',['../common_2Include_8h.html#a08d18633166a2b3c4ae9b9046bf4de3a',1,'Include.h']]],
   ['default_5faudio_5ftrack_5fid_4',['DEFAULT_AUDIO_TRACK_ID',['../common_2Include_8h.html#a9457fcc8e44a8b788b7aa5e250b6cc83',1,'Include.h']]],
@@ -36,15 +36,18 @@ var searchData=
   ['describestreamcurlhandler_33',['describeStreamCurlHandler',['../CurlApiCallbacks_8c.html#a31ddca30104358dab145d9036d37664c',1,'CurlApiCallbacks.c']]],
   ['describestreamfn_34',['describeStreamFn',['../struct____ApiCallbacks.html#a6b1768366c1d2947553af81492cd2473',1,'__ApiCallbacks']]],
   ['deserializeawscredentials_35',['deserializeawscredentials',['../group__PublicMemberFunctions.html#gaf0a1505f677d0197d1202caad5fbed29',1,'deserializeAwsCredentials(PBYTE):&#160;Auth.c'],['../group__PublicMemberFunctions.html#gaf0a1505f677d0197d1202caad5fbed29',1,'deserializeAwsCredentials(PBYTE token):&#160;Auth.c']]],
-  ['development_36',['Development',['../md_README.html#autotoc_md15',1,'']]],
-  ['devicecerttotokenaggregate_37',['deviceCertToTokenAggregate',['../CallbacksProvider_8c.html#ad12c94ae140c934f01effa3c122bd735',1,'CallbacksProvider.c']]],
-  ['devicecerttotokenfn_38',['deviceCertToTokenFn',['../struct____AuthCallbacks.html#a6bff7a8e0d62bdfb6ee206e48d482b67',1,'__AuthCallbacks']]],
-  ['deviceinfoprovider_2ec_39',['DeviceInfoProvider.c',['../DeviceInfoProvider_8c.html',1,'']]],
-  ['documentation_40',['Documentation',['../md_README.html#autotoc_md18',1,'']]],
-  ['download_41',['Download',['../md_README.html#autotoc_md2',1,'']]],
-  ['droppedfragmentreportaggregate_42',['droppedFragmentReportAggregate',['../CallbacksProvider_8c.html#a42ba4d2ba593715d0f5e7693bf85e626',1,'CallbacksProvider.c']]],
-  ['droppedfragmentreportfn_43',['droppedFragmentReportFn',['../struct____StreamCallbacks.html#aa3471f201107e490e5547bd67a3d9f47',1,'__StreamCallbacks']]],
-  ['droppedframereportaggregate_44',['droppedFrameReportAggregate',['../CallbacksProvider_8c.html#a3ef0c33a3ad6467612417fb6c8899f5d',1,'CallbacksProvider.c']]],
-  ['droppedframereportfn_45',['droppedFrameReportFn',['../struct____StreamCallbacks.html#a0f2d222758b0a4cb7c530a648b8aea98',1,'__StreamCallbacks']]],
-  ['dumpresponsecurleasyinfo_46',['dumpResponseCurlEasyInfo',['../Response_8c.html#a48340261a9f0dfc3caeb302b7ff8b8f1',1,'Response.c']]]
+  ['determinekvscontrolplaneendpointtype_36',['determineKvsControlPlaneEndpointType',['../CurlApiCallbacks_8c.html#a37e2be4f79a1f58da6459df43e9b8b56',1,'CurlApiCallbacks.c']]],
+  ['development_37',['Development',['../md_README.html#autotoc_md18',1,'']]],
+  ['devicecerttotokenaggregate_38',['deviceCertToTokenAggregate',['../CallbacksProvider_8c.html#ad12c94ae140c934f01effa3c122bd735',1,'CallbacksProvider.c']]],
+  ['devicecerttotokenfn_39',['deviceCertToTokenFn',['../struct____AuthCallbacks.html#a6bff7a8e0d62bdfb6ee206e48d482b67',1,'__AuthCallbacks']]],
+  ['deviceinfoprovider_2ec_40',['DeviceInfoProvider.c',['../DeviceInfoProvider_8c.html',1,'']]],
+  ['dns_20filtering_41',['DNS filtering',['../md_README.html#autotoc_md16',1,'']]],
+  ['dns_20resolution_42',['KVS Endpoints and DNS resolution',['../md_README.html#autotoc_md14',1,'']]],
+  ['documentation_43',['Documentation',['../md_README.html#autotoc_md21',1,'']]],
+  ['download_44',['Download',['../md_README.html#autotoc_md2',1,'']]],
+  ['droppedfragmentreportaggregate_45',['droppedFragmentReportAggregate',['../CallbacksProvider_8c.html#a42ba4d2ba593715d0f5e7693bf85e626',1,'CallbacksProvider.c']]],
+  ['droppedfragmentreportfn_46',['droppedFragmentReportFn',['../struct____StreamCallbacks.html#aa3471f201107e490e5547bd67a3d9f47',1,'__StreamCallbacks']]],
+  ['droppedframereportaggregate_47',['droppedFrameReportAggregate',['../CallbacksProvider_8c.html#a3ef0c33a3ad6467612417fb6c8899f5d',1,'CallbacksProvider.c']]],
+  ['droppedframereportfn_48',['droppedFrameReportFn',['../struct____StreamCallbacks.html#a0f2d222758b0a4cb7c530a648b8aea98',1,'__StreamCallbacks']]],
+  ['dumpresponsecurleasyinfo_49',['dumpResponseCurlEasyInfo',['../Response_8c.html#a48340261a9f0dfc3caeb302b7ff8b8f1',1,'Response.c']]]
 ];
