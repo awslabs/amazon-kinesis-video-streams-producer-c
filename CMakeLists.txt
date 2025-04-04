@@ -23,6 +23,15 @@ option(BUILD_OPENSSL_PLATFORM "If buildng OpenSSL what is the target platform" O
 option(LOCAL_OPENSSL_BUILD "Whether or not to use local OpenSSL build" OFF)
 option(CONSTRAINED_DEVICE "Change pthread stack size" OFF)
 
+# Endpoint selection - mutually exclusive
+option(AWS_KVS_USE_LEGACY_ENDPOINT_ONLY "Use only legacy IPv4-only endpoints (ignores env vars)" OFF)
+option(AWS_KVS_USE_DUAL_STACK_ENDPOINT_ONLY "Use only dual-stack endpoints (ignores env vars)" OFF)
+
+# DNS IP resolution modes - mutually exclusive
+option(AWS_KVS_IPV4_ONLY "Use only IPv4 addresses from DNS (ignores env vars)" OFF)
+option(AWS_KVS_IPV6_ONLY "Use only IPv6 addresses from DNS (ignores env vars)" OFF)
+option(AWS_KVS_IPV4_AND_IPV6_ONLY "Use both IPv4 and IPv6 addresses from DNS (ignores env vars)" OFF)
+
 # Developer Flags
 option(BUILD_TEST "Build the testing tree." OFF)
 option(CODE_COVERAGE "Enable coverage reporting" OFF)
@@ -62,6 +71,58 @@ message(STATUS "Kinesis Video Producer path is ${KINESIS_VIDEO_PRODUCER_C_SRC}")
 if(NOT CMAKE_BUILD_TYPE)
     message(STATUS "Setting CMAKE_BUILD_TYPE to Release by default")
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
+endif()
+
+# Validate mutually exclusive endpoint options
+if(AWS_KVS_USE_LEGACY_ENDPOINT_ONLY AND AWS_KVS_USE_DUAL_STACK_ENDPOINT_ONLY)
+    message(FATAL_ERROR "Cannot enable both AWS_KVS_USE_LEGACY_ENDPOINT_ONLY and AWS_KVS_USE_DUAL_STACK_ENDPOINT_ONLY at the same time.")
+endif()
+
+# Validate mutually exclusive IP resolution options
+set(IPV4_ONLY_FLAG 0)
+set(IPV6_ONLY_FLAG 0)
+set(IPV4_AND_IPV6_FLAG 0)
+
+if(AWS_KVS_IPV4_ONLY)
+    set(IPV4_ONLY_FLAG 1)
+endif()
+
+if(AWS_KVS_IPV6_ONLY)
+    set(IPV6_ONLY_FLAG 1)
+endif()
+
+if(AWS_KVS_IPV4_AND_IPV6_ONLY)
+    set(IPV4_AND_IPV6_FLAG 1)
+endif()
+
+# Sum the enabled flags
+math(EXPR IPV_OPTIONS_ENABLED_COUNT
+        "${IPV4_ONLY_FLAG}+${IPV6_ONLY_FLAG}+${IPV4_AND_IPV6_FLAG}")
+
+# Check for conflicts
+if(IPV_OPTIONS_ENABLED_COUNT GREATER 1)
+    message(FATAL_ERROR "Only one of AWS_KVS_IPV4_ONLY, AWS_KVS_IPV6_ONLY, or AWS_KVS_IPV4_AND_IPV6_ONLY can be enabled.")
+endif()
+
+# Translate the CMake flags to the pre-processor macros
+if(AWS_KVS_IPV4_ONLY)
+    add_definitions(-DAWS_KVS_IPV4_ONLY)
+endif()
+
+if(AWS_KVS_IPV6_ONLY)
+    add_definitions(-DAWS_KVS_IPV6_ONLY)
+endif()
+
+if(AWS_KVS_IPV4_AND_IPV6_ONLY)
+    add_definitions(-DAWS_KVS_IPV4_AND_IPV6_ONLY)
+endif()
+
+if(AWS_KVS_USE_LEGACY_ENDPOINT_ONLY)
+    add_definitions(-DAWS_KVS_USE_LEGACY_ENDPOINT_ONLY)
+endif()
+
+if(AWS_KVS_USE_DUAL_STACK_ENDPOINT_ONLY)
+    add_definitions(-DAWS_KVS_USE_DUAL_STACK_ENDPOINT_ONLY)
 endif()
 
 if(BUILD_DEPENDENCIES)

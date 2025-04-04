@@ -20,6 +20,15 @@ extern "C" {
 #define TAG_RESOURCE_API_POSTFIX      "/tagStream"
 #define PUT_MEDIA_API_POSTFIX         "/putMedia"
 
+#define CONTROL_PLANE_USE_DUAL_STACK_ENDPOINT_ENV_VAR "AWS_USE_DUALSTACK_ENDPOINT"
+
+typedef enum { ENDPOINT_TYPE_LEGACY, ENDPOINT_TYPE_DUAL_STACK } KvsControlPlaneEndpointType;
+typedef KvsControlPlaneEndpointType* PKvsControlPlaneEndpointType;
+
+#if defined(AWS_KVS_USE_LEGACY_ENDPOINT_ONLY) && defined(AWS_KVS_USE_DUAL_STACK_ENDPOINT_ONLY)
+#error "Only one of AWS_KVS_USE_LEGACY_ENDPOINT_ONLY or AWS_KVS_USE_DUAL_STACK_ENDPOINT_ONLY can be defined"
+#endif
+
 // NOTE: THe longest string would be the tag resource where we get the maximal tag count and sizes plus some extra.
 #define MAX_TAGS_JSON_PARAMETER_STRING_LEN (MAX_JSON_PARAMETER_STRING_LEN + (MAX_TAG_COUNT * (MAX_TAG_NAME_LEN + MAX_TAG_VALUE_LEN)))
 
@@ -177,6 +186,8 @@ typedef struct __CurlApiCallbacks* PCurlApiCallbacks;
 // Curl API Callbacks main functionality
 //////////////////////////////////////////////////////////////////////
 STATUS createCurlApiCallbacks(struct __CallbacksProvider*, PCHAR, API_CALL_CACHE_TYPE, UINT64, PCHAR, PCHAR, PCHAR, PCHAR, PCurlApiCallbacks*);
+STATUS constructControlPlaneUrl(const char*, SIZE_T, const char*, KvsControlPlaneEndpointType);
+STATUS determineKvsControlPlaneEndpointType(PKvsControlPlaneEndpointType);
 STATUS freeCurlApiCallbacks(PCurlApiCallbacks*);
 STATUS curlApiCallbacksShutdownActiveRequests(PCurlApiCallbacks, STREAM_HANDLE, UINT64, BOOL, BOOL);
 STATUS curlApiCallbacksShutdownCachedEndpoints(PCurlApiCallbacks, STREAM_HANDLE, BOOL);
@@ -184,6 +195,7 @@ STATUS curlApiCallbacksShutdownActiveUploads(PCurlApiCallbacks, STREAM_HANDLE, U
 STATUS curlApiCallbacksShutdown(PCurlApiCallbacks, UINT64);
 STATUS freeApiCallbacksCurl(PUINT64);
 STATUS findRequestWithUploadHandle(UPLOAD_HANDLE, PCurlApiCallbacks, PCurlRequest*);
+const char* endpointTypeToString(KvsControlPlaneEndpointType type);
 
 //////////////////////////////////////////////////////////////////////
 // Auxiliary functionality
