@@ -71,6 +71,7 @@ INT32 main(INT32 argc, CHAR* argv[])
     CHAR videoCodec[VIDEO_CODEC_NAME_MAX_LENGTH];
     SNPRINTF(videoCodec, SIZEOF(videoCodec), "%s", VIDEO_CODEC_NAME_H264); // h264 video by default
     VIDEO_CODEC_ID videoCodecID = VIDEO_CODEC_ID_H264;
+    CHAR endpointOverride[MAX_URI_CHAR_LEN];
 
 #ifdef IOT_CORE_ENABLE_CREDENTIALS
     PCHAR pIotCoreCredentialEndpoint, pIotCoreCert, pIotCorePrivateKey, pIotCoreRoleAlias, pIotCoreThingName;
@@ -146,12 +147,14 @@ INT32 main(INT32 argc, CHAR* argv[])
 
     startTime = GETTIME();
 
+    getEndpointOverride(endpointOverride, SIZEOF(endpointOverride));
 #ifdef IOT_CORE_ENABLE_CREDENTIALS
-    CHK_STATUS(createDefaultCallbacksProviderWithIotCertificate(pIotCoreCredentialEndpoint, pIotCoreCert, pIotCorePrivateKey, cacertPath,
-                                                                pIotCoreRoleAlias, pIotCoreThingName, region, NULL, NULL, &pClientCallbacks));
+    CHK_STATUS(createDefaultCallbacksProviderWithIotCertificateAndEndpointOverride(pIotCoreCredentialEndpoint, pIotCoreCert, pIotCorePrivateKey,
+                                                                                   cacertPath, pIotCoreRoleAlias, pIotCoreThingName, region, NULL,
+                                                                                   NULL, endpointOverride, &pClientCallbacks));
 #else
-    CHK_STATUS(createDefaultCallbacksProviderWithAwsCredentials(accessKey, secretKey, sessionToken, MAX_UINT64, region, cacertPath, NULL, NULL,
-                                                                &pClientCallbacks));
+    CHK_STATUS(createDefaultCallbacksProviderWithAwsCredentialsAndEndpointOverride(accessKey, secretKey, sessionToken, MAX_UINT64, region, cacertPath,
+                                                                                   NULL, NULL, endpointOverride, &pClientCallbacks));
 #endif
 
     if (NULL != GETENV(ENABLE_FILE_LOGGING)) {

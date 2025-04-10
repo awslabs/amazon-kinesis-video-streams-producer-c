@@ -68,13 +68,30 @@ STATUS createDefaultCallbacksProviderWithAwsCredentials(PCHAR accessKeyId, PCHAR
                                                         PClientCallbacks* ppClientCallbacks)
 {
     ENTERS();
+
+    STATUS retStatus = STATUS_SUCCESS;
+
+    CHK_STATUS(createDefaultCallbacksProviderWithAwsCredentialsAndEndpointOverride(
+        accessKeyId, secretKey, sessionToken, expiration, region, caCertPath, userAgentPostfix, customUserAgent, EMPTY_STRING, ppClientCallbacks));
+CleanUp:
+    CHK_LOG_ERR(retStatus);
+    LEAVES();
+    return retStatus;
+}
+
+STATUS createDefaultCallbacksProviderWithAwsCredentialsAndEndpointOverride(PCHAR accessKeyId, PCHAR secretKey, PCHAR sessionToken, UINT64 expiration,
+                                                                           PCHAR region, PCHAR caCertPath, PCHAR userAgentPostfix,
+                                                                           PCHAR customUserAgent, char* endpointOverride,
+                                                                           PClientCallbacks* ppClientCallbacks)
+{
+    ENTERS();
     STATUS retStatus = STATUS_SUCCESS;
     PCallbacksProvider pCallbacksProvider = NULL;
     PAuthCallbacks pAuthCallbacks = NULL;
     PStreamCallbacks pStreamCallbacks = NULL;
 
     CHK_STATUS(createAbstractDefaultCallbacksProvider(DEFAULT_CALLBACK_CHAIN_COUNT, API_CALL_CACHE_TYPE_ALL, ENDPOINT_UPDATE_PERIOD_SENTINEL_VALUE,
-                                                      region, EMPTY_STRING, caCertPath, userAgentPostfix, customUserAgent, ppClientCallbacks));
+                                                      region, endpointOverride, caCertPath, userAgentPostfix, customUserAgent, ppClientCallbacks));
 
     pCallbacksProvider = (PCallbacksProvider) *ppClientCallbacks;
 
@@ -109,9 +126,27 @@ CleanUp:
     return retStatus;
 }
 
-STATUS createDefaultCallbacksProviderWithIotCertificate(PCHAR endpoint, PCHAR iotCertPath, PCHAR privateKeyPath, PCHAR caCertPath, PCHAR roleAlias,
-                                                        PCHAR streamName, PCHAR region, PCHAR userAgentPostfix, PCHAR customUserAgent,
-                                                        PClientCallbacks* ppClientCallbacks)
+STATUS createDefaultCallbacksProviderWithIotCertificate(PCHAR iotDataPlaneEndpoint, PCHAR iotCertPath, PCHAR privateKeyPath, PCHAR caCertPath,
+                                                        PCHAR roleAlias, PCHAR streamName, PCHAR region, PCHAR userAgentPostfix,
+                                                        PCHAR customUserAgent, PClientCallbacks* ppClientCallbacks)
+{
+    ENTERS();
+
+    STATUS retStatus = STATUS_SUCCESS;
+
+    CHK_STATUS(createDefaultCallbacksProviderWithIotCertificateAndEndpointOverride(iotDataPlaneEndpoint, iotCertPath, privateKeyPath, caCertPath,
+                                                                                   roleAlias, streamName, region, userAgentPostfix, customUserAgent,
+                                                                                   EMPTY_STRING, ppClientCallbacks));
+CleanUp:
+    CHK_LOG_ERR(retStatus);
+    LEAVES();
+    return retStatus;
+}
+
+STATUS createDefaultCallbacksProviderWithIotCertificateAndEndpointOverride(PCHAR endpoint, PCHAR iotCertPath, PCHAR privateKeyPath, PCHAR caCertPath,
+                                                                           PCHAR roleAlias, PCHAR streamName, PCHAR region, PCHAR userAgentPostfix,
+                                                                           PCHAR customUserAgent, PCHAR kvsControlPlaneEndpointOverride,
+                                                                           PClientCallbacks* ppClientCallbacks)
 {
     ENTERS();
     STATUS retStatus = STATUS_SUCCESS;
@@ -120,7 +155,8 @@ STATUS createDefaultCallbacksProviderWithIotCertificate(PCHAR endpoint, PCHAR io
     PStreamCallbacks pStreamCallbacks = NULL;
 
     CHK_STATUS(createAbstractDefaultCallbacksProvider(DEFAULT_CALLBACK_CHAIN_COUNT, API_CALL_CACHE_TYPE_ALL, ENDPOINT_UPDATE_PERIOD_SENTINEL_VALUE,
-                                                      region, EMPTY_STRING, caCertPath, userAgentPostfix, customUserAgent, ppClientCallbacks));
+                                                      region, kvsControlPlaneEndpointOverride, caCertPath, userAgentPostfix, customUserAgent,
+                                                      ppClientCallbacks));
 
     pCallbacksProvider = (PCallbacksProvider) *ppClientCallbacks;
 
