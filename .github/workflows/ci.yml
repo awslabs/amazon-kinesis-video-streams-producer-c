@@ -14,7 +14,7 @@ jobs:
     strategy:
       matrix:
         compiler:
-          - name: Clang-15
+          - name: Clang
             cc: clang
             cxx: clang++
           - name: gcc-14
@@ -63,6 +63,7 @@ jobs:
       - name: Set CMake flags for Dependencies=OFF
         if: ${{ matrix.openssl == 'deps-off' }}
         run: |
+          brew install googletest
           echo "CMAKE_FLAGS_EXTRA=-DBUILD_DEPENDENCIES=OFF" >> $GITHUB_ENV
 
       - name: Build repository
