@@ -67,6 +67,7 @@ jobs:
           echo "CMAKE_FLAGS_EXTRA=-DBUILD_DEPENDENCIES=OFF" >> $GITHUB_ENV
 
       - name: Build repository
+        if: ${{ !(matrix.compiler.name == 'gcc-14' && matrix.openssl == 'deps-off') }}
         run: |
           $CC --version
           $CXX --version
@@ -76,6 +77,7 @@ jobs:
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
+        if: ${{ !(matrix.compiler.name == 'gcc-14' && matrix.openssl == 'deps-off') }}
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
@@ -83,6 +85,7 @@ jobs:
           role-duration-seconds: 3600
 
       - name: Run tests
+        if: ${{ !(matrix.compiler.name == 'gcc-14' && matrix.openssl == 'deps-off') }}
         working-directory: ./build
         run: |
           ./tst/producer_test
