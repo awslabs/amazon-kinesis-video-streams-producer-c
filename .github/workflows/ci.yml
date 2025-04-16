@@ -14,200 +14,84 @@ env:
   AWS_KVS_LOG_LEVEL: 7
 
 jobs:
-  mac-os-build-gcc:
-    runs-on: macos-13
+  mac-os-builds:
+    strategy:
+      matrix:
+        compiler:
+          - name: Clang
+            cc: clang
+            cxx: clang++
+          - name: gcc-14
+            cc: gcc-14
+            cxx: g++-14
+        cpu:
+          - name: Intel
+            image: macos-13
+          - name: Apple Silicon
+            image: macos-15
+        openssl:
+          - specific-preinstalled
+          - from-source
+          - deps-off
+      fail-fast: false
+
+    name: ${{ matrix.cpu.name }} Mac-${{ matrix.compiler.name }}-${{ matrix.openssl }}
+    runs-on: ${{ matrix.cpu.image }}
+
     permissions:
       id-token: write
       contents: read
+
     env:
-      CC: gcc-14
-      CXX: g++-14
-    steps:
-      - name: Clone repository
-        uses: actions/checkout@v3
-      - name: Setup cmake
-        uses: jwlawson/actions-setup-cmake@v2
-        with:
-          cmake-version: '3.x'
-      - name: Build repository
-        run: |
-          brew install pkgconfig
-          mkdir build && cd build
-          cmake .. --trace -DBUILD_TEST=TRUE
-          make
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-          aws-region: ${{ secrets.AWS_REGION }}
-          role-duration-seconds: 3600
-      - name: Run tests
-        run: |
-          cd build
-          ./tst/producer_test
+      CC: ${{ matrix.compiler.cc }}
+      CXX: ${{ matrix.compiler.cxx }}
 
-  mac-os-build-clang:
-    runs-on: macos-13
-    permissions:
-      id-token: write
-      contents: read
     steps:
       - name: Clone repository
-        uses: actions/checkout@v3
-      - name: Setup cmake
-        uses: jwlawson/actions-setup-cmake@v2
-        with:
-          cmake-version: '3.x'
-      - name: Build repository
-        run: |
-          brew install pkgconfig
-          mkdir build && cd build
-          cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE
-          make
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-          aws-region: ${{ secrets.AWS_REGION }}
-          role-duration-seconds: 3600
-      - name: Run tests
-        run: |
-          cd build
-          ./tst/producer_test
+        uses: actions/checkout@v4
 
-  mac-os-m1-build-clang:
-    runs-on: macos-latest
-    permissions:
-      id-token: write
-      contents: read
-    steps:
-      - name: Clone repository
-        uses: actions/checkout@v3
       - name: Setup cmake
         uses: jwlawson/actions-setup-cmake@v2
         with:
           cmake-version: '3.x'
-      - name: Build repository
-        run: |
-          brew install pkgconfig
-          mkdir build && cd build
-          cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DCMAKE_C_COMPILER=$(brew --prefix llvm@15)/bin/clang -DCMAKE_CXX_COMPILER=$(brew --prefix llvm@15)/bin/clang++
-          make
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-          aws-region: ${{ secrets.AWS_REGION }}
-          role-duration-seconds: 3600
-      - name: Run tests
-        run: |
-          cd build
-          ./tst/producer_test
 
-  mac-os-m1-build-gcc:
-    runs-on: macos-latest
-    env:
-      CC: gcc-13
-      CXX: g++-13
-    permissions:
-      id-token: write
-      contents: read
-    steps:
-      - name: Clone repository
-        uses: actions/checkout@v3
-      - name: Setup cmake
-        uses: jwlawson/actions-setup-cmake@v2
-        with:
-          cmake-version: '3.x'
-      - name: Build repository
+      - name: Setup envs for including OpenSSL locally
+        if: ${{ matrix.openssl == 'specific-preinstalled' }}
         run: |
-          brew install pkgconfig
-          mkdir build && cd build
-          cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE
-          make
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-          aws-region: ${{ secrets.AWS_REGION }}
-          role-duration-seconds: 3600
-      - name: Run tests
-        run: |
-          cd build
-          ./tst/producer_test
+          OPENSSL_PATH=$(brew --prefix openssl@3)
+          echo "LDFLAGS=-L$OPENSSL_PATH/lib" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I$OPENSSL_PATH/include" >> $GITHUB_ENV
+          echo "OPENSSL_ROOT_DIR=$OPENSSL_PATH" >> $GITHUB_ENV
+          echo "CMAKE_FLAGS_EXTRA=-DLOCAL_OPENSSL_BUILD=ON" >> $GITHUB_ENV
 
-  mac-os-build-gcc-local-openssl:
-    runs-on: macos-13
-    permissions:
-      id-token: write
-      contents: read
-    env:
-      CC: gcc-14
-      CXX: g++-14
-      LDFLAGS: -L/usr/local/opt/openssl@3/lib
-      CPPFLAGS: -I/usr/local/opt/openssl@3/include
-      OPENSSL_ROOT_DIR: /usr/local/opt/openssl@3/
-    steps:
-      - name: Clone repository
-        uses: actions/checkout@v3
-      - name: Setup cmake
-        uses: jwlawson/actions-setup-cmake@v2
-        with:
-          cmake-version: '3.x'
-      - name: Build repository
+      - name: Set CMake flags for Dependencies=OFF
+        if: ${{ matrix.openssl == 'deps-off' }}
         run: |
-          brew info openssl
-          mkdir build && cd build
-          cmake .. -DBUILD_TEST=TRUE -DLOCAL_OPENSSL_BUILD=ON
-          make
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-          aws-region: ${{ secrets.AWS_REGION }}
-          role-duration-seconds: 3600
-      - name: Run tests
-        run: |
-          cd build
-          ./tst/producer_test
+          brew install googletest
+          echo "CMAKE_FLAGS_EXTRA=-DBUILD_DEPENDENCIES=OFF" >> $GITHUB_ENV
 
-  mac-os-build-clang-local-openssl:
-    runs-on: macos-13
-    env:
-      LDFLAGS: -L/usr/local/opt/openssl@3/lib
-      CPPFLAGS: -I/usr/local/opt/openssl@3/include
-      OPENSSL_ROOT_DIR: /usr/local/opt/openssl@3/
-    permissions:
-      id-token: write
-      contents: read
-    steps:
-      - name: Clone repository
-        uses: actions/checkout@v3
-      - name: Setup cmake
-        uses: jwlawson/actions-setup-cmake@v2
-        with:
-          cmake-version: '3.x'
       - name: Build repository
+        if: ${{ !(matrix.compiler.name == 'gcc-14' && matrix.openssl == 'deps-off') }}
         run: |
-          brew info openssl
+          $CC --version
+          $CXX --version
           mkdir build && cd build
-          cmake .. -DBUILD_TEST=TRUE -DCOMPILER_WARNINGS=TRUE -DLOCAL_OPENSSL_BUILD=ON
-          make
+          cmake .. -DBUILD_TEST=ON $CMAKE_FLAGS_EXTRA
+          make -j
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
+        if: ${{ !(matrix.compiler.name == 'gcc-14' && matrix.openssl == 'deps-off') }}
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
           aws-region: ${{ secrets.AWS_REGION }}
           role-duration-seconds: 3600
+
       - name: Run tests
+        if: ${{ !(matrix.compiler.name == 'gcc-14' && matrix.openssl == 'deps-off') }}
+        working-directory: ./build
         run: |
-          cd build
           ./tst/producer_test
 
   linux-gcc-code-coverage:
@@ -367,40 +251,86 @@ jobs:
   #        timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
 
   ubuntu-gcc:
-    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        container:
+          - name: Ubuntu 20.04
+            image: public.ecr.aws/ubuntu/ubuntu:20.04_stable
+          - name: Ubuntu 22.04
+            image: public.ecr.aws/ubuntu/ubuntu:22.04_stable
+          - name: Ubuntu 24.04
+            image: public.ecr.aws/ubuntu/ubuntu:24.04_stable
+        build-configuration:
+          - name: curl
+            cmake-args: "-DBUILD_COMMON_CURL=ON -DBUILD_COMMON_LWS=OFF"
+          - name: lws
+            cmake-args: "-DBUILD_COMMON_CURL=OFF -DBUILD_COMMON_LWS=ON"
+      fail-fast: false
+
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ matrix.container.image }}
+
+    name: ${{ matrix.container.name }}-gcc-${{ matrix.build-configuration.name }}
+
     env:
+      DEBIAN_FRONTEND: noninteractive
       CC: gcc
       CXX: g++
+
     permissions:
       id-token: write
       contents: read
     steps:
       - name: Clone repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
       - name: Install dependencies
         run: |
-          sudo apt clean && sudo apt update
-          sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'
+          apt-get update
+          apt-get install -y git cmake build-essential pkg-config
+
       - name: Setup cmake
         uses: jwlawson/actions-setup-cmake@v2
         with:
           cmake-version: '3.x'
+
       - name: Build repository
         run: |
           mkdir build && cd build
-          cmake .. -DBUILD_TEST=TRUE
-          make
+          cmake .. -DBUILD_TEST=ON ${{ matrix.build-configuration.cmake-args }}
+          make -j
+
+      - name: Check libCurl
+        if: ${{ matrix.build-configuration.name == 'curl' }}
+        working-directory: ./open-source/lib
+        run: |
+          set -x
+          readelf -d libcurl.so | grep -i "runpath"
+          ldd libcurl.so
+          echo "Checking ldd output for missing dependencies..."
+          if ldd libcurl.so | grep "not found"; then
+            echo "❌ Missing dependencies detected in libcurl.so"
+            exit 1
+          else
+            echo "✅ All dependencies are found"
+          fi
+
       - name: Configure AWS Credentials
+        # Producer-C only has CURL implementation
+        if: ${{ matrix.build-configuration.name == 'curl' }}
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
           aws-region: ${{ secrets.AWS_REGION }}
           role-duration-seconds: 3600
+
       - name: Run tests
+        # Producer-C only has CURL implementation
+        if: ${{ matrix.build-configuration.name == 'curl' }}
+        working-directory: ./build
         run: |
-          cd build
-          ulimit -c unlimited -S
           timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
 
   arm64-cross-compilation:
@@ -424,8 +354,9 @@ jobs:
           sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DBUILD_OPENSSL_PLATFORM=linux-generic64
-          make
+          make -j
           file libcproducer.so
+
   linux-aarch64-cross-compilation:
     runs-on: ubuntu-22.04
     env:
@@ -447,8 +378,9 @@ jobs:
           sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DBUILD_OPENSSL_PLATFORM=linux-aarch64
-          make
+          make -j
           file libcproducer.so
+
   arm32-cross-compilation:
     runs-on: ubuntu-22.04
     env:
@@ -459,12 +391,15 @@ jobs:
         run: |
           sudo apt clean && sudo apt update
           sudo apt-get -y install gcc-arm-linux-gnueabi g++-arm-linux-gnueabi binutils-arm-linux-gnueabi
+
       - name: Clone repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
       - name: Setup cmake
         uses: jwlawson/actions-setup-cmake@v2
         with:
           cmake-version: '3.x'
+
       - name: Build Repository
         run: |
           sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'
@@ -489,17 +424,30 @@ jobs:
           make
 
   linux-thread-size-check:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
+    container:
+      image: public.ecr.aws/ubuntu/ubuntu:22.04_stable
+
+    env:
+      DEBIAN_FRONTEND: noninteractive
+
     permissions:
       id-token: write
       contents: read
+
     steps:
       - name: Clone repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y git cmake build-essential pkg-config
+
       - name: Setup cmake
         uses: jwlawson/actions-setup-cmake@v2
         with:
           cmake-version: '3.x'
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -507,11 +455,13 @@ jobs:
           role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
           aws-region: ${{ secrets.AWS_REGION }}
           role-duration-seconds: 3600
+
       - name: Build Repository
         run: |
           mkdir build && cd build
           cmake .. -DBUILD_TEST=TRUE -DKVS_DEFAULT_STACK_SIZE=65536
           make -j$(nproc)
+
       - name: Run tests with expected failure
         run: |
           set +e
