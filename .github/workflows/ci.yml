@@ -9,6 +9,10 @@ on:
     branches:
       - develop
       - master
+
+env:
+  AWS_KVS_LOG_LEVEL: 7
+
 jobs:
   mac-os-build-gcc:
     runs-on: macos-13
@@ -18,7 +22,6 @@ jobs:
     env:
       CC: gcc-14
       CXX: g++-14
-      AWS_KVS_LOG_LEVEL: 2
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
@@ -46,8 +49,6 @@ jobs:
 
   mac-os-build-clang:
     runs-on: macos-13
-    env:
-      AWS_KVS_LOG_LEVEL: 2
     permissions:
       id-token: write
       contents: read
@@ -78,8 +79,6 @@ jobs:
 
   mac-os-m1-build-clang:
     runs-on: macos-latest
-    env:
-      AWS_KVS_LOG_LEVEL: 2
     permissions:
       id-token: write
       contents: read
@@ -113,7 +112,6 @@ jobs:
     env:
       CC: gcc-13
       CXX: g++-13
-      AWS_KVS_LOG_LEVEL: 2
     permissions:
       id-token: write
       contents: read
@@ -150,7 +148,6 @@ jobs:
     env:
       CC: gcc-14
       CXX: g++-14
-      AWS_KVS_LOG_LEVEL: 2
       LDFLAGS: -L/usr/local/opt/openssl@3/lib
       CPPFLAGS: -I/usr/local/opt/openssl@3/include
       OPENSSL_ROOT_DIR: /usr/local/opt/openssl@3/
@@ -182,7 +179,6 @@ jobs:
   mac-os-build-clang-local-openssl:
     runs-on: macos-13
     env:
-      AWS_KVS_LOG_LEVEL: 2
       LDFLAGS: -L/usr/local/opt/openssl@3/lib
       CPPFLAGS: -I/usr/local/opt/openssl@3/include
       OPENSSL_ROOT_DIR: /usr/local/opt/openssl@3/
@@ -216,8 +212,6 @@ jobs:
 
   linux-gcc-code-coverage:
     runs-on: ubuntu-22.04
-    env:
-      AWS_KVS_LOG_LEVEL: 2
     permissions:
       id-token: write
       contents: read
@@ -259,7 +253,6 @@ jobs:
     env:
       CC: clang
       CXX: clang++
-      AWS_KVS_LOG_LEVEL: 2
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
@@ -293,7 +286,6 @@ jobs:
     env:
       CC: clang
       CXX: clang++
-      AWS_KVS_LOG_LEVEL: 2
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
@@ -377,7 +369,6 @@ jobs:
   ubuntu-gcc:
     runs-on: ubuntu-22.04
     env:
-      AWS_KVS_LOG_LEVEL: 2
       CC: gcc
       CXX: g++
     permissions:
