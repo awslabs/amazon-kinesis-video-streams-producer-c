@@ -19,8 +19,12 @@ extern "C" {
 #define IOT_CORE_THING_NAME          ((PCHAR) "AWS_IOT_CORE_THING_NAME")
 #define IOT_CORE_CERTIFICATE_ID      ((PCHAR) "AWS_IOT_CORE_CERTIFICATE_ID")
 
+#define CONTROL_PLANE_URI_ENV_VAR ((PCHAR) "CONTROL_PLANE_URI")
+
 #define FILE_LOGGING_BUFFER_SIZE (100 * 1024)
 #define MAX_NUMBER_OF_LOG_FILES  5
+
+VOID getEndpointOverride(PCHAR, SIZE_T);
 
 #ifdef __cplusplus
 }

@@ -188,6 +188,7 @@ INT32 main(INT32 argc, CHAR* argv[])
     BYTE aacAudioCpd[KVS_AAC_CPD_SIZE_BYTE];
     BYTE alawAudioCpd[KVS_PCM_CPD_SIZE_BYTE];
     VIDEO_CODEC_ID videoCodecID = VIDEO_CODEC_ID_H264;
+    CHAR endpointOverride[MAX_URI_CHAR_LEN];
 
     MEMSET(&data, 0x00, SIZEOF(SampleCustomData));
 
@@ -324,12 +325,15 @@ INT32 main(INT32 argc, CHAR* argv[])
 
     data.startTime = GETTIME();
     data.firstFrame = TRUE;
+
+    getEndpointOverride(endpointOverride, SIZEOF(endpointOverride));
 #ifdef IOT_CORE_ENABLE_CREDENTIALS
-    CHK_STATUS(createDefaultCallbacksProviderWithIotCertificate(pIotCoreCredentialEndpoint, pIotCoreCert, pIotCorePrivateKey, cacertPath,
-                                                                pIotCoreRoleAlias, pIotCoreThingName, region, NULL, NULL, &pClientCallbacks));
+    CHK_STATUS(createDefaultCallbacksProviderWithIotCertificateAndEndpointOverride(pIotCoreCredentialEndpoint, pIotCoreCert, pIotCorePrivateKey,
+                                                                                   cacertPath, pIotCoreRoleAlias, pIotCoreThingName, region, NULL,
+                                                                                   NULL, endpointOverride, &pClientCallbacks));
 #else
-    CHK_STATUS(createDefaultCallbacksProviderWithAwsCredentials(accessKey, secretKey, sessionToken, MAX_UINT64, region, cacertPath, NULL, NULL,
-                                                                &pClientCallbacks));
+    CHK_STATUS(createDefaultCallbacksProviderWithAwsCredentialsAndEndpointOverride(accessKey, secretKey, sessionToken, MAX_UINT64, region, cacertPath,
+                                                                                   NULL, NULL, endpointOverride, &pClientCallbacks));
 #endif
 
     if (NULL != GETENV(ENABLE_FILE_LOGGING)) {
