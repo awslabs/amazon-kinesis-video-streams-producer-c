@@ -1,14 +1,16 @@
 <map id="freeStaticAuthCallbacks" name="freeStaticAuthCallbacks">
-<area shape="rect" id="Node000001" title=" " alt="" coords="779,32,957,57"/>
-<area shape="rect" id="Node000002" href="$CallbacksProvider_8c.html#a020c62e1ff193d474681bef1c94bdcee" title=" " alt="" coords="5,5,233,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="771,33,730,29,597,20,463,17,234,17,234,12,463,11,598,15,731,23,771,28"/>
-<area shape="rect" id="Node000003" href="$group__PublicMemberFunctions.html#gabace8323412b6bd8019502f1f7d13c6a" title=" " alt="" coords="5,77,233,117"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="830,65,783,84,731,98,598,114,464,120,339,117,233,111,234,106,339,112,464,114,598,109,730,93,782,79,828,61"/>
-<area shape="rect" id="Node000004" href="$group__PublicMemberFunctions.html#ga69ee401a3d516acf3f43454570007b6e" title=" " alt="" coords="281,31,475,56"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="765,47,475,46,475,41,765,42"/>
-<area shape="rect" id="Node000005" href="$StaticAuthCallbacks_8c.html#a6ed8933ffce03b0b35f1a6fc5afaa943" title=" " alt="" coords="523,57,731,83"/>
-<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="765,58,731,62,730,56,765,53"/>
-<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="267,35,233,32,234,27,268,30"/>
-<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="303,61,218,79,216,74,302,56"/>
-<area shape="poly" id="edge7_Node000005_Node000004" title=" " alt="" coords="509,60,474,56,475,51,509,55"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="1117,32,1296,57"/>
+<area shape="rect" id="Node000002" href="$CallbacksProvider_8c.html#a020c62e1ff193d474681bef1c94bdcee" title=" " alt="" coords="313,5,541,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1109,33,1069,29,927,20,784,16,541,17,541,12,784,11,927,15,1070,23,1110,28"/>
+<area shape="rect" id="Node000003" href="$CallbacksProvider_8c.html#a4888f554a9924ff938cfa522f2ef9ceb" title=" " alt="" coords="281,77,572,117"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1168,65,1122,84,1070,98,939,115,807,121,682,119,572,113,573,108,682,114,807,115,939,109,1069,93,1120,79,1166,61"/>
+<area shape="rect" id="Node000005" href="$group__PublicMemberFunctions.html#ga69ee401a3d516acf3f43454570007b6e" title=" " alt="" coords="620,31,813,56"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="1104,47,814,46,814,41,1104,42"/>
+<area shape="rect" id="Node000006" href="$StaticAuthCallbacks_8c.html#a6ed8933ffce03b0b35f1a6fc5afaa943" title=" " alt="" coords="861,57,1069,83"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="1104,58,1070,62,1069,56,1104,53"/>
+<area shape="rect" id="Node000004" href="$group__PublicMemberFunctions.html#gabace8323412b6bd8019502f1f7d13c6a" title=" " alt="" coords="5,77,233,117"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="268,99,233,99,233,94,268,94"/>
+<area shape="poly" id="edge5_Node000005_Node000002" title=" " alt="" coords="606,36,540,31,541,25,606,31"/>
+<area shape="poly" id="edge6_Node000005_Node000003" title=" " alt="" coords="634,61,536,79,535,74,633,56"/>
+<area shape="poly" id="edge8_Node000006_Node000005" title=" " alt="" coords="847,60,813,56,814,51,848,55"/>
 </map>

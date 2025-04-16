@@ -1,86 +1,90 @@
 <map id="setRequestHeader" name="setRequestHeader">
-<area shape="rect" id="Node000001" title="Sets a header in the request info." alt="" coords="1899,259,2041,284"/>
-<area shape="rect" id="Node000002" href="$group__PublicMemberFunctions.html#ga7603d4fd331e691b00fe65a6fda8ea98" title="Creates a Request Info object." alt="" coords="1663,5,1804,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1960,246,1946,204,1923,151,1891,97,1872,73,1849,52,1827,39,1803,30,1805,25,1830,34,1852,48,1875,70,1896,94,1928,149,1951,202,1965,245"/>
-<area shape="rect" id="Node000003" href="$IotCredentialProvider_8c.html#aa0846e897b84d5ba30eae8d93938f58f" title=" " alt="" coords="1409,56,1525,81"/>
-<area shape="poly" id="edge31_Node000001_Node000003" title=" " alt="" coords="1957,247,1941,213,1918,173,1888,134,1849,103,1810,84,1767,70,1723,61,1679,57,1595,56,1526,62,1525,56,1595,50,1679,51,1724,56,1768,65,1812,79,1852,98,1891,130,1923,170,1946,210,1962,245"/>
-<area shape="rect" id="Node000015" href="$CurlApiCallbacks_8c.html#a1d050d58c5c32f4ff2f61c1f1d53e43f" title=" " alt="" coords="1154,408,1290,433"/>
-<area shape="poly" id="edge15_Node000001_Node000015" title=" " alt="" coords="1948,296,1905,335,1852,375,1778,424,1718,461,1654,489,1569,513,1512,526,1465,534,1420,531,1365,512,1348,500,1339,485,1331,470,1317,456,1275,436,1277,431,1320,452,1336,467,1344,482,1352,496,1368,508,1421,526,1465,529,1511,521,1567,507,1652,484,1715,456,1775,420,1849,370,1901,331,1944,292"/>
-<area shape="rect" id="Node000023" href="$CurlApiCallbacks_8c.html#a961f559e051708730e5962ba1292d763" title=" " alt="" coords="1147,208,1297,233"/>
-<area shape="poly" id="edge25_Node000001_Node000023" title=" " alt="" coords="1947,250,1905,211,1878,192,1850,178,1780,153,1719,137,1665,128,1612,126,1560,129,1504,137,1367,163,1301,185,1247,210,1245,206,1299,180,1366,158,1503,132,1559,124,1612,120,1665,123,1721,132,1782,148,1852,173,1881,188,1908,207,1950,246"/>
-<area shape="rect" id="Node000025" href="$CurlApiCallbacks_8c.html#a2d743329be9b21a3f9e3ba1960e48a54" title=" " alt="" coords="1125,465,1319,491"/>
-<area shape="poly" id="edge28_Node000001_Node000025" title=" " alt="" coords="1966,299,1954,344,1932,400,1899,457,1877,482,1852,503,1789,542,1731,567,1676,580,1622,583,1566,579,1506,569,1366,539,1299,518,1245,493,1247,488,1301,513,1367,534,1507,563,1567,574,1622,578,1675,575,1729,562,1787,537,1849,499,1873,478,1894,453,1927,398,1948,342,1961,297"/>
-<area shape="rect" id="Node000027" href="$CurlApiCallbacks_8c.html#a7f8ceaabce616c9c2eb4f8656319e6f3" title=" " alt="" coords="1164,327,1280,352"/>
-<area shape="poly" id="edge32_Node000001_Node000027" title=" " alt="" coords="1885,270,1780,269,1651,272,1508,281,1367,301,1343,308,1319,317,1274,329,1273,324,1318,311,1342,303,1366,295,1508,276,1650,266,1780,264,1885,265"/>
-<area shape="rect" id="Node000028" href="$group__PublicMemberFunctions.html#gabc9cba91eff17dd6b7ddc04204e294ee" title="Signs a request by appending SigV4 headers." alt="" coords="1656,335,1811,360"/>
-<area shape="poly" id="edge34_Node000001_Node000028" title=" " alt="" coords="1918,291,1775,337,1773,332,1916,286"/>
-<area shape="rect" id="Node000034" href="$CurlApiCallbacks_8c.html#a6745d65202655fd7ae9ed9b441480607" title=" " alt="" coords="1157,276,1287,301"/>
-<area shape="poly" id="edge48_Node000001_Node000034" title=" " alt="" coords="1928,256,1827,217,1759,197,1685,180,1605,169,1524,167,1444,176,1405,186,1368,199,1353,209,1344,221,1335,234,1320,248,1291,265,1261,278,1259,273,1289,261,1317,244,1331,231,1339,218,1349,205,1365,194,1404,180,1443,171,1524,162,1606,164,1686,175,1761,192,1828,212,1930,251"/>
-<area shape="rect" id="Node000036" href="$group__PublicMemberFunctions.html#ga24fb8a40db07b0fd24a92b476a4b04e7" title="Signs a request by appending SigV4 query param." alt="" coords="1616,624,1851,649"/>
-<area shape="poly" id="edge47_Node000001_Node000036" title=" " alt="" coords="1970,298,1963,361,1944,444,1929,488,1909,531,1884,571,1852,607,1820,626,1818,622,1849,603,1880,568,1904,528,1924,486,1939,442,1957,360,1965,297"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1653,36,1526,60,1525,55,1652,31"/>
-<area shape="rect" id="Node000004" href="$IotCredentialProvider_8c.html#aa723d7931db2d162faeafea647dec5a6" title=" " alt="" coords="854,99,1055,139"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="1396,75,1270,83,1126,97,1056,106,1055,101,1125,91,1269,78,1395,70"/>
-<area shape="rect" id="Node000014" href="$IotCredentialProvider_8c.html#a1fc8c2f583060ffb94d647bd1116a7df" title=" " alt="" coords="1155,107,1289,132"/>
-<area shape="poly" id="edge13_Node000003_Node000014" title=" " alt="" coords="1396,86,1285,109,1284,104,1395,81"/>
-<area shape="rect" id="Node000005" href="$group__PublicMemberFunctions.html#ga614ff0bb778c3c1fb27e66d4429327fa" title="Creates an IoT based AWS credential provider object with time function which is based on libCurl." alt="" coords="557,67,784,107"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="840,109,784,103,785,97,841,104"/>
-<area shape="rect" id="Node000009" href="$group__PublicMemberFunctions.html#gacc88aa81762b337b7156cb587abb5dfe" title="Creates an IoT based AWS credential provider object with time function which is based on libCurl." alt="" coords="557,131,784,171"/>
-<area shape="poly" id="edge8_Node000004_Node000009" title=" " alt="" coords="841,135,785,141,784,136,840,130"/>
-<area shape="rect" id="Node000012" href="$group__PublicMemberFunctions.html#gae28f29d61cd81a083bd475601ace42e8" title="Creates an IoT based AWS credential provider object with time function which is based on libWebSocket..." alt="" coords="557,195,784,235"/>
-<area shape="poly" id="edge11_Node000004_Node000012" title=" " alt="" coords="892,147,785,186,747,198,745,193,783,181,890,142"/>
-<area shape="rect" id="Node000006" href="$group__PublicMemberFunctions.html#gab4a9b009056672dbeeea6c79bfc6a797" title="Creates an IoT based AWS credential provider object using libCurl." alt="" coords="282,85,509,111"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="544,95,509,96,509,91,544,90"/>
-<area shape="rect" id="Node000007" href="$group__PublicMemberFunctions.html#ga8a84bd94812cefeab5b52176e5d7401c" title=" " alt="" coords="309,36,482,61"/>
-<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="543,72,482,63,482,58,544,67"/>
-<area shape="rect" id="Node000008" href="$group__PublicMemberFunctions.html#ga750983add758649af12b8317d8483c3e" title=" " alt="" coords="5,50,233,90"/>
-<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="295,59,234,64,233,59,295,54"/>
-<area shape="rect" id="Node000010" href="$group__PublicMemberFunctions.html#ga4235d1df60b4f123b7b55570f78f1087" title=" " alt="" coords="294,135,497,175"/>
-<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="544,156,497,157,497,151,544,151"/>
-<area shape="rect" id="Node000011" href="$group__PublicMemberFunctions.html#gacab2eb7cb8bc4a0337c9e257b5933688" title=" " alt="" coords="5,135,233,175"/>
-<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="280,158,233,158,233,153,280,153"/>
-<area shape="rect" id="Node000013" href="$group__PublicMemberFunctions.html#ga3f966d72311ebdfc66dfcf77aaf41684" title="Creates an IoT based AWS credential provider object using libWebSockets." alt="" coords="282,203,509,228"/>
-<area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="544,218,509,218,509,213,544,213"/>
-<area shape="poly" id="edge14_Node000014_Node000004" title=" " alt="" coords="1141,122,1056,122,1056,117,1141,117"/>
-<area shape="rect" id="Node000016" href="$CurlApiCallbacks_8c.html#ae625942029492c5222a76c99a93692d2" title=" " alt="" coords="861,384,1049,409"/>
-<area shape="poly" id="edge16_Node000015_Node000016" title=" " alt="" coords="1140,416,1049,408,1049,402,1141,411"/>
-<area shape="rect" id="Node000017" href="$CurlApiCallbacks_8c.html#a130e64adf86a4615c3e31fe7044c014a" title=" " alt="" coords="584,315,757,340"/>
-<area shape="poly" id="edge17_Node000016_Node000017" title=" " alt="" coords="888,383,723,343,724,337,889,378"/>
-<area shape="rect" id="Node000018" href="$group__PublicMemberFunctions.html#ga6c195173d4fd6f942260e2b81c0d4e83" title=" " alt="" coords="281,263,509,303"/>
-<area shape="poly" id="edge18_Node000017_Node000018" title=" " alt="" coords="577,315,509,304,510,299,578,310"/>
-<area shape="poly" id="edge23_Node000018_Node000008" title=" " alt="" coords="302,259,279,243,267,227,260,212,254,183,249,154,243,140,231,125,209,107,183,92,185,88,212,102,235,121,247,137,254,153,259,182,265,211,272,225,283,239,305,255"/>
-<area shape="poly" id="edge24_Node000018_Node000011" title=" " alt="" coords="312,260,280,243,265,229,255,215,247,202,232,190,209,178,211,173,235,185,251,198,260,212,269,225,283,239,314,256"/>
-<area shape="rect" id="Node000019" href="$CallbacksProvider_8c.html#a020c62e1ff193d474681bef1c94bdcee" title=" " alt="" coords="5,328,233,353"/>
-<area shape="poly" id="edge19_Node000018_Node000019" title=" " alt="" coords="286,309,182,331,181,325,284,304"/>
-<area shape="rect" id="Node000020" href="$group__PublicMemberFunctions.html#ga42ffcf860b92e764b2ba56bc5d72fd71" title=" " alt="" coords="5,378,233,418"/>
-<area shape="poly" id="edge20_Node000018_Node000020" title=" " alt="" coords="349,313,295,341,234,368,200,380,198,375,232,364,293,336,347,308"/>
-<area shape="rect" id="Node000021" href="$group__PublicMemberFunctions.html#gabace8323412b6bd8019502f1f7d13c6a" title=" " alt="" coords="5,199,233,239"/>
-<area shape="poly" id="edge21_Node000018_Node000021" title=" " alt="" coords="294,263,205,242,207,237,296,258"/>
-<area shape="rect" id="Node000022" href="$group__PublicMemberFunctions.html#gafcd18610ba9ef3d8a4ce62539ddfc2e9" title=" " alt="" coords="5,263,233,303"/>
-<area shape="poly" id="edge22_Node000018_Node000022" title=" " alt="" coords="268,286,234,286,234,281,268,281"/>
-<area shape="rect" id="Node000024" href="$CurlApiCallbacks_8c.html#a04ab4aae7ba1f0b0be9d009beb7d7eb2" title=" " alt="" coords="853,220,1056,245"/>
-<area shape="poly" id="edge26_Node000023_Node000024" title=" " alt="" coords="1133,227,1056,231,1056,225,1133,222"/>
-<area shape="poly" id="edge27_Node000024_Node000017" title=" " alt="" coords="887,251,833,267,703,317,701,312,831,262,886,246"/>
-<area shape="rect" id="Node000026" href="$CurlApiCallbacks_8c.html#a7f57a0cc68e64ec20ffa294d4e0bd0f5" title=" " alt="" coords="832,449,1077,475"/>
-<area shape="poly" id="edge29_Node000025_Node000026" title=" " alt="" coords="1111,474,1078,472,1078,467,1112,469"/>
-<area shape="poly" id="edge30_Node000026_Node000017" title=" " alt="" coords="893,448,831,424,751,382,689,342,692,338,753,377,833,420,895,443"/>
-<area shape="poly" id="edge33_Node000027_Node000017" title=" " alt="" coords="1150,340,758,332,758,327,1150,335"/>
-<area shape="rect" id="Node000029" href="$CurlApiCallbacks_8c.html#a6f353cf547367e9c2114ebd68c6e6044" title=" " alt="" coords="1374,408,1561,433"/>
-<area shape="poly" id="edge35_Node000028_Node000029" title=" " alt="" coords="1679,367,1569,399,1525,410,1523,405,1567,394,1678,362"/>
-<area shape="rect" id="Node000030" href="$CurlApiCallbacks_8c.html#a31ddca30104358dab145d9036d37664c" title=" " alt="" coords="1367,208,1568,233"/>
-<area shape="poly" id="edge37_Node000028_Node000030" title=" " alt="" coords="1692,331,1494,236,1496,231,1694,326"/>
-<area shape="rect" id="Node000031" href="$CurlApiCallbacks_8c.html#a1c7e54151eb16bf3f0649710749d62d4" title=" " alt="" coords="1371,458,1564,498"/>
-<area shape="poly" id="edge39_Node000028_Node000031" title=" " alt="" coords="1704,370,1643,409,1569,448,1539,460,1537,456,1567,444,1641,404,1701,365"/>
-<area shape="rect" id="Node000032" href="$CurlApiCallbacks_8c.html#a27728754fcd86034a116c4e8a5a4e5b8" title=" " alt="" coords="1384,359,1551,384"/>
-<area shape="poly" id="edge41_Node000028_Node000032" title=" " alt="" coords="1643,358,1551,366,1551,361,1642,353"/>
-<area shape="rect" id="Node000033" href="$CurlApiCallbacks_8c.html#a82a5f8a6a272ffefeeb1197ed520cc7d" title=" " alt="" coords="1377,309,1557,335"/>
-<area shape="poly" id="edge43_Node000028_Node000033" title=" " alt="" coords="1642,341,1557,333,1558,328,1643,336"/>
-<area shape="poly" id="edge36_Node000029_Node000015" title=" " alt="" coords="1360,423,1290,423,1290,418,1360,418"/>
-<area shape="poly" id="edge38_Node000030_Node000023" title=" " alt="" coords="1353,223,1298,223,1298,218,1353,218"/>
-<area shape="poly" id="edge40_Node000031_Node000025" title=" " alt="" coords="1357,481,1319,481,1319,475,1357,475"/>
-<area shape="poly" id="edge42_Node000032_Node000027" title=" " alt="" coords="1370,361,1280,349,1280,344,1371,356"/>
-<area shape="poly" id="edge44_Node000033_Node000034" title=" " alt="" coords="1363,311,1287,300,1287,295,1364,305"/>
-<area shape="rect" id="Node000035" href="$CurlApiCallbacks_8c.html#a68d690aafbaab0598ee193006d9189e0" title=" " alt="" coords="864,276,1045,301"/>
-<area shape="poly" id="edge45_Node000034_Node000035" title=" " alt="" coords="1144,291,1045,291,1045,286,1144,286"/>
-<area shape="poly" id="edge46_Node000035_Node000017" title=" " alt="" coords="851,305,758,318,757,313,850,300"/>
+<area shape="rect" id="Node000001" title="Sets a header in the request info." alt="" coords="2237,259,2380,284"/>
+<area shape="rect" id="Node000002" href="$group__PublicMemberFunctions.html#ga7603d4fd331e691b00fe65a6fda8ea98" title="Creates a Request Info object." alt="" coords="2001,5,2143,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="2298,246,2284,204,2262,151,2230,97,2210,73,2188,52,2166,39,2142,30,2144,25,2168,34,2191,48,2214,70,2234,94,2267,149,2289,202,2303,245"/>
+<area shape="rect" id="Node000003" href="$IotCredentialProvider_8c.html#aa0846e897b84d5ba30eae8d93938f58f" title=" " alt="" coords="1748,56,1864,81"/>
+<area shape="poly" id="edge33_Node000001_Node000003" title=" " alt="" coords="2296,247,2280,213,2257,173,2226,134,2188,103,2148,84,2106,70,2062,61,2018,57,1934,56,1864,62,1864,56,1934,50,2018,51,2063,56,2107,65,2150,79,2191,98,2230,130,2261,170,2285,210,2300,245"/>
+<area shape="rect" id="Node000016" href="$CurlApiCallbacks_8c.html#a1d050d58c5c32f4ff2f61c1f1d53e43f" title=" " alt="" coords="1493,408,1629,433"/>
+<area shape="poly" id="edge16_Node000001_Node000016" title=" " alt="" coords="2286,296,2243,335,2191,375,2116,424,2056,461,1993,489,1907,513,1850,526,1804,534,1758,531,1704,512,1687,500,1678,485,1670,470,1656,456,1613,436,1615,431,1659,452,1674,467,1683,482,1691,496,1707,508,1759,526,1804,529,1849,521,1906,507,1991,484,2054,456,2114,420,2188,370,2240,331,2283,292"/>
+<area shape="rect" id="Node000025" href="$CurlApiCallbacks_8c.html#a961f559e051708730e5962ba1292d763" title=" " alt="" coords="1485,208,1636,233"/>
+<area shape="poly" id="edge27_Node000001_Node000025" title=" " alt="" coords="2285,250,2243,211,2217,192,2188,178,2119,153,2058,137,2003,128,1951,126,1899,129,1842,137,1706,163,1639,185,1586,210,1583,206,1637,180,1705,158,1841,132,1898,124,1951,120,2004,123,2059,132,2120,148,2190,173,2220,188,2247,207,2289,246"/>
+<area shape="rect" id="Node000027" href="$CurlApiCallbacks_8c.html#a2d743329be9b21a3f9e3ba1960e48a54" title=" " alt="" coords="1464,465,1657,491"/>
+<area shape="poly" id="edge30_Node000001_Node000027" title=" " alt="" coords="2305,299,2292,344,2270,400,2237,457,2216,482,2191,503,2128,542,2070,567,2015,580,1960,583,1905,579,1845,569,1705,539,1638,518,1584,493,1586,488,1640,513,1706,534,1846,563,1905,574,1960,578,2014,575,2068,562,2125,537,2188,499,2212,478,2233,453,2266,398,2287,342,2300,297"/>
+<area shape="rect" id="Node000029" href="$CurlApiCallbacks_8c.html#a7f8ceaabce616c9c2eb4f8656319e6f3" title=" " alt="" coords="1503,327,1619,352"/>
+<area shape="poly" id="edge34_Node000001_Node000029" title=" " alt="" coords="2224,270,2119,269,1989,272,1847,281,1706,301,1682,308,1658,317,1613,329,1611,324,1657,311,1680,303,1705,295,1847,276,1989,266,2119,264,2224,265"/>
+<area shape="rect" id="Node000030" href="$group__PublicMemberFunctions.html#gabc9cba91eff17dd6b7ddc04204e294ee" title="Signs a request by appending SigV4 headers." alt="" coords="1995,335,2149,360"/>
+<area shape="poly" id="edge36_Node000001_Node000030" title=" " alt="" coords="2256,291,2113,337,2112,332,2255,286"/>
+<area shape="rect" id="Node000036" href="$CurlApiCallbacks_8c.html#a6745d65202655fd7ae9ed9b441480607" title=" " alt="" coords="1496,276,1625,301"/>
+<area shape="poly" id="edge50_Node000001_Node000036" title=" " alt="" coords="2267,256,2165,217,2098,197,2023,180,1944,169,1863,167,1783,176,1744,186,1707,199,1691,209,1682,221,1673,234,1659,248,1630,265,1600,278,1598,273,1627,261,1656,244,1669,231,1678,218,1688,205,1704,194,1742,180,1782,171,1863,162,1945,164,2024,175,2099,192,2167,212,2269,251"/>
+<area shape="rect" id="Node000038" href="$group__PublicMemberFunctions.html#ga24fb8a40db07b0fd24a92b476a4b04e7" title="Signs a request by appending SigV4 query param." alt="" coords="1955,624,2189,649"/>
+<area shape="poly" id="edge49_Node000001_Node000038" title=" " alt="" coords="2309,298,2301,361,2283,444,2268,488,2248,531,2222,571,2191,607,2159,626,2156,622,2188,603,2218,568,2243,528,2263,486,2277,442,2296,360,2303,297"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1992,36,1865,60,1864,55,1991,31"/>
+<area shape="rect" id="Node000004" href="$IotCredentialProvider_8c.html#aa723d7931db2d162faeafea647dec5a6" title=" " alt="" coords="1193,99,1394,139"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="1734,75,1608,83,1464,97,1395,106,1394,101,1464,91,1608,78,1734,70"/>
+<area shape="rect" id="Node000015" href="$IotCredentialProvider_8c.html#a1fc8c2f583060ffb94d647bd1116a7df" title=" " alt="" coords="1493,107,1628,132"/>
+<area shape="poly" id="edge14_Node000003_Node000015" title=" " alt="" coords="1735,86,1623,109,1622,104,1734,81"/>
+<area shape="rect" id="Node000005" href="$group__PublicMemberFunctions.html#ga614ff0bb778c3c1fb27e66d4429327fa" title="Creates an IoT based AWS credential provider object with time function which is based on libCurl." alt="" coords="896,67,1123,107"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="1179,109,1123,103,1123,97,1179,104"/>
+<area shape="rect" id="Node000010" href="$group__PublicMemberFunctions.html#gacc88aa81762b337b7156cb587abb5dfe" title="Creates an IoT based AWS credential provider object with time function which is based on libCurl." alt="" coords="896,131,1123,171"/>
+<area shape="poly" id="edge9_Node000004_Node000010" title=" " alt="" coords="1179,135,1123,141,1123,136,1179,130"/>
+<area shape="rect" id="Node000013" href="$group__PublicMemberFunctions.html#gae28f29d61cd81a083bd475601ace42e8" title="Creates an IoT based AWS credential provider object with time function which is based on libWebSocket..." alt="" coords="896,195,1123,235"/>
+<area shape="poly" id="edge12_Node000004_Node000013" title=" " alt="" coords="1231,147,1124,186,1085,198,1084,193,1122,181,1229,142"/>
+<area shape="rect" id="Node000006" href="$group__PublicMemberFunctions.html#gab4a9b009056672dbeeea6c79bfc6a797" title="Creates an IoT based AWS credential provider object using libCurl." alt="" coords="621,85,847,111"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="882,95,848,96,847,91,882,90"/>
+<area shape="rect" id="Node000007" href="$group__PublicMemberFunctions.html#ga8a84bd94812cefeab5b52176e5d7401c" title=" " alt="" coords="647,36,821,61"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="882,72,820,63,821,58,883,67"/>
+<area shape="rect" id="Node000008" href="$group__PublicMemberFunctions.html#gaf3fad24f4d68e3c40180d628d70b29f6" title=" " alt="" coords="289,50,564,90"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="634,58,565,63,564,58,633,53"/>
+<area shape="rect" id="Node000009" href="$group__PublicMemberFunctions.html#ga750983add758649af12b8317d8483c3e" title=" " alt="" coords="5,50,233,90"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="276,73,234,73,234,67,276,67"/>
+<area shape="rect" id="Node000011" href="$group__PublicMemberFunctions.html#ga4235d1df60b4f123b7b55570f78f1087" title=" " alt="" coords="633,135,835,175"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="882,156,836,157,836,151,882,151"/>
+<area shape="rect" id="Node000012" href="$group__PublicMemberFunctions.html#gacab2eb7cb8bc4a0337c9e257b5933688" title=" " alt="" coords="313,135,541,175"/>
+<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="619,158,541,158,541,153,619,153"/>
+<area shape="rect" id="Node000014" href="$group__PublicMemberFunctions.html#ga3f966d72311ebdfc66dfcf77aaf41684" title="Creates an IoT based AWS credential provider object using libWebSockets." alt="" coords="621,203,847,228"/>
+<area shape="poly" id="edge13_Node000013_Node000014" title=" " alt="" coords="882,218,847,218,847,213,882,213"/>
+<area shape="poly" id="edge15_Node000015_Node000004" title=" " alt="" coords="1480,122,1394,122,1394,117,1480,117"/>
+<area shape="rect" id="Node000017" href="$CurlApiCallbacks_8c.html#ae625942029492c5222a76c99a93692d2" title=" " alt="" coords="1199,384,1387,409"/>
+<area shape="poly" id="edge17_Node000016_Node000017" title=" " alt="" coords="1479,416,1387,408,1388,402,1479,411"/>
+<area shape="rect" id="Node000018" href="$CurlApiCallbacks_8c.html#a130e64adf86a4615c3e31fe7044c014a" title=" " alt="" coords="923,315,1096,340"/>
+<area shape="poly" id="edge18_Node000017_Node000018" title=" " alt="" coords="1227,383,1062,343,1063,337,1228,378"/>
+<area shape="rect" id="Node000019" href="$group__PublicMemberFunctions.html#ga6c195173d4fd6f942260e2b81c0d4e83" title=" " alt="" coords="620,263,848,303"/>
+<area shape="poly" id="edge19_Node000018_Node000019" title=" " alt="" coords="916,315,848,304,849,299,917,310"/>
+<area shape="poly" id="edge25_Node000019_Node000008" title=" " alt="" coords="640,259,618,243,606,227,599,212,593,182,588,153,582,139,570,125,545,106,516,92,518,88,548,102,574,121,586,137,593,152,599,181,604,210,610,225,622,239,643,255"/>
+<area shape="poly" id="edge26_Node000019_Node000012" title=" " alt="" coords="650,260,618,243,603,229,594,215,585,202,571,190,540,176,542,171,573,185,589,198,599,212,607,225,622,239,653,256"/>
+<area shape="rect" id="Node000020" href="$CallbacksProvider_8c.html#a020c62e1ff193d474681bef1c94bdcee" title=" " alt="" coords="313,328,541,353"/>
+<area shape="poly" id="edge20_Node000019_Node000020" title=" " alt="" coords="621,309,572,318,503,331,502,325,572,313,620,303"/>
+<area shape="rect" id="Node000021" href="$group__PublicMemberFunctions.html#ga42ffcf860b92e764b2ba56bc5d72fd71" title=" " alt="" coords="313,378,541,418"/>
+<area shape="poly" id="edge21_Node000019_Node000021" title=" " alt="" coords="689,313,635,342,573,369,534,380,532,375,571,363,632,337,687,308"/>
+<area shape="rect" id="Node000022" href="$CallbacksProvider_8c.html#a4888f554a9924ff938cfa522f2ef9ceb" title=" " alt="" coords="281,199,572,239"/>
+<area shape="poly" id="edge22_Node000019_Node000022" title=" " alt="" coords="623,263,523,242,524,237,624,258"/>
+<area shape="rect" id="Node000024" href="$group__PublicMemberFunctions.html#gafcd18610ba9ef3d8a4ce62539ddfc2e9" title=" " alt="" coords="313,263,541,303"/>
+<area shape="poly" id="edge24_Node000019_Node000024" title=" " alt="" coords="606,286,541,286,541,281,606,281"/>
+<area shape="rect" id="Node000023" href="$group__PublicMemberFunctions.html#gabace8323412b6bd8019502f1f7d13c6a" title=" " alt="" coords="5,199,233,239"/>
+<area shape="poly" id="edge23_Node000022_Node000023" title=" " alt="" coords="268,222,233,222,233,217,268,217"/>
+<area shape="rect" id="Node000026" href="$CurlApiCallbacks_8c.html#a04ab4aae7ba1f0b0be9d009beb7d7eb2" title=" " alt="" coords="1192,220,1395,245"/>
+<area shape="poly" id="edge28_Node000025_Node000026" title=" " alt="" coords="1472,227,1395,231,1395,225,1472,222"/>
+<area shape="poly" id="edge29_Node000026_Node000018" title=" " alt="" coords="1226,251,1172,267,1041,317,1039,312,1170,262,1224,246"/>
+<area shape="rect" id="Node000028" href="$CurlApiCallbacks_8c.html#a7f57a0cc68e64ec20ffa294d4e0bd0f5" title=" " alt="" coords="1171,449,1416,475"/>
+<area shape="poly" id="edge31_Node000027_Node000028" title=" " alt="" coords="1450,474,1416,472,1417,467,1450,469"/>
+<area shape="poly" id="edge32_Node000028_Node000018" title=" " alt="" coords="1232,448,1170,424,1089,382,1028,342,1031,338,1092,377,1172,420,1234,443"/>
+<area shape="poly" id="edge35_Node000029_Node000018" title=" " alt="" coords="1489,340,1096,332,1096,327,1489,335"/>
+<area shape="rect" id="Node000031" href="$CurlApiCallbacks_8c.html#a6f353cf547367e9c2114ebd68c6e6044" title=" " alt="" coords="1713,408,1899,433"/>
+<area shape="poly" id="edge37_Node000030_Node000031" title=" " alt="" coords="2018,367,1907,399,1863,410,1862,405,1906,394,2017,362"/>
+<area shape="rect" id="Node000032" href="$CurlApiCallbacks_8c.html#a31ddca30104358dab145d9036d37664c" title=" " alt="" coords="1705,208,1907,233"/>
+<area shape="poly" id="edge39_Node000030_Node000032" title=" " alt="" coords="2031,331,1833,236,1835,231,2033,326"/>
+<area shape="rect" id="Node000033" href="$CurlApiCallbacks_8c.html#a1c7e54151eb16bf3f0649710749d62d4" title=" " alt="" coords="1709,458,1903,498"/>
+<area shape="poly" id="edge41_Node000030_Node000033" title=" " alt="" coords="2043,370,1982,409,1908,448,1877,460,1876,456,1906,444,1979,404,2040,365"/>
+<area shape="rect" id="Node000034" href="$CurlApiCallbacks_8c.html#a27728754fcd86034a116c4e8a5a4e5b8" title=" " alt="" coords="1723,359,1889,384"/>
+<area shape="poly" id="edge43_Node000030_Node000034" title=" " alt="" coords="1981,358,1890,366,1890,361,1981,353"/>
+<area shape="rect" id="Node000035" href="$CurlApiCallbacks_8c.html#a82a5f8a6a272ffefeeb1197ed520cc7d" title=" " alt="" coords="1716,309,1896,335"/>
+<area shape="poly" id="edge45_Node000030_Node000035" title=" " alt="" coords="1981,341,1896,333,1897,328,1981,336"/>
+<area shape="poly" id="edge38_Node000031_Node000016" title=" " alt="" coords="1699,423,1629,423,1629,418,1699,418"/>
+<area shape="poly" id="edge40_Node000032_Node000025" title=" " alt="" coords="1692,223,1636,223,1636,218,1692,218"/>
+<area shape="poly" id="edge42_Node000033_Node000027" title=" " alt="" coords="1695,481,1657,481,1657,475,1695,475"/>
+<area shape="poly" id="edge44_Node000034_Node000029" title=" " alt="" coords="1709,361,1618,349,1619,344,1709,356"/>
+<area shape="poly" id="edge46_Node000035_Node000036" title=" " alt="" coords="1702,311,1625,300,1626,295,1703,305"/>
+<area shape="rect" id="Node000037" href="$CurlApiCallbacks_8c.html#a68d690aafbaab0598ee193006d9189e0" title=" " alt="" coords="1203,276,1384,301"/>
+<area shape="poly" id="edge47_Node000036_Node000037" title=" " alt="" coords="1482,291,1384,291,1384,286,1482,286"/>
+<area shape="poly" id="edge48_Node000037_Node000018" title=" " alt="" coords="1190,305,1097,318,1096,313,1189,300"/>
 </map>

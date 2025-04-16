@@ -1,5 +1,7 @@
 <map id="createIotAuthCallbacks" name="createIotAuthCallbacks">
-<area shape="rect" id="Node000001" title=" " alt="" coords="281,13,455,38"/>
-<area shape="rect" id="Node000002" href="$group__PublicMemberFunctions.html#ga750983add758649af12b8317d8483c3e" title=" " alt="" coords="5,5,233,45"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="268,28,234,28,234,23,268,23"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="604,13,777,38"/>
+<area shape="rect" id="Node000002" href="$group__PublicMemberFunctions.html#gaf3fad24f4d68e3c40180d628d70b29f6" title=" " alt="" coords="281,5,556,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="590,28,556,28,556,23,590,23"/>
+<area shape="rect" id="Node000003" href="$group__PublicMemberFunctions.html#ga750983add758649af12b8317d8483c3e" title=" " alt="" coords="5,5,233,45"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="268,28,233,28,233,23,268,23"/>
 </map>

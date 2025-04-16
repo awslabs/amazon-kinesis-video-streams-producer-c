@@ -1,9 +1,11 @@
 <map id="createCurlIotCredentialProviderWithTime" name="createCurlIotCredentialProviderWithTime">
-<area shape="rect" id="Node000001" title="Creates an IoT based AWS credential provider object with time function which is based on libCurl." alt="" coords="556,23,783,63"/>
-<area shape="rect" id="Node000002" href="$group__PublicMemberFunctions.html#gab4a9b009056672dbeeea6c79bfc6a797" title="Creates an IoT based AWS credential provider object using libCurl." alt="" coords="281,5,508,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="542,34,508,31,509,26,543,29"/>
-<area shape="rect" id="Node000003" href="$group__PublicMemberFunctions.html#ga8a84bd94812cefeab5b52176e5d7401c" title=" " alt="" coords="308,55,481,80"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="543,57,482,62,481,57,542,52"/>
-<area shape="rect" id="Node000004" href="$group__PublicMemberFunctions.html#ga750983add758649af12b8317d8483c3e" title=" " alt="" coords="5,47,233,87"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="294,70,233,70,233,65,294,65"/>
+<area shape="rect" id="Node000001" title="Creates an IoT based AWS credential provider object with time function which is based on libCurl." alt="" coords="879,23,1105,63"/>
+<area shape="rect" id="Node000002" href="$group__PublicMemberFunctions.html#gab4a9b009056672dbeeea6c79bfc6a797" title="Creates an IoT based AWS credential provider object using libCurl." alt="" coords="604,5,831,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="865,34,831,31,831,26,865,29"/>
+<area shape="rect" id="Node000003" href="$group__PublicMemberFunctions.html#ga8a84bd94812cefeab5b52176e5d7401c" title=" " alt="" coords="631,55,804,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="865,57,804,62,804,57,865,52"/>
+<area shape="rect" id="Node000004" href="$group__PublicMemberFunctions.html#gaf3fad24f4d68e3c40180d628d70b29f6" title=" " alt="" coords="281,47,556,87"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="617,70,556,70,556,65,617,65"/>
+<area shape="rect" id="Node000005" href="$group__PublicMemberFunctions.html#ga750983add758649af12b8317d8483c3e" title=" " alt="" coords="5,47,233,87"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="268,70,233,70,233,65,268,65"/>
 </map>

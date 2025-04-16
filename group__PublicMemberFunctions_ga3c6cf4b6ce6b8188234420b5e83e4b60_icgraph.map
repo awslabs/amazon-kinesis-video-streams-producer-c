@@ -1,89 +1,93 @@
 <map id="freeAwsCredentials" name="freeAwsCredentials">
-<area shape="rect" id="Node000001" title="Frees an Aws credentials object." alt="" coords="2143,274,2292,299"/>
-<area shape="rect" id="Node000002" href="$group__PublicMemberFunctions.html#ga91f39f496f456f5cfd1c68924edb3c29" title="Creates an AWS credentials object." alt="" coords="1909,249,2073,274"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="2128,279,2073,273,2074,268,2129,274"/>
-<area shape="rect" id="Node000007" href="$IotCredentialProvider_8c.html#afb64cf9fde7be4db855766ba2854a26b" title=" " alt="" coords="1660,227,1799,253"/>
-<area shape="poly" id="edge52_Node000001_Node000007" title=" " alt="" coords="2179,270,2139,253,2094,240,2016,230,1936,227,1799,234,1799,229,1936,221,2016,224,2095,235,2141,248,2181,265"/>
-<area shape="rect" id="Node000020" href="$FileCredentialProvider_8c.html#a4e590690d8509794518c76f11bd9dcf3" title=" " alt="" coords="1655,350,1803,375"/>
-<area shape="poly" id="edge53_Node000001_Node000020" title=" " alt="" coords="2175,307,2137,321,2095,333,2018,347,1940,356,1803,364,1803,359,1939,351,2017,342,2094,328,2135,316,2174,302"/>
-<area shape="rect" id="Node000026" href="$group__PublicMemberFunctions.html#gae05e583babc3bd248a2cd26572fa8d8e" title="Frees a File based Aws credential provider object." alt="" coords="1633,451,1825,477"/>
-<area shape="poly" id="edge27_Node000001_Node000026" title=" " alt="" coords="2189,310,2146,338,2096,365,2018,395,1938,420,1799,454,1797,449,1936,415,2016,390,2094,360,2144,333,2186,305"/>
-<area shape="rect" id="Node000029" href="$group__PublicMemberFunctions.html#ga30de0853f7b9ceadd1971a45a3d0d12d" title="Frees an IoT based Aws credential provider object." alt="" coords="1118,307,1305,333"/>
-<area shape="poly" id="edge33_Node000001_Node000029" title=" " alt="" coords="2129,292,1305,320,1305,314,2129,287"/>
-<area shape="rect" id="Node000032" href="$group__PublicMemberFunctions.html#ga94a14bb7bbda0b12bd2afb55da9374ce" title="Frees a Static Aws credential provider object." alt="" coords="1888,130,2095,155"/>
-<area shape="poly" id="edge44_Node000001_Node000032" title=" " alt="" coords="2190,267,2146,231,2093,194,2022,158,2025,153,2096,190,2149,227,2193,263"/>
-<area shape="rect" id="Node000003" href="$group__PublicMemberFunctions.html#ga76944b3c59fd2fad4348349a00c1bc49" title="Creates a Static AWS credential provider object." alt="" coords="1619,130,1840,155"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1949,245,1758,158,1760,153,1951,241"/>
-<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="1895,256,1799,248,1799,243,1896,251"/>
-<area shape="poly" id="edge20_Node000002_Node000020" title=" " alt="" coords="1946,281,1764,352,1762,347,1944,276"/>
-<area shape="rect" id="Node000004" href="$group__PublicMemberFunctions.html#ga69ee401a3d516acf3f43454570007b6e" title=" " alt="" coords="1115,55,1308,81"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="1619,131,1362,95,1290,83,1290,78,1363,89,1620,125"/>
-<area shape="rect" id="Node000005" href="$CallbacksProvider_8c.html#a020c62e1ff193d474681bef1c94bdcee" title=" " alt="" coords="832,94,1060,119"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="1111,85,1034,96,1033,91,1110,80"/>
-<area shape="rect" id="Node000006" href="$group__PublicMemberFunctions.html#gabace8323412b6bd8019502f1f7d13c6a" title=" " alt="" coords="832,11,1060,51"/>
-<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="1107,56,1060,49,1060,44,1108,51"/>
-<area shape="rect" id="Node000008" href="$IotCredentialProvider_8c.html#aa0846e897b84d5ba30eae8d93938f58f" title=" " alt="" coords="1409,227,1525,253"/>
-<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="1646,243,1525,243,1525,237,1646,237"/>
-<area shape="rect" id="Node000009" href="$IotCredentialProvider_8c.html#aa723d7931db2d162faeafea647dec5a6" title=" " alt="" coords="845,200,1047,240"/>
-<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="1394,240,1047,226,1047,221,1395,235"/>
-<area shape="rect" id="Node000019" href="$IotCredentialProvider_8c.html#a1fc8c2f583060ffb94d647bd1116a7df" title=" " alt="" coords="1144,258,1279,283"/>
-<area shape="poly" id="edge18_Node000008_Node000019" title=" " alt="" coords="1395,251,1279,265,1279,260,1395,246"/>
-<area shape="rect" id="Node000010" href="$group__PublicMemberFunctions.html#ga614ff0bb778c3c1fb27e66d4429327fa" title="Creates an IoT based AWS credential provider object with time function which is based on libCurl." alt="" coords="557,136,783,176"/>
-<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="845,199,756,179,757,173,846,194"/>
-<area shape="rect" id="Node000014" href="$group__PublicMemberFunctions.html#gacc88aa81762b337b7156cb587abb5dfe" title="Creates an IoT based AWS credential provider object with time function which is based on libCurl." alt="" coords="557,200,783,240"/>
-<area shape="poly" id="edge13_Node000009_Node000014" title=" " alt="" coords="831,223,784,223,784,217,831,217"/>
-<area shape="rect" id="Node000017" href="$group__PublicMemberFunctions.html#gae28f29d61cd81a083bd475601ace42e8" title="Creates an IoT based AWS credential provider object with time function which is based on libWebSocket..." alt="" coords="557,72,783,112"/>
-<area shape="poly" id="edge16_Node000009_Node000017" title=" " alt="" coords="904,194,848,159,783,126,751,114,753,109,785,121,850,155,906,190"/>
-<area shape="rect" id="Node000011" href="$group__PublicMemberFunctions.html#gab4a9b009056672dbeeea6c79bfc6a797" title="Creates an IoT based AWS credential provider object using libCurl." alt="" coords="281,143,508,169"/>
-<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="543,159,508,159,508,153,543,153"/>
-<area shape="rect" id="Node000012" href="$group__PublicMemberFunctions.html#ga8a84bd94812cefeab5b52176e5d7401c" title=" " alt="" coords="308,353,481,378"/>
-<area shape="poly" id="edge11_Node000010_Node000012" title=" " alt="" coords="562,186,558,190,545,206,538,223,534,257,531,292,524,311,510,328,489,344,465,355,463,350,486,340,506,325,519,308,526,291,529,257,532,221,540,203,554,186,559,182"/>
-<area shape="rect" id="Node000013" href="$group__PublicMemberFunctions.html#ga750983add758649af12b8317d8483c3e" title=" " alt="" coords="5,391,233,431"/>
-<area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="304,383,234,394,233,389,303,378"/>
-<area shape="rect" id="Node000015" href="$group__PublicMemberFunctions.html#ga4235d1df60b4f123b7b55570f78f1087" title=" " alt="" coords="293,275,496,315"/>
-<area shape="poly" id="edge14_Node000014_Node000015" title=" " alt="" coords="583,246,470,277,469,272,582,241"/>
-<area shape="rect" id="Node000016" href="$group__PublicMemberFunctions.html#gacab2eb7cb8bc4a0337c9e257b5933688" title=" " alt="" coords="5,292,233,332"/>
-<area shape="poly" id="edge15_Node000015_Node000016" title=" " alt="" coords="279,304,234,307,234,302,279,299"/>
-<area shape="rect" id="Node000018" href="$group__PublicMemberFunctions.html#ga3f966d72311ebdfc66dfcf77aaf41684" title="Creates an IoT based AWS credential provider object using libWebSockets." alt="" coords="281,79,508,105"/>
-<area shape="poly" id="edge17_Node000017_Node000018" title=" " alt="" coords="543,95,508,95,508,89,543,89"/>
-<area shape="poly" id="edge19_Node000019_Node000009" title=" " alt="" coords="1130,258,1047,242,1048,237,1131,253"/>
-<area shape="rect" id="Node000021" href="$group__PublicMemberFunctions.html#ga8fb574caec49fe52d30b3104578ac33b" title="Creates a File based AWS credential provider object." alt="" coords="1108,421,1315,461"/>
-<area shape="poly" id="edge21_Node000020_Node000021" title=" " alt="" coords="1642,379,1571,391,1315,429,1315,424,1570,385,1641,374"/>
-<area shape="rect" id="Node000025" href="$FileCredentialProvider_8c.html#a0779e047c0dca4a0ddc7353192990d23" title=" " alt="" coords="1397,350,1537,375"/>
-<area shape="poly" id="edge25_Node000020_Node000025" title=" " alt="" coords="1642,365,1537,365,1537,360,1642,360"/>
-<area shape="rect" id="Node000022" href="$group__PublicMemberFunctions.html#ga5559131631ed15d509483f06e87164e4" title=" " alt="" coords="857,518,1035,543"/>
-<area shape="poly" id="edge22_Node000021_Node000022" title=" " alt="" coords="1139,468,985,520,984,515,1137,463"/>
-<area shape="rect" id="Node000024" href="$group__PublicMemberFunctions.html#ga13aa89a1f31bc9eec655117c30bcf0df" title="Creates a File based AWS credential provider object." alt="" coords="843,429,1049,454"/>
-<area shape="poly" id="edge24_Node000021_Node000024" title=" " alt="" coords="1094,444,1049,444,1049,439,1094,439"/>
-<area shape="rect" id="Node000023" href="$group__PublicMemberFunctions.html#gafcd18610ba9ef3d8a4ce62539ddfc2e9" title=" " alt="" coords="556,517,784,557"/>
-<area shape="poly" id="edge23_Node000022_Node000023" title=" " alt="" coords="843,536,784,537,784,532,843,530"/>
-<area shape="poly" id="edge26_Node000025_Node000021" title=" " alt="" coords="1412,382,1278,424,1276,419,1411,377"/>
-<area shape="poly" id="edge28_Node000026_Node000021" title=" " alt="" coords="1619,462,1315,448,1315,443,1619,456"/>
-<area shape="rect" id="Node000027" href="$group__PublicMemberFunctions.html#ga0e672827d31267d2d80c4cd44f9b5953" title=" " alt="" coords="1385,502,1549,527"/>
-<area shape="poly" id="edge29_Node000026_Node000027" title=" " alt="" coords="1650,482,1534,504,1533,499,1649,477"/>
-<area shape="poly" id="edge30_Node000027_Node000022" title=" " alt="" coords="1371,520,1036,531,1035,525,1371,515"/>
-<area shape="rect" id="Node000028" href="$FileAuthCallbacks_8c.html#a83c00fa1949700679507728344fdb1fe" title=" " alt="" coords="1114,543,1309,569"/>
-<area shape="poly" id="edge31_Node000027_Node000028" title=" " alt="" coords="1375,532,1291,546,1290,541,1374,527"/>
-<area shape="poly" id="edge32_Node000028_Node000022" title=" " alt="" coords="1100,548,1035,542,1036,536,1101,543"/>
-<area shape="poly" id="edge34_Node000029_Node000009" title=" " alt="" coords="1133,306,1107,298,1040,271,983,242,985,238,1043,266,1109,293,1134,301"/>
-<area shape="rect" id="Node000030" href="$group__PublicMemberFunctions.html#gaefb55592d3e82672a97d95005e9510ea" title=" " alt="" coords="867,366,1025,391"/>
-<area shape="poly" id="edge35_Node000029_Node000030" title=" " alt="" coords="1140,338,1005,368,1004,363,1139,333"/>
-<area shape="poly" id="edge39_Node000030_Node000012" title=" " alt="" coords="853,379,481,370,481,365,853,374"/>
-<area shape="poly" id="edge37_Node000030_Node000013" title=" " alt="" coords="888,398,833,420,810,436,800,444,785,450,705,468,623,478,540,480,459,476,310,457,195,433,196,428,311,452,459,471,540,474,622,472,704,463,783,445,797,439,807,432,831,415,886,393"/>
-<area shape="poly" id="edge40_Node000030_Node000015" title=" " alt="" coords="911,361,853,331,783,306,709,294,634,288,496,289,496,283,634,282,710,288,785,301,855,326,914,356"/>
-<area shape="poly" id="edge38_Node000030_Node000016" title=" " alt="" coords="859,396,743,410,598,419,519,420,439,416,359,408,281,393,244,382,209,367,150,334,152,330,211,362,246,377,282,388,359,402,439,411,519,414,598,414,742,405,858,391"/>
-<area shape="poly" id="edge36_Node000030_Node000023" title=" " alt="" coords="871,398,834,419,818,439,811,459,803,480,786,501,754,520,751,515,782,497,798,477,805,457,813,436,830,415,868,394"/>
-<area shape="rect" id="Node000031" href="$IotAuthCallback_8c.html#a00b2b8c4aa2fc9deaa8ceec2dce32c06" title=" " alt="" coords="576,315,764,341"/>
-<area shape="poly" id="edge41_Node000030_Node000031" title=" " alt="" coords="862,366,739,343,740,338,863,361"/>
-<area shape="poly" id="edge42_Node000031_Node000012" title=" " alt="" coords="563,345,482,356,481,351,562,340"/>
-<area shape="poly" id="edge43_Node000031_Node000015" title=" " alt="" coords="562,318,496,309,497,304,563,312"/>
-<area shape="poly" id="edge45_Node000032_Node000003" title=" " alt="" coords="1874,145,1840,145,1840,140,1874,140"/>
-<area shape="rect" id="Node000033" href="$group__PublicMemberFunctions.html#ga5d6efb4bcce7b45136d21dd7c21b05d3" title=" " alt="" coords="1640,55,1819,81"/>
-<area shape="poly" id="edge46_Node000032_Node000033" title=" " alt="" coords="1932,129,1774,83,1775,78,1933,123"/>
-<area shape="poly" id="edge49_Node000033_Node000004" title=" " alt="" coords="1650,56,1570,45,1467,40,1363,45,1274,58,1273,53,1362,40,1467,34,1571,40,1651,50"/>
-<area shape="poly" id="edge47_Node000033_Node000005" title=" " alt="" coords="1644,85,1571,95,1434,104,1296,109,1060,111,1060,106,1296,104,1433,98,1570,89,1644,80"/>
-<area shape="poly" id="edge48_Node000033_Node000006" title=" " alt="" coords="1681,53,1628,36,1570,24,1434,11,1296,9,1168,13,1060,21,1060,16,1168,8,1296,3,1434,6,1571,19,1630,31,1683,48"/>
-<area shape="rect" id="Node000034" href="$StaticAuthCallbacks_8c.html#a6ed8933ffce03b0b35f1a6fc5afaa943" title=" " alt="" coords="1363,55,1571,81"/>
-<area shape="poly" id="edge50_Node000033_Node000034" title=" " alt="" coords="1626,71,1571,71,1571,65,1626,65"/>
-<area shape="poly" id="edge51_Node000034_Node000004" title=" " alt="" coords="1349,71,1308,71,1308,65,1349,65"/>
+<area shape="rect" id="Node000001" title="Frees an Aws credentials object." alt="" coords="2528,311,2677,336"/>
+<area shape="rect" id="Node000002" href="$group__PublicMemberFunctions.html#ga91f39f496f456f5cfd1c68924edb3c29" title="Creates an AWS credentials object." alt="" coords="2295,285,2459,311"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="2514,316,2459,310,2459,305,2514,311"/>
+<area shape="rect" id="Node000008" href="$IotCredentialProvider_8c.html#afb64cf9fde7be4db855766ba2854a26b" title=" " alt="" coords="2045,273,2184,299"/>
+<area shape="poly" id="edge54_Node000001_Node000008" title=" " alt="" coords="2565,307,2525,289,2479,275,2401,265,2322,264,2247,269,2185,277,2184,271,2247,264,2322,259,2401,260,2481,270,2527,284,2567,302"/>
+<area shape="rect" id="Node000022" href="$FileCredentialProvider_8c.html#a4e590690d8509794518c76f11bd9dcf3" title=" " alt="" coords="2041,387,2189,412"/>
+<area shape="poly" id="edge55_Node000001_Node000022" title=" " alt="" coords="2561,344,2522,358,2481,370,2403,384,2325,393,2189,401,2189,396,2325,388,2403,379,2479,365,2521,353,2559,339"/>
+<area shape="rect" id="Node000028" href="$group__PublicMemberFunctions.html#gae05e583babc3bd248a2cd26572fa8d8e" title="Frees a File based Aws credential provider object." alt="" coords="2019,488,2211,513"/>
+<area shape="poly" id="edge29_Node000001_Node000028" title=" " alt="" coords="2575,346,2532,375,2481,402,2403,432,2323,457,2184,491,2183,485,2322,452,2401,427,2479,397,2529,370,2572,342"/>
+<area shape="rect" id="Node000031" href="$group__PublicMemberFunctions.html#ga30de0853f7b9ceadd1971a45a3d0d12d" title="Frees an IoT based Aws credential provider object." alt="" coords="1503,336,1690,361"/>
+<area shape="poly" id="edge35_Node000001_Node000031" title=" " alt="" coords="2514,328,1690,349,1690,344,2514,323"/>
+<area shape="rect" id="Node000034" href="$group__PublicMemberFunctions.html#ga94a14bb7bbda0b12bd2afb55da9374ce" title="Frees a Static Aws credential provider object." alt="" coords="2273,184,2480,209"/>
+<area shape="poly" id="edge46_Node000001_Node000034" title=" " alt="" coords="2576,303,2533,266,2479,231,2430,212,2432,207,2481,226,2536,262,2580,299"/>
+<area shape="rect" id="Node000003" href="$group__PublicMemberFunctions.html#ga76944b3c59fd2fad4348349a00c1bc49" title="Creates a Static AWS credential provider object." alt="" coords="2004,197,2225,223"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="2324,283,2152,225,2154,220,2326,278"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="2281,296,2184,292,2184,286,2281,291"/>
+<area shape="poly" id="edge22_Node000002_Node000022" title=" " alt="" coords="2331,318,2150,389,2148,384,2329,313"/>
+<area shape="rect" id="Node000004" href="$group__PublicMemberFunctions.html#ga69ee401a3d516acf3f43454570007b6e" title=" " alt="" coords="1500,84,1693,109"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="2037,197,1747,135,1649,112,1650,107,1749,130,2038,192"/>
+<area shape="rect" id="Node000005" href="$CallbacksProvider_8c.html#a020c62e1ff193d474681bef1c94bdcee" title=" " alt="" coords="1186,5,1414,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="1534,83,1348,33,1349,28,1535,78"/>
+<area shape="rect" id="Node000006" href="$CallbacksProvider_8c.html#a4888f554a9924ff938cfa522f2ef9ceb" title=" " alt="" coords="1155,77,1445,117"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="1486,99,1445,99,1445,94,1486,94"/>
+<area shape="rect" id="Node000007" href="$group__PublicMemberFunctions.html#gabace8323412b6bd8019502f1f7d13c6a" title=" " alt="" coords="879,57,1107,97"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="1141,89,1107,87,1107,81,1141,84"/>
+<area shape="rect" id="Node000009" href="$IotCredentialProvider_8c.html#aa0846e897b84d5ba30eae8d93938f58f" title=" " alt="" coords="1794,273,1910,299"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="2031,289,1910,289,1910,283,2031,283"/>
+<area shape="rect" id="Node000010" href="$IotCredentialProvider_8c.html#aa723d7931db2d162faeafea647dec5a6" title=" " alt="" coords="1199,242,1401,282"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="1780,282,1700,277,1401,266,1401,261,1700,271,1781,277"/>
+<area shape="rect" id="Node000021" href="$IotCredentialProvider_8c.html#a1fc8c2f583060ffb94d647bd1116a7df" title=" " alt="" coords="1529,287,1664,312"/>
+<area shape="poly" id="edge20_Node000009_Node000021" title=" " alt="" coords="1781,292,1664,298,1664,293,1780,287"/>
+<area shape="rect" id="Node000011" href="$group__PublicMemberFunctions.html#ga614ff0bb778c3c1fb27e66d4429327fa" title="Creates an IoT based AWS credential provider object with time function which is based on libCurl." alt="" coords="879,185,1106,225"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="1186,243,1100,227,1101,222,1187,238"/>
+<area shape="rect" id="Node000016" href="$group__PublicMemberFunctions.html#gacc88aa81762b337b7156cb587abb5dfe" title="Creates an IoT based AWS credential provider object with time function which is based on libCurl." alt="" coords="879,249,1106,289"/>
+<area shape="poly" id="edge15_Node000010_Node000016" title=" " alt="" coords="1186,267,1106,269,1106,264,1186,262"/>
+<area shape="rect" id="Node000019" href="$group__PublicMemberFunctions.html#gae28f29d61cd81a083bd475601ace42e8" title="Creates an IoT based AWS credential provider object with time function which is based on libWebSocket..." alt="" coords="879,121,1106,161"/>
+<area shape="poly" id="edge18_Node000010_Node000019" title=" " alt="" coords="1247,238,1180,206,1106,175,1070,163,1072,158,1108,170,1182,201,1249,233"/>
+<area shape="rect" id="Node000012" href="$group__PublicMemberFunctions.html#gab4a9b009056672dbeeea6c79bfc6a797" title="Creates an IoT based AWS credential provider object using libCurl." alt="" coords="604,192,831,217"/>
+<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="866,207,831,207,831,202,866,202"/>
+<area shape="rect" id="Node000013" href="$group__PublicMemberFunctions.html#ga8a84bd94812cefeab5b52176e5d7401c" title=" " alt="" coords="631,364,804,389"/>
+<area shape="poly" id="edge12_Node000011_Node000013" title=" " alt="" coords="894,232,880,239,833,270,791,305,732,366,728,362,787,301,830,265,877,234,892,227"/>
+<area shape="rect" id="Node000014" href="$group__PublicMemberFunctions.html#gaf3fad24f4d68e3c40180d628d70b29f6" title=" " alt="" coords="281,341,556,381"/>
+<area shape="poly" id="edge13_Node000013_Node000014" title=" " alt="" coords="616,374,556,371,556,365,617,369"/>
+<area shape="rect" id="Node000015" href="$group__PublicMemberFunctions.html#ga750983add758649af12b8317d8483c3e" title=" " alt="" coords="5,341,233,381"/>
+<area shape="poly" id="edge14_Node000014_Node000015" title=" " alt="" coords="268,363,233,363,233,358,268,358"/>
+<area shape="rect" id="Node000017" href="$group__PublicMemberFunctions.html#ga4235d1df60b4f123b7b55570f78f1087" title=" " alt="" coords="616,433,819,473"/>
+<area shape="poly" id="edge16_Node000016_Node000017" title=" " alt="" coords="963,300,904,351,832,404,772,435,770,430,829,400,901,347,959,296"/>
+<area shape="rect" id="Node000018" href="$group__PublicMemberFunctions.html#gacab2eb7cb8bc4a0337c9e257b5933688" title=" " alt="" coords="305,449,533,489"/>
+<area shape="poly" id="edge17_Node000017_Node000018" title=" " alt="" coords="602,461,533,465,533,460,602,456"/>
+<area shape="rect" id="Node000020" href="$group__PublicMemberFunctions.html#ga3f966d72311ebdfc66dfcf77aaf41684" title="Creates an IoT based AWS credential provider object using libWebSockets." alt="" coords="604,128,831,153"/>
+<area shape="poly" id="edge19_Node000019_Node000020" title=" " alt="" coords="866,143,831,143,831,138,866,138"/>
+<area shape="poly" id="edge21_Node000021_Node000010" title=" " alt="" coords="1515,292,1401,277,1401,272,1516,287"/>
+<area shape="rect" id="Node000023" href="$group__PublicMemberFunctions.html#ga8fb574caec49fe52d30b3104578ac33b" title="Creates a File based AWS credential provider object." alt="" coords="1493,462,1700,502"/>
+<area shape="poly" id="edge23_Node000022_Node000023" title=" " alt="" coords="2028,416,1956,427,1701,468,1700,463,1956,422,2027,411"/>
+<area shape="rect" id="Node000027" href="$FileCredentialProvider_8c.html#a0779e047c0dca4a0ddc7353192990d23" title=" " alt="" coords="1782,387,1922,412"/>
+<area shape="poly" id="edge27_Node000022_Node000027" title=" " alt="" coords="2027,402,1922,402,1922,397,2027,397"/>
+<area shape="rect" id="Node000024" href="$group__PublicMemberFunctions.html#ga5559131631ed15d509483f06e87164e4" title=" " alt="" coords="1211,564,1389,589"/>
+<area shape="poly" id="edge24_Node000023_Node000024" title=" " alt="" coords="1521,509,1342,566,1340,561,1519,504"/>
+<area shape="rect" id="Node000026" href="$group__PublicMemberFunctions.html#ga13aa89a1f31bc9eec655117c30bcf0df" title="Creates a File based AWS credential provider object." alt="" coords="1197,469,1403,495"/>
+<area shape="poly" id="edge26_Node000023_Node000026" title=" " alt="" coords="1480,485,1404,485,1404,479,1480,479"/>
+<area shape="rect" id="Node000025" href="$group__PublicMemberFunctions.html#gafcd18610ba9ef3d8a4ce62539ddfc2e9" title=" " alt="" coords="879,566,1107,606"/>
+<area shape="poly" id="edge25_Node000024_Node000025" title=" " alt="" coords="1197,582,1107,585,1107,580,1197,577"/>
+<area shape="poly" id="edge28_Node000027_Node000023" title=" " alt="" coords="1797,419,1749,434,1657,464,1655,459,1747,429,1796,413"/>
+<area shape="poly" id="edge30_Node000028_Node000023" title=" " alt="" coords="2005,499,1700,488,1700,483,2005,494"/>
+<area shape="rect" id="Node000029" href="$group__PublicMemberFunctions.html#ga0e672827d31267d2d80c4cd44f9b5953" title=" " alt="" coords="1770,539,1934,564"/>
+<area shape="poly" id="edge31_Node000028_Node000029" title=" " alt="" coords="2035,519,1919,541,1918,536,2034,513"/>
+<area shape="poly" id="edge32_Node000029_Node000024" title=" " alt="" coords="1756,558,1390,575,1389,570,1756,553"/>
+<area shape="rect" id="Node000030" href="$FileAuthCallbacks_8c.html#a83c00fa1949700679507728344fdb1fe" title=" " alt="" coords="1499,581,1694,607"/>
+<area shape="poly" id="edge33_Node000029_Node000030" title=" " alt="" coords="1762,569,1674,584,1673,579,1762,564"/>
+<area shape="poly" id="edge34_Node000030_Node000024" title=" " alt="" coords="1485,590,1389,585,1390,579,1486,585"/>
+<area shape="poly" id="edge36_Node000031_Node000010" title=" " alt="" coords="1524,335,1493,327,1358,285,1359,280,1494,322,1525,330"/>
+<area shape="rect" id="Node000032" href="$group__PublicMemberFunctions.html#gaefb55592d3e82672a97d95005e9510ea" title=" " alt="" coords="1221,415,1379,440"/>
+<area shape="poly" id="edge37_Node000031_Node000032" title=" " alt="" coords="1535,368,1349,417,1348,412,1534,362"/>
+<area shape="poly" id="edge41_Node000032_Node000013" title=" " alt="" coords="1207,417,1106,406,804,384,805,379,1107,401,1207,412"/>
+<area shape="poly" id="edge39_Node000032_Node000014" title=" " alt="" coords="1246,413,1180,394,1106,378,960,359,813,351,674,350,556,354,556,349,674,345,813,346,961,354,1107,373,1181,389,1248,408"/>
+<area shape="poly" id="edge42_Node000032_Node000017" title=" " alt="" coords="1207,445,1107,455,956,460,819,459,819,454,956,455,1106,450,1207,439"/>
+<area shape="poly" id="edge40_Node000032_Node000018" title=" " alt="" coords="1224,445,1107,465,966,482,856,491,746,492,604,487,533,483,533,477,604,482,746,487,856,485,966,477,1106,459,1223,440"/>
+<area shape="poly" id="edge38_Node000032_Node000025" title=" " alt="" coords="1208,437,1181,446,1156,460,1139,481,1133,503,1126,526,1108,549,1078,568,1075,564,1105,545,1121,524,1127,501,1134,478,1153,456,1178,441,1206,432"/>
+<area shape="rect" id="Node000033" href="$IotAuthCallback_8c.html#a00b2b8c4aa2fc9deaa8ceec2dce32c06" title=" " alt="" coords="899,415,1087,440"/>
+<area shape="poly" id="edge43_Node000032_Node000033" title=" " alt="" coords="1207,430,1087,430,1087,425,1207,425"/>
+<area shape="poly" id="edge44_Node000033_Node000013" title=" " alt="" coords="909,415,787,392,788,387,910,409"/>
+<area shape="poly" id="edge45_Node000033_Node000017" title=" " alt="" coords="885,440,819,446,819,441,885,435"/>
+<area shape="poly" id="edge47_Node000034_Node000003" title=" " alt="" coords="2260,205,2226,207,2226,202,2259,200"/>
+<area shape="rect" id="Node000035" href="$group__PublicMemberFunctions.html#ga5d6efb4bcce7b45136d21dd7c21b05d3" title=" " alt="" coords="2025,96,2204,121"/>
+<area shape="poly" id="edge48_Node000034_Node000035" title=" " alt="" coords="2324,182,2152,124,2154,119,2326,177"/>
+<area shape="poly" id="edge51_Node000035_Node000004" title=" " alt="" coords="2036,96,1956,86,1852,82,1748,86,1694,90,1693,84,1748,81,1852,76,1956,81,2036,91"/>
+<area shape="poly" id="edge49_Node000035_Node000005" title=" " alt="" coords="2063,94,2012,79,1956,66,1810,45,1664,32,1414,21,1415,16,1664,27,1811,40,1956,61,2013,74,2065,89"/>
+<area shape="poly" id="edge50_Node000035_Node000006" title=" " alt="" coords="2032,126,1956,135,1826,142,1724,142,1493,123,1445,119,1446,113,1494,118,1725,136,1826,137,1956,130,2032,121"/>
+<area shape="rect" id="Node000036" href="$StaticAuthCallbacks_8c.html#a6ed8933ffce03b0b35f1a6fc5afaa943" title=" " alt="" coords="1748,96,1956,121"/>
+<area shape="poly" id="edge52_Node000035_Node000036" title=" " alt="" coords="2012,111,1956,111,1956,106,2012,106"/>
+<area shape="poly" id="edge53_Node000036_Node000004" title=" " alt="" coords="1734,106,1693,104,1693,99,1734,100"/>
 </map>
