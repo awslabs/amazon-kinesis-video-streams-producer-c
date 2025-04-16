@@ -224,7 +224,7 @@ INT32 main(INT32 argc, CHAR* argv[])
 #ifdef IOT_CORE_ENABLE_CREDENTIALS
     CHK_STATUS(createDefaultCallbacksProviderWithIotCertificateAndEndpointOverride(pIotCoreCredentialEndpoint, pIotCoreCert, pIotCorePrivateKey,
                                                                                    cacertPath, pIotCoreRoleAlias, pIotCoreThingName, region, NULL,
-                                                                                   NULL, GETENV(CONTROL_PLANE_URI_ENV_VAR), &pClientCallbacks));
+                                                                                   NULL, endpointOverride, &pClientCallbacks));
 #else
     CHK_STATUS(createDefaultCallbacksProviderWithAwsCredentialsAndEndpointOverride(accessKey, secretKey, sessionToken, MAX_UINT64, region, cacertPath,
                                                                                    NULL, NULL, endpointOverride, &pClientCallbacks));
