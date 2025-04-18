@@ -83,7 +83,7 @@ jobs:
           set -x
           file_path="./dependency/libkvspic/kvspic-src/src/client/src/StreamEvent.c"
           string_to_replace='pKinesisVideoStream->streamingAuthInfo.expiration = MIN(expiration, currentTime + MAX_ENFORCED_TOKEN_EXPIRATION_DURATION);'
-          string_to_replace_with='pKinesisVideoStream->streamingAuthInfo.expiration = MIN(expiration, currentTime + MIN_STREAMING_TOKEN_EXPIRATION_DURATION);'
+          string_to_replace_with='pKinesisVideoStream->streamingAuthInfo.expiration = MIN(  expiration, currentTime + MIN_STREAMING_TOKEN_EXPIRATION_DURATION);'
 
           set +e
           echo "Checking if the pattern exists before replacement:"
@@ -273,23 +273,27 @@ jobs:
           set -o pipefail
           set +e
 
-          echo "Running Valgrind on ${{ matrix.sample-executable.name }}"
           mkdir -p valgrind_logs
-          
+
+          LOG_FILE="valgrind_logs/${{ matrix.sample-executable.name }}.log"
+
           echo "::group::Application logs for ${{ matrix.sample-executable.name }}"
           valgrind \
             --leak-check=full \
             --show-leak-kinds=all \
             --track-origins=yes \
             --error-exitcode=1 \
-            --log-file=valgrind_logs/${{ matrix.sample-executable.name }}.log \
+            --log-file="$LOG_FILE" \
             ./${{ matrix.sample-executable.name }} "$KVS_STREAM_NAME" ${{ matrix.sample-executable.args }}
-          valgrind_exit_code=$?
           echo "::endgroup::"
 
           echo "========== Valgrind Output =========="
-          cat valgrind_logs/${{ matrix.sample-executable.name }}.log
+          cat "$LOG_FILE"
           echo "====================================="
 
-          exit "$valgrind_exit_code"
+          if grep -qE "definitely lost: [^0]" "$LOG_FILE" || grep -qE "indirectly lost: [^0]" "$LOG_FILE"; then
+            echo "❌ Valgrind found something definitely or indirectly lost"
+            exit 1
+          fi
+
         shell: bash
