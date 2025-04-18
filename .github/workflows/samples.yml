@@ -275,14 +275,17 @@ jobs:
 
           echo "Running Valgrind on ${{ matrix.sample-executable.name }}"
           mkdir -p valgrind_logs
+          
+          echo "::group::Application logs for ${{ matrix.sample-executable.name }}"
           valgrind \
             --leak-check=full \
             --show-leak-kinds=all \
             --track-origins=yes \
             --error-exitcode=1 \
-            --log-file=valgrind_logs/valgrind_${{ matrix.sample-executable.name }}.log \
+            --log-file=valgrind_logs/${{ matrix.sample-executable.name }}.log \
             ./${{ matrix.sample-executable.name }} "$KVS_STREAM_NAME" ${{ matrix.sample-executable.args }}
           valgrind_exit_code=$?
+          echo "::endgroup::"
 
           echo "========== Valgrind Output =========="
           cat valgrind_logs/${{ matrix.sample-executable.name }}.log
