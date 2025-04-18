@@ -63,7 +63,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           apt-get update
-          apt-get install -y git cmake build-essential pkg-config libssl-dev libcurl4-openssl-dev mkvtoolnix curl unzip
+          apt-get install -y git cmake build-essential pkg-config libssl-dev libcurl4-openssl-dev mkvtoolnix curl unzip valgrind
 
       - name: Build repository
         run: |
