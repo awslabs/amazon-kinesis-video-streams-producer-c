@@ -74,7 +74,7 @@ jobs:
           fi
 
           mkdir build && cd build
-          cmake .. -DBUILD_DEPENDENCIES=OFF
+          cmake .. -DBUILD_DEPENDENCIES=OFF -DCMAKE_BUILD_TYPE=RelWithDebInfo
           make -j$num_procs
 
       - name: Change token rotation to 30s
@@ -265,4 +265,28 @@ jobs:
           done < fragments.txt
 
           exit $failed
+        shell: bash
+      - name: Run Valgrind on ${{ matrix.sample-executable.name }} (Linux)
+        if: runner.os == 'Linux'
+        working-directory: ./build
+        run: |
+          set -o pipefail
+          set +e
+
+          echo "Running Valgrind on ${{ matrix.sample-executable.name }}"
+          mkdir -p valgrind_logs
+          valgrind \
+            --leak-check=full \
+            --show-leak-kinds=all \
+            --track-origins=yes \
+            --error-exitcode=1 \
+            --log-file=valgrind_logs/valgrind_${{ matrix.sample-executable.name }}.log \
+            ./${{ matrix.sample-executable.name }} "$KVS_STREAM_NAME" ${{ matrix.sample-executable.args }}
+          valgrind_exit_code=$?
+
+          echo "========== Valgrind Output =========="
+          cat valgrind_logs/${{ matrix.sample-executable.name }}.log
+          echo "====================================="
+
+          exit "$valgrind_exit_code"
         shell: bash
