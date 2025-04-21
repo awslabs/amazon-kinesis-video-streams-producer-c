@@ -83,7 +83,7 @@ jobs:
           set -x
           file_path="./dependency/libkvspic/kvspic-src/src/client/src/StreamEvent.c"
           string_to_replace='pKinesisVideoStream->streamingAuthInfo.expiration = MIN(expiration, currentTime + MAX_ENFORCED_TOKEN_EXPIRATION_DURATION);'
-          string_to_replace_with='pKinesisVideoStream->streamingAuthInfo.expiration = MIN(  expiration, currentTime + MIN_STREAMING_TOKEN_EXPIRATION_DURATION);'
+          string_to_replace_with='pKinesisVideoStream->streamingAuthInfo.expiration = MIN(expiration, currentTime + MIN_STREAMING_TOKEN_EXPIRATION_DURATION);'
 
           set +e
           echo "Checking if the pattern exists before replacement:"
