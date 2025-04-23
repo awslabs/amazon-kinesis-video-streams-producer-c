@@ -63,7 +63,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           apt-get update
-          apt-get install -y git cmake build-essential pkg-config libssl-dev libcurl4-openssl-dev mkvtoolnix curl unzip
+          apt-get install -y git cmake build-essential pkg-config libssl-dev libcurl4-openssl-dev mkvtoolnix curl unzip valgrind
 
       - name: Build repository
         run: |
@@ -74,7 +74,7 @@ jobs:
           fi
 
           mkdir build && cd build
-          cmake .. -DBUILD_DEPENDENCIES=OFF
+          cmake .. -DBUILD_DEPENDENCIES=OFF -DCMAKE_BUILD_TYPE=RelWithDebInfo
           make -j$num_procs
 
       - name: Change token rotation to 30s
@@ -265,4 +265,35 @@ jobs:
           done < fragments.txt
 
           exit $failed
+        shell: bash
+      - name: Run Valgrind on ${{ matrix.sample-executable.name }} (Linux)
+        if: runner.os == 'Linux'
+        working-directory: ./build
+        run: |
+          set -o pipefail
+          set +e
+
+          mkdir -p valgrind_logs
+
+          LOG_FILE="valgrind_logs/${{ matrix.sample-executable.name }}.log"
+
+          echo "::group::Application logs for ${{ matrix.sample-executable.name }}"
+          valgrind \
+            --leak-check=full \
+            --show-leak-kinds=all \
+            --track-origins=yes \
+            --error-exitcode=1 \
+            --log-file="$LOG_FILE" \
+            ./${{ matrix.sample-executable.name }} "$KVS_STREAM_NAME" ${{ matrix.sample-executable.args }}
+          echo "::endgroup::"
+
+          echo "========== Valgrind Output =========="
+          cat "$LOG_FILE"
+          echo "====================================="
+
+          if grep -qE "definitely lost: [^0]" "$LOG_FILE" || grep -qE "indirectly lost: [^0]" "$LOG_FILE"; then
+            echo "❌ Valgrind found something definitely or indirectly lost"
+            exit 1
+          fi
+
         shell: bash
