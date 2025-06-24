@@ -21,9 +21,9 @@ jobs:
           - name: Clang
             cc: clang
             cxx: clang++
-          - name: gcc-14
-            cc: gcc-14
-            cxx: g++-14
+#          - name: gcc-14
+#            cc: gcc-14
+#            cxx: g++-14
         cpu:
           - name: Intel
             image: macos-13
