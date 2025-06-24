@@ -1,5 +1,7 @@
 name: clang-format-check
 on: [ push ]
+permissions:
+  contents: read
 jobs:
   check-format:
     runs-on: ubuntu-latest
