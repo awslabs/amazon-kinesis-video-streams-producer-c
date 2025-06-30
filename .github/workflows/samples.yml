@@ -1,0 +1,299 @@
+name: Producer C Samples on Mac and Linux
+
+on:
+  push:
+    branches:
+      - develop
+      - master
+  pull_request:
+    branches:
+      - develop
+      - master
+
+jobs:
+  sample-checks:
+    name: ${{ matrix.runner.id }} - ${{ matrix.sample-executable.name }}
+    strategy:
+      matrix:
+        sample-executable:
+          - name: kvsAudioOnlyStreamingSample
+          - name: kvsAudioVideoStreamingSample
+          - name: kvsVideoOnlyOfflineStreamingSample
+          - name: kvsVideoOnlyRealtimeStreamingSample
+          - name: kvsVideoOnlyRealtimeStreamingSample-token-rotation
+            args: h264 120
+
+        runner:
+          - id: macos-latest
+            image: macos-latest
+
+          - id: ubuntu-22.04
+            image: ubuntu-latest
+            docker: public.ecr.aws/ubuntu/ubuntu:22.04_stable
+
+          - id: ubuntu-20.04
+            image: ubuntu-latest
+            docker: public.ecr.aws/ubuntu/ubuntu:20.04_stable
+
+      fail-fast: false
+
+    runs-on: ${{ matrix.runner.image }}
+    container: ${{ matrix.runner.docker || '' }}
+
+    env:
+      AWS_KVS_LOG_LEVEL: 2
+      KVS_DEBUG_DUMP_DATA_FILE_DIR: ./debug_output
+      DEBIAN_FRONTEND: noninteractive
+      KVS_STREAM_NAME: demo-stream-producer-c-${{ matrix.runner.id }}-ci-${{ matrix.sample-executable.name }}
+      EXECUTABLE_TIMEOUT_SECS: 300
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: brew install mkvtoolnix
+
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          apt-get update
+          apt-get install -y git cmake build-essential pkg-config libssl-dev libcurl4-openssl-dev mkvtoolnix curl unzip valgrind
+
+      - name: Build repository
+        run: |
+          if command -v nproc &>/dev/null; then
+            num_procs=$(nproc)
+          else
+            num_procs=$(sysctl -n hw.logicalcpu)
+          fi
+
+          mkdir build && cd build
+          cmake .. -DBUILD_DEPENDENCIES=OFF -DCMAKE_BUILD_TYPE=RelWithDebInfo
+          make -j$num_procs
+
+      - name: Change token rotation to 30s
+        if: ${{ matrix.sample-executable.name == 'kvsVideoOnlyRealtimeStreamingSample-token-rotation' }}
+        run: |
+          set -x
+          file_path="./dependency/libkvspic/kvspic-src/src/client/src/StreamEvent.c"
+          string_to_replace='pKinesisVideoStream->streamingAuthInfo.expiration = MIN(expiration, currentTime + MAX_ENFORCED_TOKEN_EXPIRATION_DURATION);'
+          string_to_replace_with='pKinesisVideoStream->streamingAuthInfo.expiration = MIN(expiration, currentTime + MIN_STREAMING_TOKEN_EXPIRATION_DURATION);'
+
+          set +e
+          echo "Checking if the pattern exists before replacement:"
+          occurrences_of_old=$(grep -F -c "$string_to_replace" "$file_path")
+          if [[ "$occurrences_of_old" -gt 1 ]]; then
+            echo "There is more than 1 of: \`$string_to_replace\` in \`$file_path\`!"
+            exit 1
+          elif [[ "$occurrences_of_old" -eq 0 ]]; then
+            echo "Was not able to find: \`$string_to_replace\` in \`$file_path\`!"
+            exit 1
+          fi
+          occurrences_of_new_before=$(grep -F -c "$string_to_replace_with" "$file_path")
+          echo "Yes"
+          set -e
+
+          # Replace the line, while preserving the indentation
+          awk -v old="$string_to_replace" -v new="$string_to_replace_with" \
+            '{
+              match($0, /^[[:space:]]+/);                       # Find leading spaces
+              leading_spaces = substr($0, RSTART, RLENGTH);     # Extract them
+              trimmed = $0; sub(/^[[:space:]]+/, "", trimmed);  # Trim leading spaces
+              if (trimmed == old) print leading_spaces new;     # Preserve leading spaces
+              else print $0;                                    # Print original lines
+            }' "$file_path" > temp_file
+          mv temp_file "$file_path"
+
+          cat "$file_path" | grep "EXPIRATION"
+
+          set +e
+          echo "Checking if the replacement was successful:"
+          occurrences_of_new_after=$(grep -F -c "$string_to_replace_with" "$file_path")
+          if [[ "$occurrences_of_new_after" -eq "$occurrences_of_new_before" ]]; then
+            echo "Replacement failed - Nothing changed!"
+            exit 1
+          fi
+          echo "Yes"
+          set -e
+
+          cd "$GITHUB_WORKSPACE/build"
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            num_procs=$(nproc)
+          elif [[ "$RUNNER_OS" == "macOS" ]]; then
+            num_procs=$(sysctl -n hw.logicalcpu)
+          else
+            echo "Unsupported runner: $RUNNER_OS"
+            exit 1
+          fi
+          make clean -j"$num_procs"
+          make -j"$num_procs"
+
+          # Rename the file
+          mv kvsVideoOnlyRealtimeStreamingSample kvsVideoOnlyRealtimeStreamingSample-token-rotation
+
+        shell: bash
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-duration-seconds: 900
+
+      - name: Run ${{ matrix.sample-executable.name }}
+        working-directory: ./build
+        run: |
+          set -o pipefail
+          mkdir -p $KVS_DEBUG_DUMP_DATA_FILE_DIR
+
+          set +e # disable exit on error
+          (./${{ matrix.sample-executable.name }} "$KVS_STREAM_NAME" ${{ matrix.sample-executable.args }} | tee output.log) &
+          pid=$!
+
+          (sleep "$EXECUTABLE_TIMEOUT_SECS" && kill -9 $pid 2>/dev/null && echo "${{ matrix.sample-executable.name }} timed out and was killed") &
+          watchdog=$!
+
+          # Wait for the sample executable to finish
+          wait $pid
+          exit_code=$?
+
+          # Cancel the watchdog if the process finished in time
+          kill -9 $watchdog 2>/dev/null
+
+          exit_code=${PIPESTATUS[0]}
+          if [ "$exit_code" -ne 0 ]; then
+            echo "${{ matrix.sample-executable.name }} exited with code: $exit_code"
+            exit 1
+          fi
+        shell: bash
+
+      - name: Save MKV file list
+        working-directory: ./build
+        run: |
+          echo "Debug directory:"
+          ls -lvh $KVS_DEBUG_DUMP_DATA_FILE_DIR
+
+          FILE_LIST=$(find "$KVS_DEBUG_DUMP_DATA_FILE_DIR" -type f -name "*.mkv" -size +0c 2>/dev/null | sort -V)
+          if [ -z "$FILE_LIST" ]; then
+            echo "No MKV files found in $KVS_DEBUG_DUMP_DATA_FILE_DIR"
+            exit 1
+          fi
+          echo "$FILE_LIST" >> mkv_files.txt
+
+      - name: Print MKV dump (non-verbose)
+        working-directory: ./build
+        run: |
+          while read -r mkvFile; do
+            echo "Verifying $mkvFile with mkvinfo:"
+            mkvinfo -v "$mkvFile"
+          done < mkv_files.txt
+
+      - name: Print MKV dump (verbose)
+        working-directory: ./build
+        run: |
+          while read -r mkvFile; do
+            echo "Verifying $mkvFile with mkvinfo:"
+            mkvinfo -v -X "$mkvFile"
+          done < mkv_files.txt
+
+      - name: Install AWS CLI (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          ./aws/install
+
+      - name: Check persisted fragments
+        working-directory: ./build
+        run: |
+          # Extract fragments from the log
+          grep '"EventType":"PERSISTED"' output.log | awk -F'"FragmentNumber":"' '{print $2}' | awk -F'"' '{print $1}' >> fragments.txt 
+          
+          data_endpoint=$(aws kinesisvideo get-data-endpoint --api-name GET_MEDIA_FOR_FRAGMENT_LIST --stream-name "$KVS_STREAM_NAME" --output text --no-cli-pager)
+          
+          while read -r fragment; do
+            echo "Downloading fragment: $fragment"
+
+            # Retry loop for up to 10 seconds
+            for i in {1..10}; do
+            if aws kinesis-video-archived-media get-media-for-fragment-list \
+                "$fragment".webm --stream-name "$KVS_STREAM_NAME" --endpoint-url "$data_endpoint" \
+                --fragments "[\"$fragment\"]" --no-cli-pager; then
+
+              mkvinfo -v "$fragment".webm
+              break
+            else
+              echo "Fragment $fragment not available yet, retrying in 1s... ($i/10)"
+              sleep 1
+            fi
+            done
+          done < fragments.txt
+
+      - name: Validate MKV tags
+        working-directory: ./build
+        if: ${{ matrix.sample-executable.name == 'kvsVideoOnlyRealtimeStreamingSample' || matrix.sample-executable.name == 'kvsVideoOnlyRealtimeStreamingSample-token-rotation' }}
+        run: |
+          set -x
+          set +e  # Allow script to continue even when the script exits with error code 1
+          failed=0
+
+          while read -r mkvFile; do
+            output="$(../scripts/validate-mkv-containing-tags.sh "$mkvFile" 2>&1)"
+            exit_code=$?
+            if [[ $exit_code -ne 0 ]]; then
+              echo "$output" | tee -a $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              failed=1
+            fi
+          done < mkv_files.txt
+
+          while read -r fragment; do
+            output="$(../scripts/validate-mkv-containing-tags.sh "$fragment".webm 2>&1)"
+            exit_code=$?
+            if [[ $exit_code -ne 0 ]]; then
+              echo "$output" | tee -a $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              failed=1
+            fi
+          done < fragments.txt
+
+          exit $failed
+        shell: bash
+      - name: Run Valgrind on ${{ matrix.sample-executable.name }} (Linux)
+        if: runner.os == 'Linux'
+        working-directory: ./build
+        run: |
+          set -o pipefail
+          set +e
+
+          mkdir -p valgrind_logs
+
+          LOG_FILE="valgrind_logs/${{ matrix.sample-executable.name }}.log"
+
+          echo "::group::Application logs for ${{ matrix.sample-executable.name }}"
+          valgrind \
+            --leak-check=full \
+            --show-leak-kinds=all \
+            --track-origins=yes \
+            --error-exitcode=1 \
+            --log-file="$LOG_FILE" \
+            ./${{ matrix.sample-executable.name }} "$KVS_STREAM_NAME" ${{ matrix.sample-executable.args }}
+          echo "::endgroup::"
+
+          echo "========== Valgrind Output =========="
+          cat "$LOG_FILE"
+          echo "====================================="
+
+          if grep -qE "definitely lost: [^0]" "$LOG_FILE" || grep -qE "indirectly lost: [^0]" "$LOG_FILE"; then
+            echo "❌ Valgrind found something definitely or indirectly lost"
+            exit 1
+          fi
+
+        shell: bash

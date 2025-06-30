@@ -104,10 +104,11 @@ INT32 main(INT32 argc, CHAR* argv[])
     CHAR audioCodec[AUDIO_CODEC_NAME_MAX_LENGTH];
     BYTE aacAudioCpd[KVS_AAC_CPD_SIZE_BYTE];
     BYTE alawAudioCpd[KVS_PCM_CPD_SIZE_BYTE];
+    CHAR endpointOverride[MAX_URI_CHAR_LEN];
 
     MEMSET(&data, 0x00, SIZEOF(SampleCustomData));
 
-    STRNCPY(audioCodec, AUDIO_CODEC_NAME_AAC, STRLEN(AUDIO_CODEC_NAME_AAC)); // aac audio by default
+    SNPRINTF(audioCodec, SIZEOF(audioCodec), "%s", AUDIO_CODEC_NAME_AAC); // aac audio by default
 
 #ifdef IOT_CORE_ENABLE_CREDENTIALS
     PCHAR pIotCoreCredentialEndpoint, pIotCoreCert, pIotCorePrivateKey, pIotCoreRoleAlias, pIotCoreThingName;
@@ -132,7 +133,7 @@ INT32 main(INT32 argc, CHAR* argv[])
 
     if (argc >= 5) {
         if (!STRCMP(argv[2], AUDIO_CODEC_NAME_ALAW)) {
-            STRNCPY(audioCodec, AUDIO_CODEC_NAME_ALAW, STRLEN(AUDIO_CODEC_NAME_ALAW));
+            SNPRINTF(audioCodec, SIZEOF(audioCodec), "%s", AUDIO_CODEC_NAME_ALAW);
         }
     }
 
@@ -219,12 +220,14 @@ INT32 main(INT32 argc, CHAR* argv[])
     data.startTime = GETTIME();
     data.firstFrame = TRUE;
 
+    getEndpointOverride(endpointOverride, SIZEOF(endpointOverride));
 #ifdef IOT_CORE_ENABLE_CREDENTIALS
-    CHK_STATUS(createDefaultCallbacksProviderWithIotCertificate(pIotCoreCredentialEndpoint, pIotCoreCert, pIotCorePrivateKey, cacertPath,
-                                                                pIotCoreRoleAlias, pIotCoreThingName, region, NULL, NULL, &pClientCallbacks));
+    CHK_STATUS(createDefaultCallbacksProviderWithIotCertificateAndEndpointOverride(pIotCoreCredentialEndpoint, pIotCoreCert, pIotCorePrivateKey,
+                                                                                   cacertPath, pIotCoreRoleAlias, pIotCoreThingName, region, NULL,
+                                                                                   NULL, endpointOverride, &pClientCallbacks));
 #else
-    CHK_STATUS(createDefaultCallbacksProviderWithAwsCredentials(accessKey, secretKey, sessionToken, MAX_UINT64, region, cacertPath, NULL, NULL,
-                                                                &pClientCallbacks));
+    CHK_STATUS(createDefaultCallbacksProviderWithAwsCredentialsAndEndpointOverride(accessKey, secretKey, sessionToken, MAX_UINT64, region, cacertPath,
+                                                                                   NULL, NULL, endpointOverride, &pClientCallbacks));
 #endif
 
     if (NULL != GETENV(ENABLE_FILE_LOGGING)) {

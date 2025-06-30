@@ -1,15 +1,17 @@
 #include "ProducerTestFixture.h"
 
-namespace com { namespace amazonaws { namespace kinesis { namespace video {
+namespace com {
+namespace amazonaws {
+namespace kinesis {
+namespace video {
 
-class ProducerFunctionalityTest : public ProducerClientTestBase {
-};
+class ProducerFunctionalityTest : public ProducerClientTestBase {};
 
 extern ProducerClientTestBase* gProducerClientTestBase;
 
-#define FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT    30 * HUNDREDS_OF_NANOS_IN_A_SECOND
-#define FUNCTIONALITY_TEST_STOP_STREAM_TIMEOUT      60 * HUNDREDS_OF_NANOS_IN_A_SECOND
-#define FUNCTIONALITY_TEST_STRESS_TEST_ITERATION    3
+#define FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT 30 * HUNDREDS_OF_NANOS_IN_A_SECOND
+#define FUNCTIONALITY_TEST_STOP_STREAM_TIMEOUT   60 * HUNDREDS_OF_NANOS_IN_A_SECOND
+#define FUNCTIONALITY_TEST_STRESS_TEST_ITERATION 3
 
 TEST_F(ProducerFunctionalityTest, start_stopsync_terminate)
 {
@@ -88,7 +90,6 @@ TEST_F(ProducerFunctionalityTest, reset_stream_on_stream_error_before_putFrame)
     EXPECT_LT(0, mFragmentAckReceivedFnCount);
     EXPECT_EQ(totalFragments, mPersistedFragmentCount);
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
-
 }
 
 TEST_F(ProducerFunctionalityTest, reset_stream_on_stream_error_with_frame_in_buffer)
@@ -137,7 +138,6 @@ TEST_F(ProducerFunctionalityTest, reset_stream_on_stream_error_with_frame_in_buf
     // some fragments are gonna be dropped when resetStream is triggered.
     EXPECT_LT(mPersistedFragmentCount, totalFragments);
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
-
 }
 
 TEST_F(ProducerFunctionalityTest, repeated_create_client_create_stream_sync_and_free_everything)
@@ -272,7 +272,6 @@ TEST_F(ProducerFunctionalityTest, create_client_repeated_create_stream_put_frame
     createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
 
     for (i = 0; i < FUNCTIONALITY_TEST_STRESS_TEST_ITERATION; i++) {
-
         EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION, FALSE));
         streamHandle = mStreams[0];
         EXPECT_TRUE(streamHandle != INVALID_STREAM_HANDLE_VALUE);
@@ -306,7 +305,6 @@ TEST_F(ProducerFunctionalityTest, create_caching_endpoint_repeated_create_stream
     createDefaultProducerClient(TRUE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
 
     for (i = 0; i < FUNCTIONALITY_TEST_STRESS_TEST_ITERATION; i++) {
-
         EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION, FALSE));
         streamHandle = mStreams[0];
         EXPECT_TRUE(streamHandle != INVALID_STREAM_HANDLE_VALUE);
@@ -372,7 +370,6 @@ TEST_F(ProducerFunctionalityTest, create_caching_all_repeated_create_stream_put_
     createDefaultProducerClient(API_CALL_CACHE_TYPE_ALL, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
 
     for (i = 0; i < FUNCTIONALITY_TEST_STRESS_TEST_ITERATION; i++) {
-
         EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION, FALSE));
         streamHandle = mStreams[0];
         EXPECT_TRUE(streamHandle != INVALID_STREAM_HANDLE_VALUE);
@@ -439,11 +436,8 @@ TEST_F(ProducerFunctionalityTest, create_client_repeated_create_stream_put_frame
     createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
 
     for (i = 0; i < FUNCTIONALITY_TEST_STRESS_TEST_ITERATION; i++) {
-
         for (j = 0; j < streamCount; j++) {
-            EXPECT_EQ(STATUS_SUCCESS,
-                      createTestStream(j, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION,
-                                       FALSE));
+            EXPECT_EQ(STATUS_SUCCESS, createTestStream(j, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION, FALSE));
             EXPECT_TRUE(mStreams[j] != INVALID_STREAM_HANDLE_VALUE);
         }
 
@@ -464,10 +458,7 @@ TEST_F(ProducerFunctionalityTest, create_client_repeated_create_stream_put_frame
 
         // Spin off threads to stop sync
         for (j = 0; j < streamCount; j++) {
-            EXPECT_EQ(STATUS_SUCCESS, THREAD_CREATE(
-                    &threadIds[j],
-                    stopRoutine,
-                    (PVOID) mStreams[j]));
+            EXPECT_EQ(STATUS_SUCCESS, THREAD_CREATE(&threadIds[j], stopRoutine, (PVOID) mStreams[j]));
         }
 
         // Await for every one of the threads
@@ -492,7 +483,6 @@ TEST_F(ProducerFunctionalityTest, create_client_repeated_create_stream_put_frame
     createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
 
     for (i = 0; i < FUNCTIONALITY_TEST_STRESS_TEST_ITERATION; i++) {
-
         EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION, FALSE));
         streamHandle = mStreams[0];
         EXPECT_TRUE(streamHandle != INVALID_STREAM_HANDLE_VALUE);
@@ -522,7 +512,6 @@ TEST_F(ProducerFunctionalityTest, create_client_repeated_create_stream_put_frame
     createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
 
     for (i = 0; i < FUNCTIONALITY_TEST_STRESS_TEST_ITERATION; i++) {
-
         for (j = 0; j < streamCount; j++) {
             EXPECT_EQ(STATUS_SUCCESS, createTestStream(j, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION, FALSE));
             EXPECT_TRUE(mStreams[j] != INVALID_STREAM_HANDLE_VALUE);
@@ -699,14 +688,14 @@ TEST_F(ProducerFunctionalityTest, intermittent_producer_verify_eofr_sent)
     UPLOAD_HANDLE streamUploadHandle = 0;
 
     createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
-    EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION));
+    EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_OFFLINE, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION));
     streamHandle = mStreams[0];
 
     for (i = 0; i < totalFrames; i++) {
         startTime = GETTIME();
         // i = 480 will be start of a key frame, if I don't start on key-frame
         // this test fails
-        if( (i < 30) || (i >= 480) ) {
+        if ((i < 30) || (i >= 480)) {
             EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
         }
         updateFrame();
@@ -736,14 +725,10 @@ TEST_F(ProducerFunctionalityTest, intermittent_producer_verify_eofr_sent_multi_t
     mKeyFrameInterval = 10;
     UPLOAD_HANDLE streamUploadHandle = 0;
 
-
     PStreamInfo pStreamInfo;
 
     EXPECT_EQ(STATUS_SUCCESS,
-            createRealtimeAudioVideoStreamInfoProvider(TEST_STREAM_NAME,
-                                                       TEST_RETENTION_PERIOD,
-                                                       TEST_STREAM_BUFFER_DURATION,
-                                                       &pStreamInfo));
+              createRealtimeAudioVideoStreamInfoProvider(TEST_STREAM_NAME, TEST_RETENTION_PERIOD, TEST_STREAM_BUFFER_DURATION, &pStreamInfo));
 
     EXPECT_EQ(FRAME_ORDERING_MODE_MULTI_TRACK_AV_COMPARE_PTS_ONE_MS_COMPENSATE_EOFR, pStreamInfo->streamCaps.frameOrderingMode);
     EXPECT_EQ(2, pStreamInfo->streamCaps.trackInfoCount);
@@ -758,7 +743,7 @@ TEST_F(ProducerFunctionalityTest, intermittent_producer_verify_eofr_sent_multi_t
 
     createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
 
-    EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION));
+    EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_OFFLINE, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION));
     streamHandle = mStreams[0];
 
     mFrame.flags = FRAME_FLAG_KEY_FRAME;
@@ -767,7 +752,7 @@ TEST_F(ProducerFunctionalityTest, intermittent_producer_verify_eofr_sent_multi_t
         startTime = GETTIME();
         // i = 480 will be start of a key frame, if I don't start on key-frame
         // this test fails
-        if ( (i < 30) || (i >= 480) ) {
+        if ((i < 30) || (i >= 480)) {
             mFrame.trackId = TEST_VIDEO_TRACK_ID;
             EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(streamHandle, &mFrame));
             mFrame.trackId = TEST_AUDIO_TRACK_ID;
@@ -795,7 +780,6 @@ TEST_F(ProducerFunctionalityTest, intermittent_producer_verify_eofr_sent_multi_t
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
 
-
 TEST_F(ProducerFunctionalityTest, pressure_on_buffer_duration_fail_new_connection_at_token_rotation)
 {
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
@@ -804,7 +788,8 @@ TEST_F(ProducerFunctionalityTest, pressure_on_buffer_duration_fail_new_connectio
     UINT32 totalFrames = totalFragments * TEST_FPS;
     mCurlEasyPerformInjectionCount = 1;
 
-    createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT, 60 * HUNDREDS_OF_NANOS_IN_A_SECOND, TRUE, 45 * HUNDREDS_OF_NANOS_IN_A_SECOND);
+    createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT, 60 * HUNDREDS_OF_NANOS_IN_A_SECOND, TRUE,
+                                45 * HUNDREDS_OF_NANOS_IN_A_SECOND);
 
     EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, 10 * HUNDREDS_OF_NANOS_IN_A_SECOND));
     streamHandle = mStreams[0];
@@ -838,7 +823,8 @@ TEST_F(ProducerFunctionalityTest, pressure_on_buffer_duration_fail_old_connectio
     UINT32 totalFragments = 120, errCount;
     UINT32 totalFrames = totalFragments * TEST_FPS;
 
-    createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT, 60 * HUNDREDS_OF_NANOS_IN_A_SECOND, TRUE, 45 * HUNDREDS_OF_NANOS_IN_A_SECOND);
+    createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT, 60 * HUNDREDS_OF_NANOS_IN_A_SECOND, TRUE,
+                                45 * HUNDREDS_OF_NANOS_IN_A_SECOND);
 
     EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, 10 * HUNDREDS_OF_NANOS_IN_A_SECOND));
     streamHandle = mStreams[0];
@@ -878,7 +864,8 @@ TEST_F(ProducerFunctionalityTest, pressure_on_storage_fail_new_connection_at_tok
     BYTE tempBuf[10000];
 
     mDeviceInfo.storageInfo.storageSize = 1 * 1024 * 1024;
-    createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT, 60 * HUNDREDS_OF_NANOS_IN_A_SECOND, TRUE, 45 * HUNDREDS_OF_NANOS_IN_A_SECOND);
+    createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT, 60 * HUNDREDS_OF_NANOS_IN_A_SECOND, TRUE,
+                                45 * HUNDREDS_OF_NANOS_IN_A_SECOND);
 
     EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, MAX_UINT64, 240 * HUNDREDS_OF_NANOS_IN_A_SECOND));
     streamHandle = mStreams[0];
@@ -921,7 +908,8 @@ TEST_F(ProducerFunctionalityTest, pressure_on_storage_fail_old_connection_at_tok
 
     mDeviceInfo.storageInfo.storageSize = 1 * 1024 * 1024;
     mStreamInfo.streamCaps.replayDuration = 240 * HUNDREDS_OF_NANOS_IN_A_SECOND;
-    createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT, 60 * HUNDREDS_OF_NANOS_IN_A_SECOND, TRUE, 45 * HUNDREDS_OF_NANOS_IN_A_SECOND);
+    createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT, 60 * HUNDREDS_OF_NANOS_IN_A_SECOND, TRUE,
+                                45 * HUNDREDS_OF_NANOS_IN_A_SECOND);
 
     EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, 240 * HUNDREDS_OF_NANOS_IN_A_SECOND));
     streamHandle = mStreams[0];
@@ -987,7 +975,8 @@ TEST_F(ProducerFunctionalityTest, offline_upload_limited_storage)
     UINT32 totalFrames = totalFragments * TEST_FPS;
 
     mDeviceInfo.storageInfo.storageSize = 1 * 1024 * 1024;
-    createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT, 60 * HUNDREDS_OF_NANOS_IN_A_SECOND, TRUE, 45 * HUNDREDS_OF_NANOS_IN_A_SECOND);
+    createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT, 60 * HUNDREDS_OF_NANOS_IN_A_SECOND, TRUE,
+                                45 * HUNDREDS_OF_NANOS_IN_A_SECOND);
 
     EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_OFFLINE, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION));
     streamHandle = mStreams[0];
@@ -1314,15 +1303,9 @@ TEST_F(ProducerFunctionalityTest, DISABLED_offline_mode_multiple_stream_streamin
 TEST_F(ProducerFunctionalityTest, create_abstract_provider_add_stream_callback_free_provider)
 {
     PStreamCallbacks pStreamCallbacks;
-    EXPECT_EQ(STATUS_SUCCESS, createAbstractDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT,
-                                                                     API_CALL_CACHE_TYPE_NONE,
-                                                                     TEST_CACHING_ENDPOINT_PERIOD,
-                                                                     mRegion,
-                                                                     TEST_CONTROL_PLANE_URI,
-                                                                     mCaCertPath,
-                                                                     NULL,
-                                                                     TEST_USER_AGENT,
-                                                                     &mCallbacksProvider));
+    EXPECT_EQ(STATUS_SUCCESS,
+              createAbstractDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT, API_CALL_CACHE_TYPE_NONE, TEST_CACHING_ENDPOINT_PERIOD, mRegion,
+                                                     TEST_CONTROL_PLANE_URI, mCaCertPath, NULL, TEST_USER_AGENT, &mCallbacksProvider));
     EXPECT_EQ(STATUS_SUCCESS, createStreamCallbacks(&pStreamCallbacks));
     EXPECT_EQ(STATUS_SUCCESS, addStreamCallbacks(mCallbacksProvider, pStreamCallbacks));
 
@@ -1569,7 +1552,7 @@ TEST_F(ProducerFunctionalityTest, curl_timeout_idling_force_ack)
 
     createDefaultProducerClient(FALSE, FUNCTIONALITY_TEST_CREATE_STREAM_TIMEOUT);
 
-    EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION));
+    EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_OFFLINE, TEST_MAX_STREAM_LATENCY, TEST_STREAM_BUFFER_DURATION));
     streamHandle = mStreams[0];
     EXPECT_TRUE(streamHandle != INVALID_STREAM_HANDLE_VALUE);
 
@@ -1837,7 +1820,6 @@ TEST_F(ProducerFunctionalityTest, putFrame_stopSync_timeout_reset_then_putFrame_
     mStreams[0] = INVALID_STREAM_HANDLE_VALUE;
 }
 
-
 TEST_F(ProducerFunctionalityTest, putFrame_stopSync_reset_then_putFrame_again_multistream)
 {
     UINT32 j, i;
@@ -2064,7 +2046,7 @@ TEST_F(ProducerFunctionalityTest, dropTailFragPolicyBufferOverflowNoInvalidMkv)
     EXPECT_GT(mPersistedFragmentCount, 0);
 }
 
-}
-}
-}
-}
+} // namespace video
+} // namespace kinesis
+} // namespace amazonaws
+} // namespace com

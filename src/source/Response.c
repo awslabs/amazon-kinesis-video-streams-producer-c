@@ -180,6 +180,37 @@ STATUS initializeCurlSession(PRequestInfo pRequestInfo, PCallInfo pCallInfo, CUR
         curl_easy_setopt(pCurl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
     }
 
+#if defined(AWS_KVS_IPV4_ONLY)
+    curl_easy_setopt(pCurl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+    DLOGD("Curl resolving IPV4 through AWS_KVS_IPV4_ONLY");
+#elif defined(AWS_KVS_IPV6_ONLY)
+    curl_easy_setopt(pCurl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V6);
+    DLOGD("Curl resolving IPV6 through AWS_KVS_IPV6_ONLY");
+#elif defined(AWS_KVS_IPV4_AND_IPV6_ONLY)
+    curl_easy_setopt(pCurl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_WHATEVER);
+    DLOGD("Curl resolving dual stack through AWS_KVS_IPV4_AND_IPV6_ONLY");
+#else
+    if (!IS_NULL_OR_EMPTY_STRING(GETENV(KVS_CURL_IPRESOLVE_V4_ENV_VAR))) {
+        curl_easy_setopt(pCurl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+        DLOGD("Curl resolving IPV4 through environment variable");
+    } else if (!IS_NULL_OR_EMPTY_STRING(GETENV(KVS_CURL_IPRESOLVE_V6_ENV_VAR))) {
+        curl_easy_setopt(pCurl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V6);
+        DLOGD("Curl resolving IPV6 through environment variable");
+    } else {
+        curl_easy_setopt(pCurl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_WHATEVER);
+        DLOGD("Curl resolving dual stack by default");
+    }
+#endif
+
+#ifndef NDEBUG
+    // Only available in debug build
+    // This setting will have curl print out the IP address that it resolved and connected to
+    // More info: https://everything.curl.dev/usingcurl/verbose/index.html
+    if (!IS_NULL_OR_EMPTY_STRING(GETENV(KVS_CURL_DEBUG_ENV_VAR))) {
+        curl_easy_setopt(pCurl, CURLOPT_VERBOSE, 1L);
+    }
+#endif
+
     // set request completion timeout in milliseconds
     if (pRequestInfo->completionTimeout != SERVICE_CALL_INFINITE_TIMEOUT) {
         curl_easy_setopt(pCurl, CURLOPT_TIMEOUT_MS, pRequestInfo->completionTimeout / HUNDREDS_OF_NANOS_IN_A_MILLISECOND);

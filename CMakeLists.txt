@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.6.3)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake;${CMAKE_MODULE_PATH}")
 include(Utilities)
-project(KinesisVideoProducerC VERSION 1.5.4 LANGUAGES C)
+project(KinesisVideoProducerC VERSION 1.6.0 LANGUAGES C)
 
 set(KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION 1)
-set(KINESIS_VIDEO_PRODUCER_C_MINOR_VERSION 5)
-set(KINESIS_VIDEO_PRODUCER_C_PATCH_VERSION 4)
+set(KINESIS_VIDEO_PRODUCER_C_MINOR_VERSION 6)
+set(KINESIS_VIDEO_PRODUCER_C_PATCH_VERSION 0)
 set(KINESIS_VIDEO_PRODUCER_C_VERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION}.${KINESIS_VIDEO_PRODUCER_C_MINOR_VERSION}.${KINESIS_VIDEO_PRODUCER_C_PATCH_VERSION})
 
 include(GNUInstallDirs)
@@ -22,6 +22,15 @@ option(BUILD_COMMON_CURL "Whether or not to build ProducerC curl common library"
 option(BUILD_OPENSSL_PLATFORM "If buildng OpenSSL what is the target platform" OFF)
 option(LOCAL_OPENSSL_BUILD "Whether or not to use local OpenSSL build" OFF)
 option(CONSTRAINED_DEVICE "Change pthread stack size" OFF)
+
+# Endpoint selection - mutually exclusive
+option(AWS_KVS_USE_LEGACY_ENDPOINT_ONLY "Use only legacy IPv4-only endpoints (ignores env vars)" OFF)
+option(AWS_KVS_USE_DUAL_STACK_ENDPOINT_ONLY "Use only dual-stack endpoints (ignores env vars)" OFF)
+
+# DNS IP resolution modes - mutually exclusive
+option(AWS_KVS_IPV4_ONLY "Use only IPv4 addresses from DNS (ignores env vars)" OFF)
+option(AWS_KVS_IPV6_ONLY "Use only IPv6 addresses from DNS (ignores env vars)" OFF)
+option(AWS_KVS_IPV4_AND_IPV6_ONLY "Use both IPv4 and IPv6 addresses from DNS (ignores env vars)" OFF)
 
 # Developer Flags
 option(BUILD_TEST "Build the testing tree." OFF)
@@ -64,12 +73,69 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
 endif()
 
+# Validate mutually exclusive endpoint options
+if(AWS_KVS_USE_LEGACY_ENDPOINT_ONLY AND AWS_KVS_USE_DUAL_STACK_ENDPOINT_ONLY)
+    message(FATAL_ERROR "Cannot enable both AWS_KVS_USE_LEGACY_ENDPOINT_ONLY and AWS_KVS_USE_DUAL_STACK_ENDPOINT_ONLY at the same time.")
+endif()
+
+# Validate mutually exclusive IP resolution options
+set(IPV4_ONLY_FLAG 0)
+set(IPV6_ONLY_FLAG 0)
+set(IPV4_AND_IPV6_FLAG 0)
+
+if(AWS_KVS_IPV4_ONLY)
+    set(IPV4_ONLY_FLAG 1)
+endif()
+
+if(AWS_KVS_IPV6_ONLY)
+    set(IPV6_ONLY_FLAG 1)
+endif()
+
+if(AWS_KVS_IPV4_AND_IPV6_ONLY)
+    set(IPV4_AND_IPV6_FLAG 1)
+endif()
+
+# Sum the enabled flags
+math(EXPR IPV_OPTIONS_ENABLED_COUNT
+        "${IPV4_ONLY_FLAG}+${IPV6_ONLY_FLAG}+${IPV4_AND_IPV6_FLAG}")
+
+# Check for conflicts
+if(IPV_OPTIONS_ENABLED_COUNT GREATER 1)
+    message(FATAL_ERROR "Only one of AWS_KVS_IPV4_ONLY, AWS_KVS_IPV6_ONLY, or AWS_KVS_IPV4_AND_IPV6_ONLY can be enabled.")
+endif()
+
+# Translate the CMake flags to the pre-processor macros
+if(AWS_KVS_IPV4_ONLY)
+    add_definitions(-DAWS_KVS_IPV4_ONLY)
+endif()
+
+if(AWS_KVS_IPV6_ONLY)
+    add_definitions(-DAWS_KVS_IPV6_ONLY)
+endif()
+
+if(AWS_KVS_IPV4_AND_IPV6_ONLY)
+    add_definitions(-DAWS_KVS_IPV4_AND_IPV6_ONLY)
+endif()
+
+if(AWS_KVS_USE_LEGACY_ENDPOINT_ONLY)
+    add_definitions(-DAWS_KVS_USE_LEGACY_ENDPOINT_ONLY)
+endif()
+
+if(AWS_KVS_USE_DUAL_STACK_ENDPOINT_ONLY)
+    add_definitions(-DAWS_KVS_USE_DUAL_STACK_ENDPOINT_ONLY)
+endif()
+
 if(BUILD_DEPENDENCIES)
   if (NOT OPEN_SRC_INSTALL_PREFIX)
     set(OPEN_SRC_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/open-source)
+
+    # Note: PKG_CONFIG_PATH is an environment variable. Should point to the
+    # folder containing the .pc files
+    # Needed for libcurl to find OpenSSL peer dependency
     set(ENV{PKG_CONFIG_PATH}
           "$ENV{PKG_CONFIG_PATH}:${OPEN_SRC_INSTALL_PREFIX}/lib/pkgconfig")
-    set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${OPEN_SRC_INSTALL_PREFIX})
+    set(CMAKE_PREFIX_PATH ${OPEN_SRC_INSTALL_PREFIX} ${CMAKE_PREFIX_PATH})
+    message(STATUS "PKG_CONFIG_PATH: $ENV{PKG_CONFIG_PATH}")
   endif()
 
   if(NOT EXISTS ${OPEN_SRC_INSTALL_PREFIX})
@@ -366,16 +432,16 @@ if(BUILD_COMMON_CURL)
       FILES ${CMAKE_CURRENT_BINARY_DIR}/libcproducer.pc
       DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 
-    add_executable(kvsVideoOnlyRealtimeStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsVideoOnlyRealtimeStreamingSample.c)
+    add_executable(kvsVideoOnlyRealtimeStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsVideoOnlyRealtimeStreamingSample.c ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/Common.c)
     target_link_libraries(kvsVideoOnlyRealtimeStreamingSample cproducer)
 
-    add_executable(kvsVideoOnlyOfflineStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsVideoOnlyOfflineStreamingSample.c)
+    add_executable(kvsVideoOnlyOfflineStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsVideoOnlyOfflineStreamingSample.c ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/Common.c)
     target_link_libraries(kvsVideoOnlyOfflineStreamingSample cproducer)
 
-    add_executable(kvsAudioVideoStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsAudioVideoStreamingSample.c)
+    add_executable(kvsAudioVideoStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsAudioVideoStreamingSample.c ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/Common.c)
     target_link_libraries(kvsAudioVideoStreamingSample cproducer)
 
-    add_executable(kvsAudioOnlyStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsAudioOnlyStreamingSample.c)
+    add_executable(kvsAudioOnlyStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsAudioOnlyStreamingSample.c ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/Common.c)
     target_link_libraries(kvsAudioOnlyStreamingSample cproducer)
 
     if (BUILD_TEST)

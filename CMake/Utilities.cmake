@@ -86,7 +86,7 @@ function(build_dependency lib_name)
     message(FATAL_ERROR "CMake step for lib${lib_name} failed: ${result}")
   endif()
   execute_process(
-    COMMAND ${CMAKE_COMMAND} --build .
+    COMMAND ${CMAKE_COMMAND} --build . --parallel
     RESULT_VARIABLE result
     WORKING_DIRECTORY ${OPEN_SRC_INSTALL_PREFIX}/lib${lib_name})
   if(result)

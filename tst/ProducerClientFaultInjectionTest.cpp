@@ -1,9 +1,11 @@
 #include "ProducerTestFixture.h"
 
-namespace com { namespace amazonaws { namespace kinesis { namespace video {
+namespace com {
+namespace amazonaws {
+namespace kinesis {
+namespace video {
 
-class ProducerClientFaultInjectionTest : public ProducerClientTestBase {
-};
+class ProducerClientFaultInjectionTest : public ProducerClientTestBase {};
 
 TEST_F(ProducerClientFaultInjectionTest, notAuthorizedDescribeCall)
 {
@@ -281,7 +283,8 @@ TEST_F(ProducerClientFaultInjectionTest, timeoutCreateCallWithContinuousCallback
     mCreateStreamCallResult = SERVICE_CALL_NETWORK_CONNECTION_TIMEOUT;
 
     // Attempt to create a stream
-    EXPECT_EQ(STATUS_OPERATION_TIMED_OUT, createTestStream(0, STREAMING_TYPE_REALTIME, 20 * HUNDREDS_OF_NANOS_IN_A_SECOND, 60 * HUNDREDS_OF_NANOS_IN_A_SECOND));
+    EXPECT_EQ(STATUS_OPERATION_TIMED_OUT,
+              createTestStream(0, STREAMING_TYPE_REALTIME, 20 * HUNDREDS_OF_NANOS_IN_A_SECOND, 60 * HUNDREDS_OF_NANOS_IN_A_SECOND));
 
     THREAD_SLEEP(2 * HUNDREDS_OF_NANOS_IN_A_SECOND);
 
@@ -552,7 +555,7 @@ TEST_F(ProducerClientFaultInjectionTest, timeoutPutMediaCall)
     freeStreams();
 }
 
-}  // namespace video
-}  // namespace kinesis
-}  // namespace amazonaws
-}  // namespace com;
+} // namespace video
+} // namespace kinesis
+} // namespace amazonaws
+} // namespace com

@@ -322,6 +322,28 @@ typedef enum {
 PUBLIC_API STATUS createDefaultCallbacksProviderWithAwsCredentials(PCHAR, PCHAR, PCHAR, UINT64, PCHAR, PCHAR, PCHAR, PCHAR, PClientCallbacks*);
 
 /**
+ * Creates a default callbacks provider based on static AWS credentials
+ *
+ * NOTE: The caller is responsible for releasing the structure by calling
+ * the corresponding {@link freeCallbackProvider} API.
+ *
+ * @param[in] PCHAR Access Key Id
+ * @param[in] PCHAR Secret Key
+ * @param[in,opt] PCHAR Session Token
+ * @param[in] UINT64 Expiration of the token. MAX_UINT64 if non-expiring
+ * @param[in,opt] PCHAR AWS region
+ * @param[in,opt] PCHAR CA Cert Path
+ * @param[in,opt] PCHAR User agent name (Use NULL)
+ * @param[in,out] PCHAR Custom user agent to be used in the API calls
+ * @param[in,opt] PCHAR Control Plane endpoint override
+ * @param[out] PClientCallbacks* Returned pointer to callbacks provider
+ *
+ * @return STATUS code of the execution
+ */
+PUBLIC_API STATUS createDefaultCallbacksProviderWithAwsCredentialsAndEndpointOverride(PCHAR, PCHAR, PCHAR, UINT64, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR,
+                                                                                      PClientCallbacks*);
+
+/**
  * Creates a default callbacks provider that uses iot certificate as auth method.
  *
  * NOTE: The caller is responsible for releasing the structure by calling
@@ -341,6 +363,29 @@ PUBLIC_API STATUS createDefaultCallbacksProviderWithAwsCredentials(PCHAR, PCHAR,
  * @return STATUS code of the execution
  */
 PUBLIC_API STATUS createDefaultCallbacksProviderWithIotCertificate(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PClientCallbacks*);
+
+/**
+ * Creates a default callbacks provider that uses iot certificate as auth method.
+ *
+ * NOTE: The caller is responsible for releasing the structure by calling
+ * the corresponding {@link freeCallbackProvider} API.
+ *
+ * @param[in] PCHAR IoT endpoint to use for the auth
+ * @param[in] PCHAR Credential cert path
+ * @param[in] PCHAR Private key path
+ * @param[in,opt] PCHAR CA Cert path
+ * @param[in] PCHAR Role alias name
+ * @param[in] PCHAR IoT Thing name
+ * @param[in,opt] PCHAR AWS region
+ * @param[in,opt] PCHAR User agent name (Use NULL)
+ * @param[in,opt] PCHAR Custom user agent to be used in the API calls
+ * @param[in,opt] PCHAR Control Plane endpoint override
+ * @param[out] PClientCallbacks* Returned pointer to callbacks provider
+ *
+ * @return STATUS code of the execution
+ */
+PUBLIC_API STATUS createDefaultCallbacksProviderWithIotCertificateAndEndpointOverride(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PCHAR,
+                                                                                      PCHAR, PClientCallbacks* ppClientCallbacks);
 
 /**
  * Creates a default callbacks provider that uses iot certificate as auth method.

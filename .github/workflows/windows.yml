@@ -1,0 +1,139 @@
+name: Producer C SDK Windows CI
+
+on:
+  push:
+    branches:
+      - develop
+      - master
+  pull_request:
+    branches:
+      - develop
+      - master
+
+jobs:
+  unit-tests:
+    runs-on: windows-2022
+    env:
+      AWS_KVS_LOG_LEVEL: 2
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.x'
+      - name: Install dependencies
+        run: |
+          choco install nasm strawberryperl pkgconfiglite
+      - name: Build repository
+        run: |
+          $env:Path += ';C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;C:\Program Files\NASM;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\lib;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\bin'
+          git config --system core.longpaths true
+          .github/build_windows.bat
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-duration-seconds: 3600
+      - name: Run tests
+        run: |
+          $env:Path += ';C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;C:\Program Files\NASM;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\lib;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\bin'
+          & "D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\build\tst\producer_test.exe" --gtest_filter="-ProducerFunctionalityTest.pressure_on_buffer_duration_fail_new_connection_at_token_rotation"
+
+  sample-checks:
+    name: ${{ matrix.sample-executable }}
+    runs-on: windows-2022
+    strategy:
+      matrix:
+        sample-executable:
+          - kvsAudioOnlyStreamingSample.exe
+          - kvsAudioVideoStreamingSample.exe
+          - kvsVideoOnlyOfflineStreamingSample.exe
+          - kvsVideoOnlyRealtimeStreamingSample.exe
+      fail-fast: false
+    env:
+      AWS_KVS_LOG_LEVEL: 2
+      KVS_DEBUG_DUMP_DATA_FILE_DIR: D:\debug_output
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.x'
+      - name: Install dependencies
+        run: |
+          choco install nasm strawberryperl pkgconfiglite mkvtoolnix
+          echo "PATH=$env:PATH;C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;C:\Program Files\NASM;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\lib;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\bin;C:\Program Files\MKVToolNix" >> $GITHUB_ENV
+      - name: Build repository
+        run: |
+          git config --system core.longpaths true
+          .github/build_windows.bat
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-duration-seconds: 3600
+      - name: Run ${{ matrix.sample }}
+        working-directory: ./build
+        run: |
+          # Equivalent to set -x
+          Set-PSDebug -Trace 1
+
+          # Create the debug dump directory (equivalent to mkdir -p)
+          New-Item -ItemType Directory -Path $env:KVS_DEBUG_DUMP_DATA_FILE_DIR -Force
+          
+          $env:PATH += ";C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;C:\Program Files\NASM;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\lib;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\bin;C:\Program Files\MKVToolNix"
+                    
+          # Equivalent to ls
+          dir
+
+          # Stream for 20s (default)
+          $exePath = Join-Path $PWD ${{ matrix.sample-executable }}
+          & $exePath demo-stream-producer-c-windows-ci-${{ matrix.sample-executable }}
+
+      - name: Save MKV file list
+        working-directory: ./build
+        run: |
+          $mkvFiles = Get-ChildItem -Path $env:KVS_DEBUG_DUMP_DATA_FILE_DIR -Filter *.mkv
+          
+          if ($mkvFiles.Count -eq 0) {
+            Write-Error "No MKV files found in $env:KVS_DEBUG_DUMP_DATA_FILE_DIR"
+            exit 1
+          }
+          
+          # Save the MKV file list to GITHUB_ENV
+          $fileList = $mkvFiles.FullName -join "`n"
+          "MKV_FILES=$fileList" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8
+
+      - name: Print MKV dump (non-verbose)
+        working-directory: ./build
+        run: |
+          $env:PATH += ";C:\Program Files\MKVToolNix"
+          $mkvFiles = $env:MKV_FILES -split "`n"
+          
+          foreach ($file in $mkvFiles) {
+            Write-Output "Verifying $file with mkvinfo:"
+            mkvinfo.exe -v "$file"
+          }
+
+      - name: Print MKV dump (verbose)
+        working-directory: ./build
+        run: |
+          $env:PATH += ";C:\Program Files\MKVToolNix"
+          $mkvFiles = $env:MKV_FILES -split "`n"
+          
+          foreach ($file in $mkvFiles) {
+            Write-Output "Verifying $file with mkvinfo (hexdump):"
+            mkvinfo.exe -v -X "$file"
+          }

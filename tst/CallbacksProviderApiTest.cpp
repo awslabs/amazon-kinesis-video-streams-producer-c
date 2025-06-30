@@ -1,257 +1,122 @@
 #include "ProducerTestFixture.h"
 
-namespace com { namespace amazonaws { namespace kinesis { namespace video {
+namespace com {
+namespace amazonaws {
+namespace kinesis {
+namespace video {
 
-class CallbacksProviderApiTest : public ProducerClientTestBase {
-};
+class CallbacksProviderApiTest : public ProducerClientTestBase {};
 
 TEST_F(CallbacksProviderApiTest, createDefaultCallbacksProvider_variations)
 {
     PClientCallbacks pClientCallbacks = NULL;
-    EXPECT_NE(STATUS_SUCCESS, createDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT,
-                                                             TEST_ACCESS_KEY,
-                                                             TEST_SECRET_KEY,
-                                                             TEST_SESSION_TOKEN,
-                                                             TEST_STREAMING_TOKEN_DURATION,
-                                                             TEST_DEFAULT_REGION,
-                                                             TEST_CONTROL_PLANE_URI,
-                                                             mCaCertPath,
-                                                             NULL,
-                                                             TEST_USER_AGENT,
-                                                             API_CALL_CACHE_TYPE_NONE,
-                                                             TEST_CACHING_ENDPOINT_PERIOD,
-                                                             TRUE,
-                                                             NULL));
+    EXPECT_NE(STATUS_SUCCESS,
+              createDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT, TEST_ACCESS_KEY, TEST_SECRET_KEY, TEST_SESSION_TOKEN,
+                                             TEST_STREAMING_TOKEN_DURATION, TEST_DEFAULT_REGION, TEST_CONTROL_PLANE_URI, mCaCertPath, NULL,
+                                             TEST_USER_AGENT, API_CALL_CACHE_TYPE_NONE, TEST_CACHING_ENDPOINT_PERIOD, TRUE, NULL));
     EXPECT_NE(STATUS_SUCCESS, freeCallbacksProvider(NULL));
     EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks));
 
-    EXPECT_NE(STATUS_SUCCESS, createDefaultCallbacksProvider(MAX_CALLBACK_CHAIN_COUNT + 1,
-                                                             TEST_ACCESS_KEY,
-                                                             TEST_SECRET_KEY,
-                                                             TEST_SESSION_TOKEN,
-                                                             TEST_STREAMING_TOKEN_DURATION,
-                                                             TEST_DEFAULT_REGION,
-                                                             TEST_CONTROL_PLANE_URI,
-                                                             mCaCertPath,
-                                                             NULL,
-                                                             TEST_USER_AGENT,
-                                                             API_CALL_CACHE_TYPE_NONE,
-                                                             TEST_CACHING_ENDPOINT_PERIOD,
-                                                             TRUE,
-                                                             &pClientCallbacks));
+    EXPECT_NE(STATUS_SUCCESS,
+              createDefaultCallbacksProvider(MAX_CALLBACK_CHAIN_COUNT + 1, TEST_ACCESS_KEY, TEST_SECRET_KEY, TEST_SESSION_TOKEN,
+                                             TEST_STREAMING_TOKEN_DURATION, TEST_DEFAULT_REGION, TEST_CONTROL_PLANE_URI, mCaCertPath, NULL,
+                                             TEST_USER_AGENT, API_CALL_CACHE_TYPE_NONE, TEST_CACHING_ENDPOINT_PERIOD, TRUE, &pClientCallbacks));
     EXPECT_NE(STATUS_SUCCESS, freeCallbacksProvider(NULL));
     EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks));
 
-    EXPECT_NE(STATUS_SUCCESS, createDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT,
-                                                             TEST_ACCESS_KEY,
-                                                             TEST_SECRET_KEY,
-                                                             TEST_SESSION_TOKEN,
-                                                             TEST_STREAMING_TOKEN_DURATION,
-                                                             TEST_DEFAULT_REGION,
-                                                             TEST_CONTROL_PLANE_URI,
-                                                             mCaCertPath,
-                                                             NULL,
-                                                             TEST_USER_AGENT,
-                                                             API_CALL_CACHE_TYPE_NONE,
-                                                             MAX_ENDPOINT_CACHE_UPDATE_PERIOD + 1,
-                                                             TRUE,
-                                                             &pClientCallbacks));
+    EXPECT_NE(STATUS_SUCCESS,
+              createDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT, TEST_ACCESS_KEY, TEST_SECRET_KEY, TEST_SESSION_TOKEN,
+                                             TEST_STREAMING_TOKEN_DURATION, TEST_DEFAULT_REGION, TEST_CONTROL_PLANE_URI, mCaCertPath, NULL,
+                                             TEST_USER_AGENT, API_CALL_CACHE_TYPE_NONE, MAX_ENDPOINT_CACHE_UPDATE_PERIOD + 1, TRUE,
+                                             &pClientCallbacks));
     EXPECT_NE(STATUS_SUCCESS, freeCallbacksProvider(NULL));
     EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks));
 
-    EXPECT_NE(STATUS_SUCCESS, createDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT,
-                                                             TEST_ACCESS_KEY,
-                                                             TEST_SECRET_KEY,
-                                                             TEST_SESSION_TOKEN,
-                                                             TEST_STREAMING_TOKEN_DURATION,
-                                                             TEST_DEFAULT_REGION,
-                                                             TEST_CONTROL_PLANE_URI,
-                                                             mCaCertPath,
-                                                             NULL,
-                                                             TEST_USER_AGENT,
-                                                             API_CALL_CACHE_TYPE_ENDPOINT_ONLY,
-                                                             MAX_ENDPOINT_CACHE_UPDATE_PERIOD + 1,
-                                                             TRUE,
-                                                             &pClientCallbacks));
+    EXPECT_NE(STATUS_SUCCESS,
+              createDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT, TEST_ACCESS_KEY, TEST_SECRET_KEY, TEST_SESSION_TOKEN,
+                                             TEST_STREAMING_TOKEN_DURATION, TEST_DEFAULT_REGION, TEST_CONTROL_PLANE_URI, mCaCertPath, NULL,
+                                             TEST_USER_AGENT, API_CALL_CACHE_TYPE_ENDPOINT_ONLY, MAX_ENDPOINT_CACHE_UPDATE_PERIOD + 1, TRUE,
+                                             &pClientCallbacks));
     EXPECT_NE(STATUS_SUCCESS, freeCallbacksProvider(NULL));
     EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks));
 
-    EXPECT_EQ(STATUS_SUCCESS, createDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT,
-                                                             TEST_ACCESS_KEY,
-                                                             TEST_SECRET_KEY,
-                                                             TEST_SESSION_TOKEN,
-                                                             TEST_STREAMING_TOKEN_DURATION,
-                                                             TEST_DEFAULT_REGION,
-                                                             TEST_CONTROL_PLANE_URI,
-                                                             mCaCertPath,
-                                                             NULL,
-                                                             TEST_USER_AGENT,
-                                                             API_CALL_CACHE_TYPE_NONE,
-                                                             TEST_CACHING_ENDPOINT_PERIOD,
-                                                             TRUE,
-                                                             &pClientCallbacks));
+    EXPECT_EQ(STATUS_SUCCESS,
+              createDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT, TEST_ACCESS_KEY, TEST_SECRET_KEY, TEST_SESSION_TOKEN,
+                                             TEST_STREAMING_TOKEN_DURATION, TEST_DEFAULT_REGION, TEST_CONTROL_PLANE_URI, mCaCertPath, NULL,
+                                             TEST_USER_AGENT, API_CALL_CACHE_TYPE_NONE, TEST_CACHING_ENDPOINT_PERIOD, TRUE, &pClientCallbacks));
     EXPECT_NE((PClientCallbacks) NULL, pClientCallbacks);
     EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks));
     EXPECT_EQ(NULL, pClientCallbacks);
 
-    EXPECT_EQ(STATUS_SUCCESS, createDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT,
-                                                             TEST_ACCESS_KEY,
-                                                             TEST_SECRET_KEY,
-                                                             TEST_SESSION_TOKEN,
-                                                             TEST_STREAMING_TOKEN_DURATION,
-                                                             TEST_DEFAULT_REGION,
-                                                             TEST_CONTROL_PLANE_URI,
-                                                             mCaCertPath,
-                                                             NULL,
-                                                             TEST_USER_AGENT,
-                                                             API_CALL_CACHE_TYPE_ENDPOINT_ONLY,
-                                                             TEST_CACHING_ENDPOINT_PERIOD,
-                                                             TRUE,
-                                                             &pClientCallbacks));
+    EXPECT_EQ(STATUS_SUCCESS,
+              createDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT, TEST_ACCESS_KEY, TEST_SECRET_KEY, TEST_SESSION_TOKEN,
+                                             TEST_STREAMING_TOKEN_DURATION, TEST_DEFAULT_REGION, TEST_CONTROL_PLANE_URI, mCaCertPath, NULL,
+                                             TEST_USER_AGENT, API_CALL_CACHE_TYPE_ENDPOINT_ONLY, TEST_CACHING_ENDPOINT_PERIOD, TRUE,
+                                             &pClientCallbacks));
     EXPECT_NE((PClientCallbacks) NULL, pClientCallbacks);
     EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks));
     EXPECT_EQ(NULL, pClientCallbacks);
 
-    EXPECT_EQ(STATUS_SUCCESS, createDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT,
-                                                             TEST_ACCESS_KEY,
-                                                             TEST_SECRET_KEY,
-                                                             TEST_SESSION_TOKEN,
-                                                             TEST_STREAMING_TOKEN_DURATION,
-                                                             TEST_DEFAULT_REGION,
-                                                             TEST_CONTROL_PLANE_URI,
-                                                             mCaCertPath,
-                                                             NULL,
-                                                             TEST_USER_AGENT,
-                                                             API_CALL_CACHE_TYPE_NONE,
-                                                             TEST_CACHING_ENDPOINT_PERIOD,
-                                                             FALSE,
-                                                             &pClientCallbacks));
+    EXPECT_EQ(STATUS_SUCCESS,
+              createDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT, TEST_ACCESS_KEY, TEST_SECRET_KEY, TEST_SESSION_TOKEN,
+                                             TEST_STREAMING_TOKEN_DURATION, TEST_DEFAULT_REGION, TEST_CONTROL_PLANE_URI, mCaCertPath, NULL,
+                                             TEST_USER_AGENT, API_CALL_CACHE_TYPE_NONE, TEST_CACHING_ENDPOINT_PERIOD, FALSE, &pClientCallbacks));
     EXPECT_NE((PClientCallbacks) NULL, pClientCallbacks);
     EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks));
     EXPECT_EQ(NULL, pClientCallbacks);
 
-    EXPECT_EQ(STATUS_SUCCESS, createDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT,
-                                                             TEST_ACCESS_KEY,
-                                                             TEST_SECRET_KEY,
-                                                             TEST_SESSION_TOKEN,
-                                                             TEST_STREAMING_TOKEN_DURATION,
-                                                             NULL,
-                                                             TEST_CONTROL_PLANE_URI,
-                                                             mCaCertPath,
-                                                             NULL,
-                                                             TEST_USER_AGENT,
-                                                             API_CALL_CACHE_TYPE_NONE,
-                                                             TEST_CACHING_ENDPOINT_PERIOD,
-                                                             TRUE,
-                                                             &pClientCallbacks));
+    EXPECT_EQ(STATUS_SUCCESS,
+              createDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT, TEST_ACCESS_KEY, TEST_SECRET_KEY, TEST_SESSION_TOKEN,
+                                             TEST_STREAMING_TOKEN_DURATION, NULL, TEST_CONTROL_PLANE_URI, mCaCertPath, NULL, TEST_USER_AGENT,
+                                             API_CALL_CACHE_TYPE_NONE, TEST_CACHING_ENDPOINT_PERIOD, TRUE, &pClientCallbacks));
     EXPECT_NE((PClientCallbacks) NULL, pClientCallbacks);
     EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks));
     EXPECT_EQ(NULL, pClientCallbacks);
 
-    EXPECT_EQ(STATUS_SUCCESS, createDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT,
-                                                             TEST_ACCESS_KEY,
-                                                             TEST_SECRET_KEY,
-                                                             TEST_SESSION_TOKEN,
-                                                             TEST_STREAMING_TOKEN_DURATION,
-                                                             TEST_DEFAULT_REGION,
-                                                             NULL,
-                                                             mCaCertPath,
-                                                             NULL,
-                                                             TEST_USER_AGENT,
-                                                             API_CALL_CACHE_TYPE_NONE,
-                                                             TEST_CACHING_ENDPOINT_PERIOD,
-                                                             TRUE,
-                                                             &pClientCallbacks));
+    EXPECT_EQ(STATUS_SUCCESS,
+              createDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT, TEST_ACCESS_KEY, TEST_SECRET_KEY, TEST_SESSION_TOKEN,
+                                             TEST_STREAMING_TOKEN_DURATION, TEST_DEFAULT_REGION, NULL, mCaCertPath, NULL, TEST_USER_AGENT,
+                                             API_CALL_CACHE_TYPE_NONE, TEST_CACHING_ENDPOINT_PERIOD, TRUE, &pClientCallbacks));
     EXPECT_NE((PClientCallbacks) NULL, pClientCallbacks);
     EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks));
     EXPECT_EQ(NULL, pClientCallbacks);
 
-    EXPECT_EQ(STATUS_SUCCESS, createDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT,
-                                                             TEST_ACCESS_KEY,
-                                                             TEST_SECRET_KEY,
-                                                             TEST_SESSION_TOKEN,
-                                                             TEST_STREAMING_TOKEN_DURATION,
-                                                             TEST_DEFAULT_REGION,
-                                                             TEST_CONTROL_PLANE_URI,
-                                                             mCaCertPath,
-                                                             NULL,
-                                                             TEST_USER_AGENT,
-                                                             API_CALL_CACHE_TYPE_NONE,
-                                                             TEST_CACHING_ENDPOINT_PERIOD,
-                                                             TRUE,
-                                                             &pClientCallbacks));
+    EXPECT_EQ(STATUS_SUCCESS,
+              createDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT, TEST_ACCESS_KEY, TEST_SECRET_KEY, TEST_SESSION_TOKEN,
+                                             TEST_STREAMING_TOKEN_DURATION, TEST_DEFAULT_REGION, TEST_CONTROL_PLANE_URI, mCaCertPath, NULL,
+                                             TEST_USER_AGENT, API_CALL_CACHE_TYPE_NONE, TEST_CACHING_ENDPOINT_PERIOD, TRUE, &pClientCallbacks));
     EXPECT_NE((PClientCallbacks) NULL, pClientCallbacks);
     EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks));
     EXPECT_EQ(NULL, pClientCallbacks);
 
-    EXPECT_EQ(STATUS_SUCCESS, createDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT,
-                                                             TEST_ACCESS_KEY,
-                                                             TEST_SECRET_KEY,
-                                                             TEST_SESSION_TOKEN,
-                                                             TEST_STREAMING_TOKEN_DURATION,
-                                                             TEST_DEFAULT_REGION,
-                                                             TEST_CONTROL_PLANE_URI,
-                                                             mCaCertPath,
-                                                             NULL,
-                                                             NULL,
-                                                             API_CALL_CACHE_TYPE_NONE,
-                                                             TEST_CACHING_ENDPOINT_PERIOD,
-                                                             TRUE,
-                                                             &pClientCallbacks));
+    EXPECT_EQ(STATUS_SUCCESS,
+              createDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT, TEST_ACCESS_KEY, TEST_SECRET_KEY, TEST_SESSION_TOKEN,
+                                             TEST_STREAMING_TOKEN_DURATION, TEST_DEFAULT_REGION, TEST_CONTROL_PLANE_URI, mCaCertPath, NULL, NULL,
+                                             API_CALL_CACHE_TYPE_NONE, TEST_CACHING_ENDPOINT_PERIOD, TRUE, &pClientCallbacks));
     EXPECT_NE((PClientCallbacks) NULL, pClientCallbacks);
     EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks));
     EXPECT_EQ(NULL, pClientCallbacks);
 
-    EXPECT_EQ(STATUS_SUCCESS, createDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT,
-                                                             TEST_ACCESS_KEY,
-                                                             TEST_SECRET_KEY,
-                                                             TEST_SESSION_TOKEN,
-                                                             TEST_STREAMING_TOKEN_DURATION,
-                                                             NULL,
-                                                             NULL,
-                                                             NULL,
-                                                             NULL,
-                                                             NULL,
-                                                             API_CALL_CACHE_TYPE_NONE,
-                                                             TEST_CACHING_ENDPOINT_PERIOD,
-                                                             TRUE,
-                                                             &pClientCallbacks));
+    EXPECT_EQ(STATUS_SUCCESS,
+              createDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT, TEST_ACCESS_KEY, TEST_SECRET_KEY, TEST_SESSION_TOKEN,
+                                             TEST_STREAMING_TOKEN_DURATION, NULL, NULL, NULL, NULL, NULL, API_CALL_CACHE_TYPE_NONE,
+                                             TEST_CACHING_ENDPOINT_PERIOD, TRUE, &pClientCallbacks));
     EXPECT_NE((PClientCallbacks) NULL, pClientCallbacks);
     EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks));
     EXPECT_EQ(NULL, pClientCallbacks);
 
-    EXPECT_EQ(STATUS_SUCCESS, createDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT,
-                                                             TEST_ACCESS_KEY,
-                                                             TEST_SECRET_KEY,
-                                                             TEST_SESSION_TOKEN,
-                                                             TEST_STREAMING_TOKEN_DURATION,
-                                                             EMPTY_STRING,
-                                                             EMPTY_STRING,
-                                                             EMPTY_STRING,
-                                                             EMPTY_STRING,
-                                                             EMPTY_STRING,
-                                                             API_CALL_CACHE_TYPE_NONE,
-                                                             TEST_CACHING_ENDPOINT_PERIOD,
-                                                             TRUE,
-                                                             &pClientCallbacks));
+    EXPECT_EQ(STATUS_SUCCESS,
+              createDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT, TEST_ACCESS_KEY, TEST_SECRET_KEY, TEST_SESSION_TOKEN,
+                                             TEST_STREAMING_TOKEN_DURATION, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING,
+                                             API_CALL_CACHE_TYPE_NONE, TEST_CACHING_ENDPOINT_PERIOD, TRUE, &pClientCallbacks));
     EXPECT_NE((PClientCallbacks) NULL, pClientCallbacks);
     EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks));
     EXPECT_EQ(NULL, pClientCallbacks);
 
-    EXPECT_EQ(STATUS_SUCCESS, createDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT,
-                                                             TEST_ACCESS_KEY,
-                                                             TEST_SECRET_KEY,
-                                                             TEST_SESSION_TOKEN,
-                                                             TEST_STREAMING_TOKEN_DURATION,
-                                                             EMPTY_STRING,
-                                                             EMPTY_STRING,
-                                                             EMPTY_STRING,
-                                                             EMPTY_STRING,
-                                                             EMPTY_STRING,
-                                                             API_CALL_CACHE_TYPE_ENDPOINT_ONLY,
-                                                             TEST_CACHING_ENDPOINT_PERIOD,
-                                                             TRUE,
-                                                             &pClientCallbacks));
+    EXPECT_EQ(STATUS_SUCCESS,
+              createDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT, TEST_ACCESS_KEY, TEST_SECRET_KEY, TEST_SESSION_TOKEN,
+                                             TEST_STREAMING_TOKEN_DURATION, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING, EMPTY_STRING,
+                                             API_CALL_CACHE_TYPE_ENDPOINT_ONLY, TEST_CACHING_ENDPOINT_PERIOD, TRUE, &pClientCallbacks));
     EXPECT_NE((PClientCallbacks) NULL, pClientCallbacks);
     EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks));
     EXPECT_EQ(NULL, pClientCallbacks);
@@ -274,25 +139,13 @@ TEST_F(CallbacksProviderApiTest, createStreamVerifyCallbackChainIntegration)
     EXPECT_EQ(STATUS_SUCCESS, createRealtimeVideoStreamInfoProvider(streamName, TEST_RETENTION_PERIOD, TEST_STREAM_BUFFER_DURATION, &pStreamInfo));
     pStreamInfo->streamCaps.nalAdaptationFlags = NAL_ADAPTATION_FLAG_NONE;
 
-    EXPECT_EQ(STATUS_INVALID_ARG, createAbstractDefaultCallbacksProvider(MAX_CALLBACK_CHAIN_COUNT + 1,
-                                                                         API_CALL_CACHE_TYPE_NONE,
-                                                                         TEST_CACHING_ENDPOINT_PERIOD,
-                                                                         mRegion,
-                                                                         TEST_CONTROL_PLANE_URI,
-                                                                         mCaCertPath,
-                                                                         NULL,
-                                                                         NULL,
-                                                                         &pClientCallbacks));
+    EXPECT_EQ(STATUS_INVALID_ARG,
+              createAbstractDefaultCallbacksProvider(MAX_CALLBACK_CHAIN_COUNT + 1, API_CALL_CACHE_TYPE_NONE, TEST_CACHING_ENDPOINT_PERIOD, mRegion,
+                                                     TEST_CONTROL_PLANE_URI, mCaCertPath, NULL, NULL, &pClientCallbacks));
 
-    EXPECT_EQ(STATUS_SUCCESS, createAbstractDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT,
-                                                                     API_CALL_CACHE_TYPE_NONE,
-                                                                     TEST_CACHING_ENDPOINT_PERIOD,
-                                                                     mRegion,
-                                                                     TEST_CONTROL_PLANE_URI,
-                                                                     mCaCertPath,
-                                                                     NULL,
-                                                                     NULL,
-                                                                     &pClientCallbacks));
+    EXPECT_EQ(STATUS_SUCCESS,
+              createAbstractDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT, API_CALL_CACHE_TYPE_NONE, TEST_CACHING_ENDPOINT_PERIOD, mRegion,
+                                                     TEST_CONTROL_PLANE_URI, mCaCertPath, NULL, NULL, &pClientCallbacks));
 
     mApiCallbacks.version = API_CALLBACKS_CURRENT_VERSION;
     mApiCallbacks.customData = (UINT64) this;
@@ -317,13 +170,9 @@ TEST_F(CallbacksProviderApiTest, createStreamVerifyCallbackChainIntegration)
 
     UINT64 expiration = currentTime + TEST_STREAMING_TOKEN_DURATION;
     PAuthCallbacks pAuthCallbacks;
-    EXPECT_EQ(STATUS_SUCCESS, createRotatingStaticAuthCallbacks(pClientCallbacks,
-                                                                mAccessKey,
-                                                                mSecretKey,
-                                                                mSessionToken,
-                                                                expiration,
-                                                                TEST_STREAMING_TOKEN_DURATION,
-                                                                &pAuthCallbacks));
+    EXPECT_EQ(STATUS_SUCCESS,
+              createRotatingStaticAuthCallbacks(pClientCallbacks, mAccessKey, mSecretKey, mSessionToken, expiration, TEST_STREAMING_TOKEN_DURATION,
+                                                &pAuthCallbacks));
 
     EXPECT_EQ(STATUS_SUCCESS, createKinesisVideoClientSync(pDeviceInfo, pClientCallbacks, &clientHandle));
     EXPECT_EQ(STATUS_SUCCESS, createKinesisVideoStreamSync(clientHandle, pStreamInfo, &streamHandle));
@@ -357,25 +206,13 @@ TEST_F(CallbacksProviderApiTest, createStreamVerifyCallbackChainStopsOnStopStatu
     EXPECT_EQ(STATUS_SUCCESS, createRealtimeVideoStreamInfoProvider(streamName, TEST_RETENTION_PERIOD, TEST_STREAM_BUFFER_DURATION, &pStreamInfo));
     pStreamInfo->streamCaps.nalAdaptationFlags = NAL_ADAPTATION_FLAG_NONE;
 
-    EXPECT_EQ(STATUS_INVALID_ARG, createAbstractDefaultCallbacksProvider(MAX_CALLBACK_CHAIN_COUNT + 1,
-                                                                         API_CALL_CACHE_TYPE_NONE,
-                                                                         TEST_CACHING_ENDPOINT_PERIOD,
-                                                                         mRegion,
-                                                                         TEST_CONTROL_PLANE_URI,
-                                                                         mCaCertPath,
-                                                                         NULL,
-                                                                         NULL,
-                                                                         &pClientCallbacks));
+    EXPECT_EQ(STATUS_INVALID_ARG,
+              createAbstractDefaultCallbacksProvider(MAX_CALLBACK_CHAIN_COUNT + 1, API_CALL_CACHE_TYPE_NONE, TEST_CACHING_ENDPOINT_PERIOD, mRegion,
+                                                     TEST_CONTROL_PLANE_URI, mCaCertPath, NULL, NULL, &pClientCallbacks));
 
-    EXPECT_EQ(STATUS_SUCCESS, createAbstractDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT,
-                                                                     API_CALL_CACHE_TYPE_NONE,
-                                                                     TEST_CACHING_ENDPOINT_PERIOD,
-                                                                     mRegion,
-                                                                     TEST_CONTROL_PLANE_URI,
-                                                                     mCaCertPath,
-                                                                     NULL,
-                                                                     NULL,
-                                                                     &pClientCallbacks));
+    EXPECT_EQ(STATUS_SUCCESS,
+              createAbstractDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT, API_CALL_CACHE_TYPE_NONE, TEST_CACHING_ENDPOINT_PERIOD, mRegion,
+                                                     TEST_CONTROL_PLANE_URI, mCaCertPath, NULL, NULL, &pClientCallbacks));
 
     mApiCallbacks.version = API_CALLBACKS_CURRENT_VERSION;
     mApiCallbacks.customData = (UINT64) this;
@@ -400,13 +237,9 @@ TEST_F(CallbacksProviderApiTest, createStreamVerifyCallbackChainStopsOnStopStatu
 
     UINT64 expiration = currentTime + TEST_STREAMING_TOKEN_DURATION;
     PAuthCallbacks pAuthCallbacks;
-    EXPECT_EQ(STATUS_SUCCESS, createRotatingStaticAuthCallbacks(pClientCallbacks,
-                                                                mAccessKey,
-                                                                mSecretKey,
-                                                                mSessionToken,
-                                                                expiration,
-                                                                TEST_STREAMING_TOKEN_DURATION,
-                                                                &pAuthCallbacks));
+    EXPECT_EQ(STATUS_SUCCESS,
+              createRotatingStaticAuthCallbacks(pClientCallbacks, mAccessKey, mSecretKey, mSessionToken, expiration, TEST_STREAMING_TOKEN_DURATION,
+                                                &pAuthCallbacks));
 
     EXPECT_EQ(STATUS_SUCCESS, createKinesisVideoClientSync(pDeviceInfo, pClientCallbacks, &clientHandle));
     EXPECT_EQ(STATUS_SUCCESS, createKinesisVideoStreamSync(clientHandle, pStreamInfo, &streamHandle));
@@ -423,7 +256,7 @@ TEST_F(CallbacksProviderApiTest, createStreamVerifyCallbackChainStopsOnStopStatu
     EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks));
 }
 
-}  // namespace video
-}  // namespace kinesis
-}  // namespace amazonaws
-}  // namespace com;
+} // namespace video
+} // namespace kinesis
+} // namespace amazonaws
+} // namespace com

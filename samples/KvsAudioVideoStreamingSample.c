@@ -188,11 +188,12 @@ INT32 main(INT32 argc, CHAR* argv[])
     BYTE aacAudioCpd[KVS_AAC_CPD_SIZE_BYTE];
     BYTE alawAudioCpd[KVS_PCM_CPD_SIZE_BYTE];
     VIDEO_CODEC_ID videoCodecID = VIDEO_CODEC_ID_H264;
+    CHAR endpointOverride[MAX_URI_CHAR_LEN];
 
     MEMSET(&data, 0x00, SIZEOF(SampleCustomData));
 
-    STRNCPY(audioCodec, AUDIO_CODEC_NAME_AAC, STRLEN(AUDIO_CODEC_NAME_AAC));   // aac audio by default
-    STRNCPY(videoCodec, VIDEO_CODEC_NAME_H264, STRLEN(VIDEO_CODEC_NAME_H264)); // h264 video by default
+    SNPRINTF(audioCodec, SIZEOF(audioCodec), "%s", AUDIO_CODEC_NAME_AAC);  // aac audio by default
+    SNPRINTF(videoCodec, SIZEOF(videoCodec), "%s", VIDEO_CODEC_NAME_H264); // h264 video by default
 
 #ifdef IOT_CORE_ENABLE_CREDENTIALS
     PCHAR pIotCoreCredentialEndpoint, pIotCoreCert, pIotCorePrivateKey, pIotCoreRoleAlias, pIotCoreThingName;
@@ -223,10 +224,10 @@ INT32 main(INT32 argc, CHAR* argv[])
     }
     if (argc >= 6) {
         if (!STRCMP(argv[4], AUDIO_CODEC_NAME_ALAW)) {
-            STRNCPY(audioCodec, AUDIO_CODEC_NAME_ALAW, STRLEN(AUDIO_CODEC_NAME_ALAW));
+            SNPRINTF(audioCodec, SIZEOF(audioCodec), "%s", AUDIO_CODEC_NAME_ALAW);
         }
         if (!STRCMP(argv[5], VIDEO_CODEC_NAME_H265)) {
-            STRNCPY(videoCodec, VIDEO_CODEC_NAME_H265, STRLEN(VIDEO_CODEC_NAME_H265));
+            STRCPY(videoCodec, VIDEO_CODEC_NAME_H265);
             videoCodecID = VIDEO_CODEC_ID_H265;
         }
     }
@@ -324,12 +325,15 @@ INT32 main(INT32 argc, CHAR* argv[])
 
     data.startTime = GETTIME();
     data.firstFrame = TRUE;
+
+    getEndpointOverride(endpointOverride, SIZEOF(endpointOverride));
 #ifdef IOT_CORE_ENABLE_CREDENTIALS
-    CHK_STATUS(createDefaultCallbacksProviderWithIotCertificate(pIotCoreCredentialEndpoint, pIotCoreCert, pIotCorePrivateKey, cacertPath,
-                                                                pIotCoreRoleAlias, pIotCoreThingName, region, NULL, NULL, &pClientCallbacks));
+    CHK_STATUS(createDefaultCallbacksProviderWithIotCertificateAndEndpointOverride(pIotCoreCredentialEndpoint, pIotCoreCert, pIotCorePrivateKey,
+                                                                                   cacertPath, pIotCoreRoleAlias, pIotCoreThingName, region, NULL,
+                                                                                   NULL, endpointOverride, &pClientCallbacks));
 #else
-    CHK_STATUS(createDefaultCallbacksProviderWithAwsCredentials(accessKey, secretKey, sessionToken, MAX_UINT64, region, cacertPath, NULL, NULL,
-                                                                &pClientCallbacks));
+    CHK_STATUS(createDefaultCallbacksProviderWithAwsCredentialsAndEndpointOverride(accessKey, secretKey, sessionToken, MAX_UINT64, region, cacertPath,
+                                                                                   NULL, NULL, endpointOverride, &pClientCallbacks));
 #endif
 
     if (NULL != GETENV(ENABLE_FILE_LOGGING)) {
