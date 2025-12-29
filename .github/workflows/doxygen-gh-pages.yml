@@ -6,6 +6,9 @@ on:
       - master
       - develop
 
+permissions:
+  contents: write
+
 jobs:
   generate-and-deploy-doxygen:
     runs-on: ubuntu-latest
