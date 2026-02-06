@@ -23,6 +23,9 @@ option(BUILD_OPENSSL_PLATFORM "If buildng OpenSSL what is the target platform" O
 option(LOCAL_OPENSSL_BUILD "Whether or not to use local OpenSSL build" OFF)
 option(CONSTRAINED_DEVICE "Change pthread stack size" OFF)
 
+# Dependency Flags
+option(CURL_USE_FPIC "Compile libcurl with -fPIC flag" ON)
+
 # Endpoint selection - mutually exclusive
 option(AWS_KVS_USE_LEGACY_ENDPOINT_ONLY "Use only legacy IPv4-only endpoints (ignores env vars)" OFF)
 option(AWS_KVS_USE_DUAL_STACK_ENDPOINT_ONLY "Use only dual-stack endpoints (ignores env vars)" OFF)
@@ -179,7 +182,8 @@ if(BUILD_DEPENDENCIES)
     set(BUILD_ARGS  -DBUILD_STATIC=${BUILD_STATIC}
                     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                     -DUSE_OPENSSL=${USE_OPENSSL}
-                    -DUSE_MBEDTLS=${USE_MBEDTLS})
+                    -DUSE_MBEDTLS=${USE_MBEDTLS}
+                    -DCURL_USE_FPIC=${CURL_USE_FPIC})
     build_dependency(curl ${BUILD_ARGS})
 
   endif()
