@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.6.3)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake;${CMAKE_MODULE_PATH}")
 include(Utilities)
-project(KinesisVideoProducerC VERSION 1.6.1 LANGUAGES C)
+project(KinesisVideoProducerC VERSION 1.6.2 LANGUAGES C)
 
 set(KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION 1)
 set(KINESIS_VIDEO_PRODUCER_C_MINOR_VERSION 6)
