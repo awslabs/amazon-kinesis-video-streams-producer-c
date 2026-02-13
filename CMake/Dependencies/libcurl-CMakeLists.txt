@@ -25,6 +25,10 @@ else()
     set(CMAKE_ARGS ${CMAKE_ARGS} -DBUILD_SHARED_LIBS=ON)
 endif()
 
+if (CURL_USE_FPIC)
+    set(CMAKE_ARGS ${CMAKE_ARGS} -DCMAKE_POSITION_INDEPENDENT_CODE=ON)
+endif()
+
 # By default use openssl
 if (USE_MBEDTLS)
     set(CMAKE_ARGS ${CMAKE_ARGS} -DCMAKE_USE_MBEDTLS=1)
