@@ -134,7 +134,9 @@ STATUS createCurlApiCallbacks(PCallbacksProvider pCallbacksProvider, PCHAR regio
     CHK_STATUS(initializeSslCallbacks());
 
     // CURL global initialization
+    DLOGD("Initializing curl");
     CHK(0 == curl_global_init(CURL_GLOBAL_ALL), STATUS_CURL_LIBRARY_INIT_FAILED);
+    DLOGD("Successfully initialized curl");
 
     // Not in shutdown
     ATOMIC_STORE_BOOL(&pCurlApiCallbacks->shutdown, FALSE);
