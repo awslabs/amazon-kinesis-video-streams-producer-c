@@ -16,3 +16,21 @@ VOID getEndpointOverride(PCHAR outUrl, SIZE_T maxLen)
 
     SNPRINTF(outUrl, maxLen, "%s", envValue);
 }
+
+UINT32 getSampleLogLevel()
+{
+    UINT32 userLogLevel;
+    const char* envValue = GETENV(DEBUG_LOG_LEVEL_ENV_VAR);
+
+    // Default to debug
+    if (IS_NULL_OR_EMPTY_STRING(envValue)) {
+        return LOG_LEVEL_DEBUG;
+    }
+
+    if (STATUS_FAILED(STRTOUI32((PCHAR) envValue, NULL, 10, &userLogLevel))) {
+        printf("failed to parse %s, set to debug\n", DEBUG_LOG_LEVEL_ENV_VAR);
+        userLogLevel = LOG_LEVEL_DEBUG;
+    }
+
+    return userLogLevel;
+}

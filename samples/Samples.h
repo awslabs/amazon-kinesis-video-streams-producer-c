@@ -25,6 +25,7 @@ extern "C" {
 #define MAX_NUMBER_OF_LOG_FILES  5
 
 VOID getEndpointOverride(PCHAR, SIZE_T);
+UINT32 getSampleLogLevel();
 
 #ifdef __cplusplus
 }
