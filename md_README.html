@@ -128,6 +128,7 @@ CMake Arguments</h4>
 <p>You can pass the following options to <code>cmake ..</code>.</p>
 <ul>
 <li><code>-DBUILD_DEPENDENCIES</code> &ndash; Whether or not to build depending libraries from source</li>
+<li><code>-DKVS_ENABLE_VERBOSE_LOGS</code> &ndash; Build with <code>ENTERS()</code> and <code>LEAVES()</code> logs enabled, which are <code>LOG_LEVEL_VERBOSE</code>. Default is OFF.</li>
 <li><code>-DBUILD_TEST=TRUE</code> &ndash; Build unit/integration tests, may be useful for confirm support for your device. <code>./tst/producer_test</code></li>
 <li><code>-DCODE_COVERAGE</code> &ndash; Enable coverage reporting</li>
 <li><code>-DCOMPILER_WARNINGS</code> &ndash; Enable all compiler warnings</li>
@@ -219,8 +220,8 @@ Setup logging:</h3>
 <li><code>LOG_LEVEL_PROFILE</code> -&mdash; 8</li>
 </ol>
 <p>To set a log level, you can set it using the deviceInfo structure. </p><div class="fragment"><div class="line">pDeviceInfo-&gt;clientInfo.loggerLogLevel = LOG_LEVEL_DEBUG;</div>
-</div><!-- fragment --><p>By default, our samples set the log level to <code>LOG_LEVEL_DEBUG</code>.</p>
-<p>The SDK also tracks entry and exit of functions which increases the verbosity of the logs. This will be useful when you want to track the transitions within the codebase. To do so, you need to set log level to <code>LOG_LEVEL_VERBOSE</code> and add the following to the cmake file: <code>add_definitions(-DLOG_STREAMING)</code> Note: This log level is extremely VERBOSE and could flood the files if using file based logging strategy.</p>
+</div><!-- fragment --><p>The samples set the loggerLogLevel based on the log level environment variable. If not set, it falls back to <code>LOG_LEVEL_DEBUG</code>. </p><div class="fragment"><div class="line">export AWS_KVS_LOG_LEVEL=1</div>
+</div><!-- fragment --><p>The SDK also tracks entry and exit of functions which increases the verbosity of the logs. This will be useful when you want to track the transitions within the codebase. To enable this feature, set the log level to LOG_LEVEL_VERBOSE and compile the code with <code>-DKVS_ENABLE_VERBOSE_LOGS=ON</code>. Note: This log level is extremely VERBOSE and could flood the files if using file based logging strategy.</p>
 <h3><a class="anchor" id="autotoc_md12"></a>
 Run unit tests</h3>
 <p>Since these tests exercise networking you need to have AWS credentials specified, specifically you need to:</p>
@@ -295,7 +296,7 @@ License</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Fri Feb 13 2026 22:07:40 for Amazon Kinesis Producer C SDK by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+    <li class="footer">Generated on Tue Feb 17 2026 22:40:27 for Amazon Kinesis Producer C SDK by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
   </ul>
 </div>
 </body>
