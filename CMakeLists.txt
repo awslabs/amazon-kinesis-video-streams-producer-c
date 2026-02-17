@@ -22,6 +22,7 @@ option(BUILD_COMMON_CURL "Whether or not to build ProducerC curl common library"
 option(BUILD_OPENSSL_PLATFORM "If buildng OpenSSL what is the target platform" OFF)
 option(LOCAL_OPENSSL_BUILD "Whether or not to use local OpenSSL build" OFF)
 option(CONSTRAINED_DEVICE "Change pthread stack size" OFF)
+option(KVS_ENABLE_VERBOSE_LOGS "Enable ENTERS/LEAVES logs (at LOG_LEVEL_VERBOSE)" OFF)
 
 # Dependency Flags
 option(CURL_USE_FPIC "Compile libcurl with -fPIC flag" ON)
@@ -126,6 +127,11 @@ endif()
 
 if(AWS_KVS_USE_DUAL_STACK_ENDPOINT_ONLY)
     add_definitions(-DAWS_KVS_USE_DUAL_STACK_ENDPOINT_ONLY)
+endif()
+
+if (KVS_ENABLE_VERBOSE_LOGS)
+    add_definitions(-DLOG_STREAMING)
+    message(STATUS "Enabled ENTERS/LEAVES logs")
 endif()
 
 if(BUILD_DEPENDENCIES)
