@@ -49,6 +49,7 @@ If you wish to cross-compile `CC` and `CXX` are respected when building the libr
 You can pass the following options to `cmake ..`.
 
 * `-DBUILD_DEPENDENCIES` -- Whether or not to build depending libraries from source
+* `-DKVS_ENABLE_VERBOSE_LOGS` -- Build with `ENTERS()` and `LEAVES()` logs enabled, which are `LOG_LEVEL_VERBOSE`. Default is OFF.
 * `-DBUILD_TEST=TRUE` -- Build unit/integration tests, may be useful for confirm support for your device. `./tst/producer_test`
 * `-DCODE_COVERAGE` --  Enable coverage reporting
 * `-DCOMPILER_WARNINGS` -- Enable all compiler warnings
@@ -177,10 +178,14 @@ To set a log level, you can set it using the deviceInfo structure.
 pDeviceInfo->clientInfo.loggerLogLevel = LOG_LEVEL_DEBUG;
 ```
 
-By default, our samples set the log level to `LOG_LEVEL_DEBUG`.
+The samples set the loggerLogLevel based on the log level environment variable. If not set, it falls back to `LOG_LEVEL_DEBUG`.
+```sh
+export AWS_KVS_LOG_LEVEL=1
+```
 
-The SDK also tracks entry and exit of functions which increases the verbosity of the logs. This will be useful when you want to track the transitions within the codebase. To do so, you need to set log level to `LOG_LEVEL_VERBOSE` and add the following to the cmake file:
-`add_definitions(-DLOG_STREAMING)`
+The SDK also tracks entry and exit of functions which increases the verbosity of the logs.
+This will be useful when you want to track the transitions within the codebase.
+To enable this feature, set the log level to LOG_LEVEL_VERBOSE and compile the code with `-DKVS_ENABLE_VERBOSE_LOGS=ON`.
 Note: This log level is extremely VERBOSE and could flood the files if using file based logging strategy.
 
 ### Run unit tests
