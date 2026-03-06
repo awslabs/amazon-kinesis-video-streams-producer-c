@@ -464,8 +464,9 @@ STATUS curlCompleteSync(PCurlResponse pCurlResponse)
             STRCAT(headers, header->data);
         }
 
-        DLOGW("[%s] HTTP Error %lu : Response: %s\nRequest URL: %s\nRequest Headers:%s", pCurlResponse->pCurlRequest->streamName,
-              pCurlResponse->callInfo.httpStatus, pCurlResponse->callInfo.responseData, url, headers);
+        DLOGW("[%s] HTTP Error %lu : Response: %.*s\nRequest URL: %s\nRequest Headers:%s", pCurlResponse->pCurlRequest->streamName,
+              pCurlResponse->callInfo.httpStatus, pCurlResponse->callInfo.responseDataLen,
+              pCurlResponse->callInfo.responseData != NULL ? pCurlResponse->callInfo.responseData : "", url, headers);
     }
 
 CleanUp:
