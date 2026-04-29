@@ -66,6 +66,7 @@ You can pass the following options to `cmake ..`.
 * `-DAWS_KVS_IPV6_ONLY` -- Use only IPv6 addresses from DNS (ignores env vars). Default is OFF.
 * `-DAWS_KVS_IPV4_AND_IPV6_ONLY` -- Use both IPv4 and IPv6 addresses from DNS (ignores env vars). Default is OFF.
 * `-DCURL_USE_FPIC` -- Compile libcurl with position independent code. Default is ON.
+* `-DPIC_VERSION_OVERRIDE` -- Override the version for `amazon-kinesis-video-streams-pic`. Default is set in `CMake/Dependencies/libkvspic-CMakeLists.txt`.
 
 DMEMORY_SANITIZER, DTHREAD_SANITIZER etc. flags works only with clang compiler 
 and not with gcc compiler. For using clang (on Ubuntu), do the following - 
