@@ -20,7 +20,8 @@ var searchData=
   ['max_5fsecret_5fkey_5flen_17',['MAX_SECRET_KEY_LEN',['../group__NameLengths.html#gaff3aaabf4f4790b750613d28c0e9f6da',1,'Include.h']]],
   ['max_5fsession_5ftoken_5flen_18',['MAX_SESSION_TOKEN_LEN',['../group__NameLengths.html#ga7352d249181da907a72552a26b6f74d2',1,'Include.h']]],
   ['max_5fuser_5fagent_5flen_19',['MAX_USER_AGENT_LEN',['../group__NameLengths.html#ga1fd58571978293f33ed3c56e1c5b4b30',1,'Include.h']]],
-  ['metadata_20',['Fragment metadata',['../md_README.html#autotoc_md9',1,'']]],
-  ['miscellaneous_21',['Miscellaneous',['../group__Miscellaneous.html',1,'']]],
-  ['mode_22',['Offline mode',['../md_README.html#autotoc_md13',1,'']]]
+  ['media_20',['Debug Media',['../md_README.html#autotoc_md19',1,'']]],
+  ['metadata_21',['Fragment metadata',['../md_README.html#autotoc_md9',1,'']]],
+  ['miscellaneous_22',['Miscellaneous',['../group__Miscellaneous.html',1,'']]],
+  ['mode_23',['Offline mode',['../md_README.html#autotoc_md13',1,'']]]
 ];
