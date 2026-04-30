@@ -226,6 +226,9 @@ With 2, 3, and 4, the endpoint will be constructed based on the region provided 
 3. Otherwise, no filtering will take place. Both IPv4 and IPv6 IP addresses, if returned by DNS, may be used.
 
 ## DEBUG
+
+### Debug Build Issues
+
 * When building OpenSSL during `cmake ..`, if you encounter an architecture error such as `ld: symbol(s) not found for architecture i386`, building with a local OpenSSL build may help. First install OpenSSL 1.1 (for Mac: `brew install openssl@1.1`). Next set `export PKG_CONFIG_PATH="<YOUR-PATH>/openssl@1.1/lib/pkgconfig"` (your path can be printed to terminal using `which openssl` on Linux/Mac). Now set the following flag to ON when building: `cmake .. -DLOCAL_OPENSSL_BUILD=ON`. If there are still errors regarding locating the local OpenSSL library:
     * The following environment variables may need to be set to export:
         `export LDFLAGS="-L<YOUR-PATH>/openssl@1.1/lib"` and `export CPPFLAGS="-I<YOUR-PATH>/openssl@1.1/include"`
@@ -233,6 +236,12 @@ With 2, 3, and 4, the endpoint will be constructed based on the region provided 
         `-DOPENSSL_ROOT_DIR="<YOUR-PATH>/openssl@1.1/include/openssl"`
     * If you need to have openssl@1.1 first in your PATH, run:
         `echo 'export PATH="<YOUR-PATH>/openssl@1.1/bin:$PATH"' >> ~/.zshrc`
+
+### Debug Media
+
+You can do `export KVS_DEBUG_DUMP_DATA_FILE_DIR=/path/to/directory` before streaming (the directory must exist). Producer will then dump MKV files into that path. The file is exactly what KVS will receive. You can use open source tools like [MKVToolNIX](https://mkvtoolnix.download/) to check that everything looks correct. You can also try to play the MKV file in compatible players.
+
+To check the frame timestamps submitted to the SDK, enable VERBOSE log level. The PIC library will log the timestamps of each frame submitted.
 
 ## Development
 The repository is using `develop` branch as the aggregation and all of the feature development is done in appropriate feature branches. The PRs (Pull Requests) are cut on a feature branch and once approved with all the checks passed they can be merged by a click of a button on the PR tool. The master branch should always be build-able and all the tests should be passing. We are welcoming any contribution to the code base. The master branch contains our most recent release cycle from `develop`.
