@@ -53,7 +53,7 @@ INT32 main(INT32 argc, CHAR* argv[])
     CLIENT_HANDLE clientHandle = INVALID_CLIENT_HANDLE_VALUE;
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     STATUS retStatus = STATUS_SUCCESS;
-    PCHAR accessKey = NULL, secretKey = NULL, sessionToken = NULL, streamName = NULL, region = NULL, cacertPath = NULL;
+    PCHAR streamName = NULL, region = NULL, cacertPath = NULL;
     CHAR frameFilePath[MAX_PATH_LEN + 1];
     Frame frame;
     BYTE frameBuffer[200000]; // Assuming this is enough
@@ -82,11 +82,6 @@ INT32 main(INT32 argc, CHAR* argv[])
               argv[0]);
         CHK(FALSE, STATUS_INVALID_ARG);
     }
-    if ((accessKey = GETENV(ACCESS_KEY_ENV_VAR)) == NULL || (secretKey = GETENV(SECRET_KEY_ENV_VAR)) == NULL) {
-        DLOGE("Error missing credentials");
-        CHK(FALSE, STATUS_INVALID_ARG);
-    }
-    sessionToken = GETENV(SESSION_TOKEN_ENV_VAR);
 #endif
 
     MEMSET(frameFilePath, 0x00, MAX_PATH_LEN + 1);
@@ -142,8 +137,7 @@ INT32 main(INT32 argc, CHAR* argv[])
                                                                                    cacertPath, pIotCoreRoleAlias, pIotCoreThingName, region, NULL,
                                                                                    NULL, endpointOverride, &pClientCallbacks));
 #else
-    CHK_STATUS(createDefaultCallbacksProviderWithAwsCredentialsAndEndpointOverride(accessKey, secretKey, sessionToken, MAX_UINT64, region, cacertPath,
-                                                                                   NULL, NULL, endpointOverride, &pClientCallbacks));
+    CHK_STATUS(createSampleCallbacksProvider(region, cacertPath, NULL, NULL, &pClientCallbacks));
 #endif
 
     if (NULL != GETENV(ENABLE_FILE_LOGGING)) {

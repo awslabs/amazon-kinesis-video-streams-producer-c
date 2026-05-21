@@ -285,6 +285,53 @@ CleanUp:
     return retStatus;
 }
 
+STATUS createDefaultCallbacksProviderWithEc2Credentials(PCHAR region, PCHAR caCertPath, PCHAR userAgentPostfix, PCHAR customUserAgent,
+                                                        PClientCallbacks* ppClientCallbacks)
+{
+    ENTERS();
+    STATUS retStatus = STATUS_SUCCESS;
+    PCallbacksProvider pCallbacksProvider = NULL;
+    PAuthCallbacks pAuthCallbacks = NULL;
+    PStreamCallbacks pStreamCallbacks = NULL;
+
+    CHK_STATUS(createAbstractDefaultCallbacksProvider(DEFAULT_CALLBACK_CHAIN_COUNT, API_CALL_CACHE_TYPE_ALL, ENDPOINT_UPDATE_PERIOD_SENTINEL_VALUE,
+                                                      region, EMPTY_STRING, caCertPath, userAgentPostfix, customUserAgent, ppClientCallbacks));
+
+    pCallbacksProvider = (PCallbacksProvider) *ppClientCallbacks;
+
+    CHK_STATUS(createEc2AuthCallbacks((PClientCallbacks) pCallbacksProvider, &pAuthCallbacks));
+
+    CHK_STATUS(createContinuousRetryStreamCallbacks((PClientCallbacks) pCallbacksProvider, &pStreamCallbacks));
+
+CleanUp:
+
+    if (STATUS_FAILED(retStatus)) {
+        if (pCallbacksProvider != NULL) {
+            freeCallbacksProvider((PClientCallbacks*) &pCallbacksProvider);
+        }
+
+        if (pAuthCallbacks != NULL) {
+            freeEc2AuthCallbacks(&pAuthCallbacks);
+        }
+
+        if (pStreamCallbacks != NULL) {
+            freeContinuousRetryStreamCallbacks(&pStreamCallbacks);
+        }
+
+        pCallbacksProvider = NULL;
+    }
+
+    CHK_LOG_ERR(retStatus);
+
+    // Set the return value if it's not NULL
+    if (ppClientCallbacks != NULL) {
+        *ppClientCallbacks = (PClientCallbacks) pCallbacksProvider;
+    }
+
+    LEAVES();
+    return retStatus;
+}
+
 STATUS createDefaultCallbacksProviderWithAuthCallbacks(PAuthCallbacks pAuthCallbacks, PCHAR region, PCHAR caCertPath, PCHAR userAgentPostfix,
                                                        PCHAR customUserAgent, PClientCallbacks* ppClientCallbacks)
 {

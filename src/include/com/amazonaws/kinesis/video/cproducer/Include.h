@@ -429,6 +429,26 @@ PUBLIC_API STATUS createDefaultCallbacksProviderWithIotCertificateAndTimeouts(PC
 PUBLIC_API STATUS createDefaultCallbacksProviderWithFileAuth(PCHAR, PCHAR, PCHAR, PCHAR, PCHAR, PClientCallbacks*);
 
 /**
+ * Creates a default callbacks provider that uses EC2 instance metadata (IMDSv2)
+ * for credential retrieval.
+ *
+ * NOTE: The caller is responsible for releasing the structure by calling
+ * the corresponding {@link freeCallbackProvider} API.
+ *
+ * NOTE: This provider only supports IMDSv2 (token-based). The instance must
+ * have an IAM role attached and IMDSv2 accessible.
+ *
+ * @param[in,opt] PCHAR AWS region
+ * @param[in,opt] PCHAR CA Cert path
+ * @param[in,opt] PCHAR User agent name (Use NULL)
+ * @param[in,opt] PCHAR Custom user agent to be used in the API calls
+ * @param[out] PClientCallbacks* Returned pointer to callbacks provider
+ *
+ * @return STATUS code of the execution
+ */
+PUBLIC_API STATUS createDefaultCallbacksProviderWithEc2Credentials(PCHAR, PCHAR, PCHAR, PCHAR, PClientCallbacks*);
+
+/**
  * Creates a default callbacks provider that uses auth callbacks as auth method.
  *
  * NOTE: The caller is responsible for releasing the structure by calling
@@ -788,6 +808,31 @@ PUBLIC_API STATUS createIotAuthCallbacksWithTimeouts(PClientCallbacks, PCHAR, PC
  * @return STATUS status of operation
  */
 PUBLIC_API STATUS freeIotAuthCallbacks(PAuthCallbacks*);
+
+/**
+ * Creates the EC2 IMDS Credentials auth callbacks
+ *
+ * NOTE: The caller is responsible for releasing the structure by calling
+ * the corresponding free API.
+ *
+ * NOTE: Only IMDSv2 is supported. The EC2 instance must have an IAM role
+ * attached and the instance metadata service must be accessible.
+ *
+ * @param[in] PCallbacksProvider Pointer to callback provider
+ * @param[in,out] PAuthCallbacks* Pointer to pointer to AuthCallback struct
+ *
+ * @return STATUS status of operation
+ */
+PUBLIC_API STATUS createEc2AuthCallbacks(PClientCallbacks, PAuthCallbacks*);
+
+/**
+ * Frees the EC2 IMDS Credential auth callbacks
+ *
+ * @param[in,out] PAuthCallbacks* pointer to AuthCallback provider object
+ *
+ * @return STATUS status of operation
+ */
+PUBLIC_API STATUS freeEc2AuthCallbacks(PAuthCallbacks*);
 
 /**
  * Creates the File Credentials auth callbacks
