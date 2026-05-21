@@ -74,6 +74,7 @@ typedef struct __CRYPTO_dynlock_value* PCRYPTO_dynlock_value;
 #if defined(KVS_BUILD_WITH_LWS)
 #include "Lws/LwsCall.h"
 #include "Lws/LwsIotCredentialProvider.h"
+#include "Lws/LwsEc2CredentialProvider.h"
 #endif
 
 #include "IotCredentialProvider.h"

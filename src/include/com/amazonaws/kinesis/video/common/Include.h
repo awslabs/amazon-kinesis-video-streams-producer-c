@@ -762,6 +762,29 @@ PUBLIC_API STATUS createCurlEc2CredentialProviderWithTime(GetCurrentTimeFunc, UI
 PUBLIC_API STATUS freeEc2CredentialProvider(PAwsCredentialProvider*);
 
 /**
+ * @brief Creates an EC2 IMDS (IMDSv2) based AWS credential provider object using libWebSockets
+ *
+ * Retrieves temporary credentials from the EC2 Instance Metadata Service.
+ * The instance must have an IAM role attached.
+ *
+ * @param[out] PAwsCredentialProvider* Constructed AWS credentials provider object
+ *
+ * @return STATUS code of the execution. STATUS_SUCCESS on success
+ */
+PUBLIC_API STATUS createLwsEc2CredentialProvider(PAwsCredentialProvider*);
+
+/**
+ * @brief Creates an EC2 IMDS (IMDSv2) based AWS credential provider object with custom time function using libWebSockets
+ *
+ * @param[in] GetCurrentTimeFunc Custom current time function
+ * @param[in] UINT64 function custom data
+ * @param[out] PAwsCredentialProvider* Constructed AWS credentials provider object
+ *
+ * @return STATUS code of the execution. STATUS_SUCCESS on success
+ */
+PUBLIC_API STATUS createLwsEc2CredentialProviderWithTime(GetCurrentTimeFunc, UINT64, PAwsCredentialProvider*);
+
+/**
  * @brief Creates a File based AWS credential provider object
  *
  * @param[in] PCHAR Credentials file path
