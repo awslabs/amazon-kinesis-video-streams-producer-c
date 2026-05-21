@@ -134,7 +134,8 @@ STATUS ec2FetchImdsToken(PEc2CredentialProvider pEc2CredentialProvider)
     CHK_STATUS(pEc2CredentialProvider->serviceCallFn(pRequestInfo, &callInfo));
 
     CHK_ERR(callInfo.responseDataLen > 0 && callInfo.responseDataLen <= IMDS_TOKEN_LEN, STATUS_IMDS_TOKEN_FETCH_FAILED,
-            "Failed to fetch IMDSv2 token");
+            "Failed to fetch IMDSv2 session token from %s. Verify that the instance has IMDSv2 enabled and the metadata service is reachable.",
+            tokenUrl);
 
     MEMCPY(pEc2CredentialProvider->imdsToken, callInfo.responseData, callInfo.responseDataLen);
     pEc2CredentialProvider->imdsToken[callInfo.responseDataLen] = '\0';
@@ -174,6 +175,8 @@ STATUS ec2CredentialHandler(PEc2CredentialProvider pEc2CredentialProvider)
             currentTime + IMDS_CREDENTIAL_FETCH_GRACE_PERIOD > pEc2CredentialProvider->pAwsCredentials->expiration,
         retStatus);
 
+    DLOGI("Attempting to fetch EC2 IMDS credentials");
+
     // Ensure we have a valid IMDSv2 token
     CHK_STATUS(ec2FetchImdsToken(pEc2CredentialProvider));
 
@@ -193,7 +196,7 @@ STATUS ec2CredentialHandler(PEc2CredentialProvider pEc2CredentialProvider)
     CHK_STATUS(pEc2CredentialProvider->serviceCallFn(pRequestInfo, &callInfo));
 
     CHK_ERR(callInfo.responseDataLen > 0 && callInfo.responseDataLen <= IMDS_ROLE_NAME_LEN, STATUS_IMDS_ROLE_FETCH_FAILED,
-            "Failed to fetch IAM role name from IMDS");
+            "Failed to fetch IAM role name from IMDS. Verify that an IAM role is attached to the EC2 instance.");
 
     MEMCPY(roleName, callInfo.responseData, callInfo.responseDataLen);
     roleName[callInfo.responseDataLen] = '\0';
@@ -219,6 +222,8 @@ STATUS ec2CredentialHandler(PEc2CredentialProvider pEc2CredentialProvider)
     CHK_STATUS(pEc2CredentialProvider->serviceCallFn(pRequestInfo, &callInfo));
 
     CHK_STATUS(parseEc2Response(pEc2CredentialProvider, &callInfo));
+
+    DLOGI("Successfully fetched EC2 credentials for role %s", roleName);
 
 CleanUp:
 

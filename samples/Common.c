@@ -53,11 +53,12 @@ STATUS createSampleCallbacksProvider(PCHAR region, PCHAR caCertPath, PCHAR userA
     sessionToken = GETENV(SESSION_TOKEN_ENV_VAR);
 
     if (accessKey != NULL && secretKey != NULL) {
+        DLOGI("Using environment variable credentials");
         CHK_STATUS(createDefaultCallbacksProviderWithAwsCredentialsAndEndpointOverride(accessKey, secretKey, sessionToken, MAX_UINT64, region,
                                                                                        caCertPath, userAgentPostfix, customUserAgent,
                                                                                        endpointOverride, ppClientCallbacks));
     } else {
-        DLOGI("No env credentials found, falling back to EC2 instance credentials");
+        DLOGI("Environment variable credentials not found, using EC2 IMDS credential provider");
         CHK_STATUS(createAbstractDefaultCallbacksProvider(DEFAULT_CALLBACK_CHAIN_COUNT, API_CALL_CACHE_TYPE_ALL,
                                                           ENDPOINT_UPDATE_PERIOD_SENTINEL_VALUE, region, endpointOverride, caCertPath,
                                                           userAgentPostfix, customUserAgent, ppClientCallbacks));
