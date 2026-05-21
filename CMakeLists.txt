@@ -23,6 +23,7 @@ option(BUILD_OPENSSL_PLATFORM "If buildng OpenSSL what is the target platform" O
 option(LOCAL_OPENSSL_BUILD "Whether or not to use local OpenSSL build" OFF)
 option(CONSTRAINED_DEVICE "Change pthread stack size" OFF)
 option(KVS_ENABLE_VERBOSE_LOGS "Enable ENTERS/LEAVES logs (at LOG_LEVEL_VERBOSE)" OFF)
+option(PARALLEL_BUILD "Build dependencies with parallel flag" OFF)
 
 # Dependency Flags
 option(CURL_USE_FPIC "Compile libcurl with -fPIC flag" ON)

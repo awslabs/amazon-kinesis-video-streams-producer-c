@@ -76,7 +76,7 @@ jobs:
           $CC --version
           $CXX --version
           mkdir build && cd build
-          cmake .. -DBUILD_TEST=ON $CMAKE_FLAGS_EXTRA
+          cmake .. -DBUILD_TEST=ON -DPARALLEL_BUILD=ON $CMAKE_FLAGS_EXTRA
           make -j
 
       - name: Configure AWS Credentials
@@ -109,7 +109,7 @@ jobs:
       - name: Build repository
         run: |
           mkdir build && cd build
-          cmake .. -DCODE_COVERAGE=TRUE -DBUILD_TEST=TRUE -DBUILD_COMMON_LWS=TRUE
+          cmake .. -DCODE_COVERAGE=TRUE -DBUILD_TEST=TRUE -DBUILD_COMMON_LWS=TRUE -DPARALLEL_BUILD=ON
           make
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -147,7 +147,7 @@ jobs:
       - name: Build repository
         run: |
           mkdir build && cd build
-          cmake .. -DBUILD_TEST=TRUE -DADDRESS_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
+          cmake .. -DBUILD_TEST=TRUE -DADDRESS_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE -DPARALLEL_BUILD=ON
           make
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -180,7 +180,7 @@ jobs:
       - name: Build repository
         run: |
           mkdir build && cd build
-          cmake .. -DBUILD_TEST=TRUE -DUNDEFINED_BEHAVIOR_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
+          cmake .. -DBUILD_TEST=TRUE -DUNDEFINED_BEHAVIOR_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE -DPARALLEL_BUILD=ON
           make
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -298,7 +298,7 @@ jobs:
       - name: Build repository
         run: |
           mkdir build && cd build
-          cmake .. -DBUILD_TEST=ON ${{ matrix.build-configuration.cmake-args }}
+          cmake .. -DBUILD_TEST=ON -DPARALLEL_BUILD=ON ${{ matrix.build-configuration.cmake-args }}
           make -j
 
       - name: Check libCurl
@@ -355,7 +355,7 @@ jobs:
         run: |
           sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'
           mkdir build && cd build
-          cmake .. -DBUILD_TEST=TRUE -DBUILD_OPENSSL_PLATFORM=linux-generic64
+          cmake .. -DBUILD_TEST=TRUE -DBUILD_OPENSSL_PLATFORM=linux-generic64 -DPARALLEL_BUILD=ON
           make -j
           file libcproducer.so
 
@@ -381,7 +381,7 @@ jobs:
         run: |
           sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'
           mkdir build && cd build
-          cmake .. -DBUILD_TEST=TRUE -DBUILD_OPENSSL_PLATFORM=linux-aarch64
+          cmake .. -DBUILD_TEST=TRUE -DBUILD_OPENSSL_PLATFORM=linux-aarch64 -DPARALLEL_BUILD=ON
           make -j
           file libcproducer.so
 
@@ -410,7 +410,7 @@ jobs:
         run: |
           sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'
           mkdir build && cd build
-          cmake .. -DBUILD_TEST=TRUE -DBUILD_OPENSSL_PLATFORM=linux-generic32
+          cmake .. -DBUILD_TEST=TRUE -DBUILD_OPENSSL_PLATFORM=linux-generic32 -DPARALLEL_BUILD=ON
           make
           file libcproducer.so
 
@@ -428,7 +428,7 @@ jobs:
       - name: Build Repository
         run: |
           mkdir build && cd build
-          cmake .. -DBUILD_STATIC=ON
+          cmake .. -DBUILD_STATIC=ON -DPARALLEL_BUILD=ON
           make
 
   linux-thread-size-check:
@@ -467,7 +467,7 @@ jobs:
       - name: Build Repository
         run: |
           mkdir build && cd build
-          cmake .. -DBUILD_TEST=TRUE -DKVS_DEFAULT_STACK_SIZE=65536
+          cmake .. -DBUILD_TEST=TRUE -DKVS_DEFAULT_STACK_SIZE=65536 -DPARALLEL_BUILD=ON
           make -j$(nproc)
 
       - name: Run tests with expected failure
