@@ -44,6 +44,8 @@ STATUS createSampleCallbacksProvider(PCHAR region, PCHAR caCertPath, PCHAR userA
     PStreamCallbacks pStreamCallbacks = NULL;
     CHAR endpointOverride[MAX_URI_CHAR_LEN];
 
+    SET_LOGGER_LOG_LEVEL(getSampleLogLevel());
+
     CHK(ppClientCallbacks != NULL, STATUS_NULL_ARG);
 
     getEndpointOverride(endpointOverride, SIZEOF(endpointOverride));
