@@ -16,8 +16,11 @@ STATUS blockingLwsCall(PRequestInfo pRequestInfo, PCallInfo pCallInfo)
     struct lws* clientLws = NULL;
     volatile INT32 retVal = 0;
     struct lws_protocols lwsProtocols[2];
+    BOOL useSsl;
 
     CHK(pRequestInfo != NULL && pCallInfo != NULL, STATUS_NULL_ARG);
+
+    useSsl = STRNCMP(pRequestInfo->url, "http://", 7) != 0;
 
     // Prepare the signaling channel protocols array
     MEMSET(lwsProtocols, 0x00, SIZEOF(lwsProtocols));
@@ -28,24 +31,26 @@ STATUS blockingLwsCall(PRequestInfo pRequestInfo, PCallInfo pCallInfo)
 
     // Prepare the LWS context
     MEMSET(&creationInfo, 0x00, SIZEOF(struct lws_context_creation_info));
-    creationInfo.options = LWS_SERVER_OPTION_DO_SSL_GLOBAL_INIT;
+    creationInfo.options = useSsl ? LWS_SERVER_OPTION_DO_SSL_GLOBAL_INIT : 0;
     creationInfo.port = CONTEXT_PORT_NO_LISTEN;
     creationInfo.protocols = lwsProtocols;
     creationInfo.timeout_secs = pRequestInfo->completionTimeout / HUNDREDS_OF_NANOS_IN_A_SECOND;
     creationInfo.gid = -1;
     creationInfo.uid = -1;
     creationInfo.fd_limit_per_thread = 1 + 1 + 1;
-    creationInfo.client_ssl_ca_filepath = pRequestInfo->certPath;
-    creationInfo.client_ssl_cert_filepath = pRequestInfo->sslCertPath;
-    creationInfo.client_ssl_private_key_filepath = pRequestInfo->sslPrivateKeyPath;
+    if (useSsl) {
+        creationInfo.client_ssl_ca_filepath = pRequestInfo->certPath;
+        creationInfo.client_ssl_cert_filepath = pRequestInfo->sslCertPath;
+        creationInfo.client_ssl_private_key_filepath = pRequestInfo->sslPrivateKeyPath;
+    }
 
     CHK(NULL != (lwsContext = lws_create_context(&creationInfo)), STATUS_IOT_CREATE_LWS_CONTEXT_FAILED);
 
     // Execute the LWS REST call
     MEMSET(&connectInfo, 0x00, SIZEOF(struct lws_client_connect_info));
     connectInfo.context = lwsContext;
-    connectInfo.ssl_connection = LCCSCF_USE_SSL;
-    connectInfo.port = DEFAULT_SSL_PORT_NUMBER;
+    connectInfo.ssl_connection = useSsl ? LCCSCF_USE_SSL : 0;
+    connectInfo.port = useSsl ? DEFAULT_SSL_PORT_NUMBER : 80;
 
     CHK_STATUS(getRequestHost(pRequestInfo->url, &pHostStart, &pHostEnd));
 
@@ -59,7 +64,17 @@ STATUS blockingLwsCall(PRequestInfo pRequestInfo, PCallInfo pCallInfo)
     connectInfo.address = pHostStart;
     connectInfo.path = path;
     connectInfo.host = connectInfo.address;
-    connectInfo.method = HTTP_REQUEST_VERB_GET_STRING;
+    switch (pRequestInfo->verb) {
+        case HTTP_REQUEST_VERB_PUT:
+            connectInfo.method = HTTP_REQUEST_VERB_PUT_STRING;
+            break;
+        case HTTP_REQUEST_VERB_POST:
+            connectInfo.method = HTTP_REQUEST_VERB_POST_STRING;
+            break;
+        default:
+            connectInfo.method = HTTP_REQUEST_VERB_GET_STRING;
+            break;
+    }
     connectInfo.protocol = lwsProtocols[0].name;
     connectInfo.pwsi = &clientLws;
 
