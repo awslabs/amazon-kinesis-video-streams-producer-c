@@ -8,6 +8,12 @@ function(fetch_repo lib_name)
     return()
   endif()
 
+  if(WIN32 OR NOT PARALLEL_BUILD)
+    set(PARALLEL_FLAG "")
+  else()
+    set(PARALLEL_FLAG "--parallel")
+  endif()
+
   # anything after lib_name(${ARGN}) are assumed to be arguments passed over to
   # library building cmake.
   set(build_args ${ARGN})
@@ -25,7 +31,7 @@ function(fetch_repo lib_name)
     message(FATAL_ERROR "CMake step for lib${lib_name} failed: ${result}")
   endif()
   execute_process(
-    COMMAND ${CMAKE_COMMAND} --build .
+    COMMAND ${CMAKE_COMMAND} --build . ${PARALLEL_FLAG}
     RESULT_VARIABLE result
     WORKING_DIRECTORY ${DEPENDENCY_DOWNLOAD_PATH}/lib${lib_name})
   if(result)
@@ -47,6 +53,12 @@ function(build_dependency lib_name)
   if(${index} EQUAL -1)
     message(WARNING "${lib_name} is not supported to build from source")
     return()
+  endif()
+
+  if(WIN32 OR NOT PARALLEL_BUILD)
+    set(PARALLEL_FLAG "")
+  else()
+    set(PARALLEL_FLAG "--parallel")
   endif()
 
   set(lib_file_name ${lib_name})
@@ -86,7 +98,7 @@ function(build_dependency lib_name)
     message(FATAL_ERROR "CMake step for lib${lib_name} failed: ${result}")
   endif()
   execute_process(
-    COMMAND ${CMAKE_COMMAND} --build . --parallel
+    COMMAND ${CMAKE_COMMAND} --build . ${PARALLEL_FLAG}
     RESULT_VARIABLE result
     WORKING_DIRECTORY ${OPEN_SRC_INSTALL_PREFIX}/lib${lib_name})
   if(result)

@@ -49,6 +49,7 @@ If you wish to cross-compile `CC` and `CXX` are respected when building the libr
 You can pass the following options to `cmake ..`.
 
 * `-DBUILD_DEPENDENCIES` -- Whether or not to build depending libraries from source
+* `-DPARALLEL_BUILD` -- Build dependencies with multiple cores. OFF by default. Disabled on Windows.
 * `-DKVS_ENABLE_VERBOSE_LOGS` -- Build with `ENTERS()` and `LEAVES()` logs enabled, which are `LOG_LEVEL_VERBOSE`. Default is OFF.
 * `-DBUILD_TEST=TRUE` -- Build unit/integration tests, may be useful for confirm support for your device. `./tst/producer_test`
 * `-DCODE_COVERAGE` --  Enable coverage reporting
