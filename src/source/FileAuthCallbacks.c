@@ -116,10 +116,20 @@ STATUS getStreamingTokenFileFunc(UINT64 customData, PCHAR streamName, STREAM_ACC
     PAwsCredentialProvider pCredentialProvider;
     PCallbacksProvider pCallbacksProvider = NULL;
     PFileAuthCallbacks pFileAuthCallbacks = (PFileAuthCallbacks) customData;
+    UINT64 currentTime;
 
     CHK(pFileAuthCallbacks != NULL && pServiceCallContext != NULL, STATUS_NULL_ARG);
 
     pCallbacksProvider = pFileAuthCallbacks->pCallbacksProvider;
+
+    // Respect the callAfter to honor backoff wait time from the state machine retry strategy
+    if (pServiceCallContext->callAfter != 0) {
+        currentTime = pCallbacksProvider->clientCallbacks.getCurrentTimeFn(pCallbacksProvider->clientCallbacks.customData);
+        if (currentTime < pServiceCallContext->callAfter) {
+            THREAD_SLEEP(pServiceCallContext->callAfter - currentTime);
+        }
+    }
+
     pCredentialProvider = (PAwsCredentialProvider) pFileAuthCallbacks->pCredentialProvider;
     CHK_STATUS(pCredentialProvider->getCredentialsFn(pCredentialProvider, &pAwsCredentials));
 
