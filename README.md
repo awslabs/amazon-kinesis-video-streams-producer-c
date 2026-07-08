@@ -244,6 +244,27 @@ You can do `export KVS_DEBUG_DUMP_DATA_FILE_DIR=/path/to/directory` before strea
 
 To check the frame timestamps submitted to the SDK, enable VERBOSE log level. The PIC library will log the timestamps of each frame submitted.
 
+## Local Development with Dependency Overrides
+
+When developing changes across the SDK stack (C Producer → PIC), you can point the build to a local PIC checkout instead of fetching from GitHub. This avoids the git-fetch cycle and lets you test PIC changes immediately.
+
+### CMake Variable
+
+| Variable | Description |
+|----------|-------------|
+| `LOCAL_KVSPIC_PATH` | Path to a local [KVS PIC](https://github.com/awslabs/amazon-kinesis-video-streams-pic) checkout |
+
+### Usage
+
+```bash
+# Build C Producer using local PIC
+mkdir -p build && cd build
+cmake .. -DLOCAL_KVSPIC_PATH=/path/to/amazon-kinesis-video-streams-pic
+make
+```
+
+When `LOCAL_KVSPIC_PATH` is set, the build uses `add_subdirectory` to include PIC directly from your local path instead of fetching it from GitHub or using a system-installed version. Changes in PIC source files are picked up on the next `make` without re-running `cmake`.
+
 ## Development
 The repository is using `develop` branch as the aggregation and all of the feature development is done in appropriate feature branches. The PRs (Pull Requests) are cut on a feature branch and once approved with all the checks passed they can be merged by a click of a button on the PR tool. The master branch should always be build-able and all the tests should be passing. We are welcoming any contribution to the code base. The master branch contains our most recent release cycle from `develop`.
 

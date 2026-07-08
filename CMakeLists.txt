@@ -206,24 +206,34 @@ find_package(PkgConfig REQUIRED)
 
 ############# Check system for kvspic #############
 
-pkg_check_modules(KVSPIC libkvspicUtils)
-if(KVSPIC_FOUND)
-  set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${KVSPIC_INCLUDE_DIRS})
-  link_directories(${KVSPIC_LIBRARY_DIRS})
-else()
-  ############# fetch repos that we need do add_subdirectory ############
-  # repos that we will build using add_subdirectory will be stored in this path
-  set(DEPENDENCY_DOWNLOAD_PATH ${CMAKE_CURRENT_SOURCE_DIR}/dependency)
-  set(BUILD_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
-  if (PIC_VERSION_OVERRIDE)
-      set(BUILD_ARGS ${BUILD_ARGS} -DPIC_VERSION_OVERRIDE=${PIC_VERSION_OVERRIDE})
+# Local development override: point to your local kvspic checkout
+set(LOCAL_KVSPIC_PATH "" CACHE PATH "Path to local KVS PIC SDK (skips git fetch when set)")
+
+if(LOCAL_KVSPIC_PATH)
+  message(STATUS "Using LOCAL KVS PIC SDK at: ${LOCAL_KVSPIC_PATH}")
+  if(NOT EXISTS ${LOCAL_KVSPIC_PATH}/CMakeLists.txt)
+    message(FATAL_ERROR "LOCAL_KVSPIC_PATH does not contain a CMakeLists.txt: ${LOCAL_KVSPIC_PATH}")
   endif()
-  fetch_repo(kvspic ${BUILD_ARGS})
-  add_subdirectory("${DEPENDENCY_DOWNLOAD_PATH}/libkvspic/kvspic-src")
+  add_subdirectory(${LOCAL_KVSPIC_PATH} ${CMAKE_CURRENT_BINARY_DIR}/kvspic-build)
   file(GLOB PIC_HEADERS "${pic_project_SOURCE_DIR}/src/*/include")
   include_directories("${PIC_HEADERS}")
+else()
+  pkg_check_modules(KVSPIC libkvspicUtils)
+  if(KVSPIC_FOUND)
+    set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${KVSPIC_INCLUDE_DIRS})
+    link_directories(${KVSPIC_LIBRARY_DIRS})
+  else()
+    ############# fetch repos that we need do add_subdirectory ############
+    # repos that we will build using add_subdirectory will be stored in this path
+    set(DEPENDENCY_DOWNLOAD_PATH ${CMAKE_CURRENT_SOURCE_DIR}/dependency)
+    set(BUILD_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
+    fetch_repo(kvspic ${BUILD_ARGS})
+    add_subdirectory("${DEPENDENCY_DOWNLOAD_PATH}/libkvspic/kvspic-src")
+    file(GLOB PIC_HEADERS "${pic_project_SOURCE_DIR}/src/*/include")
+    include_directories("${PIC_HEADERS}")
 
-  ############# fetch repos that we need do add_subdirectory done ############
+    ############# fetch repos that we need do add_subdirectory done ############
+  endif()
 endif()
 
 ############# Check system for kvspic done #############
