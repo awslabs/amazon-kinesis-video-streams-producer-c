@@ -274,28 +274,46 @@ Debug Media</h3>
 <p>You can do <code>export KVS_DEBUG_DUMP_DATA_FILE_DIR=/path/to/directory</code> before streaming (the directory must exist). Producer will then dump MKV files into that path. The file is exactly what KVS will receive. You can use open source tools like <a href="https://mkvtoolnix.download/">MKVToolNIX</a> to check that everything looks correct. You can also try to play the MKV file in compatible players.</p>
 <p>To check the frame timestamps submitted to the SDK, enable VERBOSE log level. The PIC library will log the timestamps of each frame submitted.</p>
 <h2><a class="anchor" id="autotoc_md20"></a>
+Local Development with Dependency Overrides</h2>
+<p>When developing changes across the SDK stack (C Producer → PIC), you can point the build to a local PIC checkout instead of fetching from GitHub. This avoids the git-fetch cycle and lets you test PIC changes immediately.</p>
+<h3><a class="anchor" id="autotoc_md21"></a>
+CMake Variable</h3>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Variable   </th><th class="markdownTableHeadNone">Description    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>LOCAL_KVSPIC_PATH</code>   </td><td class="markdownTableBodyNone">Path to a local <a href="https://github.com/awslabs/amazon-kinesis-video-streams-pic">KVS PIC</a> checkout   </td></tr>
+</table>
+<h3><a class="anchor" id="autotoc_md22"></a>
+Usage</h3>
+<div class="fragment"><div class="line"># Build C Producer using local PIC</div>
+<div class="line">mkdir -p build &amp;&amp; cd build</div>
+<div class="line">cmake .. -DLOCAL_KVSPIC_PATH=/path/to/amazon-kinesis-video-streams-pic</div>
+<div class="line">make</div>
+</div><!-- fragment --><p>When <code>LOCAL_KVSPIC_PATH</code> is set, the build uses <code>add_subdirectory</code> to include PIC directly from your local path instead of fetching it from GitHub or using a system-installed version. Changes in PIC source files are picked up on the next <code>make</code> without re-running <code>cmake</code>.</p>
+<h2><a class="anchor" id="autotoc_md23"></a>
 Development</h2>
 <p>The repository is using <code>develop</code> branch as the aggregation and all of the feature development is done in appropriate feature branches. The PRs (Pull Requests) are cut on a feature branch and once approved with all the checks passed they can be merged by a click of a button on the PR tool. The master branch should always be build-able and all the tests should be passing. We are welcoming any contribution to the code base. The master branch contains our most recent release cycle from <code>develop</code>.</p>
-<h3><a class="anchor" id="autotoc_md21"></a>
+<h3><a class="anchor" id="autotoc_md24"></a>
 Release</h3>
 <p>The repository is under active development and even with incremental unit test coverage where some of the tests are actually full integration tests, we require more rigorous internal testing in order to 'cut' release versions. The release is cut against a particular commit that gets approved. The general philosophy is to cut a release when a set of commits contribute to a self-containing feature or when we add major internal functionality improvements.</p>
-<h3><a class="anchor" id="autotoc_md22"></a>
+<h3><a class="anchor" id="autotoc_md25"></a>
 Versioning</h3>
 <p>We deploy 3 digit version strings in a form of 'Major.Minor.Revision' scheme.</p><ul>
 <li>Major version update - Major functionality changes. Might not have direct backward compatibility. For example, multiple public API parameter changes.</li>
 <li>Minor version update - Additional features. Major bug fixes. Might have some minor backward compatibility issues. For example, an extra parameter on a callback function.</li>
 <li>Revision version update - Minor features. Bug fixes. Full backward compatibility. For example, an extra fields added to the public structures with version bump.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md23"></a>
+<h2><a class="anchor" id="autotoc_md26"></a>
 Documentation</h2>
-<h2><a class="anchor" id="autotoc_md24"></a>
+<h2><a class="anchor" id="autotoc_md27"></a>
 Related</h2>
 <ul>
 <li><a href="https://github.com/awslabs/amazon-kinesis-video-streams-producer-sdk-cpp/">CPP SDK</a></li>
 <li><a href="https://github.com/awslabs/amazon-kinesis-video-streams-producer-sdk-java/">Java SDK</a></li>
 <li><a href="https://github.com/awslabs/amazon-kinesis-video-streams-pic/">PIC</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md25"></a>
+<h2><a class="anchor" id="autotoc_md28"></a>
 License</h2>
 <p>This library is licensed under the Apache 2.0 License. </p>
 </div></div><!-- contents -->
@@ -304,7 +322,7 @@ License</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Tue May 26 2026 20:40:26 for Amazon Kinesis Producer C SDK by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+    <li class="footer">Generated on Fri Jul 10 2026 05:28:20 for Amazon Kinesis Producer C SDK by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
   </ul>
 </div>
 </body>

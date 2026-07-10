@@ -6,5 +6,6 @@ var searchData=
   ['uridecodestring_3',['uriDecodeString',['../AwsV4Signer_8c.html#aa95d814be4520d03d88f2a2f26ab3fdf',1,'AwsV4Signer.c']]],
   ['uriencodestring_4',['uriEncodeString',['../AwsV4Signer_8c.html#af5bb5f6b333a4755585997deb3128d24',1,'AwsV4Signer.c']]],
   ['url_5',['url',['../struct____RequestInfo.html#abb64f8121a641baee33921f52d4a7335',1,'__RequestInfo']]],
-  ['util_2ec_6',['Util.c',['../Util_8c.html',1,'']]]
+  ['usage_6',['Usage',['../md_README.html#autotoc_md22',1,'']]],
+  ['util_2ec_7',['Util.c',['../Util_8c.html',1,'']]]
 ];
