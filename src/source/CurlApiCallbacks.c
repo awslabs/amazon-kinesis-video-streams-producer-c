@@ -2276,7 +2276,13 @@ CleanUp:
         }
 
         // Bubble the notification to potential listeners
-        notifyCallResult(pCallbacksProvider, retStatus, streamHandle);
+        if (callResult != SERVICE_CALL_RESULT_OK && callResult != SERVICE_CALL_RESULT_NOT_SET) {
+            // notify listeners with actual result from the curl response if service call was successful
+            notifyCallResult(pCallbacksProvider, serviceCallResultCheck(callResult), streamHandle);
+        } else {
+            // notify with general return status of the operation
+            notifyCallResult(pCallbacksProvider, retStatus, streamHandle);
+        }
     }
 
     LEAVES();
