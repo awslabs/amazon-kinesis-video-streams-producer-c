@@ -1113,6 +1113,7 @@ STATUS createStreamCachingCurl(UINT64 customData, PCHAR deviceName, PCHAR stream
     PCurlApiCallbacks pCurlApiCallbacks = (PCurlApiCallbacks) customData;
     PCallbacksProvider pCallbacksProvider = NULL;
     BOOL emulateApiCall = TRUE;
+    UINT64 currentTime;
 
     CHK(pCurlApiCallbacks != NULL && pCurlApiCallbacks->pCallbacksProvider != NULL && pServiceCallContext != NULL, STATUS_INVALID_ARG);
     pCallbacksProvider = pCurlApiCallbacks->pCallbacksProvider;
@@ -1128,6 +1129,14 @@ STATUS createStreamCachingCurl(UINT64 customData, PCHAR deviceName, PCHAR stream
 
         // Early return
         CHK(FALSE, retStatus);
+    }
+
+    // Respect the callAfter to honor backoff wait time from the state machine retry strategy
+    if (pServiceCallContext->callAfter != 0) {
+        currentTime = pCallbacksProvider->clientCallbacks.getCurrentTimeFn(pCallbacksProvider->clientCallbacks.customData);
+        if (currentTime < pServiceCallContext->callAfter) {
+            THREAD_SLEEP(pServiceCallContext->callAfter - currentTime);
+        }
     }
 
     DLOGV("[%s] No-op CreateStream API call", streamName);
@@ -1347,6 +1356,7 @@ STATUS describeStreamCachingCurl(UINT64 customData, PCHAR streamName, PServiceCa
     StreamDescription streamDescription;
     PStreamInfo pStreamInfo;
     BOOL emulateApiCall = TRUE;
+    UINT64 currentTime;
 
     CHK(pCurlApiCallbacks != NULL && pCurlApiCallbacks->pCallbacksProvider != NULL && pServiceCallContext != NULL, STATUS_INVALID_ARG);
     pCallbacksProvider = pCurlApiCallbacks->pCallbacksProvider;
@@ -1362,6 +1372,14 @@ STATUS describeStreamCachingCurl(UINT64 customData, PCHAR streamName, PServiceCa
 
         // Early return
         CHK(FALSE, retStatus);
+    }
+
+    // Respect the callAfter to honor backoff wait time from the state machine retry strategy
+    if (pServiceCallContext->callAfter != 0) {
+        currentTime = pCallbacksProvider->clientCallbacks.getCurrentTimeFn(pCallbacksProvider->clientCallbacks.customData);
+        if (currentTime < pServiceCallContext->callAfter) {
+            THREAD_SLEEP(pServiceCallContext->callAfter - currentTime);
+        }
     }
 
     // Get the stream info from the stream handle
@@ -1666,6 +1684,14 @@ STATUS getStreamingEndpointCachingCurl(UINT64 customData, PCHAR streamName, PCHA
     pCallbacksProvider = pCurlApiCallbacks->pCallbacksProvider;
 
     streamHandle = (STREAM_HANDLE) pServiceCallContext->customData;
+
+    // Respect the callAfter to honor backoff wait time from the state machine retry strategy
+    if (pServiceCallContext->callAfter != 0) {
+        curTime = pCallbacksProvider->clientCallbacks.getCurrentTimeFn(pCallbacksProvider->clientCallbacks.customData);
+        if (curTime < pServiceCallContext->callAfter) {
+            THREAD_SLEEP(pServiceCallContext->callAfter - curTime);
+        }
+    }
 
     // We check whether we have already made the call by checking
     // for the presence of the endpoint in the cache.
@@ -1998,6 +2024,7 @@ STATUS tagResourceCachingCurl(UINT64 customData, PCHAR streamArn, UINT32 tagCoun
     PCallbacksProvider pCallbacksProvider = NULL;
     STREAM_HANDLE streamHandle;
     BOOL emulateApiCall = TRUE;
+    UINT64 currentTime;
 
     CHK(pCurlApiCallbacks != NULL && pCurlApiCallbacks->pCallbacksProvider != NULL && pServiceCallContext != NULL, STATUS_INVALID_ARG);
     pCallbacksProvider = pCurlApiCallbacks->pCallbacksProvider;
@@ -2013,6 +2040,14 @@ STATUS tagResourceCachingCurl(UINT64 customData, PCHAR streamArn, UINT32 tagCoun
 
         // Early return
         CHK(FALSE, retStatus);
+    }
+
+    // Respect the callAfter to honor backoff wait time from the state machine retry strategy
+    if (pServiceCallContext->callAfter != 0) {
+        currentTime = pCallbacksProvider->clientCallbacks.getCurrentTimeFn(pCallbacksProvider->clientCallbacks.customData);
+        if (currentTime < pServiceCallContext->callAfter) {
+            THREAD_SLEEP(pServiceCallContext->callAfter - currentTime);
+        }
     }
 
     DLOGV("Caching TagResource API call");
