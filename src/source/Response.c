@@ -393,6 +393,9 @@ SERVICE_CALL_RESULT getServiceCallResultFromCurlStatus(CURLcode curlStatus)
         case CURLE_UNSUPPORTED_PROTOCOL:
             return SERVICE_CALL_INVALID_ARG;
         case CURLE_OPERATION_TIMEDOUT:
+        case CURLE_PARTIAL_FILE:
+        case CURLE_COULDNT_RESOLVE_HOST:
+        case CURLE_COULDNT_CONNECT:
             return SERVICE_CALL_NETWORK_CONNECTION_TIMEOUT;
         case CURLE_SSL_CERTPROBLEM:
         case CURLE_SSL_CACERT:
