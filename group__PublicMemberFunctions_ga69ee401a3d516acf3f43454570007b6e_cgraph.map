@@ -1,27 +1,27 @@
 <map id="createStaticAuthCallbacks" name="createStaticAuthCallbacks">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,301,199,327"/>
-<area shape="rect" id="Node000002" href="$group__PublicMemberFunctions.html#ga6b3d5c98d6dc8b6060fa8a8a2c9669c7" title=" " alt="" coords="285,127,423,152"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="120,299,321,158,324,162,123,303"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,289,199,315"/>
+<area shape="rect" id="Node000002" href="$group__PublicMemberFunctions.html#ga6b3d5c98d6dc8b6060fa8a8a2c9669c7" title=" " alt="" coords="285,140,423,165"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="120,287,245,205,313,169,315,174,248,210,123,291"/>
 <area shape="rect" id="Node000008" href="$group__PublicMemberFunctions.html#ga76944b3c59fd2fad4348349a00c1bc49" title="Creates a Static AWS credential provider object." alt="" coords="511,252,733,277"/>
-<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="195,299,246,293,498,271,498,276,247,298,196,304"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="184,287,246,279,376,270,498,265,498,270,376,275,247,285,185,292"/>
 <area shape="rect" id="Node000013" href="$group__PublicMemberFunctions.html#ga5d6efb4bcce7b45136d21dd7c21b05d3" title=" " alt="" coords="533,301,711,327"/>
-<area shape="poly" id="edge13_Node000001_Node000013" title=" " alt="" coords="199,311,519,311,519,317,199,317"/>
-<area shape="rect" id="Node000014" href="$StaticAuthCallbacks_8c.html#a6ed8933ffce03b0b35f1a6fc5afaa943" title=" " alt="" coords="250,327,458,352"/>
-<area shape="poly" id="edge15_Node000001_Node000014" title=" " alt="" coords="199,321,237,325,236,330,199,326"/>
-<area shape="rect" id="Node000015" href="$StaticAuthCallbacks_8c.html#ae40218d7597a2dbf04c65657b36baf25" title=" " alt="" coords="254,376,454,401"/>
-<area shape="poly" id="edge17_Node000001_Node000015" title=" " alt="" coords="138,324,247,361,282,370,281,375,246,366,136,329"/>
-<area shape="rect" id="Node000016" href="$StaticAuthCallbacks_8c.html#a210eaa03571b74e4ca79dad52d98d4b0" title=" " alt="" coords="247,425,461,451"/>
-<area shape="poly" id="edge18_Node000001_Node000016" title=" " alt="" coords="119,325,173,368,209,391,248,412,267,419,265,424,246,416,207,396,170,372,116,329"/>
+<area shape="poly" id="edge13_Node000001_Node000013" title=" " alt="" coords="199,298,461,301,519,304,519,309,461,306,199,303"/>
+<area shape="rect" id="Node000014" href="$StaticAuthCallbacks_8c.html#a6ed8933ffce03b0b35f1a6fc5afaa943" title=" " alt="" coords="250,315,458,340"/>
+<area shape="poly" id="edge15_Node000001_Node000014" title=" " alt="" coords="199,309,237,313,236,318,199,314"/>
+<area shape="rect" id="Node000015" href="$StaticAuthCallbacks_8c.html#ae40218d7597a2dbf04c65657b36baf25" title=" " alt="" coords="254,364,454,389"/>
+<area shape="poly" id="edge17_Node000001_Node000015" title=" " alt="" coords="137,312,247,350,278,358,277,363,246,355,135,317"/>
+<area shape="rect" id="Node000016" href="$StaticAuthCallbacks_8c.html#a210eaa03571b74e4ca79dad52d98d4b0" title=" " alt="" coords="247,413,461,439"/>
+<area shape="poly" id="edge18_Node000001_Node000016" title=" " alt="" coords="119,313,173,356,209,379,248,400,267,407,265,412,246,404,207,384,170,360,116,317"/>
 <area shape="rect" id="Node000003" href="$CallbacksProvider_8c.html#ad12c94ae140c934f01effa3c122bd735" title=" " alt="" coords="517,5,727,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="370,124,429,83,467,59,508,40,530,32,532,37,510,44,470,64,431,87,373,129"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="367,138,426,90,465,62,508,40,528,32,530,37,510,44,468,67,429,94,371,142"/>
 <area shape="rect" id="Node000004" href="$CallbacksProvider_8c.html#a8744dc5e9cc05cb24af5e62123f90205" title=" " alt="" coords="511,55,733,80"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="392,124,509,89,543,80,544,86,510,94,394,129"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="382,137,440,113,509,89,539,80,541,86,510,94,442,118,384,142"/>
 <area shape="rect" id="Node000005" href="$CallbacksProvider_8c.html#a5e3f4330afe31e4329e7415e764a762c" title=" " alt="" coords="509,104,735,129"/>
-<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="423,131,495,125,496,130,424,136"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="423,141,513,129,514,134,424,146"/>
 <area shape="rect" id="Node000006" href="$CallbacksProvider_8c.html#add9bf6e3a774069651a149f299c9cd0e" title=" " alt="" coords="522,153,722,179"/>
-<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="424,144,508,152,508,157,423,149"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="424,153,508,158,508,163,424,159"/>
 <area shape="rect" id="Node000007" href="$CallbacksProvider_8c.html#ae3e9564183aef54c638217b317359189" title=" " alt="" coords="515,203,729,228"/>
-<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="392,150,510,187,547,197,546,202,509,193,390,155"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="408,163,510,187,552,197,550,202,509,193,406,168"/>
 <area shape="rect" id="Node000009" href="$group__PublicMemberFunctions.html#ga91f39f496f456f5cfd1c68924edb3c29" title="Creates an AWS credentials object." alt="" coords="804,203,968,228"/>
 <area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="690,249,803,228,804,233,691,255"/>
 <area shape="rect" id="Node000011" href="$group__PublicMemberFunctions.html#ga94a14bb7bbda0b12bd2afb55da9374ce" title="Frees a Static Aws credential provider object." alt="" coords="783,301,989,327"/>
@@ -32,7 +32,9 @@
 <area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="945,225,1040,246,1039,252,944,231"/>
 <area shape="poly" id="edge11_Node000011_Node000010" title=" " alt="" coords="944,299,1039,278,1040,283,945,304"/>
 <area shape="poly" id="edge14_Node000013_Node000011" title=" " alt="" coords="711,311,769,311,769,317,711,317"/>
-<area shape="poly" id="edge16_Node000014_Node000013" title=" " alt="" coords="458,327,519,321,519,326,459,332"/>
-<area shape="rect" id="Node000017" href="$CurlApiCallbacks_8c.html#a5de89df93a74674899c68cae2b860e4f" title=" " alt="" coords="559,425,685,451"/>
-<area shape="poly" id="edge19_Node000016_Node000017" title=" " alt="" coords="461,435,546,435,546,441,461,441"/>
+<area shape="poly" id="edge16_Node000014_Node000013" title=" " alt="" coords="458,319,519,316,519,322,458,325"/>
+<area shape="rect" id="Node000017" href="$CallbacksProvider_8c.html#abfe9a11588c84de381d9bafa195d263d" title=" " alt="" coords="533,364,711,389"/>
+<area shape="poly" id="edge19_Node000016_Node000017" title=" " alt="" coords="423,411,538,389,539,395,424,416"/>
+<area shape="rect" id="Node000018" href="$CurlApiCallbacks_8c.html#a5de89df93a74674899c68cae2b860e4f" title=" " alt="" coords="559,413,685,439"/>
+<area shape="poly" id="edge20_Node000016_Node000018" title=" " alt="" coords="461,423,546,423,546,429,461,429"/>
 </map>
