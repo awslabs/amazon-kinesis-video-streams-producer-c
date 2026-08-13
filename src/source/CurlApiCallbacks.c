@@ -1132,12 +1132,7 @@ STATUS createStreamCachingCurl(UINT64 customData, PCHAR deviceName, PCHAR stream
     }
 
     // Respect the callAfter to honor backoff wait time from the state machine retry strategy
-    if (pServiceCallContext->callAfter != 0) {
-        currentTime = pCallbacksProvider->clientCallbacks.getCurrentTimeFn(pCallbacksProvider->clientCallbacks.customData);
-        if (currentTime < pServiceCallContext->callAfter) {
-            THREAD_SLEEP(pServiceCallContext->callAfter - currentTime);
-        }
-    }
+    honorCallAfterWaitTime(pCallbacksProvider, pServiceCallContext);
 
     DLOGV("[%s] No-op CreateStream API call", streamName);
 
@@ -1375,12 +1370,7 @@ STATUS describeStreamCachingCurl(UINT64 customData, PCHAR streamName, PServiceCa
     }
 
     // Respect the callAfter to honor backoff wait time from the state machine retry strategy
-    if (pServiceCallContext->callAfter != 0) {
-        currentTime = pCallbacksProvider->clientCallbacks.getCurrentTimeFn(pCallbacksProvider->clientCallbacks.customData);
-        if (currentTime < pServiceCallContext->callAfter) {
-            THREAD_SLEEP(pServiceCallContext->callAfter - currentTime);
-        }
-    }
+    honorCallAfterWaitTime(pCallbacksProvider, pServiceCallContext);
 
     // Get the stream info from the stream handle
     CHK_STATUS(kinesisVideoStreamGetStreamInfo(streamHandle, &pStreamInfo));
@@ -1686,12 +1676,7 @@ STATUS getStreamingEndpointCachingCurl(UINT64 customData, PCHAR streamName, PCHA
     streamHandle = (STREAM_HANDLE) pServiceCallContext->customData;
 
     // Respect the callAfter to honor backoff wait time from the state machine retry strategy
-    if (pServiceCallContext->callAfter != 0) {
-        curTime = pCallbacksProvider->clientCallbacks.getCurrentTimeFn(pCallbacksProvider->clientCallbacks.customData);
-        if (curTime < pServiceCallContext->callAfter) {
-            THREAD_SLEEP(pServiceCallContext->callAfter - curTime);
-        }
-    }
+    honorCallAfterWaitTime(pCallbacksProvider, pServiceCallContext);
 
     // We check whether we have already made the call by checking
     // for the presence of the endpoint in the cache.
@@ -2043,12 +2028,7 @@ STATUS tagResourceCachingCurl(UINT64 customData, PCHAR streamArn, UINT32 tagCoun
     }
 
     // Respect the callAfter to honor backoff wait time from the state machine retry strategy
-    if (pServiceCallContext->callAfter != 0) {
-        currentTime = pCallbacksProvider->clientCallbacks.getCurrentTimeFn(pCallbacksProvider->clientCallbacks.customData);
-        if (currentTime < pServiceCallContext->callAfter) {
-            THREAD_SLEEP(pServiceCallContext->callAfter - currentTime);
-        }
-    }
+    honorCallAfterWaitTime(pCallbacksProvider, pServiceCallContext);
 
     DLOGV("Caching TagResource API call");
     retStatus = tagResourceResultEvent(streamHandle, SERVICE_CALL_RESULT_OK);

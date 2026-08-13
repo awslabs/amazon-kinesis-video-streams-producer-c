@@ -174,18 +174,11 @@ STATUS getStreamingTokenIotFunc(UINT64 customData, PCHAR streamName, STREAM_ACCE
     PAwsCredentialProvider pCredentialProvider;
     PCallbacksProvider pCallbacksProvider = NULL;
     PIotAuthCallbacks pIotAuthCallbacks = (PIotAuthCallbacks) customData;
-    UINT64 currentTime;
 
     CHK(pIotAuthCallbacks != NULL && pServiceCallContext != NULL, STATUS_NULL_ARG);
-    // Respect the callAfter to honor backoff wait time from the state machine retry strategy
 
-    if (pServiceCallContext->callAfter != 0) {
-        currentTime = pIotAuthCallbacks->pCallbacksProvider->clientCallbacks.getCurrentTimeFn(
-            pIotAuthCallbacks->pCallbacksProvider->clientCallbacks.customData);
-        if (currentTime < pServiceCallContext->callAfter) {
-            THREAD_SLEEP(pServiceCallContext->callAfter - currentTime);
-        }
-    }
+    // Respect the callAfter to honor backoff wait time from the state machine retry strategy
+    honorCallAfterWaitTime(pIotAuthCallbacks->pCallbacksProvider, pServiceCallContext);
 
     pCallbacksProvider = pIotAuthCallbacks->pCallbacksProvider;
     pCredentialProvider = (PAwsCredentialProvider) pIotAuthCallbacks->pCredentialProvider;

@@ -117,20 +117,13 @@ STATUS getStreamingTokenStaticFunc(UINT64 customData, PCHAR streamName, STREAM_A
     STATUS retStatus = STATUS_SUCCESS;
     PAwsCredentials pAwsCredentials;
     PAwsCredentialProvider pCredentialProvider;
-    UINT64 currentTime;
 
     PStaticAuthCallbacks pStaticAuthCallbacks = (PStaticAuthCallbacks) customData;
 
     CHK(pStaticAuthCallbacks != NULL && pServiceCallContext != NULL, STATUS_NULL_ARG);
 
     // Respect the callAfter to honor backoff wait time from the state machine retry strategy
-    if (pServiceCallContext->callAfter != 0) {
-        currentTime = pStaticAuthCallbacks->pCallbacksProvider->clientCallbacks.getCurrentTimeFn(
-            pStaticAuthCallbacks->pCallbacksProvider->clientCallbacks.customData);
-        if (currentTime < pServiceCallContext->callAfter) {
-            THREAD_SLEEP(pServiceCallContext->callAfter - currentTime);
-        }
-    }
+    honorCallAfterWaitTime(pStaticAuthCallbacks->pCallbacksProvider, pServiceCallContext);
 
     pCredentialProvider = (PAwsCredentialProvider) pStaticAuthCallbacks->pCredentialProvider;
     CHK_STATUS(pCredentialProvider->getCredentialsFn(pCredentialProvider, &pAwsCredentials));
