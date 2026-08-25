@@ -135,6 +135,71 @@ TEST_F(AuthCallbackTest, credential_provider_auth_callbacks_test)
     EXPECT_EQ(STATUS_SUCCESS, freeCallbacksProvider(&pClientCallbacks));
     EXPECT_EQ(STATUS_SUCCESS, freeStaticCredentialProvider(&pAwsCredentialProvider));
 }
+// Credential provider that sleeps for a configurable duration before returning,
+// simulating a slow auth backend (e.g. STS with high latency).
+typedef struct {
+    AwsCredentialProvider credentialProvider;
+    UINT64 delayInHundredsOfNanos;
+} SlowCredentialProvider, *PSlowCredentialProvider;
+
+static STATUS slowGetCredentialsFn(PAwsCredentialProvider pProvider, PAwsCredentials* ppCredentials)
+{
+    UNUSED_PARAM(ppCredentials);
+    PSlowCredentialProvider pSlow = (PSlowCredentialProvider) pProvider;
+    THREAD_SLEEP(pSlow->delayInHundredsOfNanos);
+    return STATUS_OPERATION_TIMED_OUT;
+}
+
+// Verifies that a slow auth callback (simulating delayed STS response) causes
+// createKinesisVideoClientSync to time out when createClientTimeout < auth delay.
+TEST_F(AuthCallbackTest, SlowAuthCallback_ExceedingClientTimeout_ReturnsTimeout)
+{
+    PDeviceInfo pDeviceInfo = NULL;
+    PClientCallbacks pClientCallbacks = NULL;
+    PAwsCredentialProvider pSlowProvider = NULL;
+    PAuthCallbacks pAuthCallbacks = NULL;
+    CLIENT_HANDLE clientHandle = INVALID_CLIENT_HANDLE_VALUE;
+
+    const UINT64 authDelayHns = 2 * HUNDREDS_OF_NANOS_IN_A_SECOND;
+    const UINT64 clientTimeoutHns = 500 * HUNDREDS_OF_NANOS_IN_A_MILLISECOND;
+
+    PSlowCredentialProvider pSlow = (PSlowCredentialProvider) MEMCALLOC(1, SIZEOF(SlowCredentialProvider));
+    ASSERT_NE(nullptr, pSlow);
+    pSlow->credentialProvider.getCredentialsFn = slowGetCredentialsFn;
+    pSlow->delayInHundredsOfNanos = authDelayHns;
+    pSlowProvider = (PAwsCredentialProvider) pSlow;
+
+    EXPECT_EQ(STATUS_SUCCESS, createDefaultDeviceInfo(&pDeviceInfo));
+    pDeviceInfo->clientInfo.loggerLogLevel = this->loggerLogLevel;
+    pDeviceInfo->clientInfo.createClientTimeout = clientTimeoutHns;
+
+    EXPECT_EQ(STATUS_SUCCESS,
+              createAbstractDefaultCallbacksProvider(TEST_DEFAULT_CHAIN_COUNT, API_CALL_CACHE_TYPE_NONE, TEST_CACHING_ENDPOINT_PERIOD, mRegion,
+                                                     TEST_CONTROL_PLANE_URI, mCaCertPath, NULL, NULL, &pClientCallbacks));
+
+    EXPECT_EQ(STATUS_SUCCESS, createCredentialProviderAuthCallbacks(pClientCallbacks, pSlowProvider, &pAuthCallbacks));
+
+    UINT64 startTime = GETTIME();
+    STATUS retStatus = createKinesisVideoClientSync(pDeviceInfo, pClientCallbacks, &clientHandle);
+    UINT64 elapsed = GETTIME() - startTime;
+
+    // Client creation must fail with timeout
+    EXPECT_EQ(STATUS_OPERATION_TIMED_OUT, retStatus);
+
+    // PATCH VERIFIED: With the background thread fix in PIC Client.c, the condition
+    // variable wait starts immediately and fires at createClientTimeout (~500ms),
+    // NOT after the full auth delay (~2s). elapsed should be close to clientTimeoutHns.
+    EXPECT_LT(elapsed, authDelayHns) << "Timeout did not fire before auth delay — patch not effective";
+    EXPECT_GE(elapsed, clientTimeoutHns / 2) << "Elapsed suspiciously short — check timeout value";
+
+    if (IS_VALID_CLIENT_HANDLE(clientHandle)) {
+        freeKinesisVideoClient(&clientHandle);
+    }
+    freeDeviceInfo(&pDeviceInfo);
+    freeCallbacksProvider(&pClientCallbacks);
+    MEMFREE(pSlow);
+}
+
 } // namespace video
 } // namespace kinesis
 } // namespace amazonaws

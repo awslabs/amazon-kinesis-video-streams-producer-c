@@ -468,6 +468,9 @@ if(BUILD_COMMON_CURL)
     add_executable(kvsAudioOnlyStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsAudioOnlyStreamingSample.c ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/Common.c)
     target_link_libraries(kvsAudioOnlyStreamingSample cproducer)
 
+    add_executable(kvsVideoOnlyStreamingSampleWithSts ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsVideoOnlyStreamingSampleWithSts.c ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/Common.c)
+    target_link_libraries(kvsVideoOnlyStreamingSampleWithSts cproducer)
+
     if (BUILD_TEST)
         add_subdirectory(tst)
     endif()
