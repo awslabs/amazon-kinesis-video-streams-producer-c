@@ -2290,8 +2290,20 @@ CleanUp:
             kinesisVideoStreamTerminated(streamHandle, uploadHandle, callResult);
         }
 
-        // Bubble the notification to potential listeners
-        notifyCallResult(pCallbacksProvider, retStatus, streamHandle);
+        if (callResult != SERVICE_CALL_RESULT_OK && callResult != SERVICE_CALL_RESULT_NOT_SET) {
+            // Non-retriable, non-recoverable errors (e.g., 403/401 auth failures) are reported
+            // to the application with the actual HTTP error from curl response.
+            // Retriable/recoverable errors (timeouts, 500s, 404s) are handled by PIC's state machine.
+            STATUS callStatus = serviceCallResultCheck(callResult);
+            if (!IS_RETRIABLE_ERROR(callStatus) && !IS_RECOVERABLE_ERROR(callStatus)) {
+                notifyCallResult(pCallbacksProvider, callStatus, streamHandle);
+            } else {
+                notifyCallResult(pCallbacksProvider, retStatus, streamHandle);
+            }
+        } else {
+            // notify with retStatus in case of internal failures
+            notifyCallResult(pCallbacksProvider, retStatus, streamHandle);
+        }
     }
 
     LEAVES();
