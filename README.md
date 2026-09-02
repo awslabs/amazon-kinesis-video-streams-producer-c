@@ -150,6 +150,21 @@ To run the samples with IoT credential provider:
 3. Build the changes: `make`
 4. Run the sample using the instructions in previous section.
 
+### Credential Configuration
+
+The samples use a credential resolution chain that checks each source in order and uses the first one available:
+
+1. **Environment variables** (`AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`) -- Static credentials provided via environment. Optional `AWS_SESSION_TOKEN` for temporary credentials.
+2. **EC2 Instance Metadata Service (IMDSv2)** -- Automatically retrieves temporary credentials from the EC2 instance profile. Only IMDSv2 is supported. The instance must have an IAM role attached and the metadata service must be accessible.
+
+If using the IoT credential provider (`IOT_CORE_ENABLE_CREDENTIALS`), the above chain is bypassed entirely and IoT certificates are used instead.
+
+For programmatic usage, the following credential provider APIs are available:
+* `createDefaultCallbacksProviderWithAwsCredentials()` -- Static credentials
+* `createDefaultCallbacksProviderWithEc2Credentials()` -- EC2 IMDS (IMDSv2)
+* `createDefaultCallbacksProviderWithIotCertificate()` -- IoT certificate-based
+* `createDefaultCallbacksProviderWithFileAuth()` -- File-based credentials
+
 ### Fragment metadata
 
 `./kvsVideoOnlyRealtimeStreamingSample` is the only sample that has the [fragment metadata](https://docs.aws.amazon.com/kinesisvideostreams/latest/dg/how-meta.html) implemented out of the box.

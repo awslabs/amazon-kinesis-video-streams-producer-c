@@ -71,6 +71,10 @@ extern "C" {
 #define STATUS_IOT_NULL_AWS_CREDS                   STATUS_COMMON_BASE + 0x00000003
 #define STATUS_IOT_INVALID_URI_LEN                  STATUS_COMMON_BASE + 0x00000004
 #define STATUS_TIMESTAMP_STRING_UNRECOGNIZED_FORMAT STATUS_COMMON_BASE + 0x00000005
+#define STATUS_IMDS_INVALID_RESPONSE_LENGTH         STATUS_COMMON_BASE + 0x00000006
+#define STATUS_IMDS_NULL_AWS_CREDS                  STATUS_COMMON_BASE + 0x00000007
+#define STATUS_IMDS_TOKEN_FETCH_FAILED              STATUS_COMMON_BASE + 0x00000008
+#define STATUS_IMDS_ROLE_FETCH_FAILED               STATUS_COMMON_BASE + 0x00000009
 /*!@} */
 
 /**
@@ -82,7 +86,8 @@ extern "C" {
      (error) == STATUS_IOT_NULL_AWS_CREDS || (error) == STATUS_IOT_INVALID_URI_LEN || (error) == STATUS_IOT_EXPIRATION_OCCURS_IN_PAST ||             \
      (error) == STATUS_IOT_EXPIRATION_PARSING_FAILED || (error) == STATUS_IOT_CREATE_LWS_CONTEXT_FAILED ||                                           \
      (error) == STATUS_FILE_CREDENTIAL_PROVIDER_OPEN_FILE_FAILED || (error) == STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_LENGTH ||                \
-     (error) == STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_FORMAT)
+     (error) == STATUS_FILE_CREDENTIAL_PROVIDER_INVALID_FILE_FORMAT || (error) == STATUS_IMDS_INVALID_RESPONSE_LENGTH ||                             \
+     (error) == STATUS_IMDS_NULL_AWS_CREDS || (error) == STATUS_IMDS_TOKEN_FETCH_FAILED || (error) == STATUS_IMDS_ROLE_FETCH_FAILED)
 
 /////////////////////////////////////////////////////
 /// Lengths of different character arrays
@@ -723,6 +728,61 @@ PUBLIC_API STATUS createLwsIotCredentialProviderWithTime(PCHAR, PCHAR, PCHAR, PC
  * @return STATUS code of the execution. STATUS_SUCCESS on success
  */
 PUBLIC_API STATUS freeIotCredentialProvider(PAwsCredentialProvider*);
+
+/**
+ * @brief Creates an EC2 IMDS (IMDSv2) based AWS credential provider object using libCurl
+ *
+ * Retrieves temporary credentials from the EC2 Instance Metadata Service.
+ * The instance must have an IAM role attached.
+ *
+ * @param[out] PAwsCredentialProvider* Constructed AWS credentials provider object
+ *
+ * @return STATUS code of the execution. STATUS_SUCCESS on success
+ */
+PUBLIC_API STATUS createCurlEc2CredentialProvider(PAwsCredentialProvider*);
+
+/**
+ * @brief Creates an EC2 IMDS (IMDSv2) based AWS credential provider object with custom time function
+ *
+ * @param[in] GetCurrentTimeFunc Custom current time function
+ * @param[in] UINT64 function custom data
+ * @param[out] PAwsCredentialProvider* Constructed AWS credentials provider object
+ *
+ * @return STATUS code of the execution. STATUS_SUCCESS on success
+ */
+PUBLIC_API STATUS createCurlEc2CredentialProviderWithTime(GetCurrentTimeFunc, UINT64, PAwsCredentialProvider*);
+
+/**
+ * @brief Frees an EC2 IMDS based Aws credential provider object
+ *
+ * @param[in,out] PAwsCredentialProvider* Object to be destroyed.
+ *
+ * @return STATUS code of the execution. STATUS_SUCCESS on success
+ */
+PUBLIC_API STATUS freeEc2CredentialProvider(PAwsCredentialProvider*);
+
+/**
+ * @brief Creates an EC2 IMDS (IMDSv2) based AWS credential provider object using libWebSockets
+ *
+ * Retrieves temporary credentials from the EC2 Instance Metadata Service.
+ * The instance must have an IAM role attached.
+ *
+ * @param[out] PAwsCredentialProvider* Constructed AWS credentials provider object
+ *
+ * @return STATUS code of the execution. STATUS_SUCCESS on success
+ */
+PUBLIC_API STATUS createLwsEc2CredentialProvider(PAwsCredentialProvider*);
+
+/**
+ * @brief Creates an EC2 IMDS (IMDSv2) based AWS credential provider object with custom time function using libWebSockets
+ *
+ * @param[in] GetCurrentTimeFunc Custom current time function
+ * @param[in] UINT64 function custom data
+ * @param[out] PAwsCredentialProvider* Constructed AWS credentials provider object
+ *
+ * @return STATUS code of the execution. STATUS_SUCCESS on success
+ */
+PUBLIC_API STATUS createLwsEc2CredentialProviderWithTime(GetCurrentTimeFunc, UINT64, PAwsCredentialProvider*);
 
 /**
  * @brief Creates a File based AWS credential provider object

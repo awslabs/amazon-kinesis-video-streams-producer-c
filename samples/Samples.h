@@ -26,6 +26,7 @@ extern "C" {
 
 VOID getEndpointOverride(PCHAR, SIZE_T);
 UINT32 getSampleLogLevel();
+STATUS createSampleCallbacksProvider(PCHAR, PCHAR, PCHAR, PCHAR, PClientCallbacks*);
 
 #ifdef __cplusplus
 }

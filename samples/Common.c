@@ -34,3 +34,47 @@ UINT32 getSampleLogLevel()
 
     return userLogLevel;
 }
+
+STATUS createSampleCallbacksProvider(PCHAR region, PCHAR caCertPath, PCHAR userAgentPostfix, PCHAR customUserAgent,
+                                     PClientCallbacks* ppClientCallbacks)
+{
+    STATUS retStatus = STATUS_SUCCESS;
+    PCHAR accessKey = NULL, secretKey = NULL, sessionToken = NULL;
+    PAuthCallbacks pAuthCallbacks = NULL;
+    PStreamCallbacks pStreamCallbacks = NULL;
+    CHAR endpointOverride[MAX_URI_CHAR_LEN];
+
+    SET_LOGGER_LOG_LEVEL(getSampleLogLevel());
+
+    CHK(ppClientCallbacks != NULL, STATUS_NULL_ARG);
+
+    getEndpointOverride(endpointOverride, SIZEOF(endpointOverride));
+
+    accessKey = GETENV(ACCESS_KEY_ENV_VAR);
+    secretKey = GETENV(SECRET_KEY_ENV_VAR);
+    sessionToken = GETENV(SESSION_TOKEN_ENV_VAR);
+
+    if (accessKey != NULL && secretKey != NULL) {
+        DLOGI("Using environment variable credentials");
+        CHK_STATUS(createDefaultCallbacksProviderWithAwsCredentialsAndEndpointOverride(accessKey, secretKey, sessionToken, MAX_UINT64, region,
+                                                                                       caCertPath, userAgentPostfix, customUserAgent,
+                                                                                       endpointOverride, ppClientCallbacks));
+    } else {
+        DLOGI("Environment variable credentials not found, using EC2 IMDS credential provider");
+        CHK_STATUS(createAbstractDefaultCallbacksProvider(DEFAULT_CALLBACK_CHAIN_COUNT, API_CALL_CACHE_TYPE_ALL,
+                                                          ENDPOINT_UPDATE_PERIOD_SENTINEL_VALUE, region, endpointOverride, caCertPath,
+                                                          userAgentPostfix, customUserAgent, ppClientCallbacks));
+        CHK_STATUS(createEc2AuthCallbacks(*ppClientCallbacks, &pAuthCallbacks));
+        CHK_STATUS(createContinuousRetryStreamCallbacks(*ppClientCallbacks, &pStreamCallbacks));
+    }
+
+CleanUp:
+
+    CHK_LOG_ERR(retStatus);
+
+    if (STATUS_FAILED(retStatus) && ppClientCallbacks != NULL && *ppClientCallbacks != NULL) {
+        freeCallbacksProvider(ppClientCallbacks);
+    }
+
+    return retStatus;
+}
