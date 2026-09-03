@@ -3,7 +3,13 @@
 #define DEFAULT_RETENTION_PERIOD          2 * HUNDREDS_OF_NANOS_IN_AN_HOUR
 #define DEFAULT_BUFFER_DURATION           120 * HUNDREDS_OF_NANOS_IN_A_SECOND
 #define DEFAULT_CALLBACK_CHAIN_COUNT      5
-#define DEFAULT_KEY_FRAME_INTERVAL        45
+// Every frame is flagged as a key frame, so at DEFAULT_FPS_VALUE = 25 (40ms frame duration) this
+// produces one fragment every 40ms => 25 fragments/second, well above the 5 fragments/second
+// service limit. Used to reproduce service-side rate limiting. Override with the
+// KEY_FRAME_INTERVAL env var to change the fragment rate without changing the byte rate - e.g. 45
+// restores ~1.8s fragments (0.5 fragments/second) as a control.
+#define DEFAULT_KEY_FRAME_INTERVAL        1
+#define KEY_FRAME_INTERVAL_ENV_VAR        ((PCHAR) "KEY_FRAME_INTERVAL")
 #define DEFAULT_FPS_VALUE                 25
 #define DEFAULT_STREAM_DURATION           20 * HUNDREDS_OF_NANOS_IN_A_SECOND
 #define DEFAULT_STORAGE_SIZE              20 * 1024 * 1024
@@ -50,12 +56,133 @@ CleanUp:
 // Forward declaration of the default thread sleep function
 VOID defaultThreadSleep(UINT64);
 
+#define STATS_REPORT_INTERVAL (1 * HUNDREDS_OF_NANOS_IN_A_SECOND)
+
+// Diagnostic counters used to separate "the device cannot keep up" from "the content is not draining
+// to the service". The ACK-side fields are updated from the curl network thread while the put-side
+// fields are updated from the main thread; the counters are unsynchronized and indicative only.
+typedef struct {
+    // Put path, reset every report interval
+    UINT64 framesPut;
+    UINT64 readTimeSum;
+    UINT64 readTimeMax;
+    UINT64 putTimeSum;
+    UINT64 putTimeMax;
+
+    // ACK path, reset every report interval
+    UINT64 acksReceived;
+    UINT64 acksPersisted;
+    UINT64 acksError;
+    UINT64 ackLagSumMs;
+    UINT64 ackLagMaxMs;
+} SampleStats, *PSampleStats;
+
+STATUS sampleFragmentAckHandler(UINT64 customData, STREAM_HANDLE streamHandle, UPLOAD_HANDLE uploadHandle, PFragmentAck pFragmentAck)
+{
+    PSampleStats pStats = (PSampleStats) customData;
+    UINT64 nowMs, lagMs;
+
+    UNUSED_PARAM(streamHandle);
+    UNUSED_PARAM(uploadHandle);
+
+    if (pStats == NULL || pFragmentAck == NULL) {
+        return STATUS_SUCCESS;
+    }
+
+    switch (pFragmentAck->ackType) {
+        case FRAGMENT_ACK_TYPE_RECEIVED:
+            pStats->acksReceived++;
+            break;
+        case FRAGMENT_ACK_TYPE_PERSISTED:
+            pStats->acksPersisted++;
+            break;
+        case FRAGMENT_ACK_TYPE_ERROR:
+            pStats->acksError++;
+            break;
+        default:
+            // BUFFERING/IDLE ACKs carry no fragment we can age
+            return STATUS_SUCCESS;
+    }
+
+    // This stream is created with absoluteFragmentTimes, so the ACK timecode is an absolute epoch
+    // timestamp in milliseconds. The gap between it and now is the end-to-end age of the fragment at
+    // the moment its ACK arrived - i.e. the drift.
+    nowMs = GETTIME() / HUNDREDS_OF_NANOS_IN_A_MILLISECOND;
+    lagMs = nowMs > pFragmentAck->timestamp ? nowMs - pFragmentAck->timestamp : 0;
+    pStats->ackLagSumMs += lagMs;
+    if (lagMs > pStats->ackLagMaxMs) {
+        pStats->ackLagMaxMs = lagMs;
+    }
+
+    return STATUS_SUCCESS;
+}
+
+VOID reportSampleStats(STREAM_HANDLE streamHandle, PSampleStats pStats)
+{
+    StreamMetrics streamMetrics;
+    UINT64 acks = pStats->acksReceived + pStats->acksPersisted + pStats->acksError;
+
+    // Put path: if the device were the bottleneck, putRate would be well under the target frame rate
+    // and/or putAvg would be large. putKinesisVideoFrame is non-blocking in realtime mode.
+    DLOGI("PUT  frames: %" PRIu64 " (%.1f/s) | readFrameData avg/max: %.2f/%.2f ms | putKinesisVideoFrame avg/max: %.2f/%.2f ms",
+          pStats->framesPut, (DOUBLE) pStats->framesPut * HUNDREDS_OF_NANOS_IN_A_SECOND / (DOUBLE) STATS_REPORT_INTERVAL,
+          pStats->framesPut == 0 ? 0.0 : (DOUBLE) pStats->readTimeSum / (DOUBLE) pStats->framesPut / HUNDREDS_OF_NANOS_IN_A_MILLISECOND,
+          (DOUBLE) pStats->readTimeMax / HUNDREDS_OF_NANOS_IN_A_MILLISECOND,
+          pStats->framesPut == 0 ? 0.0 : (DOUBLE) pStats->putTimeSum / (DOUBLE) pStats->framesPut / HUNDREDS_OF_NANOS_IN_A_MILLISECOND,
+          (DOUBLE) pStats->putTimeMax / HUNDREDS_OF_NANOS_IN_A_MILLISECOND);
+
+    // ACK path: ackLag is the age of each fragment when its ACK landed. Growing lag with a healthy
+    // put rate means the content is queueing locally, not that the device is slow.
+    DLOGI("ACK  received: %" PRIu64 " persisted: %" PRIu64 " error: %" PRIu64 " (%.1f acked/s) | fragment age at ACK avg/max: %" PRIu64 "/%" PRIu64 " ms",
+          pStats->acksReceived, pStats->acksPersisted, pStats->acksError,
+          (DOUBLE) pStats->acksReceived * HUNDREDS_OF_NANOS_IN_A_SECOND / (DOUBLE) STATS_REPORT_INTERVAL, acks == 0 ? 0 : pStats->ackLagSumMs / acks,
+          pStats->ackLagMaxMs);
+
+    streamMetrics.version = STREAM_METRICS_CURRENT_VERSION;
+    if (STATUS_SUCCEEDED(getKinesisVideoStreamMetrics(streamHandle, &streamMetrics))) {
+        // overallViewDuration/Size is tail-to-head: the content still retained on this device, i.e.
+        // the real backlog. currentViewDuration/Size is only current-to-head - what the uploader has
+        // not been handed yet - and sits at one frame whenever the uploader is keeping up, so it must
+        // not be read as "nothing is buffered". currentTransferRate is what actually leaves the box.
+        // currentFrameRate is measured off the wall clock between putFrame calls, elementaryFrameRate
+        // off the frame presentation timestamps. currentFrameRate < elementaryFrameRate is the device
+        // failing to produce frames as fast as the media timeline claims.
+        DLOGI("BUF  retained: %" PRIu64 " ms / %" PRIu64 " KB | unsent: %" PRIu64 " ms / %" PRIu64 " KB | transferRate: %" PRIu64
+              " Kbps | frameRate wall/media: %.1f/%.1f fps | transferred: %" PRIu64 " KB",
+              streamMetrics.overallViewDuration / HUNDREDS_OF_NANOS_IN_A_MILLISECOND, streamMetrics.overallViewSize / 1024,
+              streamMetrics.currentViewDuration / HUNDREDS_OF_NANOS_IN_A_MILLISECOND, streamMetrics.currentViewSize / 1024,
+              streamMetrics.currentTransferRate * 8 / 1024, streamMetrics.currentFrameRate, streamMetrics.elementaryFrameRate,
+              streamMetrics.transferredBytes / 1024);
+        DLOGI("PRS  dropped frames: %" PRIu64 " | storage: %" PRIu64 " latency: %" PRIu64 " buffer: %" PRIu64 " pressures | stale: %" PRIu64
+              " | putFrame errors: %" PRIu64,
+              streamMetrics.droppedFrames, streamMetrics.storagePressures, streamMetrics.latencyPressures, streamMetrics.bufferPressures,
+              streamMetrics.staleEvents, streamMetrics.putFrameErrors);
+    }
+
+    // Reset the per-interval accumulators, keeping the cumulative view in the PIC metrics above
+    pStats->framesPut = 0;
+    pStats->readTimeSum = 0;
+    pStats->readTimeMax = 0;
+    pStats->putTimeSum = 0;
+    pStats->putTimeMax = 0;
+    pStats->acksReceived = 0;
+    pStats->acksPersisted = 0;
+    pStats->acksError = 0;
+    pStats->ackLagSumMs = 0;
+    pStats->ackLagMaxMs = 0;
+}
+
 INT32 main(INT32 argc, CHAR* argv[])
 {
     PDeviceInfo pDeviceInfo = NULL;
     PStreamInfo pStreamInfo = NULL;
     PClientCallbacks pClientCallbacks = NULL;
     PStreamCallbacks pStreamCallbacks = NULL;
+    StreamCallbacks statsStreamCallbacks;
+    SampleStats stats;
+    UINT64 nextStatsReportTime, opStartTime, opDuration;
+    UINT32 keyFrameInterval = DEFAULT_KEY_FRAME_INTERVAL;
+    PCHAR pKeyFrameInterval = NULL;
     CLIENT_HANDLE clientHandle = INVALID_CLIENT_HANDLE_VALUE;
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     STATUS retStatus = STATUS_SUCCESS;
@@ -132,6 +259,13 @@ INT32 main(INT32 argc, CHAR* argv[])
         CHK(numMetadata <= MAX_METADATA_PER_FRAGMENT - 1, STATUS_INVALID_ARG);
     }
 
+    if ((pKeyFrameInterval = GETENV(KEY_FRAME_INTERVAL_ENV_VAR)) != NULL && !IS_EMPTY_STRING(pKeyFrameInterval)) {
+        CHK_STATUS(STRTOUI32(pKeyFrameInterval, NULL, 10, &keyFrameInterval));
+        CHK(keyFrameInterval > 0, STATUS_INVALID_ARG);
+    }
+    DLOGI("Key frame interval: %u frame(s) => %.2f fragments/second at %u fps", keyFrameInterval,
+          (DOUBLE) DEFAULT_FPS_VALUE / (DOUBLE) keyFrameInterval, DEFAULT_FPS_VALUE);
+
     streamStopTime = GETTIME() + streamingDuration;
 
     // default storage size is 128MB. Use setDeviceInfoStorageSize after create to change storage size.
@@ -167,6 +301,15 @@ INT32 main(INT32 argc, CHAR* argv[])
     CHK_STATUS(createStreamCallbacks(&pStreamCallbacks));
     CHK_STATUS(addStreamCallbacks(pClientCallbacks, pStreamCallbacks));
 
+    // Register a second set of stream callbacks that only tallies ACKs for the diagnostic report.
+    // All registered stream callbacks are invoked, so this does not displace the default ones.
+    MEMSET(&stats, 0x00, SIZEOF(stats));
+    MEMSET(&statsStreamCallbacks, 0x00, SIZEOF(statsStreamCallbacks));
+    statsStreamCallbacks.version = STREAM_CALLBACKS_CURRENT_VERSION;
+    statsStreamCallbacks.customData = (UINT64) &stats;
+    statsStreamCallbacks.fragmentAckReceivedFn = sampleFragmentAckHandler;
+    CHK_STATUS(addStreamCallbacks(pClientCallbacks, &statsStreamCallbacks));
+
     CHK_STATUS(createKinesisVideoClient(pDeviceInfo, pClientCallbacks, &clientHandle));
     CHK_STATUS(createKinesisVideoStreamSync(clientHandle, pStreamInfo, &streamHandle));
 
@@ -179,18 +322,39 @@ INT32 main(INT32 argc, CHAR* argv[])
     frame.decodingTs = GETTIME(); // current time
     frame.presentationTs = frame.decodingTs;
 
+    nextStatsReportTime = GETTIME() + STATS_REPORT_INTERVAL;
+
     while (GETTIME() < streamStopTime) {
         frame.index = frameIndex;
-        frame.flags = fileIndex % DEFAULT_KEY_FRAME_INTERVAL == 0 ? FRAME_FLAG_KEY_FRAME : FRAME_FLAG_NONE;
+        frame.flags = fileIndex % keyFrameInterval == 0 ? FRAME_FLAG_KEY_FRAME : FRAME_FLAG_NONE;
         frame.size = SIZEOF(frameBuffer);
 
+        opStartTime = GETTIME();
         CHK_STATUS(readFrameData(&frame, frameFilePath, videoCodec));
+        opDuration = GETTIME() - opStartTime;
+        stats.readTimeSum += opDuration;
+        if (opDuration > stats.readTimeMax) {
+            stats.readTimeMax = opDuration;
+        }
 
         if (frame.flags == FRAME_FLAG_KEY_FRAME && !firstFrame) {
             putKinesisVideoFrame(streamHandle, &eofr);
         }
 
+        opStartTime = GETTIME();
         CHK_STATUS(putKinesisVideoFrame(streamHandle, &frame));
+        opDuration = GETTIME() - opStartTime;
+        stats.putTimeSum += opDuration;
+        if (opDuration > stats.putTimeMax) {
+            stats.putTimeMax = opDuration;
+        }
+        stats.framesPut++;
+
+        if (GETTIME() >= nextStatsReportTime) {
+            reportSampleStats(streamHandle, &stats);
+            nextStatsReportTime = GETTIME() + STATS_REPORT_INTERVAL;
+        }
+
         if (firstFrame) {
             startUpLatency = (DOUBLE) (GETTIME() - startTime) / (DOUBLE) HUNDREDS_OF_NANOS_IN_A_MILLISECOND;
             DLOGD("Start up latency: %lf ms", startUpLatency);

@@ -60,13 +60,57 @@ STATUS defaultStreamErrorReportCallback(UINT64 customData, STREAM_HANDLE streamH
     return STATUS_SUCCESS;
 }
 
+PCHAR getFragmentAckTypeStr(FRAGMENT_ACK_TYPE ackType)
+{
+    switch (ackType) {
+        case FRAGMENT_ACK_TYPE_BUFFERING:
+            return (PCHAR) "BUFFERING";
+        case FRAGMENT_ACK_TYPE_RECEIVED:
+            return (PCHAR) "RECEIVED";
+        case FRAGMENT_ACK_TYPE_PERSISTED:
+            return (PCHAR) "PERSISTED";
+        case FRAGMENT_ACK_TYPE_ERROR:
+            return (PCHAR) "ERROR";
+        case FRAGMENT_ACK_TYPE_IDLE:
+            return (PCHAR) "IDLE";
+        case FRAGMENT_ACK_TYPE_UNDEFINED:
+        default:
+            return (PCHAR) "UNDEFINED";
+    }
+}
+
 STATUS defaultFragmentAckReceivedCallback(UINT64 customData, STREAM_HANDLE streamHandle, UPLOAD_HANDLE uploadHandle, PFragmentAck pFragmentAck)
 {
     UNUSED_PARAM(customData);
-    UNUSED_PARAM(streamHandle);
-    UNUSED_PARAM(uploadHandle);
-    UNUSED_PARAM(pFragmentAck);
-    // not logging anything as the same thing is being logged in curlCallbackProvider.
+
+    if (pFragmentAck == NULL) {
+        return STATUS_SUCCESS;
+    }
+
+    // RECEIVED/PERSISTED/ERROR ACKs are logged at INFO so they can be collected without turning on
+    // verbose logging. BUFFERING and IDLE ACKs stay at DEBUG since they are the high volume ones.
+    switch (pFragmentAck->ackType) {
+        case FRAGMENT_ACK_TYPE_RECEIVED:
+        case FRAGMENT_ACK_TYPE_PERSISTED:
+            DLOGI("Reported fragmentAckReceived callback for stream handle %" PRIu64 ". Upload handle %" PRIu64 ". Ack type: %s."
+                  " Fragment timecode in 100ns: %" PRIu64 ". Sequence number: %s",
+                  streamHandle, uploadHandle, getFragmentAckTypeStr(pFragmentAck->ackType), pFragmentAck->timestamp,
+                  pFragmentAck->sequenceNumber);
+            break;
+
+        case FRAGMENT_ACK_TYPE_ERROR:
+            DLOGW("Reported fragmentAckReceived callback for stream handle %" PRIu64 ". Upload handle %" PRIu64 ". Ack type: ERROR."
+                  " Fragment timecode in 100ns: %" PRIu64 ". Sequence number: %s. Error id: %u",
+                  streamHandle, uploadHandle, pFragmentAck->timestamp, pFragmentAck->sequenceNumber, pFragmentAck->result);
+            break;
+
+        default:
+            DLOGD("Reported fragmentAckReceived callback for stream handle %" PRIu64 ". Upload handle %" PRIu64 ". Ack type: %s."
+                  " Fragment timecode in 100ns: %" PRIu64 ". Sequence number: %s",
+                  streamHandle, uploadHandle, getFragmentAckTypeStr(pFragmentAck->ackType), pFragmentAck->timestamp,
+                  pFragmentAck->sequenceNumber);
+            break;
+    }
 
     return STATUS_SUCCESS;
 }
