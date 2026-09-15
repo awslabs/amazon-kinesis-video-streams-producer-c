@@ -468,6 +468,24 @@ if(BUILD_COMMON_CURL)
     add_executable(kvsAudioOnlyStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsAudioOnlyStreamingSample.c ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/Common.c)
     target_link_libraries(kvsAudioOnlyStreamingSample cproducer)
 
+    # Step-based reference samples: shared helpers in samples/common, one
+    # teaching concept per function in samples/steps, short numbered-step
+    # walkthroughs in samples/entry.
+    set(STEP_SAMPLE_SOURCES
+        ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/Common.c
+        ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/common/frame_source.c
+        ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/steps/step_device_info.c
+        ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/steps/step_stream_info.c
+        ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/steps/step_auth.c
+        ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/steps/step_stream_callbacks.c
+        ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/steps/step_frame_loop.c)
+
+    add_executable(kvsBaselineSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/entry/kvs_baseline.c ${STEP_SAMPLE_SOURCES})
+    target_link_libraries(kvsBaselineSample cproducer)
+
+    add_executable(kvsAudioVideoStsSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/entry/kvs_audio_video_sts_sample.c ${STEP_SAMPLE_SOURCES})
+    target_link_libraries(kvsAudioVideoStsSample cproducer)
+
     if (BUILD_TEST)
         add_subdirectory(tst)
     endif()
