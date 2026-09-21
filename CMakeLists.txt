@@ -17,7 +17,8 @@ option(BUILD_STATIC "Static build" OFF)
 option(BUILD_DEPENDENCIES "Whether or not to build depending libraries from source" ON)
 option(USE_OPENSSL "Use openssl as crypto library" ON)
 option(USE_MBEDTLS "Use mbedtls as crypto library" OFF)
-option(USE_AWS_LC "Use AWS-LC as crypto library (OpenSSL 1.1.1 API compatible, FIPS 140-3 validatable, post-quantum key exchange by default)" OFF)
+option(USE_AWS_LC "Use AWS-LC as crypto library (OpenSSL 1.1.1 API compatible, post-quantum key exchange)" OFF)
+option(USE_AWS_LC_FIPS "Use the AWS-LC-FIPS release line (FIPS 140-3 module). Implies USE_AWS_LC behavior. Linux only for static builds; requires Go." OFF)
 option(BUILD_COMMON_LWS "Whether or not to build ProducerC libwebsockets common library" OFF)
 option(BUILD_COMMON_CURL "Whether or not to build ProducerC curl common library" ON)
 option(BUILD_OPENSSL_PLATFORM "If buildng OpenSSL what is the target platform" OFF)
@@ -155,7 +156,7 @@ if(BUILD_DEPENDENCIES)
 
   message(STATUS "Begin building dependencies.")
 
-  set(SSL_OPTIONS USE_OPENSSL USE_MBEDTLS USE_AWS_LC)
+  set(SSL_OPTIONS USE_OPENSSL USE_MBEDTLS USE_AWS_LC USE_AWS_LC_FIPS)
   count_true(ENABLED_SSL_OPTION_COUNT
     ${SSL_OPTIONS})
 
@@ -172,8 +173,17 @@ if(BUILD_DEPENDENCIES)
     elseif(USE_MBEDTLS)
       set(BUILD_ARGS -DBUILD_STATIC=${BUILD_STATIC} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
       build_dependency(mbedtls ${BUILD_ARGS})
-    elseif(USE_AWS_LC)
-      set(BUILD_ARGS -DBUILD_STATIC=${BUILD_STATIC} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
+    elseif(USE_AWS_LC OR USE_AWS_LC_FIPS)
+      if(USE_AWS_LC_FIPS)
+        if(NOT (UNIX AND NOT APPLE))
+          message(WARNING "AWS-LC-FIPS static builds are only supported on Linux (the FIPS integrity machinery is ELF-specific). This build will likely fail on this platform.")
+        endif()
+        find_program(GO_EXECUTABLE go)
+        if(NOT GO_EXECUTABLE)
+          message(FATAL_ERROR "The AWS-LC-FIPS build requires the Go toolchain (delocate/inject_hash). Install Go or use USE_AWS_LC instead.")
+        endif()
+      endif()
+      set(BUILD_ARGS -DBUILD_STATIC=${BUILD_STATIC} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DUSE_AWS_LC_FIPS=${USE_AWS_LC_FIPS})
       build_dependency(awslc ${BUILD_ARGS})
     else()
       message(FATAL_ERROR "No crypto library selected.")
@@ -195,6 +205,7 @@ if(BUILD_DEPENDENCIES)
                     -DUSE_OPENSSL=${USE_OPENSSL}
                     -DUSE_MBEDTLS=${USE_MBEDTLS}
                     -DUSE_AWS_LC=${USE_AWS_LC}
+                    -DUSE_AWS_LC_FIPS=${USE_AWS_LC_FIPS}
                     -DCURL_USE_FPIC=${CURL_USE_FPIC})
     build_dependency(curl ${BUILD_ARGS})
 
@@ -249,10 +260,10 @@ find_package(Threads)
 
 set(OPEN_SRC_INCLUDE_DIRS ${LIBKVSPIC_INCLUDE_DIRS})
 
-if(USE_OPENSSL OR USE_AWS_LC)
+if(USE_OPENSSL OR USE_AWS_LC OR USE_AWS_LC_FIPS)
   # AWS-LC installs the same openssl/*.h headers and libssl/libcrypto names, so
   # CMake's FindOpenSSL module locates it as well.
-  if(USE_AWS_LC)
+  if(USE_AWS_LC OR USE_AWS_LC_FIPS)
     set(OPENSSL_ROOT_DIR ${OPEN_SRC_INSTALL_PREFIX})
   endif()
   find_package(OpenSSL)
@@ -260,7 +271,7 @@ if(USE_OPENSSL OR USE_AWS_LC)
     message(FATAL_ERROR "OpenSSL is not found. Make sure to export PKG_CONFIG_PATH to where OpenSSL's pc file is")
   endif()
   set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR})
-  if(USE_AWS_LC)
+  if(USE_AWS_LC OR USE_AWS_LC_FIPS)
     message(STATUS "Crypto backend: AWS-LC at ${OPENSSL_CRYPTO_LIBRARY}")
   endif()
 elseif(USE_MBEDTLS)
@@ -371,8 +382,9 @@ if (USE_MBEDTLS)
     set(PRODUCER_CRYPTO_LIBRARY
             MbedTLS
             MbedCrypto)
-elseif (USE_AWS_LC)
-    # Same link targets as OpenSSL (FindOpenSSL resolves them to AWS-LC's libs)
+elseif (USE_AWS_LC OR USE_AWS_LC_FIPS)
+    # Same link targets as OpenSSL (FindOpenSSL resolves them to AWS-LC's libs).
+    # The FIPS variant shares the KVS_USE_AWS_LC code path (identical API).
     set(CPRODUCER_COMMON_TLS_OPTION KVS_USE_AWS_LC)
 endif()
 
