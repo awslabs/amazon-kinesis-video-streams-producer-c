@@ -4,6 +4,90 @@
 #define LOG_CLASS "CurlCall"
 #include "../Include_i.h"
 
+#if defined(KVS_USE_OPENSSL) || defined(KVS_USE_AWS_LC)
+#include <openssl/ssl.h>
+#endif
+
+/**
+ * curl header callback used by blockingCurlCall solely to surface TLS negotiation details.
+ * The HTTP status line ("HTTP/1.1 200 OK") arrives exactly once per response, which makes it
+ * a convenient one-shot hook while the TLS session pointer is still valid.
+ */
+static SIZE_T tlsInfoHeaderCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID customData)
+{
+    SIZE_T dataSize = size * numItems;
+    if (customData != NULL && dataSize >= 5 && 0 == STRNCMP(pBuffer, "HTTP/", 5)) {
+        logCurlTlsKeyExchange((CURL*) customData);
+    }
+    return dataSize;
+}
+
+#if defined(KVS_USE_AWS_LC)
+/**
+ * curl SSL context callback: pin the TLS key exchange groups to a post-quantum-first list.
+ *
+ * AWS-LC mainline already defaults to a PQC-first group list, but the AWS-LC-FIPS release
+ * branches default to classical-only groups, so an explicit list is required there. Setting
+ * the same list unconditionally for both variants keeps behavior identical and independent
+ * of upstream default changes. Order: hybrid post-quantum first, classical fallback so
+ * endpoints without ML-KEM (including all KVS endpoints today) keep working.
+ */
+CURLcode kvsCurlSslCtxCallback(CURL* pCurl, PVOID pSslCtx, PVOID pUserData)
+{
+    UNUSED_PARAM(pCurl);
+    UNUSED_PARAM(pUserData);
+    if (pSslCtx == NULL || 1 != SSL_CTX_set1_groups_list((SSL_CTX*) pSslCtx, KVS_TLS_KEY_EXCHANGE_GROUP_LIST)) {
+        DLOGE("Failed to set TLS key exchange groups list");
+        return CURLE_SSL_CONNECT_ERROR;
+    }
+    return CURLE_OK;
+}
+#endif
+
+VOID logCurlTlsKeyExchange(PVOID pCurlHandle)
+{
+    CURL* pCurl = (CURL*) pCurlHandle;
+    struct curl_tlssessioninfo* pTlsInfo = NULL;
+
+    if (pCurl == NULL) {
+        return;
+    }
+
+    if (CURLE_OK != curl_easy_getinfo(pCurl, CURLINFO_TLS_SSL_PTR, &pTlsInfo) || pTlsInfo == NULL || pTlsInfo->internals == NULL) {
+        // Plain HTTP or TLS pointer not available
+        return;
+    }
+
+#if defined(KVS_USE_OPENSSL) || defined(KVS_USE_AWS_LC)
+    // curl reports AWS-LC and BoringSSL under the OpenSSL backend id
+    if (pTlsInfo->backend == CURLSSLBACKEND_OPENSSL) {
+        SSL* pSsl = (SSL*) pTlsInfo->internals;
+        const CHAR* pGroupName = "unknown";
+
+#if defined(OPENSSL_IS_AWSLC) || defined(OPENSSL_IS_BORINGSSL)
+        UINT16 groupId = SSL_get_group_id(pSsl);
+        if (groupId != 0) {
+            pGroupName = SSL_get_group_name(groupId);
+        }
+#elif OPENSSL_VERSION_NUMBER >= 0x30000000L
+        INT32 groupNid = SSL_get_negotiated_group(pSsl);
+        if (groupNid != NID_undef) {
+            pGroupName = SSL_group_to_name(pSsl, groupNid);
+        }
+#else
+        // OpenSSL 1.1.1 has no public accessor for the negotiated group
+        pGroupName = "n/a (OpenSSL 1.1.1)";
+#endif
+
+        DLOGI("TLS negotiated: version=%s keyExchange=%s cipher=%s backend=%s", SSL_get_version(pSsl), pGroupName,
+              SSL_get_cipher_name(pSsl), OPENSSL_VERSION_TEXT);
+    }
+#else
+    UNUSED_PARAM(pTlsInfo);
+    DLOGD("TLS negotiated: key exchange introspection not implemented for this crypto backend");
+#endif
+}
+
 STATUS blockingCurlCall(PRequestInfo pRequestInfo, PCallInfo pCallInfo)
 {
     ENTERS();
@@ -53,25 +137,35 @@ STATUS blockingCurlCall(PRequestInfo pRequestInfo, PCallInfo pCallInfo)
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1L);
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L);
         curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
+#if defined(KVS_USE_AWS_LC)
+        curl_easy_setopt(curl, CURLOPT_SSL_CTX_FUNCTION, (curl_ssl_ctx_callback) kvsCurlSslCtxCallback);
+#endif
     }
 
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, pHeaderList);
     curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer);
     curl_easy_setopt(curl, CURLOPT_URL, pRequestInfo->url);
-    curl_easy_setopt(curl, CURLOPT_SSLCERTTYPE, getSslCertNameFromType(pRequestInfo->certType));
-    curl_easy_setopt(curl, CURLOPT_SSLCERT, pRequestInfo->sslCertPath);
-    curl_easy_setopt(curl, CURLOPT_SSLKEY, pRequestInfo->sslPrivateKeyPath);
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCurlResponseCallback);
+    // Only configure a client certificate when one is provided. curl >= 8.x rejects an
+    // unrecognized CURLOPT_SSLCERTTYPE ("Unknown") with CURLE_BAD_FUNCTION_ARGUMENT,
+    // whereas curl 7.74 silently ignored it.
+    if (pRequestInfo->sslCertPath[0] != '\0' && pRequestInfo->certType != SSL_CERTIFICATE_TYPE_NOT_SPECIFIED) {
+        curl_easy_setopt(curl, CURLOPT_SSLCERTTYPE, getSslCertNameFromType(pRequestInfo->certType));
+        curl_easy_setopt(curl, CURLOPT_SSLCERT, pRequestInfo->sslCertPath);
+        curl_easy_setopt(curl, CURLOPT_SSLKEY, pRequestInfo->sslPrivateKeyPath);
+    }
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, (curl_write_callback) writeCurlResponseCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, pCallInfo);
+    curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, (curl_write_callback) tlsInfoHeaderCallback);
+    curl_easy_setopt(curl, CURLOPT_HEADERDATA, curl);
 
-    curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, pRequestInfo->connectionTimeout / HUNDREDS_OF_NANOS_IN_A_MILLISECOND);
+    curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, (long) (pRequestInfo->connectionTimeout / HUNDREDS_OF_NANOS_IN_A_MILLISECOND));
     if (pRequestInfo->completionTimeout != SERVICE_CALL_INFINITE_TIMEOUT) {
-        curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, pRequestInfo->completionTimeout / HUNDREDS_OF_NANOS_IN_A_MILLISECOND);
+        curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, (long) (pRequestInfo->completionTimeout / HUNDREDS_OF_NANOS_IN_A_MILLISECOND));
     }
 
     // Setting up limits for curl timeout
-    curl_easy_setopt(curl, CURLOPT_LOW_SPEED_TIME, pRequestInfo->lowSpeedTimeLimit / HUNDREDS_OF_NANOS_IN_A_SECOND);
-    curl_easy_setopt(curl, CURLOPT_LOW_SPEED_LIMIT, pRequestInfo->lowSpeedLimit);
+    curl_easy_setopt(curl, CURLOPT_LOW_SPEED_TIME, (long) (pRequestInfo->lowSpeedTimeLimit / HUNDREDS_OF_NANOS_IN_A_SECOND));
+    curl_easy_setopt(curl, CURLOPT_LOW_SPEED_LIMIT, (long) pRequestInfo->lowSpeedLimit);
 
     res = curl_easy_perform(curl);
 
@@ -80,7 +174,10 @@ STATUS blockingCurlCall(PRequestInfo pRequestInfo, PCallInfo pCallInfo)
         CHK_ERR(FALSE, STATUS_CURL_PERFORM_FAILED, "Curl perform failed for url %s with result %s : %s ", url, curl_easy_strerror(res), errorBuffer);
     }
 
-    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpStatusCode);
+    // curl writes a long; go through an intermediary to avoid clobbering adjacent stack on LP64
+    long responseCode = 0;
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &responseCode);
+    httpStatusCode = (UINT32) responseCode;
     CHK_ERR(httpStatusCode == HTTP_STATUS_CODE_OK, STATUS_CURL_PERFORM_FAILED, "Curl call response failed with http status %lu", httpStatusCode);
 
 CleanUp:

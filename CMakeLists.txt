@@ -17,6 +17,7 @@ option(BUILD_STATIC "Static build" OFF)
 option(BUILD_DEPENDENCIES "Whether or not to build depending libraries from source" ON)
 option(USE_OPENSSL "Use openssl as crypto library" ON)
 option(USE_MBEDTLS "Use mbedtls as crypto library" OFF)
+option(USE_AWS_LC "Use AWS-LC as crypto library (OpenSSL 1.1.1 API compatible, FIPS 140-3 validatable, post-quantum key exchange by default)" OFF)
 option(BUILD_COMMON_LWS "Whether or not to build ProducerC libwebsockets common library" OFF)
 option(BUILD_COMMON_CURL "Whether or not to build ProducerC curl common library" ON)
 option(BUILD_OPENSSL_PLATFORM "If buildng OpenSSL what is the target platform" OFF)
@@ -154,7 +155,7 @@ if(BUILD_DEPENDENCIES)
 
   message(STATUS "Begin building dependencies.")
 
-  set(SSL_OPTIONS USE_OPENSSL USE_MBEDTLS)
+  set(SSL_OPTIONS USE_OPENSSL USE_MBEDTLS USE_AWS_LC)
   count_true(ENABLED_SSL_OPTION_COUNT
     ${SSL_OPTIONS})
 
@@ -171,6 +172,9 @@ if(BUILD_DEPENDENCIES)
     elseif(USE_MBEDTLS)
       set(BUILD_ARGS -DBUILD_STATIC=${BUILD_STATIC} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
       build_dependency(mbedtls ${BUILD_ARGS})
+    elseif(USE_AWS_LC)
+      set(BUILD_ARGS -DBUILD_STATIC=${BUILD_STATIC} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
+      build_dependency(awslc ${BUILD_ARGS})
     else()
       message(FATAL_ERROR "No crypto library selected.")
     endif()
@@ -190,6 +194,7 @@ if(BUILD_DEPENDENCIES)
                     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                     -DUSE_OPENSSL=${USE_OPENSSL}
                     -DUSE_MBEDTLS=${USE_MBEDTLS}
+                    -DUSE_AWS_LC=${USE_AWS_LC}
                     -DCURL_USE_FPIC=${CURL_USE_FPIC})
     build_dependency(curl ${BUILD_ARGS})
 
@@ -244,12 +249,20 @@ find_package(Threads)
 
 set(OPEN_SRC_INCLUDE_DIRS ${LIBKVSPIC_INCLUDE_DIRS})
 
-if(USE_OPENSSL)
+if(USE_OPENSSL OR USE_AWS_LC)
+  # AWS-LC installs the same openssl/*.h headers and libssl/libcrypto names, so
+  # CMake's FindOpenSSL module locates it as well.
+  if(USE_AWS_LC)
+    set(OPENSSL_ROOT_DIR ${OPEN_SRC_INSTALL_PREFIX})
+  endif()
   find_package(OpenSSL)
   if(NOT OPENSSL_FOUND AND NOT BUILD_DEPENDENCIES)
     message(FATAL_ERROR "OpenSSL is not found. Make sure to export PKG_CONFIG_PATH to where OpenSSL's pc file is")
   endif()
   set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR})
+  if(USE_AWS_LC)
+    message(STATUS "Crypto backend: AWS-LC at ${OPENSSL_CRYPTO_LIBRARY}")
+  endif()
 elseif(USE_MBEDTLS)
   find_package(MbedTLS REQUIRED)
   set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${MBEDTLS_INCLUDE_DIRS})
@@ -358,6 +371,9 @@ if (USE_MBEDTLS)
     set(PRODUCER_CRYPTO_LIBRARY
             MbedTLS
             MbedCrypto)
+elseif (USE_AWS_LC)
+    # Same link targets as OpenSSL (FindOpenSSL resolves them to AWS-LC's libs)
+    set(CPRODUCER_COMMON_TLS_OPTION KVS_USE_AWS_LC)
 endif()
 
 install(
@@ -408,6 +424,15 @@ if(BUILD_COMMON_CURL)
       if(ZLIB_FOUND)
         list(APPEND CURL_LIBRARIES z)
       endif()
+      # Static libcurl needs its private link dependencies too. On macOS,
+      # curl >= 8.x pulls in SystemConfiguration/CoreFoundation for proxy
+      # discovery (listed in libcurl.pc Libs.private, which pkg_check_modules
+      # splits awkwardly for -framework pairs, so add them explicitly).
+      if(APPLE)
+        list(APPEND CURL_LIBRARIES "-framework SystemConfiguration" "-framework CoreFoundation" "-framework CoreServices")
+      elseif(CURL_STATIC_LIBRARIES)
+        list(APPEND CURL_LIBRARIES ${CURL_STATIC_LIBRARIES})
+      endif()
     endif()
 
     if (WIN32)
@@ -446,6 +471,9 @@ if(BUILD_COMMON_CURL)
       set_target_properties(cproducer PROPERTIES VERSION ${KINESIS_VIDEO_PRODUCER_C_VERSION} SOVERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION})
     endif()
     target_link_libraries(cproducer PUBLIC kvsCommonCurl kvspic)
+    # cproducer's own sources (Response.c) also branch on the crypto backend
+    # (e.g. the TLS key exchange groups callback), so it needs the same TLS define.
+    target_compile_definitions(cproducer PRIVATE ${CPRODUCER_COMMON_TLS_OPTION})
 
     install(
       TARGETS cproducer
@@ -467,6 +495,12 @@ if(BUILD_COMMON_CURL)
 
     add_executable(kvsAudioOnlyStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsAudioOnlyStreamingSample.c ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/Common.c)
     target_link_libraries(kvsAudioOnlyStreamingSample cproducer)
+
+    if(USE_AWS_LC)
+      # Post-quantum key exchange probe / silent-fallback regression check
+      add_executable(kvsTlsKeyExchangeProbe ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsTlsKeyExchangeProbe.c)
+      target_link_libraries(kvsTlsKeyExchangeProbe kvsCommonCurl)
+    endif()
 
     if (BUILD_TEST)
         add_subdirectory(tst)

@@ -333,6 +333,94 @@ jobs:
         run: |
           timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
 
+  linux-gcc-aws-lc:
+    strategy:
+      matrix:
+        build-type:
+          - name: shared
+            cmake-args: ""
+          - name: static
+            cmake-args: "-DBUILD_STATIC=ON"
+      fail-fast: false
+
+    runs-on: ubuntu-latest
+    container:
+      image: public.ecr.aws/ubuntu/ubuntu:22.04_stable
+
+    name: Ubuntu 22.04-gcc-aws-lc-${{ matrix.build-type.name }}
+
+    env:
+      DEBIAN_FRONTEND: noninteractive
+      CC: gcc
+      CXX: g++
+
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y git cmake build-essential pkg-config
+
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.x'
+
+      - name: Build repository
+        run: |
+          mkdir build && cd build
+          cmake .. -DBUILD_TEST=ON -DUSE_OPENSSL=OFF -DUSE_AWS_LC=ON -DPARALLEL_BUILD=ON ${{ matrix.build-type.cmake-args }}
+          make -j
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-duration-seconds: 3600
+
+      - name: Run tests
+        working-directory: ./build
+        run: |
+          timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
+
+      - name: Verify key exchange group logging (silent-fallback check)
+        working-directory: ./build
+        run: |
+          # Real KVS endpoints negotiate classical X25519 today. When KVS enables
+          # ML-KEM, flip the expected group to X25519MLKEM768 to make this the
+          # permanent PQC regression check.
+          ./kvsTlsKeyExchangeProbe https://kinesisvideo.${{ secrets.AWS_REGION }}.amazonaws.com/ - X25519
+
+  mac-aws-lc:
+    runs-on: macos-15
+    name: Apple Silicon Mac-Clang-aws-lc
+    permissions:
+      contents: read
+    env:
+      CC: clang
+      CXX: clang++
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.x'
+
+      - name: Build repository
+        run: |
+          mkdir build && cd build
+          cmake .. -DBUILD_TEST=ON -DUSE_OPENSSL=OFF -DUSE_AWS_LC=ON -DBUILD_STATIC=ON -DPARALLEL_BUILD=ON
+          make -j
+
   arm64-cross-compilation:
     runs-on: ubuntu-22.04
     permissions:

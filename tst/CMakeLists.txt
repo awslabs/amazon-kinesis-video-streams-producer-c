@@ -21,4 +21,6 @@ include_directories(${KINESIS_VIDEO_PRODUCER_C_SRC})
 file(GLOB PRODUCER_TEST_SOURCE_FILES "*.cpp")
 
 add_executable(producer_test ${PRODUCER_TEST_SOURCE_FILES})
-target_link_libraries(producer_test cproducer ${GTEST_LIBNAME})
+# Tests branch on the selected crypto backend (see TlsBackendTest.cpp)
+target_compile_definitions(producer_test PRIVATE ${CPRODUCER_COMMON_TLS_OPTION})
+target_link_libraries(producer_test cproducer ${GTEST_LIBNAME} ${PRODUCER_CRYPTO_LIBRARY})

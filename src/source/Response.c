@@ -147,11 +147,11 @@ STATUS initializeCurlSession(PRequestInfo pRequestInfo, PCallInfo pCallInfo, CUR
     curl_easy_setopt(pCurl, CURLOPT_ERRORBUFFER, pCallInfo->errorBuffer);
 
     curl_easy_setopt(pCurl, CURLOPT_URL, pRequestInfo->url);
-    curl_easy_setopt(pCurl, CURLOPT_NOSIGNAL, 1);
+    curl_easy_setopt(pCurl, CURLOPT_NOSIGNAL, 1L);
 
     // Setting up limits for curl timeout
-    curl_easy_setopt(pCurl, CURLOPT_LOW_SPEED_TIME, DEFAULT_LOW_SPEED_TIME_LIMIT / HUNDREDS_OF_NANOS_IN_A_SECOND);
-    curl_easy_setopt(pCurl, CURLOPT_LOW_SPEED_LIMIT, DEFAULT_LOW_SPEED_LIMIT);
+    curl_easy_setopt(pCurl, CURLOPT_LOW_SPEED_TIME, (long) (DEFAULT_LOW_SPEED_TIME_LIMIT / HUNDREDS_OF_NANOS_IN_A_SECOND));
+    curl_easy_setopt(pCurl, CURLOPT_LOW_SPEED_LIMIT, (long) DEFAULT_LOW_SPEED_LIMIT);
 
     // set verification for SSL connections
     CHK_STATUS(requestRequiresSecureConnection(pRequestInfo->url, &secureConnection));
@@ -178,6 +178,9 @@ STATUS initializeCurlSession(PRequestInfo pRequestInfo, PCallInfo pCallInfo, CUR
         curl_easy_setopt(pCurl, CURLOPT_SSL_VERIFYPEER, 1L);
         curl_easy_setopt(pCurl, CURLOPT_SSL_VERIFYHOST, 2L);
         curl_easy_setopt(pCurl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
+#if defined(KVS_USE_AWS_LC)
+        curl_easy_setopt(pCurl, CURLOPT_SSL_CTX_FUNCTION, (curl_ssl_ctx_callback) kvsCurlSslCtxCallback);
+#endif
     }
 
 #if defined(AWS_KVS_IPV4_ONLY)
@@ -213,13 +216,13 @@ STATUS initializeCurlSession(PRequestInfo pRequestInfo, PCallInfo pCallInfo, CUR
 
     // set request completion timeout in milliseconds
     if (pRequestInfo->completionTimeout != SERVICE_CALL_INFINITE_TIMEOUT) {
-        curl_easy_setopt(pCurl, CURLOPT_TIMEOUT_MS, pRequestInfo->completionTimeout / HUNDREDS_OF_NANOS_IN_A_MILLISECOND);
+        curl_easy_setopt(pCurl, CURLOPT_TIMEOUT_MS, (long) (pRequestInfo->completionTimeout / HUNDREDS_OF_NANOS_IN_A_MILLISECOND));
     }
-    curl_easy_setopt(pCurl, CURLOPT_CONNECTTIMEOUT_MS, pRequestInfo->connectionTimeout / HUNDREDS_OF_NANOS_IN_A_MILLISECOND);
-    curl_easy_setopt(pCurl, CURLOPT_TCP_NODELAY, 1);
+    curl_easy_setopt(pCurl, CURLOPT_CONNECTTIMEOUT_MS, (long) (pRequestInfo->connectionTimeout / HUNDREDS_OF_NANOS_IN_A_MILLISECOND));
+    curl_easy_setopt(pCurl, CURLOPT_TCP_NODELAY, 1L);
 
     // set header callback
-    curl_easy_setopt(pCurl, CURLOPT_HEADERFUNCTION, writeHeaderFn);
+    curl_easy_setopt(pCurl, CURLOPT_HEADERFUNCTION, (curl_write_callback) writeHeaderFn);
     curl_easy_setopt(pCurl, CURLOPT_HEADERDATA, data);
 
     switch (pRequestInfo->verb) {
@@ -235,19 +238,19 @@ STATUS initializeCurlSession(PRequestInfo pRequestInfo, PCallInfo pCallInfo, CUR
             curl_easy_setopt(pCurl, CURLOPT_POST, 1L);
             if (pRequestInfo->body == NULL) {
                 // Set the read callback from the request
-                curl_easy_setopt(pCurl, CURLOPT_READFUNCTION, readFn);
+                curl_easy_setopt(pCurl, CURLOPT_READFUNCTION, (curl_read_callback) readFn);
                 curl_easy_setopt(pCurl, CURLOPT_READDATA, data);
 
                 // Set the write callback from the request
-                curl_easy_setopt(pCurl, CURLOPT_WRITEFUNCTION, writeFn);
+                curl_easy_setopt(pCurl, CURLOPT_WRITEFUNCTION, (curl_write_callback) writeFn);
                 curl_easy_setopt(pCurl, CURLOPT_WRITEDATA, data);
             } else {
                 // Set the read data and it's size
-                curl_easy_setopt(pCurl, CURLOPT_POSTFIELDSIZE, pRequestInfo->bodySize);
+                curl_easy_setopt(pCurl, CURLOPT_POSTFIELDSIZE, (long) pRequestInfo->bodySize);
                 curl_easy_setopt(pCurl, CURLOPT_POSTFIELDS, pRequestInfo->body);
 
                 // Set response callback
-                curl_easy_setopt(pCurl, CURLOPT_WRITEFUNCTION, responseWriteFn);
+                curl_easy_setopt(pCurl, CURLOPT_WRITEFUNCTION, (curl_write_callback) responseWriteFn);
                 curl_easy_setopt(pCurl, CURLOPT_WRITEDATA, data);
             }
 
@@ -305,7 +308,7 @@ VOID terminateCurlSession(PCurlResponse pCurlResponse, UINT64 timeout)
             THREAD_SLEEP(timeout);
             // unpause curl in case curl is paused
             curl_easy_pause(pCurlResponse->pCurl, CURLPAUSE_SEND_CONT);
-            curl_easy_setopt(pCurlResponse->pCurl, CURLOPT_TIMEOUT_MS, TIMEOUT_AFTER_STREAM_STOPPED);
+            curl_easy_setopt(pCurlResponse->pCurl, CURLOPT_TIMEOUT_MS, (long) TIMEOUT_AFTER_STREAM_STOPPED);
             // after timing out curl, give some time for it to take effect.
             THREAD_SLEEP(timeout);
             ATOMIC_STORE_BOOL(&pCurlResponse->terminated, TRUE);
@@ -453,8 +456,12 @@ STATUS curlCompleteSync(PCurlResponse pCurlResponse)
 
         pCurlResponse->callInfo.callResult = getServiceCallResultFromCurlStatus(result);
     } else {
-        // get the response code and note the request completion time
-        curl_easy_getinfo(pCurlResponse->pCurl, CURLINFO_RESPONSE_CODE, &pCurlResponse->callInfo.httpStatus);
+        // get the response code and note the request completion time.
+        // curl writes a long here; callInfo.httpStatus is UINT32 (public ABI), so go through
+        // a long intermediary to avoid overwriting adjacent struct memory on LP64 platforms.
+        long responseCode = 0;
+        curl_easy_getinfo(pCurlResponse->pCurl, CURLINFO_RESPONSE_CODE, &responseCode);
+        pCurlResponse->callInfo.httpStatus = (UINT32) responseCode;
         pCurlResponse->callInfo.callResult = getServiceCallResultFromHttpStatus(pCurlResponse->callInfo.httpStatus);
     }
 
@@ -529,6 +536,12 @@ SIZE_T writeHeaderCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems, PVOID cu
 
     if (pCurlResponse == NULL) {
         return CURL_READFUNC_ABORT;
+    }
+
+    // The HTTP status line arrives once per response, while the TLS session is still live.
+    // Log the negotiated key exchange group (post-quantum campaign evidence) at that point.
+    if (dataSize >= 5 && 0 == STRNCMP(pBuffer, "HTTP/", 5)) {
+        logCurlTlsKeyExchange(pCurlResponse->pCurl);
     }
 
     PCHAR pDelimiter = STRNCHR(pBuffer, (UINT32) dataSize, ':');

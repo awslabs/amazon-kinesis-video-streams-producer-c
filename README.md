@@ -60,6 +60,9 @@ You can pass the following options to `cmake ..`.
 * `-DUNDEFINED_BEHAVIOR_SANITIZER` Build with UndefinedBehaviorSanitizer
 * `-DALIGNED_MEMORY_MODEL` Build for aligned memory model only devices. Default is OFF.
 * `-DLOCAL_OPENSSL_BUILD` Whether or not to use local OpenSSL build. Default is OFF.
+* `-DUSE_OPENSSL` -- Use OpenSSL as the crypto/TLS library. Default is ON.
+* `-DUSE_MBEDTLS` -- Use mbedTLS as the crypto/TLS library. Default is OFF.
+* `-DUSE_AWS_LC` -- Use [AWS-LC](https://github.com/aws/aws-lc) as the crypto/TLS library. Default is OFF. See [Crypto library selection](#crypto-library-selection-and-post-quantum-tls).
 * `-DCONSTRAINED_DEVICE` -- Change thread stack size to 0.5Mb, needed for Alpine.
 * `-DAWS_KVS_USE_LEGACY_ENDPOINT_ONLY` -- Use only legacy IPV4-only endpoints (ignores env vars). Default is OFF.
 * `-DAWS_KVS_USE_DUAL_STACK_ENDPOINT_ONLY` -- Use only dual-stack endpoints (ignores env vars). Default is OFF.
@@ -200,6 +203,34 @@ export AWS_ACCESS_KEY_ID=<YourAWSAccessKey>
 
 Now you can execute the unit tests from the `build` directory as follows:
 `./tst/producer_test`
+
+### Crypto library selection and post-quantum TLS
+
+The SDK can be built against one of three crypto/TLS libraries, selected at build time (exactly one may be enabled):
+
+| Option | Library | Notes |
+|---|---|---|
+| `-DUSE_OPENSSL=ON` (default) | OpenSSL 1.1.1 | Built from source by default |
+| `-DUSE_MBEDTLS=ON` | mbedTLS | |
+| `-DUSE_AWS_LC=ON` | [AWS-LC](https://github.com/aws/aws-lc) | Post-quantum TLS key exchange; FIPS 140-3 validated variants available upstream |
+
+To build with AWS-LC (note `-DUSE_OPENSSL=OFF` is required since OpenSSL is the default):
+
+```
+cmake .. -DUSE_OPENSSL=OFF -DUSE_AWS_LC=ON
+make
+```
+
+AWS-LC exposes the same API surface as OpenSSL 1.1.1, so no application changes are needed. When built with AWS-LC:
+
+* TLS 1.3 connections offer hybrid post-quantum key exchange (`X25519MLKEM768`, NIST FIPS 203 ML-KEM) first, with classical groups as fallback. The negotiated key exchange group is logged once per connection: `TLS negotiated: version=... keyExchange=... cipher=...`.
+* Post-quantum key exchange is negotiated automatically when the service endpoint also supports it; otherwise the connection falls back to classical key exchange with no error.
+* libcurl is built at a newer version (8.x) than with the other backends, since AWS-LC support requires curl >= 7.87.0.
+* The `kvsTlsKeyExchangeProbe` sample is built. It performs one HTTPS request through the SDK's networking path and asserts the negotiated key exchange group, which can be used as a regression check against silent fallback from post-quantum to classical key exchange: `./kvsTlsKeyExchangeProbe <https-url> [ca-cert.pem] [expected-group]`.
+
+On Windows, libcurl uses Schannel (the OS TLS stack) regardless of the selected crypto library; the selected library is then only used for request signing, and TLS capabilities (including post-quantum key exchange) are determined by the OS.
+
+**Cryptographic module selection and compliance.** Selection of the cryptographic library, and any FIPS 140-3 or post-quantum compliance obligations that apply to your deployment, are the responsibility of the customer under the AWS shared responsibility model. AWS does not certify or validate customer-built OpenSSL FIPS configurations. For FIPS 140-3 validated cryptography, use an [AWS-LC-FIPS release](https://github.com/aws/aws-lc/blob/main/crypto/fipsmodule/FIPS.md) (Linux only for static builds).
 
 ### Offline mode
 The samples run in near real time mode by default. In order to set up offline mode, the following APIs can be used in the samples instead of the realtime variant:

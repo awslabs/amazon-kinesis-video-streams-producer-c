@@ -14,9 +14,31 @@ set(CMAKE_ARGS
         -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
         -DCMAKE_INSTALL_PREFIX=${OPEN_SRC_INSTALL_PREFIX}
         -DBUILD_CURL_EXE=OFF
-        -DCMAKE_USE_LIBSSH2=OFF
         -DBUILD_TESTING=OFF
         -DHTTP_ONLY=ON)
+
+# curl 7.74.0 does not compile against AWS-LC (it calls
+# SSL_CTX_set_post_handshake_auth, which AWS-LC does not provide). Official
+# AWS-LC support landed in curl 7.87.0. Only bump when AWS-LC is selected so
+# the existing OpenSSL / mbedTLS builds are unaffected.
+if (USE_AWS_LC)
+    set(CURL_GIT_TAG curl-8_22_0)
+    # curl 8.x option names
+    set(CMAKE_ARGS ${CMAKE_ARGS}
+        -DCURL_USE_OPENSSL=ON
+        -DCURL_USE_LIBSSH2=OFF
+        -DCURL_USE_LIBPSL=OFF
+        -DUSE_NGHTTP2=OFF
+        -DUSE_LIBIDN2=OFF
+        -DCURL_BROTLI=OFF
+        -DCURL_ZSTD=OFF
+        -DBUILD_LIBCURL_DOCS=OFF
+        -DBUILD_MISC_DOCS=OFF
+        -DENABLE_CURL_MANUAL=OFF)
+else()
+    set(CURL_GIT_TAG curl-7_74_0)
+    set(CMAKE_ARGS ${CMAKE_ARGS} -DCMAKE_USE_LIBSSH2=OFF)
+endif()
 
 # Note: Future Curl versions introduce BUILD_STATIC_LIBS flag
 if (BUILD_STATIC)
@@ -55,7 +77,7 @@ endif()
 
 ExternalProject_Add(project_libcurl
     GIT_REPOSITORY    https://github.com/curl/curl.git
-    GIT_TAG           curl-7_74_0
+    GIT_TAG           ${CURL_GIT_TAG}
     GIT_SHALLOW       TRUE
     GIT_PROGRESS      TRUE
     PREFIX            ${CMAKE_CURRENT_BINARY_DIR}/build
