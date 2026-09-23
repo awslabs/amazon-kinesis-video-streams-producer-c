@@ -297,3 +297,64 @@ jobs:
           fi
 
         shell: bash
+
+  sample-check-aws-lc:
+    name: ubuntu-22.04 - kvsVideoOnlyRealtimeStreamingSample (AWS-LC)
+    runs-on: ubuntu-latest
+    container: public.ecr.aws/ubuntu/ubuntu:22.04_stable
+
+    env:
+      AWS_KVS_LOG_LEVEL: 2
+      DEBIAN_FRONTEND: noninteractive
+      KVS_STREAM_NAME: demo-stream-producer-c-aws-lc-ci
+      EXECUTABLE_TIMEOUT_SECS: 300
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y git cmake build-essential pkg-config
+
+      - name: Build repository (USE_AWS_LC, dependencies from source)
+        run: |
+          mkdir build && cd build
+          cmake .. -DUSE_OPENSSL=OFF -DUSE_AWS_LC=ON -DPARALLEL_BUILD=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
+          make -j$(nproc)
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-duration-seconds: 900
+
+      - name: Run sample
+        working-directory: ./build
+        run: |
+          set -o pipefail
+          timeout --signal=SIGKILL "$EXECUTABLE_TIMEOUT_SECS" \
+            ./kvsVideoOnlyRealtimeStreamingSample "$KVS_STREAM_NAME" | tee output.log
+
+      - name: Verify fragments persisted
+        working-directory: ./build
+        run: |
+          grep -q '"EventType":"PERSISTED"' output.log
+
+      - name: Verify TLS key exchange evidence (PQC campaign log line)
+        working-directory: ./build
+        run: |
+          # Both call sites must emit the negotiated group, and the backend must be AWS-LC.
+          grep -m2 'TLS negotiated:.*keyExchange=.*AWS-LC' output.log
+          # Expected group today is classical X25519. When KVS endpoints enable
+          # ML-KEM, change the assertion to X25519MLKEM768 to make this the
+          # permanent PQC regression check.
+          grep -q 'keyExchange=X25519 ' output.log
+

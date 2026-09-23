@@ -72,7 +72,16 @@ else()
 endif()
 
 if (WIN32)
-    set(CMAKE_ARGS ${CMAKE_ARGS} -DCMAKE_USE_SCHANNEL=1 -DCURL_STATIC_CRT=1)
+    # Windows uses the OS TLS stack (Schannel) regardless of the crypto backend;
+    # the selected crypto library only serves request signing there.
+    # curl 8.x renamed CMAKE_USE_SCHANNEL to CURL_USE_SCHANNEL, so pick the name
+    # matching the pinned curl version, and make sure the OpenSSL backend is off
+    # so AWS-LC builds don't silently switch Windows TLS away from Schannel.
+    if (USE_AWS_LC)
+        set(CMAKE_ARGS ${CMAKE_ARGS} -DCURL_USE_SCHANNEL=ON -DCURL_USE_OPENSSL=OFF -DCURL_STATIC_CRT=1)
+    else()
+        set(CMAKE_ARGS ${CMAKE_ARGS} -DCMAKE_USE_SCHANNEL=1 -DCURL_STATIC_CRT=1)
+    endif()
 endif()
 
 ExternalProject_Add(project_libcurl
