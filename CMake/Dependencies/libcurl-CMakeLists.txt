@@ -16,6 +16,14 @@ set(CMAKE_ARGS
         -DBUILD_CURL_EXE=OFF
         -DCMAKE_USE_LIBSSH2=OFF
         -DBUILD_TESTING=OFF
+        # Curl's own -Werror set (includes -Werror=partial-availability) turns any
+        # newer-SDK API reference into a hard error. We do not want a dependency's
+        # internal warning policy to break our build.
+        -DPICKY_COMPILER=OFF
+        # Curl detects pipe2 from the macOS SDK headers even when the deployment
+        # target predates it, then cannot call it. Pre-seed the cache so curl's
+        # check_symbol_exists is skipped and socketpair.c takes the portable path.
+        -DHAVE_PIPE2=OFF
         -DHTTP_ONLY=ON)
 
 # Note: Future Curl versions introduce BUILD_STATIC_LIBS flag
@@ -55,7 +63,7 @@ endif()
 
 ExternalProject_Add(project_libcurl
     GIT_REPOSITORY    https://github.com/curl/curl.git
-    GIT_TAG           curl-7_74_0
+    GIT_TAG           curl-8_17_0
     GIT_SHALLOW       TRUE
     GIT_PROGRESS      TRUE
     PREFIX            ${CMAKE_CURRENT_BINARY_DIR}/build
