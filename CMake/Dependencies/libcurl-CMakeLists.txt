@@ -24,6 +24,16 @@ set(CMAKE_ARGS
         # which lets a dependency's warning policy break this build. Applies to every
         # toolchain, so it is set unconditionally.
         -DPICKY_COMPILER=OFF
+        # Curl 8.x probes the host for these by default: libpsl fails configure when
+        # absent, and brotli/zstd are AUTO so a cross-compile picks up the host's x86_64
+        # libraries and fails at link. HTTP_ONLY does not cover them since they are not
+        # protocol handlers. Disabling them keeps the feature set identical on every host
+        # and matches the 7.74.0 build, which had none of them.
+        -DCURL_USE_LIBPSL=OFF
+        -DUSE_NGHTTP2=OFF
+        -DUSE_LIBIDN2=OFF
+        -DCURL_BROTLI=OFF
+        -DCURL_ZSTD=OFF
         -DHTTP_ONLY=ON)
 
 # Apple only: the SDK headers declare pipe2 with an availability annotation newer
