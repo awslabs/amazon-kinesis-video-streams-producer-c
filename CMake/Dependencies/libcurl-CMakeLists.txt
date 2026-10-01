@@ -11,7 +11,7 @@ endif()
 include(ExternalProject)
 
 # NOTE: Curl dropped the CMAKE_USE_* option prefix in 7.77 in favour of CURL_USE_*.
-# The names below are the post-7.77 spelling and are required by the pinned version;
+# The names below are post-7.77, and are required by the pinned version;
 # they are silently ignored by curl < 7.77, so the option names and GIT_TAG must be
 # kept in step.
 set(CMAKE_ARGS
@@ -24,11 +24,9 @@ set(CMAKE_ARGS
         # which lets a dependency's warning policy break this build. Applies to every
         # toolchain, so it is set unconditionally.
         -DPICKY_COMPILER=OFF
-        # Curl 8.x probes the host for these by default: libpsl fails configure when
-        # absent, and brotli/zstd are AUTO so a cross-compile picks up the host's x86_64
-        # libraries and fails at link. HTTP_ONLY does not cover them since they are not
-        # protocol handlers. Disabling them keeps the feature set identical on every host
-        # and matches the 7.74.0 build, which had none of them.
+        # Optional features this SDK does not use. Curl 8.x probes the host for them by
+        # default, which makes the build depend on what happens to be installed, so they
+        # are disabled explicitly. HTTP_ONLY does not cover them: they are not protocols.
         -DCURL_USE_LIBPSL=OFF
         -DUSE_NGHTTP2=OFF
         -DUSE_LIBIDN2=OFF
@@ -36,12 +34,11 @@ set(CMAKE_ARGS
         -DCURL_ZSTD=OFF
         -DHTTP_ONLY=ON)
 
-# Apple only: the SDK headers declare pipe2 with an availability annotation newer
-# than our deployment target, so curl's check_function_exists finds it and then
-# compiles a call that is not legal on the target OS. Pre-seeding the cache variable
-# skips the check and socketpair.c takes the portable path. Everywhere else pipe2 is
-# either genuinely available and preferable (Linux glibc >= 2.9 sets O_CLOEXEC
-# atomically) or absent and never detected (Windows), so this must not be global.
+# Apple only: pipe2() is macOS 27+, but check_function_exists() uses its own prototype
+# and misses the availability annotation, so HAVE_PIPE2 is set even when the deployment
+# target is older and clang then rejects the call in socketpair.c. Any SDK newer than the
+# host OS hits this. OFF takes the pipe()+fcntl(FD_CLOEXEC) fallback. Not global: on
+# Linux pipe2() is real and preferable, since it sets O_CLOEXEC atomically.
 if (APPLE)
     set(CMAKE_ARGS ${CMAKE_ARGS} -DHAVE_PIPE2=OFF)
 endif()
