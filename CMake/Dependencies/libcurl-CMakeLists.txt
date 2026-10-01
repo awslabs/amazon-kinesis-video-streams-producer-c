@@ -54,11 +54,15 @@ if (CURL_USE_FPIC)
     set(CMAKE_ARGS ${CMAKE_ARGS} -DCMAKE_POSITION_INDEPENDENT_CODE=ON)
 endif()
 
-# By default use openssl. Both backends must be selected explicitly: CURL_USE_MBEDTLS
-# and CURL_USE_OPENSSL are cmake_dependent_option and default OFF, so omitting them
-# leaves curl to pick a backend on its own.
+# Select exactly one TLS backend. Curl 8.x ignores the pre-7.77 CMAKE_USE_* spellings,
+# so a USE_MBEDTLS build silently got OpenSSL, and enabling two backends at once yields
+# a MultiSSL build with curl picking the default. Schannel defaults OFF
+# (curl CMakeLists.txt:708); OpenSSL defaults ON on non-Windows platforms when no other
+# backend is enabled, but is set explicitly so the choice does not rest on that heuristic.
 if (USE_MBEDTLS)
     set(CMAKE_ARGS ${CMAKE_ARGS} -DCURL_USE_MBEDTLS=ON)
+elseif (WIN32)
+    set(CMAKE_ARGS ${CMAKE_ARGS} -DCURL_USE_SCHANNEL=ON)
 else()
     set(CMAKE_ARGS ${CMAKE_ARGS} -DCURL_USE_OPENSSL=ON)
 endif()
@@ -79,8 +83,8 @@ else()
 endif()
 
 if (WIN32)
-    # Schannel supersedes the OpenSSL selection made above on Windows.
-    set(CMAKE_ARGS ${CMAKE_ARGS} -DCURL_USE_SCHANNEL=ON -DCURL_USE_OPENSSL=OFF -DCURL_STATIC_CRT=1)
+    # Static MSVC runtime (/MT). Unrelated to the TLS backend chosen above.
+    set(CMAKE_ARGS ${CMAKE_ARGS} -DCURL_STATIC_CRT=1)
 endif()
 
 # NOTE: curl 8.18.0 and later require OpenSSL 3.0 (lib/vtls/openssl.c). This project
