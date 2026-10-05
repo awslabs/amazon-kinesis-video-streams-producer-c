@@ -69,13 +69,16 @@ typedef struct __CRYPTO_dynlock_value* PCRYPTO_dynlock_value;
 #if defined(KVS_BUILD_WITH_CURL)
 #include "Curl/CurlCall.h"
 #include "Curl/CurlIotCredentialProvider.h"
+#include "Curl/CurlEc2CredentialProvider.h"
 #endif
 #if defined(KVS_BUILD_WITH_LWS)
 #include "Lws/LwsCall.h"
 #include "Lws/LwsIotCredentialProvider.h"
+#include "Lws/LwsEc2CredentialProvider.h"
 #endif
 
 #include "IotCredentialProvider.h"
+#include "Ec2CredentialProvider.h"
 #include "AwsV4Signer.h"
 #include "Util.h"
 #include "RequestInfo.h"
