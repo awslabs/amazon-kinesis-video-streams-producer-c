@@ -9,6 +9,7 @@ on:
     branches:
       - develop
       - master
+      - release-*
 
 env:
   AWS_KVS_LOG_LEVEL: 7
