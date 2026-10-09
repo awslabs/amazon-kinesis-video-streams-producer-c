@@ -5,6 +5,8 @@ name: Close Stale Issues
 on:
   schedule:
     - cron: "0 0 * * *"
+  # Manual runs are always a dry run (preview only).
+  workflow_dispatch:
 
 permissions:
   issues: write
@@ -17,11 +19,11 @@ jobs:
       - uses: aws-actions/stale-issue-cleanup@v7.1.1
         with:
           ancient-issue-message: This is a very old issue. We encourage you to check if this is still an issue in the latest release and if you find that this is still a problem, please feel free to open a new one.
-          stale-issue-message: It looks like this issue has not been active for 10 days. If the issue is not resolved, please add an update to the ticket, else it will be automatically resolved in a few days.
+          stale-issue-message: It looks like this issue has not been active for 7 days. If the issue is not resolved, please add an update to the ticket, else it will be automatically resolved in a few days.
 
           # labels to be added
           stale-issue-label: closing-soon
-          exempt-issue-labels: enhancement,pending-research,pending-action,needs-triage,bug
+          exempt-issue-labels: enhancement,pending-research,pending-action,needs-triage
           response-requested-label: pending-response
 
           closed-for-staleness-label: closed-for-staleness
@@ -33,6 +35,5 @@ jobs:
 
 
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          loglevel: DEBUG
-          # Set dry-run to true to not perform label or close actions.
-          dry-run: false
+          # Only the scheduled run makes changes. Any other trigger is a dry run.
+          dry-run: ${{ github.event_name != 'schedule' }}
