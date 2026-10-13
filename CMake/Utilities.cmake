@@ -84,6 +84,23 @@ function(build_dependency lib_name)
   # library building cmake.
   set(build_args ${ARGN})
 
+  # Cross-compiling: the dependency sub-builds are separate CMake projects, so
+  # they only learn the target (CMAKE_SYSTEM_NAME / CMAKE_SYSTEM_PROCESSOR /
+  # compilers) if the toolchain file is handed down. AWS-LC in particular picks
+  # its assembly set from CMAKE_SYSTEM_PROCESSOR. Relative paths are resolved
+  # the way CMake itself does: build dir first, then source dir.
+  if(CMAKE_TOOLCHAIN_FILE)
+    set(toolchain_abs "${CMAKE_TOOLCHAIN_FILE}")
+    if(NOT IS_ABSOLUTE "${toolchain_abs}")
+      if(EXISTS "${CMAKE_BINARY_DIR}/${CMAKE_TOOLCHAIN_FILE}")
+        set(toolchain_abs "${CMAKE_BINARY_DIR}/${CMAKE_TOOLCHAIN_FILE}")
+      else()
+        set(toolchain_abs "${CMAKE_SOURCE_DIR}/${CMAKE_TOOLCHAIN_FILE}")
+      endif()
+    endif()
+    list(APPEND build_args -DCMAKE_TOOLCHAIN_FILE=${toolchain_abs})
+  endif()
+
   file(REMOVE_RECURSE ${OPEN_SRC_INSTALL_PREFIX}/lib${lib_name})
 
   # build library
