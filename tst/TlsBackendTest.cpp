@@ -5,6 +5,7 @@
 
 #if defined(KVS_USE_AWS_LC)
 #include <openssl/ssl.h>
+#include <openssl/crypto.h>
 #include <curl/curl.h>
 
 extern "C" CURLcode kvsCurlSslCtxCallback(CURL*, PVOID, PVOID);
@@ -12,7 +13,10 @@ extern "C" CURLcode kvsCurlSslCtxCallback(CURL*, PVOID, PVOID);
 
 extern "C" PUBLIC_API VOID logCurlTlsKeyExchange(PVOID);
 
-namespace com { namespace amazonaws { namespace kinesis { namespace video {
+namespace com {
+namespace amazonaws {
+namespace kinesis {
+namespace video {
 
 // Plain TESTs (no fixture): these are network-free and must not require credentials
 
@@ -41,6 +45,21 @@ TEST(TlsBackendTest, sslCtxCallbackNullCtxFails)
     EXPECT_EQ(CURLE_SSL_CONNECT_ERROR, kvsCurlSslCtxCallback(NULL, NULL, NULL));
 }
 
+// The linked AWS-LC must match the selected build variant: the FIPS build
+// (USE_AWS_LC_FIPS) has to run with the FIPS module active, and the regular
+// build must not silently pick up a FIPS library (or vice versa).
+TEST(TlsBackendTest, fipsModeMatchesSelectedBuildVariant)
+{
+#if defined(KVS_USE_AWS_LC_FIPS)
+    EXPECT_EQ(1, FIPS_mode());
+#else
+    EXPECT_EQ(0, FIPS_mode());
+#endif
+}
+
 #endif // KVS_USE_AWS_LC
 
-} } } }
+} // namespace video
+} // namespace kinesis
+} // namespace amazonaws
+} // namespace com
