@@ -62,6 +62,23 @@ option(UNDEFINED_BEHAVIOR_SANITIZER "Build with UndefinedBehaviorSanitizer." OFF
 option(ALIGNED_MEMORY_MODEL "Aligned memory model ONLY." OFF)
 option(SET_SSL_CALLBACKS "Set SSL thread and lock callbacks." OFF)
 
+# Dependency version overrides. Empty means "use the pinned tag" from
+# CMake/Dependencies/lib*-CMakeLists.txt. Used by the weekly latest-dependency
+# CI build to detect upstream breakage early; not intended for production builds.
+set(AWS_LC_GIT_TAG "" CACHE STRING "Override the pinned AWS-LC git tag (empty = pinned)")
+set(CURL_GIT_TAG "" CACHE STRING "Override the pinned libcurl git tag (empty = pinned)")
+
+# Exactly one crypto backend must be selected. Checked here, before the
+# dependency build, so the check also applies with -DBUILD_DEPENDENCIES=OFF.
+set(SSL_OPTIONS USE_OPENSSL USE_MBEDTLS USE_AWS_LC USE_AWS_LC_FIPS)
+count_true(ENABLED_SSL_OPTION_COUNT
+  ${SSL_OPTIONS})
+if(ENABLED_SSL_OPTION_COUNT GREATER "1")
+  message(FATAL_ERROR "Only one of ${SSL_OPTIONS} can be enabled")
+elseif(ENABLED_SSL_OPTION_COUNT EQUAL "0")
+  message(FATAL_ERROR "No crypto library selected. Enable one of ${SSL_OPTIONS}")
+endif()
+
 set(TYPE_OF_LIB SHARED)
 if (BUILD_STATIC)
   set(TYPE_OF_LIB STATIC)
@@ -168,14 +185,6 @@ if(BUILD_DEPENDENCIES)
 
   message(STATUS "Begin building dependencies.")
 
-  set(SSL_OPTIONS USE_OPENSSL USE_MBEDTLS USE_AWS_LC USE_AWS_LC_FIPS)
-  count_true(ENABLED_SSL_OPTION_COUNT
-    ${SSL_OPTIONS})
-
-  if(ENABLED_SSL_OPTION_COUNT GREATER "1")
-    message(FATAL_ERROR "Only one of ${SSL_OPTIONS} can be enabled")
-  endif()
-
   if(NOT LOCAL_CRYPTO_BUILD)
     message(STATUS "Building crypto library from source")
     if(USE_OPENSSL)
@@ -196,7 +205,8 @@ if(BUILD_DEPENDENCIES)
           message(FATAL_ERROR "The AWS-LC-FIPS build requires the Go toolchain (delocate/inject_hash). Install Go or use USE_AWS_LC instead.")
         endif()
       endif()
-      set(BUILD_ARGS -DBUILD_STATIC=${BUILD_STATIC} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DUSE_AWS_LC_FIPS=${USE_AWS_LC_FIPS})
+      set(BUILD_ARGS -DBUILD_STATIC=${BUILD_STATIC} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DUSE_AWS_LC_FIPS=${USE_AWS_LC_FIPS}
+                    -DAWS_LC_GIT_TAG=${AWS_LC_GIT_TAG})
       build_dependency(awslc ${BUILD_ARGS})
     else()
       message(FATAL_ERROR "No crypto library selected.")
@@ -219,6 +229,7 @@ if(BUILD_DEPENDENCIES)
                     -DUSE_MBEDTLS=${USE_MBEDTLS}
                     -DUSE_AWS_LC=${USE_AWS_LC}
                     -DUSE_AWS_LC_FIPS=${USE_AWS_LC_FIPS}
+                    -DCURL_GIT_TAG=${CURL_GIT_TAG}
                     -DUSE_LEGACY_MBEDTLS=${USE_LEGACY_MBEDTLS}
                     -DCURL_USE_FPIC=${CURL_USE_FPIC})
     if(USE_MBEDTLS)
