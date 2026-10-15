@@ -45,6 +45,35 @@ jobs:
           $env:Path += ';C:\Strawberry\perl\site\bin;C:\Strawberry\perl\bin;C:\Strawberry\c\bin;C:\Program Files\NASM;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\lib;D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\open-source\bin'
           & "D:\a\amazon-kinesis-video-streams-producer-c\amazon-kinesis-video-streams-producer-c\build\tst\producer_test.exe" --gtest_filter="-ProducerFunctionalityTest.pressure_on_buffer_duration_fail_new_connection_at_token_rotation"
 
+  build-aws-lc:
+    # Build-only: verifies the AWS-LC backend compiles with MSVC/NMake and that
+    # curl stays on Schannel for TLS (AWS-LC serves signing only on Windows).
+    # No test run: TLS behavior on Windows is Schannel's, covered by the default job.
+    runs-on: windows-2022
+    env:
+      AWS_KVS_LOG_LEVEL: 2
+    permissions:
+      contents: read
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.x'
+      - name: Install dependencies
+        run: |
+          choco install nasm strawberryperl pkgconfiglite
+      - name: Build repository (USE_AWS_LC)
+        shell: cmd
+        run: |
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          git config --system core.longpaths true
+          mkdir build
+          cd build
+          cmake -G "NMake Makefiles" -DUSE_OPENSSL=OFF -DUSE_AWS_LC=ON -DBUILD_TEST=TRUE ..
+          nmake
+
   sample-checks:
     name: ${{ matrix.sample-executable }}
     runs-on: windows-2022
