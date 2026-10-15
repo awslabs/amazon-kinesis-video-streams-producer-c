@@ -7,22 +7,46 @@
  * regression check against silent fallback from post-quantum to classical key exchange.
  *
  * Usage:
- *   kvsTlsKeyExchangeProbe <https-url> [ca-cert.pem] [expected-group]
+ *   kvsTlsKeyExchangeProbe <https-url> [ca-cert.pem] [expected-group[:expected-group...]]
  *
- *   expected-group defaults to KVS_EXPECTED_KEY_EXCHANGE_GROUP below. Today KVS endpoints
- *   negotiate X25519; flip the default to X25519MLKEM768 once the service side supports ML-KEM.
+ *   expected-group defaults to KVS_EXPECTED_KEY_EXCHANGE_GROUP below. A colon-separated list
+ *   accepts any of the listed groups, which lets a CI gate tolerate a service-side rollout
+ *   (control plane already on X25519MLKEM768, PutMedia hosts still on X25519) while a stricter
+ *   check pins a single group. Pass "-" for the CA argument to use the system default store.
+ *
+ *   Exit code 0: handshake completed and the negotiated group is in the expected list.
+ *   Exit code 1: no TLS session, or the negotiated group is not in the list (silent fallback).
  */
 #include <com/amazonaws/kinesis/video/common/Include.h>
 
-// What we expect a production KVS endpoint to negotiate today. Change to "X25519MLKEM768"
-// when KVS endpoints enable hybrid post-quantum key exchange.
-#define KVS_EXPECTED_KEY_EXCHANGE_GROUP "X25519"
+// Default acceptance list when no expected-group argument is given: KVS control plane
+// endpoints negotiate X25519MLKEM768 and PutMedia endpoints still negotiate X25519 while the
+// service-side rollout completes, so both are acceptable by default. Pass a single group to
+// pin the expectation (the nightly drift check does).
+#define KVS_EXPECTED_KEY_EXCHANGE_GROUP "X25519MLKEM768:X25519"
 
 // Internal to kvsCommonCurl, not part of the public header
 extern STATUS blockingCurlCall(PRequestInfo, PCallInfo);
 
 // Captured by the log hook below
 static CHAR gNegotiatedGroup[64] = "";
+
+// TRUE if group appears in the colon-separated expectedList
+static BOOL groupInExpectedList(PCHAR group, PCHAR expectedList)
+{
+    PCHAR pStart = expectedList, pEnd;
+    SIZE_T groupLen = STRLEN(group), tokenLen;
+
+    while (pStart != NULL && *pStart != '\0') {
+        pEnd = STRCHR(pStart, ':');
+        tokenLen = (pEnd != NULL) ? (SIZE_T) (pEnd - pStart) : STRLEN(pStart);
+        if (tokenLen == groupLen && 0 == STRNCMP(pStart, group, groupLen)) {
+            return TRUE;
+        }
+        pStart = (pEnd != NULL) ? pEnd + 1 : NULL;
+    }
+    return FALSE;
+}
 
 // Intercept SDK logs to pull out the "keyExchange=" value emitted by logCurlTlsKeyExchange()
 static VOID probeLogPrint(UINT32 level, PCHAR tag, PCHAR fmt, ...)
@@ -56,7 +80,7 @@ INT32 main(INT32 argc, CHAR* argv[])
     INT32 exitCode = 1;
 
     if (argc < 2) {
-        fprintf(stderr, "Usage: %s <https-url> [ca-cert.pem] [expected-group]\n", argv[0]);
+        fprintf(stderr, "Usage: %s <https-url> [ca-cert.pem|-] [expected-group[:expected-group...]]\n", argv[0]);
         return 1;
     }
     url = argv[1];
@@ -80,11 +104,11 @@ INT32 main(INT32 argc, CHAR* argv[])
 
     printf("url:                 %s\n", url);
     printf("negotiated group:    %s\n", gNegotiatedGroup[0] ? gNegotiatedGroup : "<none: handshake failed or not captured>");
-    printf("expected group:      %s\n", expected);
+    printf("expected group(s):   %s\n", expected);
 
     if (gNegotiatedGroup[0] == '\0') {
         printf("RESULT: FAIL (no TLS session; status 0x%08x)\n", retStatus);
-    } else if (STRCMP(gNegotiatedGroup, expected) == 0) {
+    } else if (groupInExpectedList(gNegotiatedGroup, expected)) {
         printf("RESULT: PASS\n");
         exitCode = 0;
     } else {
