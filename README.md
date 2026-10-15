@@ -63,6 +63,7 @@ You can pass the following options to `cmake ..`.
 * `-DUSE_OPENSSL` -- Use OpenSSL as the crypto/TLS library. Default is ON.
 * `-DUSE_MBEDTLS` -- Use mbedTLS as the crypto/TLS library. Default is OFF.
 * `-DUSE_AWS_LC` -- Use [AWS-LC](https://github.com/aws/aws-lc) as the crypto/TLS library. Default is OFF. See [Crypto library selection](#crypto-library-selection-and-post-quantum-tls).
+* `-DUSE_AWS_LC_FIPS` -- Use the [AWS-LC-FIPS](https://github.com/aws/aws-lc/blob/main/crypto/fipsmodule/FIPS.md) release line (FIPS 140-3 cryptographic module). Default is OFF. Linux only for static builds; requires the Go toolchain.
 * `-DCONSTRAINED_DEVICE` -- Change thread stack size to 0.5Mb, needed for Alpine.
 * `-DAWS_KVS_USE_LEGACY_ENDPOINT_ONLY` -- Use only legacy IPV4-only endpoints (ignores env vars). Default is OFF.
 * `-DAWS_KVS_USE_DUAL_STACK_ENDPOINT_ONLY` -- Use only dual-stack endpoints (ignores env vars). Default is OFF.
@@ -212,7 +213,8 @@ The SDK can be built against one of three crypto/TLS libraries, selected at buil
 |---|---|---|
 | `-DUSE_OPENSSL=ON` (default) | OpenSSL 1.1.1 | Built from source by default |
 | `-DUSE_MBEDTLS=ON` | mbedTLS | |
-| `-DUSE_AWS_LC=ON` | [AWS-LC](https://github.com/aws/aws-lc) | Post-quantum TLS key exchange; FIPS 140-3 validated variants available upstream |
+| `-DUSE_AWS_LC=ON` | [AWS-LC](https://github.com/aws/aws-lc) | Post-quantum TLS key exchange |
+| `-DUSE_AWS_LC_FIPS=ON` | [AWS-LC-FIPS](https://github.com/aws/aws-lc/blob/main/crypto/fipsmodule/FIPS.md) | FIPS 140-3 module + post-quantum TLS key exchange. Linux only for static builds; requires Go |
 
 To build with AWS-LC (note `-DUSE_OPENSSL=OFF` is required since OpenSSL is the default):
 
@@ -230,7 +232,7 @@ AWS-LC exposes the same API surface as OpenSSL 1.1.1, so no application changes 
 
 On Windows, libcurl uses Schannel (the OS TLS stack) regardless of the selected crypto library; the selected library is then only used for request signing, and TLS capabilities (including post-quantum key exchange) are determined by the OS.
 
-**Cryptographic module selection and compliance.** Selection of the cryptographic library, and any FIPS 140-3 or post-quantum compliance obligations that apply to your deployment, are the responsibility of the customer under the AWS shared responsibility model. AWS does not certify or validate customer-built OpenSSL FIPS configurations. For FIPS 140-3 validated cryptography, use an [AWS-LC-FIPS release](https://github.com/aws/aws-lc/blob/main/crypto/fipsmodule/FIPS.md) (Linux only for static builds).
+**Cryptographic module selection and compliance.** Selection of the cryptographic library, and any FIPS 140-3 or post-quantum compliance obligations that apply to your deployment, are the responsibility of the customer under the AWS shared responsibility model. AWS does not certify or validate customer-built OpenSSL FIPS configurations. For FIPS 140-3 validated cryptography, build with `-DUSE_AWS_LC_FIPS=ON` (Linux only for static builds; requires Go) and consult the [AWS-LC FIPS documentation](https://github.com/aws/aws-lc/blob/main/crypto/fipsmodule/FIPS.md) for the validation status of the pinned release.
 
 ### Offline mode
 The samples run in near real time mode by default. In order to set up offline mode, the following APIs can be used in the samples instead of the realtime variant:
