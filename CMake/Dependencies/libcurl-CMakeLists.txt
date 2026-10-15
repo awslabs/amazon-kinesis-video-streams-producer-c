@@ -93,13 +93,24 @@ endif()
 # AWS-LC is not bound by that cap (curl detects it as its own OpenSSL flavor), so
 # AWS-LC builds take the newer curl they were validated with.
 if (USE_AWS_LC OR USE_AWS_LC_FIPS)
-    set(CURL_GIT_TAG curl-8_22_0)
+    set(CURL_DEFAULT_GIT_TAG curl-8_22_0)
     set(CMAKE_ARGS ${CMAKE_ARGS}
         -DBUILD_LIBCURL_DOCS=OFF
         -DBUILD_MISC_DOCS=OFF
         -DENABLE_CURL_MANUAL=OFF)
 else()
-    set(CURL_GIT_TAG curl-8_17_0)
+    set(CURL_DEFAULT_GIT_TAG curl-8_17_0)
+endif()
+
+# CURL_GIT_TAG may be passed in to override the pin (weekly latest-dependency CI build).
+if (NOT CURL_GIT_TAG)
+    set(CURL_GIT_TAG ${CURL_DEFAULT_GIT_TAG})
+endif()
+message(STATUS "libcurl git tag: ${CURL_GIT_TAG}")
+
+# Cross-compiling: ExternalProject does not forward the toolchain file on its own.
+if (CMAKE_TOOLCHAIN_FILE)
+    set(CMAKE_ARGS ${CMAKE_ARGS} -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE})
 endif()
 
 ExternalProject_Add(project_libcurl
