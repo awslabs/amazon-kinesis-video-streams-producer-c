@@ -94,46 +94,7 @@ jobs:
         if: ${{ matrix.sample-executable.name == 'kvsVideoOnlyRealtimeStreamingSample-token-rotation' }}
         run: |
           set -x
-          file_path="./dependency/libkvspic/kvspic-src/src/client/src/StreamEvent.c"
-          string_to_replace='pKinesisVideoStream->streamingAuthInfo.expiration = MIN(expiration, currentTime + MAX_ENFORCED_TOKEN_EXPIRATION_DURATION);'
-          string_to_replace_with='pKinesisVideoStream->streamingAuthInfo.expiration = MIN(expiration, currentTime + MIN_STREAMING_TOKEN_EXPIRATION_DURATION);'
-
-          set +e
-          echo "Checking if the pattern exists before replacement:"
-          occurrences_of_old=$(grep -F -c "$string_to_replace" "$file_path")
-          if [[ "$occurrences_of_old" -gt 1 ]]; then
-            echo "There is more than 1 of: \`$string_to_replace\` in \`$file_path\`!"
-            exit 1
-          elif [[ "$occurrences_of_old" -eq 0 ]]; then
-            echo "Was not able to find: \`$string_to_replace\` in \`$file_path\`!"
-            exit 1
-          fi
-          occurrences_of_new_before=$(grep -F -c "$string_to_replace_with" "$file_path")
-          echo "Yes"
-          set -e
-
-          # Replace the line, while preserving the indentation
-          awk -v old="$string_to_replace" -v new="$string_to_replace_with" \
-            '{
-              match($0, /^[[:space:]]+/);                       # Find leading spaces
-              leading_spaces = substr($0, RSTART, RLENGTH);     # Extract them
-              trimmed = $0; sub(/^[[:space:]]+/, "", trimmed);  # Trim leading spaces
-              if (trimmed == old) print leading_spaces new;     # Preserve leading spaces
-              else print $0;                                    # Print original lines
-            }' "$file_path" > temp_file
-          mv temp_file "$file_path"
-
-          cat "$file_path" | grep "EXPIRATION"
-
-          set +e
-          echo "Checking if the replacement was successful:"
-          occurrences_of_new_after=$(grep -F -c "$string_to_replace_with" "$file_path")
-          if [[ "$occurrences_of_new_after" -eq "$occurrences_of_new_before" ]]; then
-            echo "Replacement failed - Nothing changed!"
-            exit 1
-          fi
-          echo "Yes"
-          set -e
+          .github/scripts/shorten-token-rotation.sh ./dependency/libkvspic/kvspic-src
 
           cd "$GITHUB_WORKSPACE/build"
           if [[ "$RUNNER_OS" == "Linux" ]]; then
@@ -310,3 +271,103 @@ jobs:
           fi
 
         shell: bash
+
+  sample-check-aws-lc:
+    name: ubuntu-22.04 - ${{ matrix.sample-executable.name }} (AWS-LC)
+    strategy:
+      matrix:
+        sample-executable:
+          - name: kvsVideoOnlyRealtimeStreamingSample
+          - name: kvsVideoOnlyRealtimeStreamingSample-token-rotation
+            args: h264 120
+      fail-fast: false
+
+    runs-on: ubuntu-latest
+    container: public.ecr.aws/ubuntu/ubuntu:22.04_stable
+
+    env:
+      AWS_KVS_LOG_LEVEL: 2
+      DEBIAN_FRONTEND: noninteractive
+      KVS_STREAM_NAME: demo-stream-producer-c-aws-lc-ci-${{ matrix.sample-executable.name }}
+      EXECUTABLE_TIMEOUT_SECS: 300
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y git cmake build-essential pkg-config
+
+      - name: Build repository (USE_AWS_LC, dependencies from source)
+        run: |
+          mkdir build && cd build
+          cmake .. -DUSE_OPENSSL=OFF -DUSE_AWS_LC=ON -DPARALLEL_BUILD=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
+          make -j$(nproc)
+
+      - name: Change token rotation to 30s
+        if: ${{ matrix.sample-executable.name == 'kvsVideoOnlyRealtimeStreamingSample-token-rotation' }}
+        run: |
+          set -x
+          .github/scripts/shorten-token-rotation.sh ./dependency/libkvspic/kvspic-src
+          cd build
+          make clean -j$(nproc)
+          make -j$(nproc)
+          mv kvsVideoOnlyRealtimeStreamingSample kvsVideoOnlyRealtimeStreamingSample-token-rotation
+        shell: bash
+
+      - name: Verify crypto backend is AWS-LC
+        run: |
+          ./tst/scripts/check_crypto_backend.sh aws-lc ./build ./open-source/lib
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-duration-seconds: 900
+
+      - name: Run ${{ matrix.sample-executable.name }}
+        working-directory: ./build
+        run: |
+          set -o pipefail
+          timeout --signal=SIGKILL "$EXECUTABLE_TIMEOUT_SECS" \
+            ./${{ matrix.sample-executable.name }} "$KVS_STREAM_NAME" ${{ matrix.sample-executable.args }} | tee output.log
+
+      - name: Verify fragments persisted
+        working-directory: ./build
+        run: |
+          grep -q '"EventType":"PERSISTED"' output.log
+
+      - name: Verify TLS key exchange evidence (PQC campaign log line)
+        working-directory: ./build
+        run: |
+          set -e
+          # Every TLS connection must have logged its negotiated group with the AWS-LC backend.
+          tls_lines=$(grep -c 'TLS negotiated:.*keyExchange=.*backend=.*AWS-LC' output.log || true)
+          echo "TLS evidence lines: $tls_lines"
+          # Control plane (describeStream, getDataEndpoint) plus the PutMedia data-plane
+          # connection, all through the curl session setup in Response.c. The blockingCurlCall
+          # site (CurlCall.c) is covered by the offline referee tests, not by this sample.
+          if [ "$tls_lines" -lt 3 ]; then
+            echo "Expected at least 3 'TLS negotiated' lines (control plane x2 + PutMedia), got $tls_lines"
+            exit 1
+          fi
+          # Rollout-tolerant: the control plane already negotiates X25519MLKEM768 and PutMedia
+          # hosts still negotiate X25519; either is accepted so a service-side rollout step
+          # cannot break unrelated pull requests. The nightly pqc-drift workflow pins the
+          # exact group per plane.
+          # Any other group (or an 'unknown') is a regression in the SDK's group list.
+          if grep 'TLS negotiated:' output.log | grep -v -E 'keyExchange=(X25519|X25519MLKEM768) '; then
+            echo "Unexpected key exchange group negotiated (see lines above)"
+            exit 1
+          fi
+          echo "All TLS connections used an allowed key exchange group:"
+          grep -o 'keyExchange=[^ ]*' output.log | sort | uniq -c
+
