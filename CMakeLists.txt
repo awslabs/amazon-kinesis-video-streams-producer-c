@@ -508,7 +508,7 @@ if(BUILD_COMMON_CURL)
     add_executable(kvsAudioOnlyStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsAudioOnlyStreamingSample.c ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/Common.c)
     target_link_libraries(kvsAudioOnlyStreamingSample cproducer)
 
-    if(USE_AWS_LC)
+    if(USE_AWS_LC OR USE_AWS_LC_FIPS)
       # Post-quantum key exchange probe / silent-fallback regression check
       add_executable(kvsTlsKeyExchangeProbe ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsTlsKeyExchangeProbe.c)
       target_link_libraries(kvsTlsKeyExchangeProbe kvsCommonCurl)

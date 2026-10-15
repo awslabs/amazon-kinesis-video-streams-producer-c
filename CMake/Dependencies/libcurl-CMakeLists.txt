@@ -92,7 +92,7 @@ endif()
 # version until that pin moves. Do not bump past 8.17.0 in isolation.
 # AWS-LC is not bound by that cap (curl detects it as its own OpenSSL flavor), so
 # AWS-LC builds take the newer curl they were validated with.
-if (USE_AWS_LC)
+if (USE_AWS_LC OR USE_AWS_LC_FIPS)
     set(CURL_GIT_TAG curl-8_22_0)
     set(CMAKE_ARGS ${CMAKE_ARGS}
         -DBUILD_LIBCURL_DOCS=OFF
