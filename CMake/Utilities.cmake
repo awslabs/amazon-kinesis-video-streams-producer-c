@@ -44,6 +44,7 @@ function(build_dependency lib_name)
   set(supported_libs
       gtest
       openssl
+      awslc
       srtp
       usrsctp
       websockets
@@ -62,7 +63,8 @@ function(build_dependency lib_name)
   endif()
 
   set(lib_file_name ${lib_name})
-  if (${lib_name} STREQUAL "openssl")
+  if (${lib_name} STREQUAL "openssl" OR ${lib_name} STREQUAL "awslc")
+    # Both install libssl/libcrypto
     set(lib_file_name ssl)
   elseif(${lib_name} STREQUAL "srtp")
     set(lib_file_name srtp2)
