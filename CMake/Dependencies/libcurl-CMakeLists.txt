@@ -103,15 +103,30 @@ endif()
 # USE_LEGACY_MBEDTLS (deprecated, mbedTLS builds only) pins 8.15.0 instead: 8.16.0 raised
 # curl's mbedTLS minimum to 3.2.0, so 8.15.0 is the last release that builds on mbedTLS 2.x.
 if (USE_AWS_LC OR USE_AWS_LC_FIPS)
-    set(CURL_GIT_TAG curl-8_22_0)
+    set(CURL_DEFAULT_GIT_TAG curl-8_22_0)
     set(CMAKE_ARGS ${CMAKE_ARGS}
         -DBUILD_LIBCURL_DOCS=OFF
         -DBUILD_MISC_DOCS=OFF
         -DENABLE_CURL_MANUAL=OFF)
+    if (NOT WIN32)
+        # curl skips CA bundle detection when cross-compiling: use AWS-LC's default CA store then
+        set(CMAKE_ARGS ${CMAKE_ARGS} -DCURL_CA_FALLBACK=ON)
+    endif()
 elseif (USE_LEGACY_MBEDTLS)
-    set(CURL_GIT_TAG curl-8_15_0)
+    set(CURL_DEFAULT_GIT_TAG curl-8_15_0)
 else()
-    set(CURL_GIT_TAG curl-8_17_0)
+    set(CURL_DEFAULT_GIT_TAG curl-8_17_0)
+endif()
+
+# CURL_GIT_TAG may be passed in to override the pin (weekly latest-dependency CI build).
+if (NOT CURL_GIT_TAG)
+    set(CURL_GIT_TAG ${CURL_DEFAULT_GIT_TAG})
+endif()
+message(STATUS "libcurl git tag: ${CURL_GIT_TAG}")
+
+# Cross-compiling: ExternalProject does not forward the toolchain file on its own.
+if (CMAKE_TOOLCHAIN_FILE)
+    set(CMAKE_ARGS ${CMAKE_ARGS} -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE})
 endif()
 
 ExternalProject_Add(project_libcurl
