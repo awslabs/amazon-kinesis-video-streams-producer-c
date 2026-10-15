@@ -1,0 +1,37 @@
+cmake_minimum_required(VERSION 3.6.3)
+
+project(libawslc-download NONE)
+
+include(ExternalProject)
+
+# AWS-LC is API-compatible with OpenSSL 1.1.1 (same openssl/*.h headers, same
+# libssl/libcrypto names) and is FIPS 140-3 validatable. It negotiates
+# X25519MLKEM768 (post-quantum hybrid key exchange) by default on TLS 1.3.
+#
+# DISABLE_GO / DISABLE_PERL use the pre-generated assembly shipped in the repo
+# so the non-FIPS build has no Go or Perl toolchain requirement.
+# NOTE: the FIPS build variant (-DFIPS=1) requires Go and is NOT covered here.
+set(CMAKE_ARGS
+        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        -DCMAKE_INSTALL_PREFIX=${OPEN_SRC_INSTALL_PREFIX}
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+        -DBUILD_TESTING=OFF
+        -DBUILD_TOOL=OFF
+        -DDISABLE_GO=ON
+        -DDISABLE_PERL=ON)
+
+if (BUILD_STATIC)
+    set(CMAKE_ARGS ${CMAKE_ARGS} -DBUILD_SHARED_LIBS=OFF)
+else()
+    set(CMAKE_ARGS ${CMAKE_ARGS} -DBUILD_SHARED_LIBS=ON)
+endif()
+
+ExternalProject_Add(project_libawslc
+    GIT_REPOSITORY    https://github.com/aws/aws-lc.git
+    GIT_TAG           v5.8.0
+    GIT_SHALLOW       TRUE
+    GIT_PROGRESS      TRUE
+    PREFIX            ${CMAKE_CURRENT_BINARY_DIR}/build
+    CMAKE_ARGS        ${CMAKE_ARGS}
+    BUILD_ALWAYS      TRUE
+    TEST_COMMAND      "")

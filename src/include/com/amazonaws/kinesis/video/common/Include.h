@@ -862,6 +862,31 @@ PUBLIC_API STATUS getUserAgentString(PCHAR, PCHAR, UINT32, PCHAR);
 PUBLIC_API STATUS requestRequiresSecureConnection(PCHAR, PBOOL);
 
 /**
+ * @brief Logs the negotiated TLS parameters (protocol version, key exchange group, cipher) of the
+ * connection backing a curl easy handle. Emitted as evidence for the post-quantum key exchange
+ * campaign (expected group: X25519MLKEM768 once both client and server support it).
+ *
+ * Must be called from within a curl transfer callback (e.g. header callback), since the TLS
+ * session pointer is only valid while the transfer is in progress. No-op for plain HTTP or when
+ * the crypto backend does not expose the negotiated group.
+ *
+ * @param[in] PVOID Active curl easy handle (CURL*)
+ */
+PUBLIC_API VOID logCurlTlsKeyExchange(PVOID);
+
+/**
+ * @brief Checks whether a header line delivered to a curl header callback is the status line of
+ * the final (non-1xx) response. Header callbacks use it to call logCurlTlsKeyExchange once per
+ * transfer: interim responses such as "100 Continue" also start with "HTTP/".
+ *
+ * @param[in] PCHAR Header line as passed to the curl header callback (not NULL-terminated)
+ * @param[in] SIZE_T Length of the header line in bytes
+ *
+ * @return TRUE for a final (non-1xx) status line, FALSE otherwise
+ */
+PUBLIC_API BOOL isCurlFinalHttpStatusLine(PCHAR, SIZE_T);
+
+/**
  * @brief Sets a header in the request info
  *
  * @param[in] PRequestInfo Request Info object
