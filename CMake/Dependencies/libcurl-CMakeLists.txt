@@ -102,7 +102,7 @@ endif()
 # AWS-LC builds take the newer curl they were validated with.
 # USE_LEGACY_MBEDTLS (deprecated, mbedTLS builds only) pins 8.15.0 instead: 8.16.0 raised
 # curl's mbedTLS minimum to 3.2.0, so 8.15.0 is the last release that builds on mbedTLS 2.x.
-if (USE_AWS_LC)
+if (USE_AWS_LC OR USE_AWS_LC_FIPS)
     set(CURL_GIT_TAG curl-8_22_0)
     set(CMAKE_ARGS ${CMAKE_ARGS}
         -DBUILD_LIBCURL_DOCS=OFF
