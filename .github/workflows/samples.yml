@@ -322,6 +322,7 @@ jobs:
 
       - name: Run ${{ matrix.sample-executable.name }}
         working-directory: ./build
+        shell: bash
         run: |
           set -o pipefail
           timeout --signal=SIGKILL "$EXECUTABLE_TIMEOUT_SECS" \
