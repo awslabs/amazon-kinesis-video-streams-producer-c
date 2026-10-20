@@ -4,7 +4,7 @@
 #define LOG_CLASS "CurlCall"
 #include "../Include_i.h"
 
-#if defined(KVS_USE_OPENSSL) || defined(KVS_USE_AWS_LC)
+#if defined(KVS_CURL_TLS_USES_OPENSSL_API)
 #include <openssl/ssl.h>
 #endif
 
@@ -40,7 +40,7 @@ static SIZE_T tlsInfoHeaderCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems,
     return dataSize;
 }
 
-#if defined(KVS_USE_AWS_LC)
+#if defined(KVS_USE_AWS_LC) && !defined(_WIN32)
 /**
  * curl SSL context callback: pin the TLS key exchange groups to a post-quantum-first list.
  *
@@ -76,7 +76,7 @@ VOID logCurlTlsKeyExchange(PVOID pCurlHandle)
         return;
     }
 
-#if defined(KVS_USE_OPENSSL) || defined(KVS_USE_AWS_LC)
+#if defined(KVS_CURL_TLS_USES_OPENSSL_API)
     // curl reports AWS-LC and BoringSSL under the OpenSSL backend id
     if (pTlsInfo->backend == CURLSSLBACKEND_OPENSSL) {
         SSL* pSsl = (SSL*) pTlsInfo->internals;
@@ -156,7 +156,7 @@ STATUS blockingCurlCall(PRequestInfo pRequestInfo, PCallInfo pCallInfo)
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1L);
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L);
         curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
-#if defined(KVS_USE_AWS_LC)
+#if defined(KVS_USE_AWS_LC) && !defined(_WIN32)
         curl_easy_setopt(curl, CURLOPT_SSL_CTX_FUNCTION, (curl_ssl_ctx_callback) kvsCurlSslCtxCallback);
 #endif
     }

@@ -3,7 +3,7 @@
  */
 #include "ProducerTestFixture.h"
 
-#if defined(KVS_USE_AWS_LC)
+#if defined(KVS_USE_AWS_LC) && !defined(_WIN32)
 #include <openssl/ssl.h>
 #include <openssl/crypto.h>
 #include <curl/curl.h>
@@ -49,7 +49,7 @@ TEST(TlsBackendTest, finalHttpStatusLineSkipsInformationalResponses)
     EXPECT_FALSE(isCurlFinalHttpStatusLine(NULL, 0));
 }
 
-#if defined(KVS_USE_AWS_LC)
+#if defined(KVS_USE_AWS_LC) && !defined(_WIN32)
 
 // The groups callback must accept a real SSL_CTX: proves the PQC-first group list
 // is valid for the linked AWS-LC version (guards against upstream group renames
@@ -80,7 +80,7 @@ TEST(TlsBackendTest, fipsModeMatchesSelectedBuildVariant)
 #endif
 }
 
-#endif // KVS_USE_AWS_LC
+#endif // KVS_USE_AWS_LC && !_WIN32
 
 } // namespace video
 } // namespace kinesis

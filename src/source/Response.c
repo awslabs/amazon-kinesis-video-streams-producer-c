@@ -178,7 +178,7 @@ STATUS initializeCurlSession(PRequestInfo pRequestInfo, PCallInfo pCallInfo, CUR
         curl_easy_setopt(pCurl, CURLOPT_SSL_VERIFYPEER, 1L);
         curl_easy_setopt(pCurl, CURLOPT_SSL_VERIFYHOST, 2L);
         curl_easy_setopt(pCurl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
-#if defined(KVS_USE_AWS_LC)
+#if defined(KVS_USE_AWS_LC) && !defined(_WIN32)
         curl_easy_setopt(pCurl, CURLOPT_SSL_CTX_FUNCTION, (curl_ssl_ctx_callback) kvsCurlSslCtxCallback);
 #endif
     }
