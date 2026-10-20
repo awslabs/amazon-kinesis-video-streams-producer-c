@@ -68,7 +68,7 @@ if [[ -n "$OPEN_SRC_LIB" ]]; then
   if [[ -z "$CRYPTO_LIB" ]]; then
     fail "no libcrypto found in $OPEN_SRC_LIB"
   else
-    VERSION_TEXT=$("$STRINGS" "$CRYPTO_LIB" | grep -m1 -E 'AWS-LC [0-9]+\.[0-9]+\.[0-9]+|^OpenSSL [0-9]+\.[0-9]+\.[0-9]+' || true)
+    VERSION_TEXT=$("$STRINGS" "$CRYPTO_LIB" | grep -m1 -E 'AWS-LC (FIPS )?[0-9]+\.[0-9]+\.[0-9]+|^OpenSSL [0-9]+\.[0-9]+\.[0-9]+' || true)
     echo "libcrypto version string: ${VERSION_TEXT:-<none>}"
     if [[ "$EXPECTED" == "aws-lc" ]]; then
       if [[ "$VERSION_TEXT" == *"AWS-LC"* ]]; then
