@@ -55,6 +55,18 @@ STATUS blockingCurlCall(PRequestInfo pRequestInfo, PCallInfo pCallInfo)
         curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
     }
 
+    if (pRequestInfo->verb == HTTP_REQUEST_VERB_PUT) {
+        curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, HTTP_REQUEST_VERB_PUT_STRING);
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, pRequestInfo->body != NULL ? pRequestInfo->body : "");
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, pRequestInfo->bodySize);
+    } else if (pRequestInfo->verb == HTTP_REQUEST_VERB_POST) {
+        curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, HTTP_REQUEST_VERB_POST_STRING);
+        if (pRequestInfo->body != NULL) {
+            curl_easy_setopt(curl, CURLOPT_POSTFIELDS, pRequestInfo->body);
+            curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, pRequestInfo->bodySize);
+        }
+    }
+
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, pHeaderList);
     curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorBuffer);
     curl_easy_setopt(curl, CURLOPT_URL, pRequestInfo->url);
@@ -81,7 +93,8 @@ STATUS blockingCurlCall(PRequestInfo pRequestInfo, PCallInfo pCallInfo)
     }
 
     curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpStatusCode);
-    CHK_ERR(httpStatusCode == HTTP_STATUS_CODE_OK, STATUS_CURL_PERFORM_FAILED, "Curl call response failed with http status %lu", httpStatusCode);
+    curl_easy_getinfo(curl, CURLINFO_EFFECTIVE_URL, &url);
+    CHK_ERR(httpStatusCode == HTTP_STATUS_CODE_OK, STATUS_CURL_PERFORM_FAILED, "Curl call to %s failed with http status %lu", url, httpStatusCode);
 
 CleanUp:
 
