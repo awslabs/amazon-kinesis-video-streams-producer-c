@@ -37,6 +37,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <signal.h>
 
 namespace com {
 namespace amazonaws {
@@ -222,6 +223,10 @@ static BOOL refereeServerListen(RefereeServer* pServer)
     socklen_t addrLen = SIZEOF(addr);
     struct timeval acceptTimeout;
     INT32 one = 1;
+
+    // A client that closes right after its request makes the server's SSL_write/SSL_shutdown
+    // hit a closed socket; without this the resulting SIGPIPE kills the whole test binary.
+    signal(SIGPIPE, SIG_IGN);
 
     pServer->listenFd = socket(AF_INET, SOCK_STREAM, 0);
     if (pServer->listenFd < 0) {
