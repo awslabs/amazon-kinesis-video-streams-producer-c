@@ -62,7 +62,7 @@ jobs:
           echo "LDFLAGS=-L$OPENSSL_PATH/lib" >> $GITHUB_ENV
           echo "CPPFLAGS=-I$OPENSSL_PATH/include" >> $GITHUB_ENV
           echo "OPENSSL_ROOT_DIR=$OPENSSL_PATH" >> $GITHUB_ENV
-          echo "CMAKE_FLAGS_EXTRA=-DLOCAL_OPENSSL_BUILD=ON" >> $GITHUB_ENV
+          echo "CMAKE_FLAGS_EXTRA=-DLOCAL_CRYPTO_BUILD=ON" >> $GITHUB_ENV
 
       - name: Set CMake flags for Dependencies=OFF
         if: ${{ matrix.openssl == 'deps-off' }}

@@ -61,6 +61,14 @@ endif()
 # backend is enabled, but is set explicitly so the choice does not rest on that heuristic.
 if (USE_MBEDTLS)
     set(CMAKE_ARGS ${CMAKE_ARGS} -DCURL_USE_MBEDTLS=ON)
+    # Set by the parent so curl skips its pkg-config lookup and links the SDK's mbedTLS.
+    if (MBEDTLS_INCLUDE_DIR)
+        set(CMAKE_ARGS ${CMAKE_ARGS}
+            -DMBEDTLS_INCLUDE_DIR=${MBEDTLS_INCLUDE_DIR}
+            -DMBEDTLS_LIBRARY=${MBEDTLS_LIBRARY}
+            -DMBEDX509_LIBRARY=${MBEDX509_LIBRARY}
+            -DMBEDCRYPTO_LIBRARY=${MBEDCRYPTO_LIBRARY})
+    endif()
 elseif (WIN32)
     set(CMAKE_ARGS ${CMAKE_ARGS} -DCURL_USE_SCHANNEL=ON)
 else()
