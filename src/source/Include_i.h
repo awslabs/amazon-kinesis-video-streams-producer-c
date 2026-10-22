@@ -26,6 +26,12 @@ typedef StreamLatencyStateMachine* PStreamLatencyStateMachine;
 
 #include <curl/curl.h>
 
+#if defined(KVS_USE_AWS_LC)
+// Defined in kvsCommonCurl (Common/Curl/CurlCall.c): pins the TLS key exchange groups
+// to a post-quantum-first list. Installed on every secure curl handle.
+extern CURLcode kvsCurlSslCtxCallback(CURL*, PVOID, PVOID);
+#endif
+
 #if !defined __WINDOWS_BUILD__
 #include <signal.h>
 #endif

@@ -1,0 +1,61 @@
+cmake_minimum_required(VERSION 3.6.3)
+
+project(libawslc-download NONE)
+
+include(ExternalProject)
+
+# AWS-LC is API-compatible with OpenSSL 1.1.1 (same openssl/*.h headers, same
+# libssl/libcrypto names) and is FIPS 140-3 validatable. It negotiates
+# X25519MLKEM768 (post-quantum hybrid key exchange) by default on TLS 1.3.
+#
+# The FIPS release line is separate from mainline and moves slower; its default TLS
+# group list may lag mainline (the SDK sets an explicit groups list for this reason).
+# Static FIPS builds are Linux-only and require Go for the integrity-check tooling.
+if (USE_AWS_LC_FIPS)
+    set(AWS_LC_DEFAULT_GIT_TAG AWS-LC-FIPS-3.3.0)
+    set(AWS_LC_FIPS_ARG -DFIPS=1)
+else()
+    set(AWS_LC_DEFAULT_GIT_TAG v5.8.0)
+    set(AWS_LC_FIPS_ARG "")
+endif()
+
+# AWS_LC_GIT_TAG may be passed in to override the pin (weekly latest-dependency CI build).
+if (NOT AWS_LC_GIT_TAG)
+    set(AWS_LC_GIT_TAG ${AWS_LC_DEFAULT_GIT_TAG})
+endif()
+message(STATUS "AWS-LC git tag: ${AWS_LC_GIT_TAG}")
+
+set(CMAKE_ARGS
+        ${AWS_LC_FIPS_ARG}
+        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        -DCMAKE_INSTALL_PREFIX=${OPEN_SRC_INSTALL_PREFIX}
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+        -DBUILD_TESTING=OFF
+        -DBUILD_TOOL=OFF)
+
+if (NOT USE_AWS_LC_FIPS)
+    # Non-FIPS builds use the pre-generated assembly, avoiding the Go/Perl toolchains
+    set(CMAKE_ARGS ${CMAKE_ARGS} -DDISABLE_GO=ON -DDISABLE_PERL=ON)
+endif()
+
+# Cross-compiling: hand the toolchain file to the inner cmake so AWS-LC targets
+# the right CMAKE_SYSTEM_PROCESSOR (ExternalProject does not forward it).
+if (CMAKE_TOOLCHAIN_FILE)
+    set(CMAKE_ARGS ${CMAKE_ARGS} -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE})
+endif()
+
+if (BUILD_STATIC)
+    set(CMAKE_ARGS ${CMAKE_ARGS} -DBUILD_SHARED_LIBS=OFF)
+else()
+    set(CMAKE_ARGS ${CMAKE_ARGS} -DBUILD_SHARED_LIBS=ON)
+endif()
+
+ExternalProject_Add(project_libawslc
+    GIT_REPOSITORY    https://github.com/aws/aws-lc.git
+    GIT_TAG           ${AWS_LC_GIT_TAG}
+    GIT_SHALLOW       TRUE
+    GIT_PROGRESS      TRUE
+    PREFIX            ${CMAKE_CURRENT_BINARY_DIR}/build
+    CMAKE_ARGS        ${CMAKE_ARGS}
+    BUILD_ALWAYS      TRUE
+    TEST_COMMAND      "")

@@ -316,6 +316,11 @@ jobs:
             echo "✅ All dependencies are found"
           fi
 
+      - name: Verify crypto backend is OpenSSL (no AWS-LC code in the default build)
+        if: ${{ matrix.build-configuration.name == 'curl' }}
+        run: |
+          ./tst/scripts/check_crypto_backend.sh openssl ./build ./open-source/lib
+
       - name: Configure AWS Credentials
         # Producer-C only has CURL implementation
         if: ${{ matrix.build-configuration.name == 'curl' }}
@@ -332,6 +337,274 @@ jobs:
         working-directory: ./build
         run: |
           timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
+
+  linux-gcc-aws-lc:
+    strategy:
+      matrix:
+        build-type:
+          - name: shared
+            cmake-args: ""
+          - name: static
+            cmake-args: "-DBUILD_STATIC=ON"
+      fail-fast: false
+
+    runs-on: ubuntu-latest
+    container:
+      image: public.ecr.aws/ubuntu/ubuntu:22.04_stable
+
+    name: Ubuntu 22.04-gcc-aws-lc-${{ matrix.build-type.name }}
+
+    env:
+      DEBIAN_FRONTEND: noninteractive
+      CC: gcc
+      CXX: g++
+
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y git cmake build-essential pkg-config
+
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.x'
+
+      - name: Build repository
+        run: |
+          mkdir build && cd build
+          cmake .. -DBUILD_TEST=ON -DUSE_OPENSSL=OFF -DUSE_AWS_LC=ON -DPARALLEL_BUILD=ON ${{ matrix.build-type.cmake-args }}
+          make -j
+
+      - name: Verify crypto backend is AWS-LC
+        run: |
+          ./tst/scripts/check_crypto_backend.sh aws-lc ./build ./open-source/lib
+
+      - name: Run TLS referee tests (offline PQC gate)
+        # Network-free, no credentials: an in-process TLS server that accepts only
+        # X25519MLKEM768 must complete a handshake with the SDK's real HTTPS path.
+        working-directory: ./build
+        run: |
+          ./tst/producer_test --gtest_filter="TlsBackendTest.*:TlsKeyExchangeRefereeTest.*"
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-duration-seconds: 3600
+
+      - name: Run tests
+        working-directory: ./build
+        run: |
+          timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
+
+      - name: Verify key exchange group against the live control plane
+        working-directory: ./build
+        run: |
+          # Rollout-tolerant: the KVS control plane already negotiates X25519MLKEM768
+          # while PutMedia hosts still negotiate X25519; either is acceptable here so
+          # a service-side rollout step cannot break unrelated pull requests. The
+          # nightly pqc-drift workflow pins the exact expected group per plane and
+          # catches a transition in both directions.
+          ./kvsTlsKeyExchangeProbe https://kinesisvideo.${{ secrets.AWS_REGION }}.amazonaws.com/ - X25519MLKEM768:X25519
+
+      - name: Verify the silent-fallback detector fires on a mismatch
+        working-directory: ./build
+        run: |
+          # Negative control for the probe itself: expecting a group the SDK never
+          # offers (P-521 is not in KVS_TLS_KEY_EXCHANGE_GROUP_LIST, so no server can
+          # have selected it) must fail, whatever the service negotiates today.
+          if ./kvsTlsKeyExchangeProbe https://kinesisvideo.${{ secrets.AWS_REGION }}.amazonaws.com/ - P-521; then
+            echo "Probe reported PASS for a group the SDK never offers; the detector is broken"
+            exit 1
+          fi
+          echo "Detector correctly reported a mismatch"
+
+  linux-gcc-aws-lc-fips:
+    # AWS-LC-FIPS release line: static Linux build only (the FIPS integrity check is
+    # ELF-specific) and requires Go for the delocate/inject_hash tooling.
+    runs-on: ubuntu-22.04
+    name: Ubuntu 22.04-gcc-aws-lc-fips-static
+
+    env:
+      CC: gcc
+      CXX: g++
+
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.x'
+
+      - name: Setup Go (required by the AWS-LC FIPS build)
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      - name: Build repository
+        run: |
+          go version
+          mkdir build && cd build
+          cmake .. -DBUILD_TEST=ON -DUSE_OPENSSL=OFF -DUSE_AWS_LC_FIPS=ON -DBUILD_STATIC=ON -DPARALLEL_BUILD=ON
+          make -j
+
+      - name: Verify crypto backend is AWS-LC
+        run: |
+          ./tst/scripts/check_crypto_backend.sh aws-lc ./build ./open-source/lib
+
+      - name: Run TLS referee tests (FIPS module active, PQC groups still offered)
+        # TlsBackendTest.fipsModeMatchesSelectedBuildVariant asserts FIPS_mode() == 1 here.
+        # The referee tests guard the finding that FIPS branches default to classical-only
+        # groups: the SDK's explicit list must still get ML-KEM negotiated.
+        working-directory: ./build
+        run: |
+          ./tst/producer_test --gtest_filter="TlsBackendTest.*:TlsKeyExchangeRefereeTest.*"
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-duration-seconds: 3600
+
+      - name: Run tests
+        working-directory: ./build
+        run: |
+          timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
+
+      - name: Verify key exchange group against the live control plane
+        working-directory: ./build
+        run: |
+          ./kvsTlsKeyExchangeProbe https://kinesisvideo.${{ secrets.AWS_REGION }}.amazonaws.com/ - X25519MLKEM768:X25519
+
+  sanitizers-aws-lc:
+    strategy:
+      matrix:
+        sanitizer:
+          - name: address
+            cmake-flag: ADDRESS_SANITIZER
+          - name: undefined-behavior
+            cmake-flag: UNDEFINED_BEHAVIOR_SANITIZER
+      fail-fast: false
+
+    runs-on: ubuntu-22.04
+    name: ${{ matrix.sanitizer.name }}-sanitizer-aws-lc
+
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      CC: clang
+      CXX: clang++
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.x'
+      - name: Build repository
+        run: |
+          mkdir build && cd build
+          cmake .. -DBUILD_TEST=TRUE -D${{ matrix.sanitizer.cmake-flag }}=TRUE -DUSE_OPENSSL=OFF -DUSE_AWS_LC=ON -DBUILD_STATIC=ON -DPARALLEL_BUILD=ON
+          make -j
+      - name: Run TLS referee tests (offline)
+        working-directory: ./build
+        run: |
+          ./tst/producer_test --gtest_filter="TlsBackendTest.*:TlsKeyExchangeRefereeTest.*"
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-duration-seconds: 3600
+      - name: Run tests
+        run: |
+          cd build
+          ulimit -c unlimited -S
+          timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
+
+  linux-aarch64-cross-compilation-aws-lc:
+    # Build-only. The toolchain file is handed down to the AWS-LC and libcurl
+    # sub-builds so AWS-LC selects its aarch64 assembly set.
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo apt clean && sudo apt update
+          sudo apt-get -y install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu
+      - name: Clone repository
+        uses: actions/checkout@v4
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.x'
+      - name: Build Repository
+        run: |
+          mkdir build && cd build
+          cmake .. -DCMAKE_TOOLCHAIN_FILE=../CMake/toolchains/aarch64-linux-gnu.cmake -DUSE_OPENSSL=OFF -DUSE_AWS_LC=ON -DBUILD_STATIC=ON -DPARALLEL_BUILD=ON
+          make -j
+          # Architecture of what was built: the archive's members and both executables must be aarch64
+          aarch64-linux-gnu-readelf -h libcproducer.a | grep -m1 'Machine:.*AArch64'
+          file kvsVideoOnlyRealtimeStreamingSample | grep -i "aarch64"
+          file kvsTlsKeyExchangeProbe | grep -i "aarch64"
+      - name: Verify crypto backend is AWS-LC
+        env:
+          # The artifacts are foreign ELF; read them with the target toolchain's binutils
+          NM: aarch64-linux-gnu-nm
+          STRINGS: aarch64-linux-gnu-strings
+        run: |
+          ./tst/scripts/check_crypto_backend.sh aws-lc ./build ./open-source/lib
+
+  mac-aws-lc:
+    runs-on: macos-15
+    name: Apple Silicon Mac-Clang-aws-lc
+    permissions:
+      contents: read
+    env:
+      CC: clang
+      CXX: clang++
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.x'
+
+      - name: Build repository
+        run: |
+          mkdir build && cd build
+          cmake .. -DBUILD_TEST=ON -DUSE_OPENSSL=OFF -DUSE_AWS_LC=ON -DBUILD_STATIC=ON -DPARALLEL_BUILD=ON
+          make -j
+
+      - name: Verify crypto backend is AWS-LC
+        run: |
+          ./tst/scripts/check_crypto_backend.sh aws-lc ./build ./open-source/lib
+
+      - name: Run TLS referee tests (offline PQC gate)
+        working-directory: ./build
+        run: |
+          ./tst/producer_test --gtest_filter="TlsBackendTest.*:TlsKeyExchangeRefereeTest.*"
 
   arm64-cross-compilation:
     runs-on: ubuntu-22.04

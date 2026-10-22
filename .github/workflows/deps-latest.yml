@@ -1,0 +1,169 @@
+name: AWS-LC and curl latest-release build
+
+# Weekly early warning: build and unit-test the AWS-LC backend against the
+# newest AWS-LC and libcurl releases instead of the pinned tags, so an upstream
+# change that breaks the SDK (API removal, group rename, curl option rename) is
+# seen before the next pin bump. Schedule-only, so it never blocks a pull
+# request; the pinned builds in ci.yml stay the gate. A failed run opens an
+# issue labelled "deps-latest" (or updates the open one), which is the signal
+# this job exists to produce, so it is not marked continue-on-error.
+#
+# AWS-LC publishes two release lines from one repository (vX.Y.Z and
+# AWS-LC-FIPS-X.Y.Z); "latest" here means the newest non-prerelease vX.Y.Z tag,
+# which is the line USE_AWS_LC pins. The FIPS line is covered by the pinned
+# linux-gcc-aws-lc-fips job in ci.yml.
+
+on:
+  schedule:
+    - cron: '37 7 * * 1'   # Mondays, 07:37 UTC
+  workflow_dispatch:
+    inputs:
+      aws_lc_tag:
+        description: 'AWS-LC git tag, e.g. v5.8.0 (empty = latest release)'
+        required: false
+        default: ''
+      curl_tag:
+        description: 'curl git tag, e.g. curl-8_22_0 (empty = latest release)'
+        required: false
+        default: ''
+
+jobs:
+  latest-deps:
+    runs-on: ubuntu-22.04
+    name: Ubuntu 22.04-gcc-aws-lc-latest-deps
+
+    env:
+      AWS_KVS_LOG_LEVEL: 2
+      CC: gcc
+      CXX: g++
+
+    permissions:
+      id-token: write
+      contents: read
+      issues: write
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.x'
+
+      - name: Resolve latest release tags
+        id: tags
+        env:
+          GH_TOKEN: ${{ github.token }}
+          # Inputs are passed through the environment, never interpolated into the script
+          INPUT_AWS_LC_TAG: ${{ inputs.aws_lc_tag }}
+          INPUT_CURL_TAG: ${{ inputs.curl_tag }}
+        run: |
+          set -e
+          aws_lc_tag="$INPUT_AWS_LC_TAG"
+          curl_tag="$INPUT_CURL_TAG"
+          if [ -z "$aws_lc_tag" ]; then
+            # Not releases/latest: that returns the newest release of EITHER line, which is
+            # the FIPS line right after a FIPS release. Take the newest published vX.Y.Z.
+            aws_lc_tag=$(gh api 'repos/aws/aws-lc/releases?per_page=100' \
+              --jq '[.[] | select(.draft == false and .prerelease == false and (.tag_name | startswith("v")))] | sort_by(.published_at) | last | .tag_name')
+          fi
+          if [ -z "$curl_tag" ]; then
+            curl_tag=$(gh api repos/curl/curl/releases/latest --jq .tag_name)
+          fi
+          case "$aws_lc_tag" in ''|null) echo "Could not resolve the latest AWS-LC release tag"; exit 1;; esac
+          case "$curl_tag" in ''|null) echo "Could not resolve the latest curl release tag"; exit 1;; esac
+          echo "AWS-LC: $aws_lc_tag   curl: $curl_tag"
+          echo "aws_lc_tag=$aws_lc_tag" >> "$GITHUB_OUTPUT"
+          echo "curl_tag=$curl_tag" >> "$GITHUB_OUTPUT"
+          {
+            echo "## Latest-dependency build"
+            echo "* AWS-LC: \`$aws_lc_tag\`"
+            echo "* curl: \`$curl_tag\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Build repository (USE_AWS_LC, latest tags)
+        id: build
+        env:
+          AWS_LC_GIT_TAG: ${{ steps.tags.outputs.aws_lc_tag }}
+          CURL_GIT_TAG: ${{ steps.tags.outputs.curl_tag }}
+        run: |
+          mkdir build && cd build
+          cmake .. -DBUILD_TEST=ON -DUSE_OPENSSL=OFF -DUSE_AWS_LC=ON -DBUILD_STATIC=ON -DPARALLEL_BUILD=ON \
+            -DAWS_LC_GIT_TAG="$AWS_LC_GIT_TAG" -DCURL_GIT_TAG="$CURL_GIT_TAG"
+          make -j
+
+      - name: Verify crypto backend is AWS-LC
+        id: backend
+        run: |
+          # Prints the libcrypto version string, which confirms the resolved tag was built
+          ./tst/scripts/check_crypto_backend.sh aws-lc ./build ./open-source/lib
+
+      - name: Run TLS referee tests (offline)
+        id: referee
+        working-directory: ./build
+        run: |
+          ./tst/producer_test --gtest_filter="TlsBackendTest.*:TlsKeyExchangeRefereeTest.*"
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-duration-seconds: 3600
+
+      - name: Run tests
+        id: tests
+        working-directory: ./build
+        run: |
+          timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
+
+      - name: Verify key exchange group against the live control plane
+        id: probe
+        working-directory: ./build
+        run: |
+          ./kvsTlsKeyExchangeProbe https://kinesisvideo.${{ secrets.AWS_REGION }}.amazonaws.com/ - X25519MLKEM768:X25519
+
+      - name: Open or update the latest-dependency issue
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          AWS_LC_TAG: ${{ steps.tags.outputs.aws_lc_tag }}
+          CURL_TAG: ${{ steps.tags.outputs.curl_tag }}
+          OUTCOME_TAGS: ${{ steps.tags.outcome }}
+          OUTCOME_BUILD: ${{ steps.build.outcome }}
+          OUTCOME_BACKEND: ${{ steps.backend.outcome }}
+          OUTCOME_REFEREE: ${{ steps.referee.outcome }}
+          OUTCOME_TESTS: ${{ steps.tests.outcome }}
+          OUTCOME_PROBE: ${{ steps.probe.outcome }}
+        run: |
+          set -e
+          title="Latest AWS-LC/curl build failed (AWS-LC ${AWS_LC_TAG:-unresolved}, curl ${CURL_TAG:-unresolved})"
+          body=$(cat <<EOF
+          The weekly build against the newest AWS-LC and curl releases failed.
+
+          | Step | Outcome |
+          |---|---|
+          | Resolve tags | $OUTCOME_TAGS |
+          | Build (AWS-LC \`${AWS_LC_TAG:-unresolved}\`, curl \`${CURL_TAG:-unresolved}\`) | $OUTCOME_BUILD |
+          | Crypto backend check | $OUTCOME_BACKEND |
+          | TLS referee tests | $OUTCOME_REFEREE |
+          | Full test suite | $OUTCOME_TESTS |
+          | Live control plane probe | $OUTCOME_PROBE |
+
+          Run: $RUN_URL
+
+          The pinned builds in ci.yml are unaffected. Decide whether the next pin bump needs an SDK change (API removal, renamed group or curl option) or whether the upstream release is at fault.
+          EOF
+          )
+          # '// empty' matters: on an empty list '.[0].number' prints the string "null", which would pass -n
+          existing=$(gh issue list --label deps-latest --state open --json number --jq '.[0].number // empty' || true)
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+            echo "Updated issue #$existing"
+          else
+            gh label create deps-latest --description "Weekly latest AWS-LC/curl build failed" --color FBCA04 2>/dev/null || true
+            gh issue create --title "$title" --label deps-latest --body "$body"
+          fi

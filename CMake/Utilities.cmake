@@ -44,6 +44,7 @@ function(build_dependency lib_name)
   set(supported_libs
       gtest
       openssl
+      awslc
       srtp
       usrsctp
       websockets
@@ -62,7 +63,8 @@ function(build_dependency lib_name)
   endif()
 
   set(lib_file_name ${lib_name})
-  if (${lib_name} STREQUAL "openssl")
+  if (${lib_name} STREQUAL "openssl" OR ${lib_name} STREQUAL "awslc")
+    # Both install libssl/libcrypto
     set(lib_file_name ssl)
   elseif(${lib_name} STREQUAL "srtp")
     set(lib_file_name srtp2)
@@ -81,6 +83,26 @@ function(build_dependency lib_name)
   # anything after lib_name(${ARGN}) are assumed to be arguments passed over to
   # library building cmake.
   set(build_args ${ARGN})
+
+  # Cross-compiling: the dependency sub-builds are separate CMake projects, so
+  # they only learn the target (CMAKE_SYSTEM_NAME / CMAKE_SYSTEM_PROCESSOR /
+  # compilers) if the toolchain file is handed down. AWS-LC in particular picks
+  # its assembly set from CMAKE_SYSTEM_PROCESSOR. Relative paths are resolved
+  # the way CMake itself does: build dir first, then source dir.
+  # Limited to the AWS-LC backends: handing the toolchain file to the other
+  # backends' dependency builds puts curl in cross-compiling mode, where it skips
+  # CA bundle detection, which would change existing OpenSSL/mbedTLS builds.
+  if(CMAKE_TOOLCHAIN_FILE AND (USE_AWS_LC OR USE_AWS_LC_FIPS))
+    set(toolchain_abs "${CMAKE_TOOLCHAIN_FILE}")
+    if(NOT IS_ABSOLUTE "${toolchain_abs}")
+      if(EXISTS "${CMAKE_BINARY_DIR}/${CMAKE_TOOLCHAIN_FILE}")
+        set(toolchain_abs "${CMAKE_BINARY_DIR}/${CMAKE_TOOLCHAIN_FILE}")
+      else()
+        set(toolchain_abs "${CMAKE_SOURCE_DIR}/${CMAKE_TOOLCHAIN_FILE}")
+      endif()
+    endif()
+    list(APPEND build_args -DCMAKE_TOOLCHAIN_FILE=${toolchain_abs})
+  endif()
 
   file(REMOVE_RECURSE ${OPEN_SRC_INSTALL_PREFIX}/lib${lib_name})
 
