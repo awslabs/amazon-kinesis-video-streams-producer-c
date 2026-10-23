@@ -1,10 +1,10 @@
 var searchData=
 [
-  ['waitconditionvariableaggregate_0',['waitConditionVariableAggregate',['../CallbacksProvider_8c.html#ab39eafe3e4f46b8e9b1a3227c0675ea3',1,'CallbacksProvider.c']]],
-  ['waitconditionvariablefn_1',['waitConditionVariableFn',['../struct____PlatformCallbacks.html#a421774abbc3feeb6f25e55c83896437a',1,'__PlatformCallbacks']]],
-  ['with_20dependency_20overrides_2',['Local Development with Dependency Overrides',['../md_README.html#autotoc_md20',1,'']]],
-  ['with_20iot_20credential_20provider_3',['Running with IoT credential provider',['../md_README.html#autotoc_md8',1,'']]],
-  ['writecurlresponsecallback_4',['writeCurlResponseCallback',['../CurlCall_8c.html#a254799a28ddab568cda7b34c83abfb3f',1,'CurlCall.c']]],
-  ['writeheadercallback_5',['writeHeaderCallback',['../Response_8c.html#aebd94be007e57e77989f786989061735',1,'Response.c']]],
-  ['wss_5fscheme_5fname_6',['WSS_SCHEME_NAME',['../group__StringConstants.html#gab2690fd62e31bea295f6e3bb6a35fe76',1,'Include.h']]]
+  ['valuelen_0',['valueLen',['../struct____RequestHeader.html#ad9c29c70aa60d829623af4b39bec160f',1,'__RequestHeader']]],
+  ['variable_1',['CMake Variable',['../md_README.html#autotoc_md26',1,'']]],
+  ['verb_2',['verb',['../struct____RequestInfo.html#a607fbced0dcec9c57a7dd22906747dfe',1,'__RequestInfo']]],
+  ['version_3',['version',['../struct____AwsCredentials.html#a2d3315ebeab54ec2c5900c71da799d1c',1,'__AwsCredentials::version'],['../struct____PlatformCallbacks.html#a0ea90656bb7557200190757815ff500d',1,'__PlatformCallbacks::version'],['../struct____ProducerCallbacks.html#a5b7a3a54c91979dea97605bf118b25b6',1,'__ProducerCallbacks::version'],['../struct____StreamCallbacks.html#abf905e1040976396ad8f3af37a620d18',1,'__StreamCallbacks::version'],['../struct____AuthCallbacks.html#a8737f0bbcd6d1844dbbd7b8ff9aef274',1,'__AuthCallbacks::version'],['../struct____ApiCallbacks.html#a0d3c5e397c739a9babb32b22fa47fce4',1,'__ApiCallbacks::version']]],
+  ['version_2ec_4',['Version.c',['../Version_8c.html',1,'']]],
+  ['versioning_5',['Versioning',['../md_README.html#autotoc_md30',1,'']]],
+  ['versions_6',['Bundled dependency versions',['../md_README.html#autotoc_md7',1,'']]]
 ];

@@ -127,7 +127,10 @@ Cross-Compilation</h4>
 CMake Arguments</h4>
 <p>You can pass the following options to <code>cmake ..</code>.</p>
 <ul>
-<li><code>-DBUILD_DEPENDENCIES</code> &ndash; Whether or not to build depending libraries from source</li>
+<li><code>-DBUILD_DEPENDENCIES</code> &ndash; Build the crypto library, libcurl and googletest from source. ON by default. See Building with dependencies off.</li>
+<li><code>-DUSE_OPENSSL</code> &ndash; Use OpenSSL as the crypto library. ON by default.</li>
+<li><code>-DUSE_MBEDTLS</code> &ndash; Use mbedTLS as the crypto library. OFF by default. Requires <code>-DUSE_OPENSSL=OFF</code>.</li>
+<li><code>-DUSE_LEGACY_MBEDTLS</code> &ndash; Deprecated. Build mbedTLS 2.28.10 and libcurl 8.15.0 instead of mbedTLS 3.6.7 and libcurl 8.17.0. OFF by default. Requires <code>-DUSE_MBEDTLS=ON</code>. See Building with legacy mbedTLS 2.x.</li>
 <li><code>-DPARALLEL_BUILD</code> &ndash; Build dependencies with multiple cores. OFF by default. Disabled on Windows.</li>
 <li><code>-DKVS_ENABLE_VERBOSE_LOGS</code> &ndash; Build with <code>ENTERS()</code> and <code>LEAVES()</code> logs enabled, which are <code>LOG_LEVEL_VERBOSE</code>. Default is OFF.</li>
 <li><code>-DBUILD_TEST=TRUE</code> &ndash; Build unit/integration tests, may be useful for confirm support for your device. <code>./tst/producer_test</code></li>
@@ -138,7 +141,7 @@ CMake Arguments</h4>
 <li><code>-DTHREAD_SANITIZER</code> &ndash; Build with ThreadSanitizer</li>
 <li><code>-DUNDEFINED_BEHAVIOR_SANITIZER</code> Build with UndefinedBehaviorSanitizer</li>
 <li><code>-DALIGNED_MEMORY_MODEL</code> Build for aligned memory model only devices. Default is OFF.</li>
-<li><code>-DLOCAL_OPENSSL_BUILD</code> Whether or not to use local OpenSSL build. Default is OFF.</li>
+<li><code>-DLOCAL_CRYPTO_BUILD</code> &ndash; Use a pre-installed crypto library (OpenSSL or mbedTLS) instead of building it from source; libcurl is still built from source. OFF by default. See Building with your own crypto library. Replaces <code>-DLOCAL_OPENSSL_BUILD</code>, which still works but is deprecated.</li>
 <li><code>-DCONSTRAINED_DEVICE</code> &ndash; Change thread stack size to 0.5Mb, needed for Alpine.</li>
 <li><code>-DAWS_KVS_USE_LEGACY_ENDPOINT_ONLY</code> &ndash; Use only legacy IPV4-only endpoints (ignores env vars). Default is OFF.</li>
 <li><code>-DAWS_KVS_USE_DUAL_STACK_ENDPOINT_ONLY</code> &ndash; Use only dual-stack endpoints (ignores env vars). Default is OFF.</li>
@@ -152,7 +155,7 @@ CMake Arguments</h4>
 <div class="line">export CC=/usr/bin/clang</div>
 <div class="line">export CXX=/usr/bin/clang++</div>
 <div class="line">cmake .. -DMEMORY_SANITIZER=TRUE</div>
-</div><!-- fragment --><p> DLOCAL_OPENSSL_BUILD requires first installing OpenSSL 1.1 (<code>brew install openssl@1.1</code> for Mac) and then running <code>export PKG_CONFIG_PATH="&lt;YOUR-PATH&gt;/openssl@1.1/lib/pkgconfig"</code> (your path can be printed to terminal using <code>which openssl</code> on Linux/Mac).</p>
+</div><!-- fragment --><p> <code>-DLOCAL_CRYPTO_BUILD</code> requires the crypto library to be installed first. See Building with your own crypto library.</p>
 <p>DMEMORY_SANITIZER, DTHREAD_SANITIZER etc. flags works only with clang compiler and not with gcc compiler. For using clang (on Ubuntu), do the following - </p><div class="fragment"><div class="line">sudo apt-get install clang</div>
 <div class="line">export CC=/usr/bin/clang</div>
 <div class="line">export CXX=/usr/bin/clang++</div>
@@ -162,6 +165,84 @@ Build</h3>
 <p>To build the library run make in the build directory you executed CMake.</p>
 <p><code>make</code></p>
 <h3><a class="anchor" id="autotoc_md7"></a>
+Bundled dependency versions</h3>
+<p>With <code>-DBUILD_DEPENDENCIES=ON</code> (the default), the SDK downloads and builds these versions. They are pinned in <a href="CMake/Dependencies">CMake/Dependencies</a>.</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Library   </th><th class="markdownTableHeadNone">Version   </th><th class="markdownTableHeadNone">When    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">OpenSSL   </td><td class="markdownTableBodyNone">1.1.1t   </td><td class="markdownTableBodyNone">default    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">mbedTLS   </td><td class="markdownTableBodyNone">3.6.7   </td><td class="markdownTableBodyNone"><code>-DUSE_MBEDTLS=ON</code>    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">mbedTLS   </td><td class="markdownTableBodyNone">2.28.10   </td><td class="markdownTableBodyNone"><code>-DUSE_MBEDTLS=ON -DUSE_LEGACY_MBEDTLS=ON</code> (deprecated)    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">libcurl   </td><td class="markdownTableBodyNone">8.17.0   </td><td class="markdownTableBodyNone">always, except with <code>-DUSE_LEGACY_MBEDTLS=ON</code>    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">libcurl   </td><td class="markdownTableBodyNone">8.15.0   </td><td class="markdownTableBodyNone"><code>-DUSE_LEGACY_MBEDTLS=ON</code> (deprecated)    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">googletest   </td><td class="markdownTableBodyNone">1.12.1   </td><td class="markdownTableBodyNone"><code>-DBUILD_TEST=ON</code>   </td></tr>
+</table>
+<p>Amazon Kinesis Video Streams PIC is fetched from GitHub in both modes, unless <code>libkvspicUtils</code> is installed and visible to <code>pkg-config</code>, or <code>-DLOCAL_KVSPIC_PATH</code> is set. Its version is set in <code>CMake/Dependencies/libkvspic-CMakeLists.txt</code> and can be changed with <code>-DPIC_VERSION_OVERRIDE</code>.</p>
+<h3><a class="anchor" id="autotoc_md8"></a>
+Dependency requirements</h3>
+<p>These apply when the SDK links against system-installed libraries instead of building them.</p>
+<ul>
+<li><code>libcurl</code>: <code>&gt;= 7.55.0</code>, built against the same crypto library you select</li>
+<li><code>libopenssl</code>: <code>1.1.1x</code> or <code>&gt;= 3.0.0</code></li>
+<li><code>libmbedtls</code>: <code>&gt;= 2.16.0</code> and <code>&lt; 4.0.0</code></li>
+<li>With mbedTLS 2.x, <code>libcurl</code> must be <code>&lt;= 8.15.0</code>. libcurl 8.16.0 and newer require mbedTLS 3.2.0 or newer. libcurl 8.15.0 does not build against mbedTLS 2.16.x; it is tested with mbedTLS 2.28.10.</li>
+</ul>
+<blockquote class="doxtable">
+<p>&zwj;[!NOTE] mbedTLS 2.x must not be built with <code>MBEDTLS_DEPRECATED_REMOVED</code>. The SDK calls <code>mbedtls_sha256()</code>, which mbedTLS 2.x marks as deprecated. </p>
+</blockquote>
+<h3><a class="anchor" id="autotoc_md9"></a>
+Building with dependencies off</h3>
+<p>Install the dependencies with your package manager.</p>
+<p>On Ubuntu: <code>sudo apt-get install pkg-config libssl-dev libcurl4-openssl-dev</code></p>
+<p>To use OpenSSL: </p><div class="fragment"><div class="line">cmake .. -DBUILD_DEPENDENCIES=OFF</div>
+</div><!-- fragment --><p>To use mbedTLS: </p><div class="fragment"><div class="line">cmake .. -DBUILD_DEPENDENCIES=OFF -DUSE_OPENSSL=OFF -DUSE_MBEDTLS=ON</div>
+</div><!-- fragment --><p>The SDK finds the crypto library with CMake (<code>find_package</code>) and libcurl with <code>pkg-config</code>. If they are installed in a non-standard location, set <code>CMAKE_PREFIX_PATH</code> and <code>PKG_CONFIG_PATH</code>.</p>
+<blockquote class="doxtable">
+<p>&zwj;<b>Note:</b> Check the dependency requirements before using system libraries. The build does not check versions. If your system libraries do not meet them, let the SDK build the dependencies instead. </p>
+</blockquote>
+<blockquote class="doxtable">
+<p>&zwj;[!CAUTION] System libcurl packages (apt, brew, etc.) are typically built against OpenSSL. If you build the SDK with <code>-DUSE_MBEDTLS=ON</code> against such a libcurl, the build succeeds but both libraries are loaded: TLS goes through OpenSSL while request signing uses mbedTLS. For a pure mbedTLS build, use a libcurl that you built against the same mbedTLS, or let the SDK build libcurl (see Building with your own crypto library). </p>
+</blockquote>
+<blockquote class="doxtable">
+<p>&zwj;[!CAUTION] <code>brew install mbedtls</code> currently installs mbedTLS 4.x, which the SDK does not support. mbedTLS 4 moved the hashing APIs the SDK uses into TF-PSA-Crypto. </p>
+</blockquote>
+<blockquote class="doxtable">
+<p>&zwj;[!TIP] If you are unsure, let the SDK build the dependencies using <code>-DBUILD_DEPENDENCIES=ON</code>. </p>
+</blockquote>
+<h3><a class="anchor" id="autotoc_md10"></a>
+Building with your own crypto library</h3>
+<p>To use a pre-installed OpenSSL or mbedTLS but still have the SDK build libcurl against it, keep <code>-DBUILD_DEPENDENCIES=ON</code> and add <code>-DLOCAL_CRYPTO_BUILD=ON</code>.</p>
+<p>OpenSSL 3.x on macOS: </p><div class="fragment"><div class="line">brew install openssl@3</div>
+<div class="line">export OPENSSL_ROOT_DIR=$(brew --prefix openssl@3)</div>
+<div class="line">export PKG_CONFIG_PATH=&quot;$OPENSSL_ROOT_DIR/lib/pkgconfig:$PKG_CONFIG_PATH&quot;</div>
+<div class="line">cmake .. -DLOCAL_CRYPTO_BUILD=ON</div>
+</div><!-- fragment --><p>mbedTLS: </p><div class="fragment"><div class="line">cmake .. -DLOCAL_CRYPTO_BUILD=ON -DUSE_OPENSSL=OFF -DUSE_MBEDTLS=ON -DCMAKE_PREFIX_PATH=&lt;mbedtls-install-prefix&gt;</div>
+</div><!-- fragment --><blockquote class="doxtable">
+<p>&zwj;[!TIP] The SDK passes the mbedTLS it found to the bundled libcurl, so both link the same copy even if another mbedTLS (for example from Homebrew) is installed. To confirm, check that <code>libcurl</code> and <code>libcproducer</code> list the same mbedTLS with <code>ldd</code> (Linux) or <code>otool -L</code> (macOS). </p>
+</blockquote>
+<blockquote class="doxtable">
+<p>&zwj;[!CAUTION] The bundled libcurl 8.17.0 requires mbedTLS 3.2.0 or newer. With an older mbedTLS, the build stops at libcurl's configure step with <code>mbedTLS v3.2.0 or newer is required.</code> Use <code>-DBUILD_DEPENDENCIES=OFF</code> with your own libcurl if you need to stay on mbedTLS 2.x, or see Building with legacy mbedTLS 2.x. </p>
+</blockquote>
+<blockquote class="doxtable">
+<p>&zwj;[!NOTE] <code>-DLOCAL_CRYPTO_BUILD</code> replaces <code>-DLOCAL_OPENSSL_BUILD</code>. The old name still works and prints a deprecation warning. </p>
+</blockquote>
+<h3><a class="anchor" id="autotoc_md11"></a>
+Building with legacy mbedTLS 2.x</h3>
+<p>If you cannot move to mbedTLS 3.x yet, <code>-DUSE_LEGACY_MBEDTLS=ON</code> builds mbedTLS 2.28.10 with libcurl 8.15.0, the last libcurl release that supports mbedTLS 2.x.</p>
+<div class="fragment"><div class="line">cmake .. -DUSE_OPENSSL=OFF -DUSE_MBEDTLS=ON -DUSE_LEGACY_MBEDTLS=ON</div>
+</div><!-- fragment --><blockquote class="doxtable">
+<p>&zwj;[!WARNING] This option is deprecated and will be removed in a future release. mbedTLS 2.28 is end-of-life and no longer receives security fixes, and libcurl 8.15.0 does not receive the fixes in later libcurl releases. Use it only as a migration aid. </p>
+</blockquote>
+<blockquote class="doxtable">
+<p>&zwj;[!CAUTION] Delete the <code>open-source</code> folder when switching this option on or off. The SDK reuses dependencies already built in <code>open-source</code> and does not rebuild them when their version changes. </p>
+</blockquote>
+<h3><a class="anchor" id="autotoc_md12"></a>
 Run samples</h3>
 <p>To run the samples:</p>
 <div class="fragment"><div class="line">export AWS_SECRET_ACCESS_KEY=&lt;YourAWSSecretAccessKey&gt;</div>
@@ -193,7 +274,7 @@ Run samples</h3>
 <p>Note: The resulting sample video is the same.</p>
 <p>For audio only, run <code>./kvsAudioOnlyStreamingSample &lt;stream-name&gt; &lt;streaming_duration&gt; &lt;sample_location&gt; &lt;audio-codec&gt;</code>.</p>
 <p>This will stream the audio files from the <code>samples/aacSampleFrames</code> or <code>samples/alawSampleFrames</code> (as per the choice of audio codec in the last argument) respectively.</p>
-<h3><a class="anchor" id="autotoc_md8"></a>
+<h3><a class="anchor" id="autotoc_md13"></a>
 Running with IoT credential provider</h3>
 <p>To run the samples with IoT credential provider:</p>
 <ol type="1">
@@ -202,14 +283,14 @@ Running with IoT credential provider</h3>
 <li>Build the changes: <code>make</code></li>
 <li>Run the sample using the instructions in previous section.</li>
 </ol>
-<h3><a class="anchor" id="autotoc_md9"></a>
+<h3><a class="anchor" id="autotoc_md14"></a>
 Fragment metadata</h3>
 <p><code>./kvsVideoOnlyRealtimeStreamingSample</code> is the only sample that has the <a href="https://docs.aws.amazon.com/kinesisvideostreams/latest/dg/how-meta.html">fragment metadata</a> implemented out of the box.</p>
 <p>In addition to the required arguments above, this sample has an additional argument: </p><div class="fragment"><div class="line">./kvsVideoOnlyRealtimeStreamingSample &lt;stream-name&gt; &lt;video-codec&gt; &lt;streaming-duration-in-seconds&gt; &lt;sample-location&gt; &lt;num-metadata&gt;</div>
 </div><!-- fragment --><p><code>num-metadata</code> &ndash; the number of sample fragment metadata key-value pairs that are added to each fragment. Min: 0, Max: 10. Default: 10.</p>
-<h3><a class="anchor" id="autotoc_md10"></a>
+<h3><a class="anchor" id="autotoc_md15"></a>
 Setting log levels</h3>
-<h3><a class="anchor" id="autotoc_md11"></a>
+<h3><a class="anchor" id="autotoc_md16"></a>
 Setup logging:</h3>
 <p>Set up the desired log level. The log levels and corresponding values currently available are:</p><ol type="1">
 <li><code>LOG_LEVEL_VERBOSE</code> -&mdash; 1</li>
@@ -224,21 +305,21 @@ Setup logging:</h3>
 <p>To set a log level, you can set it using the deviceInfo structure. </p><div class="fragment"><div class="line">pDeviceInfo-&gt;clientInfo.loggerLogLevel = LOG_LEVEL_DEBUG;</div>
 </div><!-- fragment --><p>The samples set the loggerLogLevel based on the log level environment variable. If not set, it falls back to <code>LOG_LEVEL_DEBUG</code>. </p><div class="fragment"><div class="line">export AWS_KVS_LOG_LEVEL=1</div>
 </div><!-- fragment --><p>The SDK also tracks entry and exit of functions which increases the verbosity of the logs. This will be useful when you want to track the transitions within the codebase. To enable this feature, set the log level to LOG_LEVEL_VERBOSE and compile the code with <code>-DKVS_ENABLE_VERBOSE_LOGS=ON</code>. Note: This log level is extremely VERBOSE and could flood the files if using file based logging strategy.</p>
-<h3><a class="anchor" id="autotoc_md12"></a>
+<h3><a class="anchor" id="autotoc_md17"></a>
 Run unit tests</h3>
 <p>Since these tests exercise networking you need to have AWS credentials specified, specifically you need to:</p>
 <div class="fragment"><div class="line">export AWS_SECRET_ACCESS_KEY=&lt;YourAWSSecretAccessKey&gt;</div>
 <div class="line">export AWS_ACCESS_KEY_ID=&lt;YourAWSAccessKey&gt;</div>
 </div><!-- fragment --><p>Now you can execute the unit tests from the <code>build</code> directory as follows: <code>./tst/producer_test</code></p>
-<h3><a class="anchor" id="autotoc_md13"></a>
+<h3><a class="anchor" id="autotoc_md18"></a>
 Offline mode</h3>
 <p>The samples run in near real time mode by default. In order to set up offline mode, the following APIs can be used in the samples instead of the realtime variant:</p>
 <p>For video only: <code><a class="el" href="group__PublicMemberFunctions.html#ga6e083dfc57516c4efaa9951df09c6848">createOfflineVideoStreamInfoProviderWithCodecs()</a></code> For video and audio: <code><a class="el" href="group__PublicMemberFunctions.html#ga70f651dfddea8ff8e60c89571204be15">createOfflineAudioVideoStreamInfoProviderWithCodecs()</a></code></p>
 <p>The 2 APIs are available in <a href="https://github.com/awslabs/amazon-kinesis-video-streams-producer-c/blob/412aab82c99a72f9dbde975f5fea81ffdc844ae5/src/include/com/amazonaws/kinesis/video/cproducer/Include.h">this</a> header file.</p>
-<h3><a class="anchor" id="autotoc_md14"></a>
+<h3><a class="anchor" id="autotoc_md19"></a>
 KVS Endpoints and DNS resolution</h3>
 <p>The default endpoints and DNS resolution chain is implemented by the SDK. It sequentially checks each place where you can set the configuration for these parameters, and then selects the first one you set. The predefined sequence is as follows:</p>
-<h4><a class="anchor" id="autotoc_md15"></a>
+<h4><a class="anchor" id="autotoc_md20"></a>
 Endpoint Configuration</h4>
 <ol type="1">
 <li>The <code>controlPlaneUrl</code> parameter for <code>createAbstractDefaultCallbacksProvider</code>.</li>
@@ -250,33 +331,33 @@ Endpoint Configuration</h4>
 <li>Otherwise, the legacy endpoint will be constructed.</li>
 </ol>
 <p>With 2, 3, and 4, the endpoint will be constructed based on the region provided to <code>createAbstractDefaultCallbacksProvider</code>.</p>
-<h4><a class="anchor" id="autotoc_md16"></a>
+<h4><a class="anchor" id="autotoc_md21"></a>
 DNS filtering</h4>
 <ol type="1">
 <li>DNS resolution CMake parameters: (<code>-DAWS_KVS_IPV4_ONLY=TRUE</code>, <code>-DAWS_KVS_IPV6_ONLY=TRUE</code>, <code>-DAWS_KVS_IPV4_AND_IPV6_ONLY=TRUE</code>)</li>
 <li>Environment variables (<code>export AWS_KVS_USE_IPV4=TRUE</code>, <code>export AWS_KVS_USE_IPV6=TRUE</code>)</li>
 <li>Otherwise, no filtering will take place. Both IPv4 and IPv6 IP addresses, if returned by DNS, may be used.</li>
 </ol>
-<h2><a class="anchor" id="autotoc_md17"></a>
+<h2><a class="anchor" id="autotoc_md22"></a>
 DEBUG</h2>
-<h3><a class="anchor" id="autotoc_md18"></a>
+<h3><a class="anchor" id="autotoc_md23"></a>
 Debug Build Issues</h3>
 <ul>
-<li>When building OpenSSL during <code>cmake ..</code>, if you encounter an architecture error such as <code>ld: symbol(s) not found for architecture i386</code>, building with a local OpenSSL build may help. First install OpenSSL 1.1 (for Mac: <code>brew install openssl@1.1</code>). Next set <code>export PKG_CONFIG_PATH="&lt;YOUR-PATH&gt;/openssl@1.1/lib/pkgconfig"</code> (your path can be printed to terminal using <code>which openssl</code> on Linux/Mac). Now set the following flag to ON when building: <code>cmake .. -DLOCAL_OPENSSL_BUILD=ON</code>. If there are still errors regarding locating the local OpenSSL library:<ul>
+<li>When building OpenSSL during <code>cmake ..</code>, if you encounter an architecture error such as <code>ld: symbol(s) not found for architecture i386</code>, building with a local OpenSSL build may help. First install OpenSSL (for Mac: <code>brew install openssl@3</code>). Next set <code>export PKG_CONFIG_PATH="&lt;YOUR-PATH&gt;/openssl@3/lib/pkgconfig"</code> (on Mac, <code>brew --prefix openssl@3</code> prints the path). Now set the following flag to ON when building: <code>cmake .. -DLOCAL_CRYPTO_BUILD=ON</code>. If there are still errors regarding locating the local OpenSSL library:<ul>
 <li>The following environment variables may need to be set to export: <code>export LDFLAGS="-L&lt;YOUR-PATH&gt;/openssl@1.1/lib"</code> and <code>export CPPFLAGS="-I&lt;YOUR-PATH&gt;/openssl@1.1/include"</code></li>
 <li>The path to OpenSSL’s root directory may need to be specified when running <code>cmake</code>: <code>-DOPENSSL_ROOT_DIR="&lt;YOUR-PATH&gt;/openssl@1.1/include/openssl"</code></li>
 <li>If you need to have openssl@1.1 first in your PATH, run: &lsquo;echo 'export PATH="&lt;YOUR-PATH&gt;/openssl@1.1/bin:$PATH"&rsquo; &gt;&gt; ~/.zshrc`</li>
 </ul>
 </li>
 </ul>
-<h3><a class="anchor" id="autotoc_md19"></a>
+<h3><a class="anchor" id="autotoc_md24"></a>
 Debug Media</h3>
 <p>You can do <code>export KVS_DEBUG_DUMP_DATA_FILE_DIR=/path/to/directory</code> before streaming (the directory must exist). Producer will then dump MKV files into that path. The file is exactly what KVS will receive. You can use open source tools like <a href="https://mkvtoolnix.download/">MKVToolNIX</a> to check that everything looks correct. You can also try to play the MKV file in compatible players.</p>
 <p>To check the frame timestamps submitted to the SDK, enable VERBOSE log level. The PIC library will log the timestamps of each frame submitted.</p>
-<h2><a class="anchor" id="autotoc_md20"></a>
+<h2><a class="anchor" id="autotoc_md25"></a>
 Local Development with Dependency Overrides</h2>
 <p>When developing changes across the SDK stack (C Producer → PIC), you can point the build to a local PIC checkout instead of fetching from GitHub. This avoids the git-fetch cycle and lets you test PIC changes immediately.</p>
-<h3><a class="anchor" id="autotoc_md21"></a>
+<h3><a class="anchor" id="autotoc_md26"></a>
 CMake Variable</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -284,36 +365,36 @@ CMake Variable</h3>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>LOCAL_KVSPIC_PATH</code>   </td><td class="markdownTableBodyNone">Path to a local <a href="https://github.com/awslabs/amazon-kinesis-video-streams-pic">KVS PIC</a> checkout   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md22"></a>
+<h3><a class="anchor" id="autotoc_md27"></a>
 Usage</h3>
 <div class="fragment"><div class="line"># Build C Producer using local PIC</div>
 <div class="line">mkdir -p build &amp;&amp; cd build</div>
 <div class="line">cmake .. -DLOCAL_KVSPIC_PATH=/path/to/amazon-kinesis-video-streams-pic</div>
 <div class="line">make</div>
 </div><!-- fragment --><p>When <code>LOCAL_KVSPIC_PATH</code> is set, the build uses <code>add_subdirectory</code> to include PIC directly from your local path instead of fetching it from GitHub or using a system-installed version. Changes in PIC source files are picked up on the next <code>make</code> without re-running <code>cmake</code>.</p>
-<h2><a class="anchor" id="autotoc_md23"></a>
+<h2><a class="anchor" id="autotoc_md28"></a>
 Development</h2>
 <p>The repository is using <code>develop</code> branch as the aggregation and all of the feature development is done in appropriate feature branches. The PRs (Pull Requests) are cut on a feature branch and once approved with all the checks passed they can be merged by a click of a button on the PR tool. The master branch should always be build-able and all the tests should be passing. We are welcoming any contribution to the code base. The master branch contains our most recent release cycle from <code>develop</code>.</p>
-<h3><a class="anchor" id="autotoc_md24"></a>
+<h3><a class="anchor" id="autotoc_md29"></a>
 Release</h3>
 <p>The repository is under active development and even with incremental unit test coverage where some of the tests are actually full integration tests, we require more rigorous internal testing in order to 'cut' release versions. The release is cut against a particular commit that gets approved. The general philosophy is to cut a release when a set of commits contribute to a self-containing feature or when we add major internal functionality improvements.</p>
-<h3><a class="anchor" id="autotoc_md25"></a>
+<h3><a class="anchor" id="autotoc_md30"></a>
 Versioning</h3>
 <p>We deploy 3 digit version strings in a form of 'Major.Minor.Revision' scheme.</p><ul>
 <li>Major version update - Major functionality changes. Might not have direct backward compatibility. For example, multiple public API parameter changes.</li>
 <li>Minor version update - Additional features. Major bug fixes. Might have some minor backward compatibility issues. For example, an extra parameter on a callback function.</li>
 <li>Revision version update - Minor features. Bug fixes. Full backward compatibility. For example, an extra fields added to the public structures with version bump.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md26"></a>
+<h2><a class="anchor" id="autotoc_md31"></a>
 Documentation</h2>
-<h2><a class="anchor" id="autotoc_md27"></a>
+<h2><a class="anchor" id="autotoc_md32"></a>
 Related</h2>
 <ul>
 <li><a href="https://github.com/awslabs/amazon-kinesis-video-streams-producer-sdk-cpp/">CPP SDK</a></li>
 <li><a href="https://github.com/awslabs/amazon-kinesis-video-streams-producer-sdk-java/">Java SDK</a></li>
 <li><a href="https://github.com/awslabs/amazon-kinesis-video-streams-pic/">PIC</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md28"></a>
+<h2><a class="anchor" id="autotoc_md33"></a>
 License</h2>
 <p>This library is licensed under the Apache 2.0 License. </p>
 </div></div><!-- contents -->
@@ -322,7 +403,7 @@ License</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Thu Oct 22 2026 22:19:39 for Amazon Kinesis Producer C SDK by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+    <li class="footer">Generated on Fri Oct 23 2026 04:55:06 for Amazon Kinesis Producer C SDK by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
   </ul>
 </div>
 </body>
