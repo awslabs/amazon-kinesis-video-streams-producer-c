@@ -58,6 +58,16 @@ typedef struct __CallbacksProvider* PCallbacksProvider;
 STATUS setDefaultPlatformCallbacks(PCallbacksProvider);
 
 /**
+ * Blocks until the service call context's callAfter time is reached in order to honor
+ * the backoff wait time computed by the state machine retry strategy. No-op if callAfter
+ * is unset or already in the past.
+ *
+ * @param - PCallbacksProvider - IN - Callbacks provider used to retrieve the current time
+ * @param - PServiceCallContext - IN - Service call context carrying the callAfter deadline
+ */
+VOID honorCallAfterWaitTime(PCallbacksProvider, PServiceCallContext);
+
+/**
  * Creates a default callbacks provider.
  *
  * NOTE: The caller is responsible for releasing the structure by calling

@@ -62,7 +62,7 @@ jobs:
           echo "LDFLAGS=-L$OPENSSL_PATH/lib" >> $GITHUB_ENV
           echo "CPPFLAGS=-I$OPENSSL_PATH/include" >> $GITHUB_ENV
           echo "OPENSSL_ROOT_DIR=$OPENSSL_PATH" >> $GITHUB_ENV
-          echo "CMAKE_FLAGS_EXTRA=-DLOCAL_OPENSSL_BUILD=ON" >> $GITHUB_ENV
+          echo "CMAKE_FLAGS_EXTRA=-DLOCAL_CRYPTO_BUILD=ON" >> $GITHUB_ENV
 
       - name: Set CMake flags for Dependencies=OFF
         if: ${{ matrix.openssl == 'deps-off' }}
@@ -76,7 +76,7 @@ jobs:
           $CC --version
           $CXX --version
           mkdir build && cd build
-          cmake .. -DBUILD_TEST=ON $CMAKE_FLAGS_EXTRA
+          cmake .. -DBUILD_TEST=ON -DPARALLEL_BUILD=ON $CMAKE_FLAGS_EXTRA
           make -j
 
       - name: Configure AWS Credentials
@@ -109,7 +109,7 @@ jobs:
       - name: Build repository
         run: |
           mkdir build && cd build
-          cmake .. -DCODE_COVERAGE=TRUE -DBUILD_TEST=TRUE -DBUILD_COMMON_LWS=TRUE
+          cmake .. -DCODE_COVERAGE=TRUE -DBUILD_TEST=TRUE -DBUILD_COMMON_LWS=TRUE -DPARALLEL_BUILD=ON
           make
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -147,7 +147,7 @@ jobs:
       - name: Build repository
         run: |
           mkdir build && cd build
-          cmake .. -DBUILD_TEST=TRUE -DADDRESS_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
+          cmake .. -DBUILD_TEST=TRUE -DADDRESS_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE -DPARALLEL_BUILD=ON
           make
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -180,7 +180,7 @@ jobs:
       - name: Build repository
         run: |
           mkdir build && cd build
-          cmake .. -DBUILD_TEST=TRUE -DUNDEFINED_BEHAVIOR_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE
+          cmake .. -DBUILD_TEST=TRUE -DUNDEFINED_BEHAVIOR_SANITIZER=TRUE -DBUILD_COMMON_LWS=TRUE -DPARALLEL_BUILD=ON
           make
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -298,7 +298,7 @@ jobs:
       - name: Build repository
         run: |
           mkdir build && cd build
-          cmake .. -DBUILD_TEST=ON ${{ matrix.build-configuration.cmake-args }}
+          cmake .. -DBUILD_TEST=ON -DPARALLEL_BUILD=ON ${{ matrix.build-configuration.cmake-args }}
           make -j
 
       - name: Check libCurl
@@ -333,6 +333,72 @@ jobs:
         run: |
           timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
 
+  ubuntu-mbedtls:
+    # Builds the mbedTLS crypto backend with bundled dependencies
+    runs-on: ubuntu-latest
+    container:
+      image: public.ecr.aws/ubuntu/ubuntu:22.04_stable
+
+    name: Ubuntu 22.04-gcc-mbedtls
+
+    env:
+      DEBIAN_FRONTEND: noninteractive
+      CC: gcc
+      CXX: g++
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y git cmake build-essential pkg-config python3
+
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.x'
+
+      - name: Build repository with mbedTLS backend
+        run: |
+          mkdir build && cd build
+          cmake .. -DUSE_OPENSSL=OFF -DUSE_MBEDTLS=ON -DBUILD_DEPENDENCIES=ON -DBUILD_TEST=ON -DPARALLEL_BUILD=ON
+          make -j
+
+      - name: Assert mbedTLS backend and no OpenSSL
+        working-directory: ./build
+        run: |
+          set -x
+          # cproducer must link mbedTLS and must NOT link OpenSSL.
+          ldd ./libcproducer.so
+          if ! ldd ./libcproducer.so | grep -qE 'libmbedtls|libmbedcrypto'; then
+            echo "❌ cproducer is not linked against mbedTLS"
+            exit 1
+          fi
+          if ldd ./libcproducer.so | grep -qE 'libssl|libcrypto\.so'; then
+            echo "❌ OpenSSL leaked into the mbedTLS build"
+            exit 1
+          fi
+          echo "✅ mbedTLS backend confirmed, no OpenSSL"
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-duration-seconds: 3600
+
+      - name: Run tests
+        working-directory: ./build
+        run: |
+          timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
+
   arm64-cross-compilation:
     runs-on: ubuntu-22.04
     permissions:
@@ -355,7 +421,7 @@ jobs:
         run: |
           sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'
           mkdir build && cd build
-          cmake .. -DBUILD_TEST=TRUE -DBUILD_OPENSSL_PLATFORM=linux-generic64
+          cmake .. -DBUILD_TEST=TRUE -DBUILD_OPENSSL_PLATFORM=linux-generic64 -DPARALLEL_BUILD=ON
           make -j
           file libcproducer.so
 
@@ -381,7 +447,7 @@ jobs:
         run: |
           sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'
           mkdir build && cd build
-          cmake .. -DBUILD_TEST=TRUE -DBUILD_OPENSSL_PLATFORM=linux-aarch64
+          cmake .. -DBUILD_TEST=TRUE -DBUILD_OPENSSL_PLATFORM=linux-aarch64 -DPARALLEL_BUILD=ON
           make -j
           file libcproducer.so
 
@@ -410,7 +476,7 @@ jobs:
         run: |
           sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'
           mkdir build && cd build
-          cmake .. -DBUILD_TEST=TRUE -DBUILD_OPENSSL_PLATFORM=linux-generic32
+          cmake .. -DBUILD_TEST=TRUE -DBUILD_OPENSSL_PLATFORM=linux-generic32 -DPARALLEL_BUILD=ON
           make
           file libcproducer.so
 
@@ -428,7 +494,7 @@ jobs:
       - name: Build Repository
         run: |
           mkdir build && cd build
-          cmake .. -DBUILD_STATIC=ON
+          cmake .. -DBUILD_STATIC=ON -DPARALLEL_BUILD=ON
           make
 
   linux-thread-size-check:
@@ -467,7 +533,7 @@ jobs:
       - name: Build Repository
         run: |
           mkdir build && cd build
-          cmake .. -DBUILD_TEST=TRUE -DKVS_DEFAULT_STACK_SIZE=65536
+          cmake .. -DBUILD_TEST=TRUE -DKVS_DEFAULT_STACK_SIZE=65536 -DPARALLEL_BUILD=ON
           make -j$(nproc)
 
       - name: Run tests with expected failure

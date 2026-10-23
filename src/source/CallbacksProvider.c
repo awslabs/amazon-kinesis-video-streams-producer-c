@@ -474,6 +474,19 @@ CleanUp:
     return retStatus;
 }
 
+VOID honorCallAfterWaitTime(PCallbacksProvider pCallbacksProvider, PServiceCallContext pServiceCallContext)
+{
+    UINT64 currentTime;
+
+    // Respect the callAfter to honor backoff wait time from the state machine retry strategy
+    if (pCallbacksProvider != NULL && pServiceCallContext != NULL && pServiceCallContext->callAfter != 0) {
+        currentTime = pCallbacksProvider->clientCallbacks.getCurrentTimeFn(pCallbacksProvider->clientCallbacks.customData);
+        if (currentTime < pServiceCallContext->callAfter) {
+            THREAD_SLEEP(pServiceCallContext->callAfter - currentTime);
+        }
+    }
+}
+
 STATUS setPlatformCallbacks(PClientCallbacks pClientCallbacks, PPlatformCallbacks pPlatformCallbacks)
 {
     ENTERS();

@@ -1113,6 +1113,7 @@ STATUS createStreamCachingCurl(UINT64 customData, PCHAR deviceName, PCHAR stream
     PCurlApiCallbacks pCurlApiCallbacks = (PCurlApiCallbacks) customData;
     PCallbacksProvider pCallbacksProvider = NULL;
     BOOL emulateApiCall = TRUE;
+    UINT64 currentTime;
 
     CHK(pCurlApiCallbacks != NULL && pCurlApiCallbacks->pCallbacksProvider != NULL && pServiceCallContext != NULL, STATUS_INVALID_ARG);
     pCallbacksProvider = pCurlApiCallbacks->pCallbacksProvider;
@@ -1129,6 +1130,9 @@ STATUS createStreamCachingCurl(UINT64 customData, PCHAR deviceName, PCHAR stream
         // Early return
         CHK(FALSE, retStatus);
     }
+
+    // Respect the callAfter to honor backoff wait time from the state machine retry strategy
+    honorCallAfterWaitTime(pCallbacksProvider, pServiceCallContext);
 
     DLOGV("[%s] No-op CreateStream API call", streamName);
 
@@ -1347,6 +1351,7 @@ STATUS describeStreamCachingCurl(UINT64 customData, PCHAR streamName, PServiceCa
     StreamDescription streamDescription;
     PStreamInfo pStreamInfo;
     BOOL emulateApiCall = TRUE;
+    UINT64 currentTime;
 
     CHK(pCurlApiCallbacks != NULL && pCurlApiCallbacks->pCallbacksProvider != NULL && pServiceCallContext != NULL, STATUS_INVALID_ARG);
     pCallbacksProvider = pCurlApiCallbacks->pCallbacksProvider;
@@ -1363,6 +1368,9 @@ STATUS describeStreamCachingCurl(UINT64 customData, PCHAR streamName, PServiceCa
         // Early return
         CHK(FALSE, retStatus);
     }
+
+    // Respect the callAfter to honor backoff wait time from the state machine retry strategy
+    honorCallAfterWaitTime(pCallbacksProvider, pServiceCallContext);
 
     // Get the stream info from the stream handle
     CHK_STATUS(kinesisVideoStreamGetStreamInfo(streamHandle, &pStreamInfo));
@@ -1666,6 +1674,9 @@ STATUS getStreamingEndpointCachingCurl(UINT64 customData, PCHAR streamName, PCHA
     pCallbacksProvider = pCurlApiCallbacks->pCallbacksProvider;
 
     streamHandle = (STREAM_HANDLE) pServiceCallContext->customData;
+
+    // Respect the callAfter to honor backoff wait time from the state machine retry strategy
+    honorCallAfterWaitTime(pCallbacksProvider, pServiceCallContext);
 
     // We check whether we have already made the call by checking
     // for the presence of the endpoint in the cache.
@@ -1998,6 +2009,7 @@ STATUS tagResourceCachingCurl(UINT64 customData, PCHAR streamArn, UINT32 tagCoun
     PCallbacksProvider pCallbacksProvider = NULL;
     STREAM_HANDLE streamHandle;
     BOOL emulateApiCall = TRUE;
+    UINT64 currentTime;
 
     CHK(pCurlApiCallbacks != NULL && pCurlApiCallbacks->pCallbacksProvider != NULL && pServiceCallContext != NULL, STATUS_INVALID_ARG);
     pCallbacksProvider = pCurlApiCallbacks->pCallbacksProvider;
@@ -2014,6 +2026,9 @@ STATUS tagResourceCachingCurl(UINT64 customData, PCHAR streamArn, UINT32 tagCoun
         // Early return
         CHK(FALSE, retStatus);
     }
+
+    // Respect the callAfter to honor backoff wait time from the state machine retry strategy
+    honorCallAfterWaitTime(pCallbacksProvider, pServiceCallContext);
 
     DLOGV("Caching TagResource API call");
     retStatus = tagResourceResultEvent(streamHandle, SERVICE_CALL_RESULT_OK);
@@ -2275,8 +2290,20 @@ CleanUp:
             kinesisVideoStreamTerminated(streamHandle, uploadHandle, callResult);
         }
 
-        // Bubble the notification to potential listeners
-        notifyCallResult(pCallbacksProvider, retStatus, streamHandle);
+        if (callResult != SERVICE_CALL_RESULT_OK && callResult != SERVICE_CALL_RESULT_NOT_SET) {
+            // Non-retriable, non-recoverable errors (e.g., 403/401 auth failures) are reported
+            // to the application with the actual HTTP error from curl response.
+            // Retriable/recoverable errors (timeouts, 500s, 404s) are handled by PIC's state machine.
+            STATUS callStatus = serviceCallResultCheck(callResult);
+            if (!IS_RETRIABLE_ERROR(callStatus) && !IS_RECOVERABLE_ERROR(callStatus)) {
+                notifyCallResult(pCallbacksProvider, callStatus, streamHandle);
+            } else {
+                notifyCallResult(pCallbacksProvider, retStatus, streamHandle);
+            }
+        } else {
+            // notify with retStatus in case of internal failures
+            notifyCallResult(pCallbacksProvider, retStatus, streamHandle);
+        }
     }
 
     LEAVES();

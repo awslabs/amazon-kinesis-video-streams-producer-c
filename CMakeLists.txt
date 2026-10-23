@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.6.3)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake;${CMAKE_MODULE_PATH}")
 include(Utilities)
-project(KinesisVideoProducerC VERSION 1.6.4 LANGUAGES C)
+project(KinesisVideoProducerC VERSION 1.6.5 LANGUAGES C)
 
 set(KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION 1)
 set(KINESIS_VIDEO_PRODUCER_C_MINOR_VERSION 6)
-set(KINESIS_VIDEO_PRODUCER_C_PATCH_VERSION 4)
+set(KINESIS_VIDEO_PRODUCER_C_PATCH_VERSION 5)
 set(KINESIS_VIDEO_PRODUCER_C_VERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION}.${KINESIS_VIDEO_PRODUCER_C_MINOR_VERSION}.${KINESIS_VIDEO_PRODUCER_C_PATCH_VERSION})
 
 include(GNUInstallDirs)
@@ -17,12 +17,25 @@ option(BUILD_STATIC "Static build" OFF)
 option(BUILD_DEPENDENCIES "Whether or not to build depending libraries from source" ON)
 option(USE_OPENSSL "Use openssl as crypto library" ON)
 option(USE_MBEDTLS "Use mbedtls as crypto library" OFF)
+option(USE_LEGACY_MBEDTLS "Deprecated: build mbedTLS 2.28 and libcurl 8.15.0 instead of mbedTLS 3.6 and libcurl 8.17.0" OFF)
+if(USE_LEGACY_MBEDTLS)
+  if(NOT USE_MBEDTLS)
+    message(FATAL_ERROR "USE_LEGACY_MBEDTLS requires -DUSE_MBEDTLS=ON -DUSE_OPENSSL=OFF")
+  endif()
+  message(DEPRECATION "USE_LEGACY_MBEDTLS builds mbedTLS 2.28 (end-of-life) and libcurl 8.15.0. It is a migration aid and will be removed in a future release; move to mbedTLS 3.x.")
+endif()
 option(BUILD_COMMON_LWS "Whether or not to build ProducerC libwebsockets common library" OFF)
 option(BUILD_COMMON_CURL "Whether or not to build ProducerC curl common library" ON)
 option(BUILD_OPENSSL_PLATFORM "If buildng OpenSSL what is the target platform" OFF)
-option(LOCAL_OPENSSL_BUILD "Whether or not to use local OpenSSL build" OFF)
+option(LOCAL_CRYPTO_BUILD "Use a pre-installed crypto library (OpenSSL or mbedTLS) instead of building it from source" OFF)
+# Deprecated alias, kept so existing build scripts keep working.
+if(LOCAL_OPENSSL_BUILD)
+  message(DEPRECATION "LOCAL_OPENSSL_BUILD is deprecated, use LOCAL_CRYPTO_BUILD instead.")
+  set(LOCAL_CRYPTO_BUILD ON)
+endif()
 option(CONSTRAINED_DEVICE "Change pthread stack size" OFF)
 option(KVS_ENABLE_VERBOSE_LOGS "Enable ENTERS/LEAVES logs (at LOG_LEVEL_VERBOSE)" OFF)
+option(PARALLEL_BUILD "Build dependencies with parallel flag" OFF)
 
 # Dependency Flags
 option(CURL_USE_FPIC "Compile libcurl with -fPIC flag" ON)
@@ -161,14 +174,15 @@ if(BUILD_DEPENDENCIES)
     message(FATAL_ERROR "Only one of ${SSL_OPTIONS} can be enabled")
   endif()
 
-  if(NOT LOCAL_OPENSSL_BUILD)
-    message(STATUS "Building non-local OpenSSL")
+  if(NOT LOCAL_CRYPTO_BUILD)
+    message(STATUS "Building crypto library from source")
     if(USE_OPENSSL)
       set(BUILD_ARGS -DBUILD_STATIC=${BUILD_STATIC}
                     -DBUILD_OPENSSL_PLATFORM=${BUILD_OPENSSL_PLATFORM})
       build_dependency(openssl ${BUILD_ARGS})
     elseif(USE_MBEDTLS)
-      set(BUILD_ARGS -DBUILD_STATIC=${BUILD_STATIC} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
+      set(BUILD_ARGS -DBUILD_STATIC=${BUILD_STATIC} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+                     -DUSE_LEGACY_MBEDTLS=${USE_LEGACY_MBEDTLS})
       build_dependency(mbedtls ${BUILD_ARGS})
     else()
       message(FATAL_ERROR "No crypto library selected.")
@@ -189,7 +203,18 @@ if(BUILD_DEPENDENCIES)
                     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                     -DUSE_OPENSSL=${USE_OPENSSL}
                     -DUSE_MBEDTLS=${USE_MBEDTLS}
+                    -DUSE_LEGACY_MBEDTLS=${USE_LEGACY_MBEDTLS}
                     -DCURL_USE_FPIC=${CURL_USE_FPIC})
+    if(USE_MBEDTLS)
+      # Hand curl the same mbedTLS the SDK links. Otherwise curl looks it up with
+      # pkg-config and can pick up a different install.
+      find_package(MbedTLS REQUIRED)
+      list(APPEND BUILD_ARGS
+                    -DMBEDTLS_INCLUDE_DIR=${MBEDTLS_INCLUDE_DIRS}
+                    -DMBEDTLS_LIBRARY=${MBEDTLS_LIBRARY}
+                    -DMBEDX509_LIBRARY=${MBEDX509_LIBRARY}
+                    -DMBEDCRYPTO_LIBRARY=${MBEDCRYPTO_LIBRARY})
+    endif()
     build_dependency(curl ${BUILD_ARGS})
 
   endif()
@@ -205,24 +230,37 @@ find_package(PkgConfig REQUIRED)
 
 ############# Check system for kvspic #############
 
-pkg_check_modules(KVSPIC libkvspicUtils)
-if(KVSPIC_FOUND)
-  set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${KVSPIC_INCLUDE_DIRS})
-  link_directories(${KVSPIC_LIBRARY_DIRS})
-else()
-  ############# fetch repos that we need do add_subdirectory ############
-  # repos that we will build using add_subdirectory will be stored in this path
-  set(DEPENDENCY_DOWNLOAD_PATH ${CMAKE_CURRENT_SOURCE_DIR}/dependency)
-  set(BUILD_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
-  if (PIC_VERSION_OVERRIDE)
-      set(BUILD_ARGS ${BUILD_ARGS} -DPIC_VERSION_OVERRIDE=${PIC_VERSION_OVERRIDE})
+# Local development override: point to your local kvspic checkout
+set(LOCAL_KVSPIC_PATH "" CACHE PATH "Path to local KVS PIC SDK (skips git fetch when set)")
+
+if(LOCAL_KVSPIC_PATH)
+  message(STATUS "Using LOCAL KVS PIC SDK at: ${LOCAL_KVSPIC_PATH}")
+  if(NOT EXISTS ${LOCAL_KVSPIC_PATH}/CMakeLists.txt)
+    message(FATAL_ERROR "LOCAL_KVSPIC_PATH does not contain a CMakeLists.txt: ${LOCAL_KVSPIC_PATH}")
   endif()
-  fetch_repo(kvspic ${BUILD_ARGS})
-  add_subdirectory("${DEPENDENCY_DOWNLOAD_PATH}/libkvspic/kvspic-src")
+  add_subdirectory(${LOCAL_KVSPIC_PATH} ${CMAKE_CURRENT_BINARY_DIR}/kvspic-build)
   file(GLOB PIC_HEADERS "${pic_project_SOURCE_DIR}/src/*/include")
   include_directories("${PIC_HEADERS}")
+else()
+  pkg_check_modules(KVSPIC libkvspicUtils)
+  if(KVSPIC_FOUND)
+    set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${KVSPIC_INCLUDE_DIRS})
+    link_directories(${KVSPIC_LIBRARY_DIRS})
+  else()
+    ############# fetch repos that we need do add_subdirectory ############
+    # repos that we will build using add_subdirectory will be stored in this path
+    set(DEPENDENCY_DOWNLOAD_PATH ${CMAKE_CURRENT_SOURCE_DIR}/dependency)
+    set(BUILD_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
+    if (PIC_VERSION_OVERRIDE)
+        set(BUILD_ARGS ${BUILD_ARGS} -DPIC_VERSION_OVERRIDE=${PIC_VERSION_OVERRIDE})
+    endif()
+    fetch_repo(kvspic ${BUILD_ARGS})
+    add_subdirectory("${DEPENDENCY_DOWNLOAD_PATH}/libkvspic/kvspic-src")
+    file(GLOB PIC_HEADERS "${pic_project_SOURCE_DIR}/src/*/include")
+    include_directories("${PIC_HEADERS}")
 
-  ############# fetch repos that we need do add_subdirectory done ############
+    ############# fetch repos that we need do add_subdirectory done ############
+  endif()
 endif()
 
 ############# Check system for kvspic done #############

@@ -484,6 +484,46 @@ TEST_F(ProducerClientFaultInjectionTest, notAuthorizedPutMediaCall)
     // NOTE: PutStream state has no limit on retries
     EXPECT_LE(SERVICE_CALL_MAX_RETRY_COUNT + 1, mCurlPutMediaCount);
 
+    // Verify streamErrorReportFn was called with the auth error
+    EXPECT_LT(0, mStreamErrorFnCount);
+    EXPECT_EQ(STATUS_SERVICE_CALL_NOT_AUTHORIZED_ERROR, mLastError);
+
+    freeStreams();
+}
+
+TEST_F(ProducerClientFaultInjectionTest, forbiddenPutMediaCall)
+{
+    createDefaultProducerClient(FALSE);
+
+    mPutMediaStatus = STATUS_NOT_IMPLEMENTED; // Non success status
+    mPutMediaCallResult = SERVICE_CALL_FORBIDDEN;
+
+    EXPECT_EQ(STATUS_SUCCESS, createTestStream(0, STREAMING_TYPE_REALTIME, 20 * HUNDREDS_OF_NANOS_IN_A_SECOND, 60 * HUNDREDS_OF_NANOS_IN_A_SECOND));
+
+    // Induce the putMedia call by putting a frame
+    Frame frame;
+    frame.version = FRAME_CURRENT_VERSION;
+    frame.duration = TEST_FRAME_DURATION;
+    frame.frameData = mFrameBuffer;
+    frame.trackId = DEFAULT_VIDEO_TRACK_ID;
+    MEMSET(frame.frameData, 0x55, mFrameSize);
+    frame.index = 0;
+    frame.decodingTs = frame.presentationTs = GETTIME();
+    frame.size = mFrameSize;
+    frame.flags = FRAME_FLAG_KEY_FRAME;
+    EXPECT_EQ(STATUS_SUCCESS, putKinesisVideoFrame(mStreams[0], &frame));
+
+    THREAD_SLEEP(2 * HUNDREDS_OF_NANOS_IN_A_SECOND);
+
+    EXPECT_EQ(0, mCurlCreateStreamCount);
+    EXPECT_EQ(1, mCurlDescribeStreamCount);
+    EXPECT_EQ(1, mCurlTagResourceCount);
+    EXPECT_EQ(1, mCurlGetDataEndpointCount);
+
+    // Verify streamErrorReportFn was called with the auth error (403 maps to same status)
+    EXPECT_LT(0, mStreamErrorFnCount);
+    EXPECT_EQ(STATUS_SERVICE_CALL_NOT_AUTHORIZED_ERROR, mLastError);
+
     freeStreams();
 }
 
