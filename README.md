@@ -48,7 +48,10 @@ If you wish to cross-compile `CC` and `CXX` are respected when building the libr
 #### CMake Arguments
 You can pass the following options to `cmake ..`.
 
-* `-DBUILD_DEPENDENCIES` -- Whether or not to build depending libraries from source
+* `-DBUILD_DEPENDENCIES` -- Build the crypto library, libcurl and googletest from source. ON by default. See [Building with dependencies off](#building-with-dependencies-off).
+* `-DUSE_OPENSSL` -- Use OpenSSL as the crypto library. ON by default.
+* `-DUSE_MBEDTLS` -- Use mbedTLS as the crypto library. OFF by default. Requires `-DUSE_OPENSSL=OFF`.
+* `-DUSE_LEGACY_MBEDTLS` -- Deprecated. Build mbedTLS 2.28.10 and libcurl 8.15.0 instead of mbedTLS 3.6.7 and libcurl 8.17.0. OFF by default. Requires `-DUSE_MBEDTLS=ON`. See [Building with legacy mbedTLS 2.x](#building-with-legacy-mbedtls-2x).
 * `-DPARALLEL_BUILD` -- Build dependencies with multiple cores. OFF by default. Disabled on Windows.
 * `-DKVS_ENABLE_VERBOSE_LOGS` -- Build with `ENTERS()` and `LEAVES()` logs enabled, which are `LOG_LEVEL_VERBOSE`. Default is OFF.
 * `-DBUILD_TEST=TRUE` -- Build unit/integration tests, may be useful for confirm support for your device. `./tst/producer_test`
@@ -59,7 +62,7 @@ You can pass the following options to `cmake ..`.
 * `-DTHREAD_SANITIZER` -- Build with ThreadSanitizer
 * `-DUNDEFINED_BEHAVIOR_SANITIZER` Build with UndefinedBehaviorSanitizer
 * `-DALIGNED_MEMORY_MODEL` Build for aligned memory model only devices. Default is OFF.
-* `-DLOCAL_OPENSSL_BUILD` Whether or not to use local OpenSSL build. Default is OFF.
+* `-DLOCAL_CRYPTO_BUILD` -- Use a pre-installed crypto library (OpenSSL or mbedTLS) instead of building it from source; libcurl is still built from source. OFF by default. See [Building with your own crypto library](#building-with-your-own-crypto-library). Replaces `-DLOCAL_OPENSSL_BUILD`, which still works but is deprecated.
 * `-DCONSTRAINED_DEVICE` -- Change thread stack size to 0.5Mb, needed for Alpine.
 * `-DAWS_KVS_USE_LEGACY_ENDPOINT_ONLY` -- Use only legacy IPV4-only endpoints (ignores env vars). Default is OFF.
 * `-DAWS_KVS_USE_DUAL_STACK_ENDPOINT_ONLY` -- Use only dual-stack endpoints (ignores env vars). Default is OFF.
@@ -77,7 +80,7 @@ export CC=/usr/bin/clang
 export CXX=/usr/bin/clang++
 cmake .. -DMEMORY_SANITIZER=TRUE
 ```
-DLOCAL_OPENSSL_BUILD requires first installing OpenSSL 1.1 (`brew install openssl@1.1` for Mac) and then running `export PKG_CONFIG_PATH="<YOUR-PATH>/openssl@1.1/lib/pkgconfig"` (your path can be printed to terminal using `which openssl` on Linux/Mac).
+`-DLOCAL_CRYPTO_BUILD` requires the crypto library to be installed first. See [Building with your own crypto library](#building-with-your-own-crypto-library).
 
 
 DMEMORY_SANITIZER, DTHREAD_SANITIZER etc. flags works only with clang compiler 
@@ -93,6 +96,103 @@ cmake .. -DMEMORY_SANITIZER=TRUE
 To build the library run make in the build directory you executed CMake.
 
 `make`
+
+### Bundled dependency versions
+
+With `-DBUILD_DEPENDENCIES=ON` (the default), the SDK downloads and builds these versions. They are pinned in [CMake/Dependencies](CMake/Dependencies).
+
+| Library | Version | When |
+| --- | --- | --- |
+| OpenSSL | 1.1.1t | default |
+| mbedTLS | 3.6.7 | `-DUSE_MBEDTLS=ON` |
+| mbedTLS | 2.28.10 | `-DUSE_MBEDTLS=ON -DUSE_LEGACY_MBEDTLS=ON` (deprecated) |
+| libcurl | 8.17.0 | always, except with `-DUSE_LEGACY_MBEDTLS=ON` |
+| libcurl | 8.15.0 | `-DUSE_LEGACY_MBEDTLS=ON` (deprecated) |
+| googletest | 1.12.1 | `-DBUILD_TEST=ON` |
+
+Amazon Kinesis Video Streams PIC is fetched from GitHub in both modes, unless `libkvspicUtils` is installed and visible to `pkg-config`, or `-DLOCAL_KVSPIC_PATH` is set. Its version is set in `CMake/Dependencies/libkvspic-CMakeLists.txt` and can be changed with `-DPIC_VERSION_OVERRIDE`.
+
+### Dependency requirements
+
+These apply when the SDK links against system-installed libraries instead of building them.
+
+* `libcurl`: `>= 7.55.0`, built against the same crypto library you select
+* `libopenssl`: `1.1.1x` or `>= 3.0.0`
+* `libmbedtls`: `>= 2.16.0` and `< 4.0.0`
+* With mbedTLS 2.x, `libcurl` must be `<= 8.15.0`. libcurl 8.16.0 and newer require mbedTLS 3.2.0 or newer. libcurl 8.15.0 does not build against mbedTLS 2.16.x; it is tested with mbedTLS 2.28.10.
+
+> [!NOTE]
+> mbedTLS 2.x must not be built with `MBEDTLS_DEPRECATED_REMOVED`. The SDK calls `mbedtls_sha256()`, which mbedTLS 2.x marks as deprecated.
+
+### Building with dependencies off
+
+Install the dependencies with your package manager.
+
+On Ubuntu:
+`sudo apt-get install pkg-config libssl-dev libcurl4-openssl-dev`
+
+To use OpenSSL:
+```shell
+cmake .. -DBUILD_DEPENDENCIES=OFF
+```
+
+To use mbedTLS:
+```shell
+cmake .. -DBUILD_DEPENDENCIES=OFF -DUSE_OPENSSL=OFF -DUSE_MBEDTLS=ON
+```
+
+The SDK finds the crypto library with CMake (`find_package`) and libcurl with `pkg-config`. If they are installed in a non-standard location, set `CMAKE_PREFIX_PATH` and `PKG_CONFIG_PATH`.
+
+> **Note:** Check the [dependency requirements](#dependency-requirements) before using system libraries. The build does not check versions. If your system libraries do not meet them, let the SDK build the dependencies instead.
+
+> [!CAUTION]
+> System libcurl packages (apt, brew, etc.) are typically built against OpenSSL. If you build the SDK with `-DUSE_MBEDTLS=ON` against such a libcurl, the build succeeds but both libraries are loaded: TLS goes through OpenSSL while request signing uses mbedTLS. For a pure mbedTLS build, use a libcurl that you built against the same mbedTLS, or let the SDK build libcurl (see [Building with your own crypto library](#building-with-your-own-crypto-library)).
+
+> [!CAUTION]
+> `brew install mbedtls` currently installs mbedTLS 4.x, which the SDK does not support. mbedTLS 4 moved the hashing APIs the SDK uses into TF-PSA-Crypto.
+
+> [!TIP]
+> If you are unsure, let the SDK build the dependencies using `-DBUILD_DEPENDENCIES=ON`.
+
+### Building with your own crypto library
+
+To use a pre-installed OpenSSL or mbedTLS but still have the SDK build libcurl against it, keep `-DBUILD_DEPENDENCIES=ON` and add `-DLOCAL_CRYPTO_BUILD=ON`.
+
+OpenSSL 3.x on macOS:
+```shell
+brew install openssl@3
+export OPENSSL_ROOT_DIR=$(brew --prefix openssl@3)
+export PKG_CONFIG_PATH="$OPENSSL_ROOT_DIR/lib/pkgconfig:$PKG_CONFIG_PATH"
+cmake .. -DLOCAL_CRYPTO_BUILD=ON
+```
+
+mbedTLS:
+```shell
+cmake .. -DLOCAL_CRYPTO_BUILD=ON -DUSE_OPENSSL=OFF -DUSE_MBEDTLS=ON -DCMAKE_PREFIX_PATH=<mbedtls-install-prefix>
+```
+
+> [!TIP]
+> The SDK passes the mbedTLS it found to the bundled libcurl, so both link the same copy even if another mbedTLS (for example from Homebrew) is installed. To confirm, check that `libcurl` and `libcproducer` list the same mbedTLS with `ldd` (Linux) or `otool -L` (macOS).
+
+> [!CAUTION]
+> The bundled libcurl 8.17.0 requires mbedTLS 3.2.0 or newer. With an older mbedTLS, the build stops at libcurl's configure step with `mbedTLS v3.2.0 or newer is required.` Use `-DBUILD_DEPENDENCIES=OFF` with your own libcurl if you need to stay on mbedTLS 2.x, or see [Building with legacy mbedTLS 2.x](#building-with-legacy-mbedtls-2x).
+
+> [!NOTE]
+> `-DLOCAL_CRYPTO_BUILD` replaces `-DLOCAL_OPENSSL_BUILD`. The old name still works and prints a deprecation warning.
+
+### Building with legacy mbedTLS 2.x
+
+If you cannot move to mbedTLS 3.x yet, `-DUSE_LEGACY_MBEDTLS=ON` builds mbedTLS 2.28.10 with libcurl 8.15.0, the last libcurl release that supports mbedTLS 2.x.
+
+```shell
+cmake .. -DUSE_OPENSSL=OFF -DUSE_MBEDTLS=ON -DUSE_LEGACY_MBEDTLS=ON
+```
+
+> [!WARNING]
+> This option is deprecated and will be removed in a future release. mbedTLS 2.28 is end-of-life and no longer receives security fixes, and libcurl 8.15.0 does not receive the fixes in later libcurl releases. Use it only as a migration aid.
+
+> [!CAUTION]
+> Delete the `open-source` folder when switching this option on or off. The SDK reuses dependencies already built in `open-source` and does not rebuild them when their version changes.
 
 ### Run samples
 To run the samples:
@@ -230,7 +330,7 @@ With 2, 3, and 4, the endpoint will be constructed based on the region provided 
 
 ### Debug Build Issues
 
-* When building OpenSSL during `cmake ..`, if you encounter an architecture error such as `ld: symbol(s) not found for architecture i386`, building with a local OpenSSL build may help. First install OpenSSL 1.1 (for Mac: `brew install openssl@1.1`). Next set `export PKG_CONFIG_PATH="<YOUR-PATH>/openssl@1.1/lib/pkgconfig"` (your path can be printed to terminal using `which openssl` on Linux/Mac). Now set the following flag to ON when building: `cmake .. -DLOCAL_OPENSSL_BUILD=ON`. If there are still errors regarding locating the local OpenSSL library:
+* When building OpenSSL during `cmake ..`, if you encounter an architecture error such as `ld: symbol(s) not found for architecture i386`, building with a local OpenSSL build may help. First install OpenSSL (for Mac: `brew install openssl@3`). Next set `export PKG_CONFIG_PATH="<YOUR-PATH>/openssl@3/lib/pkgconfig"` (on Mac, `brew --prefix openssl@3` prints the path). Now set the following flag to ON when building: `cmake .. -DLOCAL_CRYPTO_BUILD=ON`. If there are still errors regarding locating the local OpenSSL library:
     * The following environment variables may need to be set to export:
         `export LDFLAGS="-L<YOUR-PATH>/openssl@1.1/lib"` and `export CPPFLAGS="-I<YOUR-PATH>/openssl@1.1/include"`
     * The path to OpenSSL’s root directory may need to be specified when running `cmake`:
