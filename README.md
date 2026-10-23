@@ -51,6 +51,7 @@ You can pass the following options to `cmake ..`.
 * `-DBUILD_DEPENDENCIES` -- Build the crypto library, libcurl and googletest from source. ON by default. See [Building with dependencies off](#building-with-dependencies-off).
 * `-DUSE_OPENSSL` -- Use OpenSSL as the crypto library. ON by default.
 * `-DUSE_MBEDTLS` -- Use mbedTLS as the crypto library. OFF by default. Requires `-DUSE_OPENSSL=OFF`.
+* `-DUSE_LEGACY_MBEDTLS` -- Deprecated. Build mbedTLS 2.28.10 and libcurl 8.15.0 instead of mbedTLS 3.6.7 and libcurl 8.17.0. OFF by default. Requires `-DUSE_MBEDTLS=ON`. See [Building with legacy mbedTLS 2.x](#building-with-legacy-mbedtls-2x).
 * `-DPARALLEL_BUILD` -- Build dependencies with multiple cores. OFF by default. Disabled on Windows.
 * `-DKVS_ENABLE_VERBOSE_LOGS` -- Build with `ENTERS()` and `LEAVES()` logs enabled, which are `LOG_LEVEL_VERBOSE`. Default is OFF.
 * `-DBUILD_TEST=TRUE` -- Build unit/integration tests, may be useful for confirm support for your device. `./tst/producer_test`
@@ -104,7 +105,9 @@ With `-DBUILD_DEPENDENCIES=ON` (the default), the SDK downloads and builds these
 | --- | --- | --- |
 | OpenSSL | 1.1.1t | default |
 | mbedTLS | 3.6.7 | `-DUSE_MBEDTLS=ON` |
-| libcurl | 8.17.0 | always |
+| mbedTLS | 2.28.10 | `-DUSE_MBEDTLS=ON -DUSE_LEGACY_MBEDTLS=ON` (deprecated) |
+| libcurl | 8.17.0 | always, except with `-DUSE_LEGACY_MBEDTLS=ON` |
+| libcurl | 8.15.0 | `-DUSE_LEGACY_MBEDTLS=ON` (deprecated) |
 | googletest | 1.12.1 | `-DBUILD_TEST=ON` |
 
 Amazon Kinesis Video Streams PIC is fetched from GitHub in both modes, unless `libkvspicUtils` is installed and visible to `pkg-config`, or `-DLOCAL_KVSPIC_PATH` is set. Its version is set in `CMake/Dependencies/libkvspic-CMakeLists.txt` and can be changed with `-DPIC_VERSION_OVERRIDE`.
@@ -116,6 +119,7 @@ These apply when the SDK links against system-installed libraries instead of bui
 * `libcurl`: `>= 7.55.0`, built against the same crypto library you select
 * `libopenssl`: `1.1.1x` or `>= 3.0.0`
 * `libmbedtls`: `>= 2.16.0` and `< 4.0.0`
+* With mbedTLS 2.x, `libcurl` must be `<= 8.15.0`. libcurl 8.16.0 and newer require mbedTLS 3.2.0 or newer. libcurl 8.15.0 does not build against mbedTLS 2.16.x; it is tested with mbedTLS 2.28.10.
 
 > [!NOTE]
 > mbedTLS 2.x must not be built with `MBEDTLS_DEPRECATED_REMOVED`. The SDK calls `mbedtls_sha256()`, which mbedTLS 2.x marks as deprecated.
@@ -171,10 +175,24 @@ cmake .. -DLOCAL_CRYPTO_BUILD=ON -DUSE_OPENSSL=OFF -DUSE_MBEDTLS=ON -DCMAKE_PREF
 > The SDK passes the mbedTLS it found to the bundled libcurl, so both link the same copy even if another mbedTLS (for example from Homebrew) is installed. To confirm, check that `libcurl` and `libcproducer` list the same mbedTLS with `ldd` (Linux) or `otool -L` (macOS).
 
 > [!CAUTION]
-> The bundled libcurl 8.17.0 requires mbedTLS 3.2.0 or newer. With an older mbedTLS, the build stops at libcurl's configure step with `mbedTLS v3.2.0 or newer is required.` Use `-DBUILD_DEPENDENCIES=OFF` with your own libcurl if you need to stay on mbedTLS 2.x.
+> The bundled libcurl 8.17.0 requires mbedTLS 3.2.0 or newer. With an older mbedTLS, the build stops at libcurl's configure step with `mbedTLS v3.2.0 or newer is required.` Use `-DBUILD_DEPENDENCIES=OFF` with your own libcurl if you need to stay on mbedTLS 2.x, or see [Building with legacy mbedTLS 2.x](#building-with-legacy-mbedtls-2x).
 
 > [!NOTE]
 > `-DLOCAL_CRYPTO_BUILD` replaces `-DLOCAL_OPENSSL_BUILD`. The old name still works and prints a deprecation warning.
+
+### Building with legacy mbedTLS 2.x
+
+If you cannot move to mbedTLS 3.x yet, `-DUSE_LEGACY_MBEDTLS=ON` builds mbedTLS 2.28.10 with libcurl 8.15.0, the last libcurl release that supports mbedTLS 2.x.
+
+```shell
+cmake .. -DUSE_OPENSSL=OFF -DUSE_MBEDTLS=ON -DUSE_LEGACY_MBEDTLS=ON
+```
+
+> [!WARNING]
+> This option is deprecated and will be removed in a future release. mbedTLS 2.28 is end-of-life and no longer receives security fixes, and libcurl 8.15.0 does not receive the fixes in later libcurl releases. Use it only as a migration aid.
+
+> [!CAUTION]
+> Delete the `open-source` folder when switching this option on or off. The SDK reuses dependencies already built in `open-source` and does not rebuild them when their version changes.
 
 ### Run samples
 To run the samples:

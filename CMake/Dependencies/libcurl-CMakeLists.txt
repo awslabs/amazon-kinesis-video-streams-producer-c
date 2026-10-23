@@ -98,9 +98,17 @@ endif()
 # NOTE: curl 8.18.0 and later require OpenSSL 3.0 (lib/vtls/openssl.c). This project
 # pins OpenSSL 1.1.1 in libopenssl-CMakeLists.txt, so 8.17.0 is the highest usable
 # version until that pin moves. Do not bump past 8.17.0 in isolation.
+# USE_LEGACY_MBEDTLS (deprecated, mbedTLS builds only) pins 8.15.0 instead: 8.16.0 raised
+# curl's mbedTLS minimum to 3.2.0, so 8.15.0 is the last release that builds on mbedTLS 2.x.
+if (USE_LEGACY_MBEDTLS)
+    set(CURL_GIT_TAG curl-8_15_0)
+else()
+    set(CURL_GIT_TAG curl-8_17_0)
+endif()
+
 ExternalProject_Add(project_libcurl
     GIT_REPOSITORY    https://github.com/curl/curl.git
-    GIT_TAG           curl-8_17_0
+    GIT_TAG           ${CURL_GIT_TAG}
     GIT_SHALLOW       TRUE
     GIT_PROGRESS      TRUE
     PREFIX            ${CMAKE_CURRENT_BINARY_DIR}/build
