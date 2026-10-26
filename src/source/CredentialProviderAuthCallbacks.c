@@ -119,6 +119,9 @@ STATUS getStreamingTokenCredentialProviderFunc(UINT64 customData, PCHAR streamNa
 
     CHK(pCredentialProviderAuthCallbacks != NULL, STATUS_NULL_ARG);
 
+    // Respect the callAfter to honor backoff wait time from the state machine retry strategy
+    honorCallAfterWaitTime(pCredentialProviderAuthCallbacks->pCallbacksProvider, pServiceCallContext);
+
     pCredentialProvider = (PAwsCredentialProvider) pCredentialProviderAuthCallbacks->pCredentialProvider;
     CHK_STATUS(pCredentialProvider->getCredentialsFn(pCredentialProvider, &pAwsCredentials));
 

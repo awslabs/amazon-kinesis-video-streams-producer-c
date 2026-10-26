@@ -177,6 +177,9 @@ STATUS getStreamingTokenIotFunc(UINT64 customData, PCHAR streamName, STREAM_ACCE
 
     CHK(pIotAuthCallbacks != NULL && pServiceCallContext != NULL, STATUS_NULL_ARG);
 
+    // Respect the callAfter to honor backoff wait time from the state machine retry strategy
+    honorCallAfterWaitTime(pIotAuthCallbacks->pCallbacksProvider, pServiceCallContext);
+
     pCallbacksProvider = pIotAuthCallbacks->pCallbacksProvider;
     pCredentialProvider = (PAwsCredentialProvider) pIotAuthCallbacks->pCredentialProvider;
     CHK_STATUS(pCredentialProvider->getCredentialsFn(pCredentialProvider, &pAwsCredentials));
