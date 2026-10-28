@@ -585,8 +585,18 @@ jobs:
           ./tst/scripts/check_crypto_backend.sh aws-lc ./build ./open-source/lib
 
   mac-aws-lc:
-    runs-on: macos-15
-    name: Apple Silicon Mac-Clang-aws-lc
+    # Same cpu matrix as mac-os-builds: the AWS-LC build has x86_64 and arm64
+    # assembly sets, so both Mac architectures are compiled and gated offline.
+    strategy:
+      matrix:
+        cpu:
+          - name: Intel
+            image: macos-15-intel
+          - name: Apple Silicon
+            image: macos-15
+      fail-fast: false
+    runs-on: ${{ matrix.cpu.image }}
+    name: ${{ matrix.cpu.name }} Mac-Clang-aws-lc
     permissions:
       contents: read
     env:
