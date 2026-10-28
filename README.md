@@ -108,8 +108,11 @@ With `-DBUILD_DEPENDENCIES=ON` (the default), the SDK downloads and builds these
 | OpenSSL | 1.1.1t | default |
 | mbedTLS | 3.6.7 | `-DUSE_MBEDTLS=ON` |
 | mbedTLS | 2.28.10 | `-DUSE_MBEDTLS=ON -DUSE_LEGACY_MBEDTLS=ON` (deprecated) |
-| libcurl | 8.17.0 | always, except with `-DUSE_LEGACY_MBEDTLS=ON` |
+| AWS-LC | 5.8.0 | `-DUSE_AWS_LC=ON` |
+| AWS-LC-FIPS | 3.3.0 | `-DUSE_AWS_LC_FIPS=ON` |
+| libcurl | 8.17.0 | always, except with `-DUSE_LEGACY_MBEDTLS=ON` or an AWS-LC backend |
 | libcurl | 8.15.0 | `-DUSE_LEGACY_MBEDTLS=ON` (deprecated) |
+| libcurl | 8.22.0 | `-DUSE_AWS_LC=ON` or `-DUSE_AWS_LC_FIPS=ON` |
 | googletest | 1.12.1 | `-DBUILD_TEST=ON` |
 
 Amazon Kinesis Video Streams PIC is fetched from GitHub in both modes, unless `libkvspicUtils` is installed and visible to `pkg-config`, or `-DLOCAL_KVSPIC_PATH` is set. Its version is set in `CMake/Dependencies/libkvspic-CMakeLists.txt` and can be changed with `-DPIC_VERSION_OVERRIDE`.
