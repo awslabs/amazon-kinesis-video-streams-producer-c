@@ -349,8 +349,18 @@ jobs:
           timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
 
   linux-gcc-aws-lc:
+    needs: ecr-login
     strategy:
       matrix:
+        # Two compiler generations for the AWS-LC build: 22.04 (gcc 11) and
+        # 24.04 (gcc 13). The default-backend ubuntu-gcc job above already covers
+        # both; before this, gcc 11 was the only gcc that built AWS-LC's x86-64
+        # assembly and curl from source.
+        container:
+          - name: Ubuntu 22.04
+            image: public.ecr.aws/ubuntu/ubuntu:22.04_stable
+          - name: Ubuntu 24.04
+            image: public.ecr.aws/ubuntu/ubuntu:24.04_stable
         build-type:
           - name: shared
             cmake-args: ""
@@ -360,9 +370,11 @@ jobs:
 
     runs-on: ubuntu-latest
     container:
-      image: public.ecr.aws/ubuntu/ubuntu:22.04_stable
+      image: ${{ matrix.container.image }}
+      # Authenticated pull; see ecr-public-login.yml.
+      credentials: ${{ fromJSON(needs.ecr-login.outputs.attempt == github.run_attempt && needs.ecr-login.outputs.credentials || '{}') }}
 
-    name: Ubuntu 22.04-gcc-aws-lc-${{ matrix.build-type.name }}
+    name: ${{ matrix.container.name }}-gcc-aws-lc-${{ matrix.build-type.name }}
 
     env:
       DEBIAN_FRONTEND: noninteractive

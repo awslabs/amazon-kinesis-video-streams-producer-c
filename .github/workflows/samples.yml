@@ -274,6 +274,7 @@ jobs:
 
   sample-check-aws-lc:
     name: ubuntu-22.04 - ${{ matrix.sample-executable.name }} (AWS-LC)
+    needs: ecr-login
     strategy:
       matrix:
         sample-executable:
@@ -283,7 +284,10 @@ jobs:
       fail-fast: false
 
     runs-on: ubuntu-latest
-    container: public.ecr.aws/ubuntu/ubuntu:22.04_stable
+    container:
+      image: public.ecr.aws/ubuntu/ubuntu:22.04_stable
+      # Authenticated pull; see ecr-public-login.yml.
+      credentials: ${{ fromJSON(needs.ecr-login.outputs.attempt == github.run_attempt && needs.ecr-login.outputs.credentials || '{}') }}
 
     env:
       AWS_KVS_LOG_LEVEL: 2
