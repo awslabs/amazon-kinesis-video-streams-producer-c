@@ -14,6 +14,13 @@ env:
   AWS_KVS_LOG_LEVEL: 7
 
 jobs:
+  ecr-login:
+    uses: ./.github/workflows/ecr-public-login.yml
+    permissions:
+      id-token: write
+      contents: read
+    secrets: inherit
+
   mac-os-builds:
     strategy:
       matrix:
@@ -251,6 +258,7 @@ jobs:
   #        timeout --signal=SIGABRT 150m ./tst/producer_test --gtest_break_on_failure
 
   ubuntu-gcc:
+    needs: ecr-login
     strategy:
       matrix:
         container:
@@ -270,6 +278,8 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ${{ matrix.container.image }}
+      # Authenticated pull; see ecr-public-login.yml.
+      credentials: ${{ fromJSON(needs.ecr-login.outputs.attempt == github.run_attempt && needs.ecr-login.outputs.credentials || '{}') }}
 
     name: ${{ matrix.container.name }}-gcc-${{ matrix.build-configuration.name }}
 
@@ -335,9 +345,12 @@ jobs:
 
   ubuntu-mbedtls:
     # Builds the mbedTLS crypto backend with bundled dependencies
+    needs: ecr-login
     runs-on: ubuntu-latest
     container:
       image: public.ecr.aws/ubuntu/ubuntu:22.04_stable
+      # Authenticated pull; see ecr-public-login.yml.
+      credentials: ${{ fromJSON(needs.ecr-login.outputs.attempt == github.run_attempt && needs.ecr-login.outputs.credentials || '{}') }}
 
     name: Ubuntu 22.04-gcc-mbedtls
 
@@ -498,9 +511,12 @@ jobs:
           make
 
   linux-thread-size-check:
+    needs: ecr-login
     runs-on: ubuntu-latest
     container:
       image: public.ecr.aws/ubuntu/ubuntu:22.04_stable
+      # Authenticated pull; see ecr-public-login.yml.
+      credentials: ${{ fromJSON(needs.ecr-login.outputs.attempt == github.run_attempt && needs.ecr-login.outputs.credentials || '{}') }}
 
     env:
       DEBIAN_FRONTEND: noninteractive
@@ -552,8 +568,12 @@ jobs:
         shell: bash
 
   cmake-flags-test:
+    needs: ecr-login
     runs-on: ubuntu-22.04
-    container: public.ecr.aws/ubuntu/ubuntu:22.04_stable
+    container:
+      image: public.ecr.aws/ubuntu/ubuntu:22.04_stable
+      # Authenticated pull; see ecr-public-login.yml.
+      credentials: ${{ fromJSON(needs.ecr-login.outputs.attempt == github.run_attempt && needs.ecr-login.outputs.credentials || '{}') }}
 
     permissions:
       contents: read
