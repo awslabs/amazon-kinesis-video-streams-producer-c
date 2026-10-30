@@ -17,6 +17,8 @@ option(BUILD_STATIC "Static build" OFF)
 option(BUILD_DEPENDENCIES "Whether or not to build depending libraries from source" ON)
 option(USE_OPENSSL "Use openssl as crypto library" ON)
 option(USE_MBEDTLS "Use mbedtls as crypto library" OFF)
+option(USE_AWS_LC "Use AWS-LC as crypto library (OpenSSL 1.1.1 API compatible, post-quantum key exchange)" OFF)
+option(USE_AWS_LC_FIPS "Use the AWS-LC-FIPS release line (FIPS 140-3 module). Implies USE_AWS_LC behavior. Linux only for static builds; requires Go." OFF)
 option(USE_LEGACY_MBEDTLS "Deprecated: build mbedTLS 2.28 and libcurl 8.15.0 instead of mbedTLS 3.6 and libcurl 8.17.0" OFF)
 if(USE_LEGACY_MBEDTLS)
   if(NOT USE_MBEDTLS)
@@ -59,6 +61,23 @@ option(THREAD_SANITIZER "Build with ThreadSanitizer." OFF)
 option(UNDEFINED_BEHAVIOR_SANITIZER "Build with UndefinedBehaviorSanitizer." OFF)
 option(ALIGNED_MEMORY_MODEL "Aligned memory model ONLY." OFF)
 option(SET_SSL_CALLBACKS "Set SSL thread and lock callbacks." OFF)
+
+# Dependency version overrides. Empty means "use the pinned tag" from
+# CMake/Dependencies/lib*-CMakeLists.txt. Used by the weekly latest-dependency
+# CI build to detect upstream breakage early; not intended for production builds.
+set(AWS_LC_GIT_TAG "" CACHE STRING "Override the pinned AWS-LC git tag (empty = pinned)")
+set(CURL_GIT_TAG "" CACHE STRING "Override the pinned libcurl git tag (empty = pinned)")
+
+# Exactly one crypto backend must be selected. Checked here, before the
+# dependency build, so the check also applies with -DBUILD_DEPENDENCIES=OFF.
+set(SSL_OPTIONS USE_OPENSSL USE_MBEDTLS USE_AWS_LC USE_AWS_LC_FIPS)
+count_true(ENABLED_SSL_OPTION_COUNT
+  ${SSL_OPTIONS})
+if(ENABLED_SSL_OPTION_COUNT GREATER "1")
+  message(FATAL_ERROR "Only one of ${SSL_OPTIONS} can be enabled")
+elseif(ENABLED_SSL_OPTION_COUNT EQUAL "0")
+  message(FATAL_ERROR "No crypto library selected. Enable one of ${SSL_OPTIONS}")
+endif()
 
 set(TYPE_OF_LIB SHARED)
 if (BUILD_STATIC)
@@ -166,14 +185,6 @@ if(BUILD_DEPENDENCIES)
 
   message(STATUS "Begin building dependencies.")
 
-  set(SSL_OPTIONS USE_OPENSSL USE_MBEDTLS)
-  count_true(ENABLED_SSL_OPTION_COUNT
-    ${SSL_OPTIONS})
-
-  if(ENABLED_SSL_OPTION_COUNT GREATER "1")
-    message(FATAL_ERROR "Only one of ${SSL_OPTIONS} can be enabled")
-  endif()
-
   if(NOT LOCAL_CRYPTO_BUILD)
     message(STATUS "Building crypto library from source")
     if(USE_OPENSSL)
@@ -184,6 +195,19 @@ if(BUILD_DEPENDENCIES)
       set(BUILD_ARGS -DBUILD_STATIC=${BUILD_STATIC} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                      -DUSE_LEGACY_MBEDTLS=${USE_LEGACY_MBEDTLS})
       build_dependency(mbedtls ${BUILD_ARGS})
+    elseif(USE_AWS_LC OR USE_AWS_LC_FIPS)
+      if(USE_AWS_LC_FIPS)
+        if(NOT (UNIX AND NOT APPLE))
+          message(WARNING "AWS-LC-FIPS static builds are only supported on Linux (the FIPS integrity machinery is ELF-specific). This build will likely fail on this platform.")
+        endif()
+        find_program(GO_EXECUTABLE go)
+        if(NOT GO_EXECUTABLE)
+          message(FATAL_ERROR "The AWS-LC-FIPS build requires the Go toolchain (delocate/inject_hash). Install Go or use USE_AWS_LC instead.")
+        endif()
+      endif()
+      set(BUILD_ARGS -DBUILD_STATIC=${BUILD_STATIC} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DUSE_AWS_LC_FIPS=${USE_AWS_LC_FIPS}
+                    -DAWS_LC_GIT_TAG=${AWS_LC_GIT_TAG})
+      build_dependency(awslc ${BUILD_ARGS})
     else()
       message(FATAL_ERROR "No crypto library selected.")
     endif()
@@ -203,6 +227,9 @@ if(BUILD_DEPENDENCIES)
                     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                     -DUSE_OPENSSL=${USE_OPENSSL}
                     -DUSE_MBEDTLS=${USE_MBEDTLS}
+                    -DUSE_AWS_LC=${USE_AWS_LC}
+                    -DUSE_AWS_LC_FIPS=${USE_AWS_LC_FIPS}
+                    -DCURL_GIT_TAG=${CURL_GIT_TAG}
                     -DUSE_LEGACY_MBEDTLS=${USE_LEGACY_MBEDTLS}
                     -DCURL_USE_FPIC=${CURL_USE_FPIC})
     if(USE_MBEDTLS)
@@ -271,12 +298,38 @@ find_package(Threads)
 
 set(OPEN_SRC_INCLUDE_DIRS ${LIBKVSPIC_INCLUDE_DIRS})
 
-if(USE_OPENSSL)
+if(USE_OPENSSL OR USE_AWS_LC OR USE_AWS_LC_FIPS)
+  # AWS-LC installs the same openssl/*.h headers and libssl/libcrypto names, so
+  # CMake's FindOpenSSL module locates it as well.
+  if(USE_AWS_LC OR USE_AWS_LC_FIPS)
+    set(OPENSSL_ROOT_DIR ${OPEN_SRC_INSTALL_PREFIX})
+  endif()
   find_package(OpenSSL)
   if(NOT OPENSSL_FOUND AND NOT BUILD_DEPENDENCIES)
     message(FATAL_ERROR "OpenSSL is not found. Make sure to export PKG_CONFIG_PATH to where OpenSSL's pc file is")
   endif()
   set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR})
+  if(USE_AWS_LC OR USE_AWS_LC_FIPS)
+    # FindOpenSSL accepts any OpenSSL-compatible library (and falls back to system paths),
+    # so make sure the headers found are really AWS-LC. Re-checked on every configure so a
+    # corrected OPENSSL_ROOT_DIR / OPEN_SRC_INSTALL_PREFIX is picked up.
+    include(CheckSymbolExists)
+    unset(KVS_FOUND_AWS_LC CACHE)
+    set(KVS_SAVED_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES})
+    set(CMAKE_REQUIRED_INCLUDES ${OPENSSL_INCLUDE_DIR})
+    check_symbol_exists(OPENSSL_IS_AWSLC "openssl/base.h" KVS_FOUND_AWS_LC)
+    set(CMAKE_REQUIRED_INCLUDES ${KVS_SAVED_REQUIRED_INCLUDES})
+    if(NOT KVS_FOUND_AWS_LC)
+      set(KVS_WRONG_CRYPTO_LIBRARY ${OPENSSL_CRYPTO_LIBRARY})
+      # Drop FindOpenSSL's cached results so the next configure re-searches with a corrected prefix
+      unset(OPENSSL_INCLUDE_DIR CACHE)
+      unset(OPENSSL_CRYPTO_LIBRARY CACHE)
+      unset(OPENSSL_SSL_LIBRARY CACHE)
+      message(FATAL_ERROR "USE_AWS_LC/USE_AWS_LC_FIPS is set, but the OpenSSL-compatible library found (${KVS_WRONG_CRYPTO_LIBRARY}) is not AWS-LC. "
+                          "Build dependencies (-DBUILD_DEPENDENCIES=ON) or point OPEN_SRC_INSTALL_PREFIX at an AWS-LC install.")
+    endif()
+    message(STATUS "Crypto backend: AWS-LC at ${OPENSSL_CRYPTO_LIBRARY}")
+  endif()
 elseif(USE_MBEDTLS)
   find_package(MbedTLS REQUIRED)
   set(OPEN_SRC_INCLUDE_DIRS ${OPEN_SRC_INCLUDE_DIRS} ${MBEDTLS_INCLUDE_DIRS})
@@ -385,6 +438,10 @@ if (USE_MBEDTLS)
     set(PRODUCER_CRYPTO_LIBRARY
             MbedTLS
             MbedCrypto)
+elseif (USE_AWS_LC OR USE_AWS_LC_FIPS)
+    # Same link targets as OpenSSL (FindOpenSSL resolves them to AWS-LC's libs).
+    # The FIPS variant shares the KVS_USE_AWS_LC code path (identical API).
+    set(CPRODUCER_COMMON_TLS_OPTION KVS_USE_AWS_LC)
 endif()
 
 install(
@@ -435,6 +492,15 @@ if(BUILD_COMMON_CURL)
       if(ZLIB_FOUND)
         list(APPEND CURL_LIBRARIES z)
       endif()
+      # Static libcurl needs its private link dependencies too. On macOS,
+      # curl >= 8.x pulls in SystemConfiguration/CoreFoundation for proxy
+      # discovery (listed in libcurl.pc Libs.private, which pkg_check_modules
+      # splits awkwardly for -framework pairs, so add them explicitly).
+      if(APPLE)
+        list(APPEND CURL_LIBRARIES "-framework SystemConfiguration" "-framework CoreFoundation" "-framework CoreServices")
+      elseif(CURL_STATIC_LIBRARIES)
+        list(APPEND CURL_LIBRARIES ${CURL_STATIC_LIBRARIES})
+      endif()
     endif()
 
     if (WIN32)
@@ -473,6 +539,9 @@ if(BUILD_COMMON_CURL)
       set_target_properties(cproducer PROPERTIES VERSION ${KINESIS_VIDEO_PRODUCER_C_VERSION} SOVERSION ${KINESIS_VIDEO_PRODUCER_C_MAJOR_VERSION})
     endif()
     target_link_libraries(cproducer PUBLIC kvsCommonCurl kvspic)
+    # cproducer's own sources (Response.c) also branch on the crypto backend
+    # (e.g. the TLS key exchange groups callback), so it needs the same TLS define.
+    target_compile_definitions(cproducer PRIVATE ${CPRODUCER_COMMON_TLS_OPTION})
 
     install(
       TARGETS cproducer
@@ -494,6 +563,12 @@ if(BUILD_COMMON_CURL)
 
     add_executable(kvsAudioOnlyStreamingSample ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsAudioOnlyStreamingSample.c ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/Common.c)
     target_link_libraries(kvsAudioOnlyStreamingSample cproducer)
+
+    if(USE_AWS_LC OR USE_AWS_LC_FIPS)
+      # Post-quantum key exchange probe / silent-fallback regression check
+      add_executable(kvsTlsKeyExchangeProbe ${KINESIS_VIDEO_PRODUCER_C_SRC}/samples/KvsTlsKeyExchangeProbe.c)
+      target_link_libraries(kvsTlsKeyExchangeProbe kvsCommonCurl)
+    endif()
 
     if (BUILD_TEST)
         add_subdirectory(tst)
