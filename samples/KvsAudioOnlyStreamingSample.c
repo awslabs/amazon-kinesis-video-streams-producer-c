@@ -94,7 +94,7 @@ INT32 main(INT32 argc, CHAR* argv[])
     CLIENT_HANDLE clientHandle = INVALID_CLIENT_HANDLE_VALUE;
     STREAM_HANDLE streamHandle = INVALID_STREAM_HANDLE_VALUE;
     STATUS retStatus = STATUS_SUCCESS;
-    PCHAR accessKey = NULL, secretKey = NULL, sessionToken = NULL, streamName = NULL, region = NULL, cacertPath = NULL;
+    PCHAR streamName = NULL, region = NULL, cacertPath = NULL;
     UINT64 streamStopTime, streamingDuration = DEFAULT_STREAM_DURATION, fileSize = 0;
     TID audioSendTid;
     SampleCustomData data;
@@ -124,11 +124,6 @@ INT32 main(INT32 argc, CHAR* argv[])
                argv[0]);
         CHK(FALSE, STATUS_INVALID_ARG);
     }
-    if ((accessKey = GETENV(ACCESS_KEY_ENV_VAR)) == NULL || (secretKey = GETENV(SECRET_KEY_ENV_VAR)) == NULL) {
-        printf("Error missing credentials\n");
-        CHK(FALSE, STATUS_INVALID_ARG);
-    }
-    sessionToken = GETENV(SESSION_TOKEN_ENV_VAR);
 #endif
 
     if (argc >= 5) {
@@ -158,7 +153,6 @@ INT32 main(INT32 argc, CHAR* argv[])
     printf("Done loading audio frames.\n");
 
     cacertPath = GETENV(CACERT_PATH_ENV_VAR);
-    sessionToken = GETENV(SESSION_TOKEN_ENV_VAR);
 
 #ifdef IOT_CORE_ENABLE_CREDENTIALS
     streamName = pIotCoreThingName;
@@ -226,8 +220,7 @@ INT32 main(INT32 argc, CHAR* argv[])
                                                                                    cacertPath, pIotCoreRoleAlias, pIotCoreThingName, region, NULL,
                                                                                    NULL, endpointOverride, &pClientCallbacks));
 #else
-    CHK_STATUS(createDefaultCallbacksProviderWithAwsCredentialsAndEndpointOverride(accessKey, secretKey, sessionToken, MAX_UINT64, region, cacertPath,
-                                                                                   NULL, NULL, endpointOverride, &pClientCallbacks));
+    CHK_STATUS(createSampleCallbacksProvider(region, cacertPath, NULL, NULL, &pClientCallbacks));
 #endif
 
     if (NULL != GETENV(ENABLE_FILE_LOGGING)) {
