@@ -11,8 +11,16 @@ on:
       - master
 
 jobs:
+  ecr-login:
+    uses: ./.github/workflows/ecr-public-login.yml
+    permissions:
+      id-token: write
+      contents: read
+    secrets: inherit
+
   sample-checks:
     name: ${{ matrix.runner.id }} - ${{ matrix.sample-executable.name }}
+    needs: ecr-login
     strategy:
       matrix:
         sample-executable:
@@ -38,7 +46,12 @@ jobs:
       fail-fast: false
 
     runs-on: ${{ matrix.runner.image }}
-    container: ${{ matrix.runner.docker || '' }}
+    # The macOS entry has no `docker:`; an empty image means "no container" in
+    # mapping form too, exactly like the scalar form did.
+    container:
+      image: ${{ matrix.runner.docker || '' }}
+      # Authenticated pull; see ecr-public-login.yml.
+      credentials: ${{ fromJSON(needs.ecr-login.outputs.attempt == github.run_attempt && needs.ecr-login.outputs.credentials || '{}') }}
 
     env:
       AWS_KVS_LOG_LEVEL: 2
