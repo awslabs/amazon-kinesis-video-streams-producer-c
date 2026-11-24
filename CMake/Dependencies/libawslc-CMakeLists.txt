@@ -11,8 +11,13 @@ include(ExternalProject)
 # The FIPS release line is separate from mainline and moves slower; its default TLS
 # group list may lag mainline (the SDK sets an explicit groups list for this reason).
 # Static FIPS builds are Linux-only and require Go for the integrity-check tooling.
+#
+# The FIPS default is AWS-LC-FIPS-3.1.0, the FIPS release with FIPS 140-3 certificates
+# (static #5314, dynamic #5298; see crypto/fipsmodule/FIPS.md in the AWS-LC repository).
+# Newer AWS-LC-FIPS-* tags are the same release line but are not validated modules until
+# a certificate is issued, so the default only moves when a newer tag is certified.
 if (USE_AWS_LC_FIPS)
-    set(AWS_LC_DEFAULT_GIT_TAG AWS-LC-FIPS-3.3.0)
+    set(AWS_LC_DEFAULT_GIT_TAG AWS-LC-FIPS-3.1.0)
     set(AWS_LC_FIPS_ARG -DFIPS=1)
 else()
     set(AWS_LC_DEFAULT_GIT_TAG v5.8.0)

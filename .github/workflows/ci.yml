@@ -484,14 +484,16 @@ jobs:
           cmake .. -DBUILD_TEST=ON -DUSE_OPENSSL=OFF -DUSE_AWS_LC_FIPS=ON -DBUILD_STATIC=ON -DPARALLEL_BUILD=ON
           make -j
 
-      - name: Verify crypto backend is AWS-LC
+      - name: Verify crypto backend is the AWS-LC FIPS module
         run: |
-          ./tst/scripts/check_crypto_backend.sh aws-lc ./build ./open-source/lib
+          ./tst/scripts/check_crypto_backend.sh aws-lc-fips ./build ./open-source/lib
 
-      - name: Run TLS referee tests (FIPS module active, PQC groups still offered)
+      - name: Run TLS referee tests (FIPS module active, PQC groups still offered, no plain X25519)
         # TlsBackendTest.fipsModeMatchesSelectedBuildVariant asserts FIPS_mode() == 1 here.
         # The referee tests guard the finding that FIPS branches default to classical-only
-        # groups: the SDK's explicit list must still get ML-KEM negotiated.
+        # groups: the SDK's explicit list must still get ML-KEM negotiated. On this variant
+        # fipsBuildRejectsX25519OnlyServer also asserts the list omits plain X25519 (not an
+        # approved key-agreement algorithm) and the classical fallback is P-256.
         working-directory: ./build
         run: |
           ./tst/producer_test --gtest_filter="TlsBackendTest.*:TlsKeyExchangeRefereeTest.*"

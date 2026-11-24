@@ -46,16 +46,26 @@ namespace video {
 
 #define REFEREE_PQC_ONLY_GROUPS       "X25519MLKEM768"
 #define REFEREE_CLASSICAL_ONLY_GROUPS "X25519:P-256"
+#define REFEREE_X25519_ONLY_GROUPS    "X25519"
 #define REFEREE_GROUP_X25519MLKEM768  "X25519MLKEM768"
 #define REFEREE_GROUP_X25519          "X25519"
+#define REFEREE_GROUP_P256            "P-256"
 #define REFEREE_CA_FILE               "tls_referee_ca.pem"
 #define REFEREE_ACCEPT_TIMEOUT_SEC    10
 #define REFEREE_HTTP_RESPONSE         "HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
 #define REFEREE_HTTP_100_THEN_404     "HTTP/1.1 100 Continue\r\n\r\n" REFEREE_HTTP_RESPONSE
 #define REFEREE_UNKNOWN_GROUP_NAME    "unknown"
 
-// The list the SDK must offer, in order (from the PR requirement, not from the SDK constant)
-#define REFEREE_SDK_OFFERED_GROUPS "X25519MLKEM768:SecP256r1MLKEM768:X25519:P-256:P-384"
+// The list the SDK must offer, in order (from the PR requirement, not from the SDK constant).
+// The FIPS variant leaves out plain X25519 (not an approved key-agreement algorithm), so its
+// classical fallback against a server without ML-KEM is P-256 instead of X25519.
+#if defined(KVS_USE_AWS_LC_FIPS)
+#define REFEREE_SDK_OFFERED_GROUPS          "X25519MLKEM768:SecP256r1MLKEM768:P-256:P-384"
+#define REFEREE_EXPECTED_CLASSICAL_FALLBACK REFEREE_GROUP_P256
+#else
+#define REFEREE_SDK_OFFERED_GROUPS          "X25519MLKEM768:SecP256r1MLKEM768:X25519:P-256:P-384"
+#define REFEREE_EXPECTED_CLASSICAL_FALLBACK REFEREE_GROUP_X25519
+#endif
 
 // SSL_get_group_name() returns NULL for a group id AWS-LC has no name for; never feed that
 // into "%s" (undefined behavior, a crash on glibc) when it should be an assertion failure.
@@ -558,9 +568,9 @@ TEST(TlsKeyExchangeRefereeTest, sdkCurlSessionNegotiatesHybridMlKemWithPqcOnlySe
 }
 
 // Fallback: against a server without ML-KEM (the KVS PutMedia endpoints today, and any
-// region or partition that has not enabled it) the SDK must still connect, using classical
-// X25519, and the log line must say so. This is the behavior a silent-fallback detector
-// relies on being visible.
+// region or partition that has not enabled it) the SDK must still connect, using a classical
+// group (X25519; P-256 on the FIPS variant, whose list has no X25519), and the log line must
+// say so. This is the behavior a silent-fallback detector relies on being visible.
 TEST(TlsKeyExchangeRefereeTest, sdkFallsBackToClassicalWithClassicalOnlyServer)
 {
     RefereeServer server;
@@ -571,11 +581,54 @@ TEST(TlsKeyExchangeRefereeTest, sdkFallsBackToClassicalWithClassicalOnlyServer)
 
     ASSERT_TRUE(server.acceptedConnection) << server.errorText;
     ASSERT_TRUE(server.handshakeOk) << server.errorText;
-    EXPECT_STREQ(REFEREE_GROUP_X25519, server.negotiatedGroup);
+    EXPECT_STREQ(REFEREE_EXPECTED_CLASSICAL_FALLBACK, server.negotiatedGroup);
 
+    ASSERT_EQ(1u, gRefereeLoggedGroupCount);
+    EXPECT_STREQ(REFEREE_EXPECTED_CLASSICAL_FALLBACK, gRefereeLoggedGroups[0]);
+}
+
+#if defined(KVS_USE_AWS_LC_FIPS)
+// FIPS variant: the SDK must not be able to land on plain X25519, which is not an approved
+// key-agreement algorithm. A server that offers nothing else must reject the SDK's handshake.
+// The raw-client control first proves the same server completes an X25519 handshake with a
+// client that asks for it (AWS-LC-FIPS keeps X25519 callable; it is the SDK's list that
+// leaves it out), so a rejection here is attributable to the list and not to the server.
+TEST(TlsKeyExchangeRefereeTest, fipsBuildRejectsX25519OnlyServer)
+{
+    RefereeServer server;
+    CHAR negotiated[64];
+
+    ASSERT_TRUE(refereeRawClientHandshake(REFEREE_GROUP_X25519, REFEREE_X25519_ONLY_GROUPS, negotiated, SIZEOF(negotiated)));
+    ASSERT_STREQ(REFEREE_GROUP_X25519, negotiated);
+
+    refereeStartLogCapture();
+    STATUS status = refereeRunSdkRequest(REFEREE_X25519_ONLY_GROUPS, &server, FALSE);
+    refereeStopLogCapture();
+
+    EXPECT_TRUE(STATUS_FAILED(status));
+    ASSERT_TRUE(server.acceptedConnection) << server.errorText;
+    EXPECT_FALSE(server.handshakeOk) << "FIPS build negotiated " << server.negotiatedGroup;
+    EXPECT_STREQ(REFEREE_SDK_OFFERED_GROUPS, server.offeredGroups);
+    EXPECT_EQ(0u, gRefereeLoggedGroupCount) << "no connection, so no 'TLS negotiated' line";
+}
+#else
+// Non-FIPS variant: the same X25519-only server is acceptable, which is what makes the FIPS
+// rejection above a property of the FIPS list rather than of the server.
+TEST(TlsKeyExchangeRefereeTest, nonFipsBuildAcceptsX25519OnlyServer)
+{
+    RefereeServer server;
+
+    refereeStartLogCapture();
+    refereeRunSdkRequest(REFEREE_X25519_ONLY_GROUPS, &server, FALSE);
+    refereeStopLogCapture();
+
+    ASSERT_TRUE(server.acceptedConnection) << server.errorText;
+    ASSERT_TRUE(server.handshakeOk) << server.errorText;
+    EXPECT_STREQ(REFEREE_GROUP_X25519, server.negotiatedGroup);
     ASSERT_EQ(1u, gRefereeLoggedGroupCount);
     EXPECT_STREQ(REFEREE_GROUP_X25519, gRefereeLoggedGroups[0]);
 }
+#endif
 
 // The group list the SDK installs must put the hybrid post-quantum group first: a server
 // that supports both and honors client preference picks ML-KEM. (AWS-LC servers follow

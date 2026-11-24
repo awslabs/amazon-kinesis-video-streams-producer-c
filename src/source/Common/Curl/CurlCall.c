@@ -7,6 +7,9 @@
 #if defined(KVS_CURL_TLS_USES_OPENSSL_API)
 #include <openssl/ssl.h>
 #endif
+#if defined(KVS_USE_AWS_LC_FIPS)
+#include <openssl/crypto.h> // FIPS_mode()
+#endif
 
 BOOL isCurlFinalHttpStatusLine(PCHAR pBuffer, SIZE_T dataSize)
 {
@@ -54,6 +57,15 @@ CURLcode kvsCurlSslCtxCallback(CURL* pCurl, PVOID pSslCtx, PVOID pUserData)
 {
     UNUSED_PARAM(pCurl);
     UNUSED_PARAM(pUserData);
+#if defined(KVS_USE_AWS_LC_FIPS)
+    // Built for the FIPS module: never complete a TLS connection through a non-FIPS AWS-LC.
+    // createCurlApiCallbacks() refuses to initialise on this mismatch; this is the per-connection
+    // backstop for callers that bypass the callbacks provider (blockingCurlCall, the probe sample).
+    if (FIPS_mode() != 1) {
+        DLOGE("Built with USE_AWS_LC_FIPS but the linked AWS-LC is not in FIPS mode; refusing the TLS connection");
+        return CURLE_SSL_CONNECT_ERROR;
+    }
+#endif
     if (pSslCtx == NULL || 1 != SSL_CTX_set1_groups_list((SSL_CTX*) pSslCtx, KVS_TLS_KEY_EXCHANGE_GROUP_LIST)) {
         DLOGE("Failed to set TLS key exchange groups list");
         return CURLE_SSL_CONNECT_ERROR;

@@ -53,7 +53,7 @@ You can pass the following options to `cmake ..`.
 * `-DUSE_MBEDTLS` -- Use mbedTLS as the crypto library. OFF by default. Requires `-DUSE_OPENSSL=OFF`.
 * `-DUSE_LEGACY_MBEDTLS` -- Deprecated. Build mbedTLS 2.28.10 and libcurl 8.15.0 instead of mbedTLS 3.6.7 and libcurl 8.17.0. OFF by default. Requires `-DUSE_MBEDTLS=ON`. See [Building with legacy mbedTLS 2.x](#building-with-legacy-mbedtls-2x).
 * `-DUSE_AWS_LC` -- Use [AWS-LC](https://github.com/aws/aws-lc) as the crypto/TLS library. Default is OFF. See [Crypto library selection](#crypto-library-selection-and-post-quantum-tls).
-* `-DUSE_AWS_LC_FIPS` -- Use the [AWS-LC-FIPS](https://github.com/aws/aws-lc/blob/main/crypto/fipsmodule/FIPS.md) release line (FIPS 140-3 cryptographic module). Default is OFF. Linux only for static builds; requires the Go toolchain.
+* `-DUSE_AWS_LC_FIPS` -- Use the [AWS-LC-FIPS](https://github.com/aws/aws-lc/blob/main/crypto/fipsmodule/FIPS.md) release line (FIPS 140-3 cryptographic module; pinned to the certified AWS-LC-FIPS 3.1.0). Default is OFF. Linux only for static builds; requires the Go toolchain. See [Crypto library selection](#crypto-library-selection-and-post-quantum-tls).
 * `-DPARALLEL_BUILD` -- Build dependencies with multiple cores. OFF by default. Disabled on Windows.
 * `-DKVS_ENABLE_VERBOSE_LOGS` -- Build with `ENTERS()` and `LEAVES()` logs enabled, which are `LOG_LEVEL_VERBOSE`. Default is OFF.
 * `-DBUILD_TEST=TRUE` -- Build unit/integration tests, may be useful for confirm support for your device. `./tst/producer_test`
@@ -109,7 +109,7 @@ With `-DBUILD_DEPENDENCIES=ON` (the default), the SDK downloads and builds these
 | mbedTLS | 3.6.7 | `-DUSE_MBEDTLS=ON` |
 | mbedTLS | 2.28.10 | `-DUSE_MBEDTLS=ON -DUSE_LEGACY_MBEDTLS=ON` (deprecated) |
 | AWS-LC | 5.8.0 | `-DUSE_AWS_LC=ON` |
-| AWS-LC-FIPS | 3.3.0 | `-DUSE_AWS_LC_FIPS=ON` |
+| AWS-LC-FIPS | 3.1.0 | `-DUSE_AWS_LC_FIPS=ON` |
 | libcurl | 8.17.0 | always, except with `-DUSE_LEGACY_MBEDTLS=ON` or an AWS-LC backend |
 | libcurl | 8.15.0 | `-DUSE_LEGACY_MBEDTLS=ON` (deprecated) |
 | libcurl | 8.22.0 | `-DUSE_AWS_LC=ON` or `-DUSE_AWS_LC_FIPS=ON` |
@@ -315,7 +315,7 @@ The SDK can be built against one of three crypto/TLS libraries, selected at buil
 | `-DUSE_OPENSSL=ON` (default) | OpenSSL 1.1.1 | Built from source by default |
 | `-DUSE_MBEDTLS=ON` | mbedTLS | |
 | `-DUSE_AWS_LC=ON` | [AWS-LC](https://github.com/aws/aws-lc) | Post-quantum TLS key exchange |
-| `-DUSE_AWS_LC_FIPS=ON` | [AWS-LC-FIPS](https://github.com/aws/aws-lc/blob/main/crypto/fipsmodule/FIPS.md) | FIPS 140-3 module + post-quantum TLS key exchange. Linux only for static builds; requires Go |
+| `-DUSE_AWS_LC_FIPS=ON` | [AWS-LC-FIPS 3.1.0](https://github.com/aws/aws-lc/blob/main/crypto/fipsmodule/FIPS.md) | FIPS 140-3 validated module (certificates #5314 static, #5298 dynamic) + post-quantum TLS key exchange; the offered group list has no plain X25519 (see below). Linux only for static builds; requires Go |
 
 To build with AWS-LC (note `-DUSE_OPENSSL=OFF` is required since OpenSSL is the default):
 
@@ -328,12 +328,15 @@ AWS-LC exposes the same API surface as OpenSSL 1.1.1, so no application changes 
 
 * TLS 1.3 connections offer hybrid post-quantum key exchange (`X25519MLKEM768`, NIST FIPS 203 ML-KEM) first, with classical groups as fallback. The negotiated key exchange group is logged at INFO level once per request, when the final (non-1xx) response status line arrives, so an interim `100 Continue` does not add a line. Each SDK request uses its own curl handle and TLS connection, so this is one line per connection: `TLS negotiated: version=... keyExchange=... cipher=...`.
 * Post-quantum key exchange is negotiated automatically when the service endpoint also supports it; otherwise the connection falls back to classical key exchange with no error.
+* The offered group list is `X25519MLKEM768:SecP256r1MLKEM768:X25519:P-256:P-384`. With `-DUSE_AWS_LC_FIPS=ON` it is `X25519MLKEM768:SecP256r1MLKEM768:P-256:P-384`: plain X25519 is left out because it is not an approved key-agreement algorithm under NIST SP 800-56A, so the classical fallback of a FIPS build is P-256 (which every TLS 1.3 endpoint supports), then P-384.
 * libcurl is built at a newer version (8.x) than with the other backends, since AWS-LC support requires curl >= 7.87.0.
 * The `kvsTlsKeyExchangeProbe` sample is built. It performs one HTTPS request through the SDK's networking path and asserts the negotiated key exchange group, which can be used as a regression check against silent fallback from post-quantum to classical key exchange: `./kvsTlsKeyExchangeProbe <https-url> [ca-cert.pem] [expected-group]`.
 
 On Windows, libcurl uses Schannel (the OS TLS stack) regardless of the selected crypto library; the selected library is then only used for request signing, and TLS capabilities (including post-quantum key exchange) are determined by the OS.
 
-**Cryptographic module selection and compliance.** Selection of the cryptographic library, and any FIPS 140-3 or post-quantum compliance obligations that apply to your deployment, are the responsibility of the customer under the AWS shared responsibility model. AWS does not certify or validate customer-built OpenSSL FIPS configurations. For FIPS 140-3 validated cryptography, build with `-DUSE_AWS_LC_FIPS=ON` (Linux only for static builds; requires Go) and consult the [AWS-LC FIPS documentation](https://github.com/aws/aws-lc/blob/main/crypto/fipsmodule/FIPS.md) for the validation status of the pinned release.
+**Cryptographic module selection and compliance.** Selection of the cryptographic library, the operational environment it runs in, approved-mode operation, and any FIPS 140-3 or post-quantum compliance obligations that apply to your deployment are the responsibility of the customer under the AWS shared responsibility model. AWS does not certify or validate customer-built configurations. `-DUSE_AWS_LC_FIPS=ON` (Linux only for static builds; requires Go) builds the AWS-LC-FIPS 3.1.0 module, which holds FIPS 140-3 certificates [#5314](https://csrc.nist.gov/projects/cryptographic-module-validation-program/certificate/5314) (static library) and [#5298](https://csrc.nist.gov/projects/cryptographic-module-validation-program/certificate/5298) (dynamic library); their security policies list the tested operational environments and the approved services. Building the SDK with this option is not by itself a compliance claim: the module keeps non-approved algorithms callable, and the SDK does not consult the module's service indicator. Consult the [AWS-LC FIPS documentation](https://github.com/aws/aws-lc/blob/main/crypto/fipsmodule/FIPS.md) for the validation status of the pinned release before relying on it.
+
+The FIPS and non-FIPS AWS-LC lines install identical headers and library names, and the dependency build is skipped when the install prefix already holds a `libssl`. Use a separate build tree and `OPEN_SRC_INSTALL_PREFIX` per crypto backend, including one per AWS-LC line. A `-DUSE_AWS_LC_FIPS=ON` configure over a prefix holding a non-FIPS AWS-LC (or the reverse) fails at configure time, and a FIPS-configured SDK refuses to initialise or open a TLS connection when the linked AWS-LC reports `FIPS_mode() == 0` (`STATUS_CRYPTO_FIPS_MODE_MISMATCH`).
 
 ### Offline mode
 The samples run in near real time mode by default. In order to set up offline mode, the following APIs can be used in the samples instead of the realtime variant:

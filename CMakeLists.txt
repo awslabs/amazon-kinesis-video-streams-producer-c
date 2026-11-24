@@ -329,6 +329,29 @@ if(USE_OPENSSL OR USE_AWS_LC OR USE_AWS_LC_FIPS)
                           "Build dependencies (-DBUILD_DEPENDENCIES=ON) or point OPEN_SRC_INSTALL_PREFIX at an AWS-LC install.")
     endif()
     message(STATUS "Crypto backend: AWS-LC at ${OPENSSL_CRYPTO_LIBRARY}")
+
+    # The FIPS and non-FIPS AWS-LC release lines install identical headers and library
+    # names, so the OPENSSL_IS_AWSLC check above cannot tell them apart, and
+    # build_dependency() skips the AWS-LC build whenever the prefix already holds a
+    # libssl. A USE_AWS_LC_FIPS configure over a prefix left by a USE_AWS_LC build (or the
+    # reverse) would therefore link the other line silently. Tell them apart by the version
+    # string the module embeds in libcrypto ("AWS-LC FIPS x.y.z" on the FIPS line,
+    # "AWS-LC x.y.z" on mainline) and refuse the mismatch here. The same test runs in CI
+    # as tst/scripts/check_crypto_backend.sh, and at run time as the FIPS_mode() check in
+    # createCurlApiCallbacks().
+    file(STRINGS "${OPENSSL_CRYPTO_LIBRARY}" KVS_AWS_LC_FIPS_VERSION_STRING
+         REGEX "AWS-LC FIPS [0-9]+\\.[0-9]+\\.[0-9]+" LIMIT_COUNT 1)
+    if(USE_AWS_LC_FIPS AND NOT KVS_AWS_LC_FIPS_VERSION_STRING)
+      message(FATAL_ERROR "USE_AWS_LC_FIPS is set, but ${OPENSSL_CRYPTO_LIBRARY} is not the AWS-LC FIPS module "
+                          "(no 'AWS-LC FIPS x.y.z' version string). It is most likely a non-FIPS AWS-LC left in "
+                          "${OPEN_SRC_INSTALL_PREFIX} by an earlier USE_AWS_LC build. Remove that directory and "
+                          "reconfigure, or build into a separate OPEN_SRC_INSTALL_PREFIX.")
+    elseif(NOT USE_AWS_LC_FIPS AND KVS_AWS_LC_FIPS_VERSION_STRING)
+      message(FATAL_ERROR "USE_AWS_LC is set, but ${OPENSSL_CRYPTO_LIBRARY} is the AWS-LC FIPS module "
+                          "(${KVS_AWS_LC_FIPS_VERSION_STRING}), most likely left in ${OPEN_SRC_INSTALL_PREFIX} by an "
+                          "earlier USE_AWS_LC_FIPS build. Remove that directory and reconfigure, or build into a "
+                          "separate OPEN_SRC_INSTALL_PREFIX; pass USE_AWS_LC_FIPS=ON if the FIPS module is intended.")
+    endif()
   endif()
 elseif(USE_MBEDTLS)
   find_package(MbedTLS REQUIRED)
@@ -440,8 +463,13 @@ if (USE_MBEDTLS)
             MbedCrypto)
 elseif (USE_AWS_LC OR USE_AWS_LC_FIPS)
     # Same link targets as OpenSSL (FindOpenSSL resolves them to AWS-LC's libs).
-    # The FIPS variant shares the KVS_USE_AWS_LC code path (identical API).
+    # The FIPS variant shares the KVS_USE_AWS_LC code path (identical API) and adds
+    # KVS_USE_AWS_LC_FIPS, which selects the FIPS TLS group list (CurlCall.h) and lets
+    # the tests assert the FIPS module is active.
     set(CPRODUCER_COMMON_TLS_OPTION KVS_USE_AWS_LC)
+    if(USE_AWS_LC_FIPS)
+        list(APPEND CPRODUCER_COMMON_TLS_OPTION KVS_USE_AWS_LC_FIPS)
+    endif()
 endif()
 
 install(

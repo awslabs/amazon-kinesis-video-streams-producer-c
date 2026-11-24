@@ -21,10 +21,8 @@ include_directories(${KINESIS_VIDEO_PRODUCER_C_SRC})
 file(GLOB PRODUCER_TEST_SOURCE_FILES "*.cpp")
 
 add_executable(producer_test ${PRODUCER_TEST_SOURCE_FILES})
-# Tests branch on the selected crypto backend (see TlsBackendTest.cpp)
+# Tests branch on the selected crypto backend (see TlsBackendTest.cpp and
+# TlsKeyExchangeRefereeTest.cpp). On the FIPS variant the list also carries
+# KVS_USE_AWS_LC_FIPS, the same definition the SDK libraries are built with.
 target_compile_definitions(producer_test PRIVATE ${CPRODUCER_COMMON_TLS_OPTION})
-if(USE_AWS_LC_FIPS)
-  # Lets TlsBackendTest assert FIPS_mode() == 1 on the FIPS variant and == 0 otherwise
-  target_compile_definitions(producer_test PRIVATE KVS_USE_AWS_LC_FIPS)
-endif()
 target_link_libraries(producer_test cproducer ${GTEST_LIBNAME} ${PRODUCER_CRYPTO_LIBRARY})
