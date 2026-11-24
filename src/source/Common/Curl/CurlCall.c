@@ -48,10 +48,11 @@ static SIZE_T tlsInfoHeaderCallback(PCHAR pBuffer, SIZE_T size, SIZE_T numItems,
  * curl SSL context callback: pin the TLS key exchange groups to a post-quantum-first list.
  *
  * AWS-LC mainline already defaults to a PQC-first group list, but the AWS-LC-FIPS release
- * branches default to classical-only groups, so an explicit list is required there. Setting
- * the same list unconditionally for both variants keeps behavior identical and independent
- * of upstream default changes. Order: hybrid post-quantum first, classical fallback so
- * endpoints without ML-KEM (including all KVS endpoints today) keep working.
+ * branches default to classical-only groups, so an explicit list is required there. The list
+ * is set explicitly on both variants so behavior does not depend on upstream defaults; the
+ * FIPS variant leaves out plain X25519 (see CurlCall.h). Order: hybrid post-quantum first,
+ * classical fallback so endpoints without ML-KEM (including all KVS endpoints today) keep
+ * working.
  */
 CURLcode kvsCurlSslCtxCallback(CURL* pCurl, PVOID pSslCtx, PVOID pUserData)
 {

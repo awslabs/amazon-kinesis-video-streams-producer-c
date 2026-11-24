@@ -345,12 +345,12 @@ if(USE_OPENSSL OR USE_AWS_LC OR USE_AWS_LC_FIPS)
       message(FATAL_ERROR "USE_AWS_LC_FIPS is set, but ${OPENSSL_CRYPTO_LIBRARY} is not the AWS-LC FIPS module "
                           "(no 'AWS-LC FIPS x.y.z' version string). It is most likely a non-FIPS AWS-LC left in "
                           "${OPEN_SRC_INSTALL_PREFIX} by an earlier USE_AWS_LC build. Remove that directory and "
-                          "reconfigure, or build into a separate OPEN_SRC_INSTALL_PREFIX.")
+                          "reconfigure.")
     elseif(NOT USE_AWS_LC_FIPS AND KVS_AWS_LC_FIPS_VERSION_STRING)
       message(FATAL_ERROR "USE_AWS_LC is set, but ${OPENSSL_CRYPTO_LIBRARY} is the AWS-LC FIPS module "
                           "(${KVS_AWS_LC_FIPS_VERSION_STRING}), most likely left in ${OPEN_SRC_INSTALL_PREFIX} by an "
-                          "earlier USE_AWS_LC_FIPS build. Remove that directory and reconfigure, or build into a "
-                          "separate OPEN_SRC_INSTALL_PREFIX; pass USE_AWS_LC_FIPS=ON if the FIPS module is intended.")
+                          "earlier USE_AWS_LC_FIPS build. Remove that directory and reconfigure; pass "
+                          "USE_AWS_LC_FIPS=ON if the FIPS module is intended.")
     endif()
   endif()
 elseif(USE_MBEDTLS)

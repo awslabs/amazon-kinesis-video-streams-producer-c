@@ -11,8 +11,9 @@
  *
  *   expected-group defaults to KVS_EXPECTED_KEY_EXCHANGE_GROUP below. A colon-separated list
  *   accepts any of the listed groups, which lets a CI gate tolerate a service-side rollout
- *   (control plane already on X25519MLKEM768, PutMedia hosts still on X25519) while a stricter
- *   check pins a single group. Pass "-" for the CA argument to use the system default store.
+ *   (control plane already on X25519MLKEM768, PutMedia hosts still on X25519, P-256 on a FIPS
+ *   build) while a stricter check pins a single group. Pass "-" for the CA argument to use the
+ *   system default store.
  *
  *   Exit code 0: handshake completed and the negotiated group is in the expected list.
  *   Exit code 1: no TLS session, or the negotiated group is not in the list (silent fallback).
@@ -21,9 +22,10 @@
 
 // Default acceptance list when no expected-group argument is given: KVS control plane
 // endpoints negotiate X25519MLKEM768 and PutMedia endpoints still negotiate X25519 while the
-// service-side rollout completes, so both are acceptable by default. Pass a single group to
-// pin the expectation (the nightly drift check does).
-#define KVS_EXPECTED_KEY_EXCHANGE_GROUP "X25519MLKEM768:X25519"
+// service-side rollout completes (P-256 on a FIPS build, whose list has no plain X25519), so
+// all three are acceptable by default. Pass a single group to pin the expectation (the nightly
+// drift check does).
+#define KVS_EXPECTED_KEY_EXCHANGE_GROUP "X25519MLKEM768:X25519:P-256"
 
 // Internal to kvsCommonCurl, not part of the public header
 extern STATUS blockingCurlCall(PRequestInfo, PCallInfo);
