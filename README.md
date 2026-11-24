@@ -117,6 +117,15 @@ With `-DBUILD_DEPENDENCIES=ON` (the default), the SDK downloads and builds these
 
 Amazon Kinesis Video Streams PIC is fetched from GitHub in both modes, unless `libkvspicUtils` is installed and visible to `pkg-config`, or `-DLOCAL_KVSPIC_PATH` is set. Its version is set in `CMake/Dependencies/libkvspic-CMakeLists.txt` and can be changed with `-DPIC_VERSION_OVERRIDE`.
 
+### Keeping the bundled dependencies current
+
+The pinned versions above are the SDK's responsibility to keep current; customers get fixes through SDK releases.
+
+* **Detection.** The weekly `deps-latest` workflow builds the AWS-LC backend against the newest AWS-LC and curl releases and opens a `deps-latest` issue when that build breaks; it also compares the pinned AWS-LC and curl tags with the newest releases and opens a `deps-behind` issue, with links to the release notes and security advisories, whenever a pin is behind. GitHub Dependabot alerts cover the GitHub Actions used by CI. The KVS SDK team watches the security advisories of [AWS-LC](https://github.com/aws/aws-lc/security/advisories), [curl](https://curl.se/docs/vulnerabilities.html), [OpenSSL](https://openssl-library.org/news/vulnerabilities/) and [Mbed TLS](https://mbed-tls.readthedocs.io/en/latest/security-advisories/).
+* **Response.** When an advisory of Critical or High severity affects a bundled dependency on a code path the SDK uses, the KVS SDK team bumps the pin and publishes an SDK patch release as a priority, ahead of the regular release cycle. Other bumps go into the next regular release.
+* **Bumping a pin.** Change the tag in the matching `CMake/Dependencies/lib*-CMakeLists.txt`, update the table above, and let CI run: the AWS-LC lanes rebuild the dependency from source and run `check_crypto_backend.sh`, the referee tests and a live probe against the new version.
+* **Not waiting for a release.** AWS-LC builds accept `-DAWS_LC_GIT_TAG=<tag>` and `-DCURL_GIT_TAG=<tag>` to override the pins at configure time, so a fix can be picked up before the SDK release that carries it.
+
 ### Dependency requirements
 
 These apply when the SDK links against system-installed libraries instead of building them.

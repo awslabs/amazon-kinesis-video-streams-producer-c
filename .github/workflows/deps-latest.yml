@@ -1,16 +1,26 @@
 name: AWS-LC and curl latest-release build
 
-# Weekly early warning: build and unit-test the AWS-LC backend against the
-# newest AWS-LC and libcurl releases instead of the pinned tags, so an upstream
-# change that breaks the SDK (API removal, group rename, curl option rename) is
-# seen before the next pin bump. Schedule-only, so it never blocks a pull
-# request; the pinned builds in ci.yml stay the gate. A failed run opens an
-# issue labelled "deps-latest" (or updates the open one), which is the signal
-# this job exists to produce, so it is not marked continue-on-error.
+# Weekly early warning with two signals:
+#
+# 1. Build and unit-test the AWS-LC backend against the newest AWS-LC and libcurl
+#    releases instead of the pinned tags, so an upstream change that breaks the
+#    SDK (API removal, group rename, curl option rename) is seen before the next
+#    pin bump. A failed run opens an issue labelled "deps-latest" (or updates the
+#    open one).
+# 2. Compare the pinned AWS-LC and curl tags with the newest releases. When a pin
+#    is behind, open an issue labelled "deps-behind" (or update the open one) with
+#    links to the release notes and security advisories, so the on-call reads
+#    them and decides whether the bump is routine or a security fix; close it
+#    once the pins catch up. The build in signal 1 passing does not mean the pin
+#    is current: this is the signal that says "you are behind".
+#
+# Schedule-only, so it never blocks a pull request; the pinned builds in ci.yml
+# stay the gate. Neither signal is marked continue-on-error.
 #
 # AWS-LC publishes two release lines from one repository (vX.Y.Z and
 # AWS-LC-FIPS-X.Y.Z); "latest" here means the newest non-prerelease vX.Y.Z tag,
-# which is the line USE_AWS_LC pins. The FIPS line is covered by the pinned
+# which is the line USE_AWS_LC pins. The FIPS line is pinned to a certified
+# release on purpose and is not compared here; it is covered by the pinned
 # linux-gcc-aws-lc-fips job in ci.yml.
 
 on:
@@ -60,26 +70,59 @@ jobs:
           INPUT_CURL_TAG: ${{ inputs.curl_tag }}
         run: |
           set -e
-          aws_lc_tag="$INPUT_AWS_LC_TAG"
-          curl_tag="$INPUT_CURL_TAG"
-          if [ -z "$aws_lc_tag" ]; then
-            # Not releases/latest: that returns the newest release of EITHER line, which is
-            # the FIPS line right after a FIPS release. Take the newest published vX.Y.Z.
-            aws_lc_tag=$(gh api 'repos/aws/aws-lc/releases?per_page=100' \
-              --jq '[.[] | select(.draft == false and .prerelease == false and (.tag_name | startswith("v")))] | sort_by(.published_at) | last | .tag_name')
-          fi
-          if [ -z "$curl_tag" ]; then
-            curl_tag=$(gh api repos/curl/curl/releases/latest --jq .tag_name)
-          fi
-          case "$aws_lc_tag" in ''|null) echo "Could not resolve the latest AWS-LC release tag"; exit 1;; esac
-          case "$curl_tag" in ''|null) echo "Could not resolve the latest curl release tag"; exit 1;; esac
-          echo "AWS-LC: $aws_lc_tag   curl: $curl_tag"
-          echo "aws_lc_tag=$aws_lc_tag" >> "$GITHUB_OUTPUT"
-          echo "curl_tag=$curl_tag" >> "$GITHUB_OUTPUT"
+          # Not releases/latest for AWS-LC: that returns the newest release of EITHER line,
+          # which is the FIPS line right after a FIPS release. Take the newest published vX.Y.Z.
+          latest_aws_lc=$(gh api 'repos/aws/aws-lc/releases?per_page=100' \
+            --jq '[.[] | select(.draft == false and .prerelease == false and (.tag_name | startswith("v")))] | sort_by(.published_at) | last | .tag_name')
+          latest_curl=$(gh api repos/curl/curl/releases/latest --jq .tag_name)
+          case "$latest_aws_lc" in ''|null) echo "Could not resolve the latest AWS-LC release tag"; exit 1;; esac
+          case "$latest_curl" in ''|null) echo "Could not resolve the latest curl release tag"; exit 1;; esac
+          # The build uses the dispatch inputs when given; the pin comparison below always
+          # uses the real latest releases.
+          aws_lc_tag="${INPUT_AWS_LC_TAG:-$latest_aws_lc}"
+          curl_tag="${INPUT_CURL_TAG:-$latest_curl}"
+          echo "AWS-LC: $aws_lc_tag   curl: $curl_tag   (latest releases: $latest_aws_lc, $latest_curl)"
+          {
+            echo "aws_lc_tag=$aws_lc_tag"
+            echo "curl_tag=$curl_tag"
+            echo "latest_aws_lc=$latest_aws_lc"
+            echo "latest_curl=$latest_curl"
+          } >> "$GITHUB_OUTPUT"
           {
             echo "## Latest-dependency build"
             echo "* AWS-LC: \`$aws_lc_tag\`"
             echo "* curl: \`$curl_tag\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Compare the pinned tags with the latest releases
+        id: pins
+        env:
+          LATEST_AWS_LC: ${{ steps.tags.outputs.latest_aws_lc }}
+          LATEST_CURL: ${{ steps.tags.outputs.latest_curl }}
+        run: |
+          set -e
+          # The non-FIPS AWS-LC pin (the FIPS line is pinned to a certified release on purpose)
+          # and the curl pin the AWS-LC backends use (the first CURL_DEFAULT_GIT_TAG after the
+          # USE_AWS_LC branch; the OpenSSL and mbedTLS backends pin older curl releases by design).
+          pinned_aws_lc=$(grep -oE 'set\(AWS_LC_DEFAULT_GIT_TAG v[0-9]+\.[0-9]+\.[0-9]+\)' CMake/Dependencies/libawslc-CMakeLists.txt | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+')
+          pinned_curl=$(awk '/if \(USE_AWS_LC OR USE_AWS_LC_FIPS\)/ {f=1} f && /set\(CURL_DEFAULT_GIT_TAG/ {gsub(/[()]/, ""); print $2; exit}' CMake/Dependencies/libcurl-CMakeLists.txt)
+          case "$pinned_aws_lc" in '') echo "Could not read the AWS-LC pin from libawslc-CMakeLists.txt"; exit 1;; esac
+          case "$pinned_curl" in '') echo "Could not read the curl pin from libcurl-CMakeLists.txt"; exit 1;; esac
+          behind=false
+          [ "$pinned_aws_lc" != "$LATEST_AWS_LC" ] && behind=true
+          [ "$pinned_curl" != "$LATEST_CURL" ] && behind=true
+          echo "pinned: AWS-LC $pinned_aws_lc, curl $pinned_curl; latest: AWS-LC $LATEST_AWS_LC, curl $LATEST_CURL; behind=$behind"
+          {
+            echo "pinned_aws_lc=$pinned_aws_lc"
+            echo "pinned_curl=$pinned_curl"
+            echo "behind=$behind"
+          } >> "$GITHUB_OUTPUT"
+          {
+            echo "## Pinned tags vs latest releases"
+            echo "| Dependency | Pinned | Latest release |"
+            echo "|---|---|---|"
+            echo "| AWS-LC | \`$pinned_aws_lc\` | \`$LATEST_AWS_LC\` |"
+            echo "| curl | \`$pinned_curl\` | \`$LATEST_CURL\` |"
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Build repository (USE_AWS_LC, latest tags)
@@ -166,4 +209,52 @@ jobs:
           else
             gh label create deps-latest --description "Weekly latest AWS-LC/curl build failed" --color FBCA04 2>/dev/null || true
             gh issue create --title "$title" --label deps-latest --body "$body"
+          fi
+
+      - name: Open, update or close the pin-behind issue
+        # Runs whatever the build outcome: the pin comparison is independent of signal 1.
+        if: always() && steps.pins.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          BEHIND: ${{ steps.pins.outputs.behind }}
+          PINNED_AWS_LC: ${{ steps.pins.outputs.pinned_aws_lc }}
+          PINNED_CURL: ${{ steps.pins.outputs.pinned_curl }}
+          LATEST_AWS_LC: ${{ steps.tags.outputs.latest_aws_lc }}
+          LATEST_CURL: ${{ steps.tags.outputs.latest_curl }}
+          OUTCOME_BUILD: ${{ steps.build.outcome }}
+          OUTCOME_TESTS: ${{ steps.tests.outcome }}
+        run: |
+          set -e
+          existing=$(gh issue list --label deps-behind --state open --json number --jq '.[0].number // empty' || true)
+          if [ "$BEHIND" != "true" ]; then
+            if [ -n "$existing" ]; then
+              gh issue close "$existing" --comment "The pins now match the latest releases (AWS-LC \`$PINNED_AWS_LC\`, curl \`$PINNED_CURL\`). Run: $RUN_URL"
+              echo "Closed issue #$existing"
+            else
+              echo "Pins are current; nothing to do"
+            fi
+            exit 0
+          fi
+          title="Dependency pin behind the latest release (AWS-LC $PINNED_AWS_LC -> $LATEST_AWS_LC, curl $PINNED_CURL -> $LATEST_CURL)"
+          body=$(cat <<EOF
+          A pinned dependency of the AWS-LC backend is behind its newest upstream release.
+
+          | Dependency | Pinned | Latest release | Release notes | Security advisories |
+          |---|---|---|---|---|
+          | AWS-LC | \`$PINNED_AWS_LC\` | \`$LATEST_AWS_LC\` | https://github.com/aws/aws-lc/releases/tag/$LATEST_AWS_LC | https://github.com/aws/aws-lc/security/advisories |
+          | curl | \`$PINNED_CURL\` | \`$LATEST_CURL\` | https://github.com/curl/curl/releases/tag/$LATEST_CURL | https://curl.se/docs/vulnerabilities.html |
+
+          The build against the latest releases in this run: build $OUTCOME_BUILD, test suite $OUTCOME_TESTS ($RUN_URL).
+
+          Read the release notes and advisories between the pinned and the latest release. If any fixes a vulnerability that affects the SDK, treat the bump as a security fix and follow the dependency security response in the README (owner and target time). Otherwise bump the pins (\`CMake/Dependencies/libawslc-CMakeLists.txt\`, \`libcurl-CMakeLists.txt\`, and the versions table in README.md) with the next release. This issue closes itself when the pins catch up.
+          EOF
+          )
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+            gh issue edit "$existing" --title "$title"
+            echo "Updated issue #$existing"
+          else
+            gh label create deps-behind --description "A pinned AWS-LC or curl release is behind upstream" --color D93F0B 2>/dev/null || true
+            gh issue create --title "$title" --label deps-behind --body "$body"
           fi
