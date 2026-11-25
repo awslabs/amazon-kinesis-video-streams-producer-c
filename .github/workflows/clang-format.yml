@@ -4,7 +4,10 @@ permissions:
   contents: read
 jobs:
   check-format:
-    runs-on: ubuntu-latest
+    # ubuntu-22.04 (jammy), not ubuntu-latest: the pinned clang-format-14 package is only in
+    # the archives up to 22.04. ubuntu-latest moved to 26.04, whose apt has no clang-format-14,
+    # so `apt-get install clang-format-14` fails before the check even runs.
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -27,7 +30,7 @@ jobs:
           echo "All files are properly formatted." >> $GITHUB_STEP_SUMMARY
 
   format-and-upload:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04  # see check-format: clang-format-14 is only packaged up to 22.04
     needs: check-format
     if: failure()  # Only run this job if the check-format job fails
 
