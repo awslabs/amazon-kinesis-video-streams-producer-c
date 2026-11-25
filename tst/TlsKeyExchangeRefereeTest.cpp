@@ -81,6 +81,10 @@ static const CHAR* refereeNegotiatedGroupName(const SSL* pSsl)
 // ---------------------------------------------------------------------------
 static CHAR gRefereeLoggedGroups[16][64];
 static UINT32 gRefereeLoggedGroupCount = 0;
+// The curl failure the SDK reported for the request: blockingCurlCall logs it as
+// "Curl perform failed ... with result <curl_easy_strerror> : <CURLOPT_ERRORBUFFER>";
+// on the session path the test performs the request itself and records the CURLcode text.
+static CHAR gRefereeClientError[512];
 static logPrintFunc gRefereePreviousLogFn = NULL;
 
 static VOID refereeCaptureLogPrint(UINT32 level, const PCHAR tag, const PCHAR fmt, ...)
@@ -102,11 +106,15 @@ static VOID refereeCaptureLogPrint(UINT32 level, const PCHAR tag, const PCHAR fm
                  (INT32) (end != NULL ? (SIZE_T) (end - p) : STRLEN(p)), p);
         gRefereeLoggedGroupCount++;
     }
+    if (STRSTR(buf, "Curl perform failed") != NULL) {
+        SNPRINTF(gRefereeClientError, SIZEOF(gRefereeClientError), "%s", buf);
+    }
 }
 
 static VOID refereeStartLogCapture()
 {
     gRefereeLoggedGroupCount = 0;
+    gRefereeClientError[0] = '\0';
     gRefereePreviousLogFn = globalCustomLogPrintFn;
     globalCustomLogPrintFn = refereeCaptureLogPrint;
 }
@@ -117,10 +125,13 @@ static VOID refereeStopLogCapture()
 }
 
 // ---------------------------------------------------------------------------
-// Self-signed server certificate for 127.0.0.1, generated in-process so the
-// test needs no fixture files and the private key never leaves memory.
+// Self-signed server certificate, generated in-process so the test needs no fixture
+// files and the private key never leaves memory. The subject, the subjectAltName and
+// the validity window are parameters so the certificate verification tests can issue
+// a certificate that is expired or that names another host.
 // ---------------------------------------------------------------------------
-static BOOL refereeCreateSelfSignedCert(EVP_PKEY** ppKey, X509** ppCert)
+static BOOL refereeCreateSelfSignedCertFor(const CHAR* commonName, const CHAR* subjectAltName, INT64 notBeforeOffsetSec, INT64 notAfterOffsetSec,
+                                           EVP_PKEY** ppKey, X509** ppCert)
 {
     BOOL ok = FALSE;
     EVP_PKEY* pKey = NULL;
@@ -140,21 +151,21 @@ static BOOL refereeCreateSelfSignedCert(EVP_PKEY** ppKey, X509** ppCert)
 
     pCert = X509_new();
     if (pCert == NULL || 1 != X509_set_version(pCert, X509_VERSION_3) || 1 != ASN1_INTEGER_set(X509_get_serialNumber(pCert), 1) ||
-        NULL == X509_gmtime_adj(X509_getm_notBefore(pCert), -60) || NULL == X509_gmtime_adj(X509_getm_notAfter(pCert), 3600) ||
-        1 != X509_set_pubkey(pCert, pKey)) {
+        NULL == X509_gmtime_adj(X509_getm_notBefore(pCert), (long) notBeforeOffsetSec) ||
+        NULL == X509_gmtime_adj(X509_getm_notAfter(pCert), (long) notAfterOffsetSec) || 1 != X509_set_pubkey(pCert, pKey)) {
         goto CleanUp;
     }
 
     pName = X509_get_subject_name(pCert);
-    if (1 != X509_NAME_add_entry_by_txt(pName, "CN", MBSTRING_ASC, (const unsigned char*) "127.0.0.1", -1, -1, 0) ||
+    if (1 != X509_NAME_add_entry_by_txt(pName, "CN", MBSTRING_ASC, (const unsigned char*) commonName, -1, -1, 0) ||
         1 != X509_set_issuer_name(pCert, pName)) {
         goto CleanUp;
     }
 
-    // curl verifies the peer against the IP SAN (CURLOPT_SSL_VERIFYHOST=2)
+    // curl verifies the peer against the SAN (CURLOPT_SSL_VERIFYHOST=2)
     X509V3_set_ctx(&v3Ctx, pCert, pCert, NULL, NULL, 0);
     X509V3_set_ctx_nodb(&v3Ctx);
-    pSan = X509V3_EXT_conf_nid(NULL, &v3Ctx, NID_subject_alt_name, "IP:127.0.0.1");
+    pSan = X509V3_EXT_conf_nid(NULL, &v3Ctx, NID_subject_alt_name, subjectAltName);
     if (pSan == NULL || 1 != X509_add_ext(pCert, pSan, -1)) {
         goto CleanUp;
     }
@@ -174,6 +185,33 @@ CleanUp:
     X509_free(pCert);
     EVP_PKEY_free(pKey);
     return ok;
+}
+
+// The certificate the key exchange tests use: issued to 127.0.0.1, valid for an hour.
+static BOOL refereeCreateSelfSignedCert(EVP_PKEY** ppKey, X509** ppCert)
+{
+    return refereeCreateSelfSignedCertFor("127.0.0.1", "IP:127.0.0.1", -60, 3600, ppKey, ppCert);
+}
+
+// Which server certificate the referee presents, and which certificate the SDK is told to
+// trust (its certPath). Only REFEREE_CERT_TRUSTED must let a request through.
+typedef enum {
+    REFEREE_CERT_TRUSTED,          // issued to 127.0.0.1, valid now, and it is the one in the SDK's CA file
+    REFEREE_CERT_UNTRUSTED_ISSUER, // issued to 127.0.0.1, valid now, but the SDK's CA file holds a different certificate
+    REFEREE_CERT_EXPIRED,          // in the SDK's CA file, but its validity ended an hour ago
+    REFEREE_CERT_WRONG_HOST,       // in the SDK's CA file, valid now, but issued to referee.invalid, not to 127.0.0.1
+} REFEREE_CERT_SCENARIO;
+
+static BOOL refereeCreateServerCert(REFEREE_CERT_SCENARIO scenario, EVP_PKEY** ppKey, X509** ppCert)
+{
+    switch (scenario) {
+        case REFEREE_CERT_EXPIRED:
+            return refereeCreateSelfSignedCertFor("127.0.0.1", "IP:127.0.0.1", -7200, -3600, ppKey, ppCert);
+        case REFEREE_CERT_WRONG_HOST:
+            return refereeCreateSelfSignedCertFor("referee.invalid", "DNS:referee.invalid", -60, 3600, ppKey, ppCert);
+        default:
+            return refereeCreateSelfSignedCert(ppKey, ppCert);
+    }
 }
 
 static BOOL refereeWriteCertPem(X509* pCert, const CHAR* path)
@@ -202,6 +240,7 @@ typedef struct {
     // Results
     BOOL acceptedConnection;
     BOOL handshakeOk;
+    BOOL receivedRequest; // the client sent HTTP over the connection, i.e. it accepted the server certificate
     CHAR negotiatedGroup[64];
     CHAR offeredGroups[256]; // supported_groups from the ClientHello, colon-separated, in order
     CHAR errorText[256];
@@ -318,6 +357,7 @@ static PVOID refereeServerThread(PVOID arg)
     // header callback logs the negotiated group when the final (non-1xx) status line arrives.
     readLen = SSL_read(pSsl, requestBuf, SIZEOF(requestBuf) - 1);
     if (readLen > 0) {
+        pServer->receivedRequest = TRUE;
         SSL_write(pSsl, pResponse, (INT32) STRLEN(pResponse));
     }
     SSL_shutdown(pSsl);
@@ -343,11 +383,13 @@ static SIZE_T refereeDiscardCurlData(PCHAR pBuffer, SIZE_T size, SIZE_T numItems
 }
 
 // Runs one SDK HTTPS request (the production code path) against a referee server that
-// only accepts the given groups. viaCurlSession selects the call site: FALSE is
-// blockingCurlCall (CurlCall.c), TRUE is initializeCurlSession (Response.c), which every
-// KVS API call and PutMedia use. httpResponse is the raw HTTP reply (NULL for the default
-// 404). Returns the SDK call status; fills the server results.
-static STATUS refereeRunSdkRequestWithResponse(const CHAR* serverGroups, const CHAR* httpResponse, RefereeServer* pServer, BOOL viaCurlSession)
+// only accepts the given groups and presents the certificate certScenario selects.
+// viaCurlSession selects the call site: FALSE is blockingCurlCall (CurlCall.c), TRUE is
+// initializeCurlSession (Response.c), which every KVS API call and PutMedia use.
+// httpResponse is the raw HTTP reply (NULL for the default 404). Returns the SDK call
+// status; fills the server results.
+static STATUS refereeRunSdkRequestWithCert(const CHAR* serverGroups, const CHAR* httpResponse, REFEREE_CERT_SCENARIO certScenario,
+                                           RefereeServer* pServer, BOOL viaCurlSession)
 {
     STATUS retStatus = STATUS_SUCCESS;
     TID serverTid = INVALID_TID_VALUE;
@@ -357,9 +399,12 @@ static STATUS refereeRunSdkRequestWithResponse(const CHAR* serverGroups, const C
     CHAR url[64];
     CHAR caPath[MAX_PATH_LEN + 1];
     CURL* pCurl = NULL;
+    CURLcode curlResult;
     BOOL curlGlobalInitialized = FALSE;
     PCurlRequest pCurlRequest = NULL;
     PCurlResponse pCurlResponse = NULL;
+    EVP_PKEY* pOtherKey = NULL;
+    X509* pOtherCert = NULL;
 
     MEMSET(pServer, 0x00, SIZEOF(RefereeServer));
     MEMSET(&callInfo, 0x00, SIZEOF(CallInfo));
@@ -367,9 +412,17 @@ static STATUS refereeRunSdkRequestWithResponse(const CHAR* serverGroups, const C
     pServer->httpResponse = httpResponse;
     pServer->listenFd = -1;
 
-    CHK(refereeCreateSelfSignedCert(&pServer->pKey, &pServer->pCert), STATUS_INTERNAL_ERROR);
+    CHK(refereeCreateServerCert(certScenario, &pServer->pKey, &pServer->pCert), STATUS_INTERNAL_ERROR);
     SNPRINTF(caPath, SIZEOF(caPath), "%s", REFEREE_CA_FILE);
-    CHK(refereeWriteCertPem(pServer->pCert, caPath), STATUS_INTERNAL_ERROR);
+    if (certScenario == REFEREE_CERT_UNTRUSTED_ISSUER) {
+        // The SDK trusts a different, equally valid, self-signed certificate: the CA file is
+        // well-formed (a malformed one fails with CURLE_SSL_CACERT_BADFILE, not with a
+        // verification error), it just does not vouch for the server's certificate.
+        CHK(refereeCreateSelfSignedCert(&pOtherKey, &pOtherCert), STATUS_INTERNAL_ERROR);
+        CHK(refereeWriteCertPem(pOtherCert, caPath), STATUS_INTERNAL_ERROR);
+    } else {
+        CHK(refereeWriteCertPem(pServer->pCert, caPath), STATUS_INTERNAL_ERROR);
+    }
     CHK(refereeServerListen(pServer), STATUS_INTERNAL_ERROR);
 
     CHK_STATUS(THREAD_CREATE(&serverTid, refereeServerThread, (PVOID) pServer));
@@ -399,12 +452,18 @@ static STATUS refereeRunSdkRequestWithResponse(const CHAR* serverGroups, const C
         CHK_STATUS(initializeCurlSession(pRequestInfo, &pCurlResponse->callInfo, &pCurl, pCurlRequest, writeHeaderCallback, NULL,
                                          refereeDiscardCurlData, refereeDiscardCurlData));
         pCurlResponse->pCurl = pCurl;
-        CHK(CURLE_OK == curl_easy_perform(pCurl), STATUS_CURL_PERFORM_FAILED);
+        curlResult = curl_easy_perform(pCurl);
+        if (curlResult != CURLE_OK) {
+            SNPRINTF(gRefereeClientError, SIZEOF(gRefereeClientError), "curl_easy_perform: %s", curl_easy_strerror(curlResult));
+        }
+        CHK(CURLE_OK == curlResult, STATUS_CURL_PERFORM_FAILED);
     } else {
         retStatus = blockingCurlCall(pRequestInfo, &callInfo);
     }
 
 CleanUp:
+    X509_free(pOtherCert);
+    EVP_PKEY_free(pOtherKey);
     if (pCurl != NULL) {
         curl_easy_cleanup(pCurl);
     }
@@ -432,9 +491,44 @@ CleanUp:
     return retStatus;
 }
 
+static STATUS refereeRunSdkRequestWithResponse(const CHAR* serverGroups, const CHAR* httpResponse, RefereeServer* pServer, BOOL viaCurlSession)
+{
+    return refereeRunSdkRequestWithCert(serverGroups, httpResponse, REFEREE_CERT_TRUSTED, pServer, viaCurlSession);
+}
+
 static STATUS refereeRunSdkRequest(const CHAR* serverGroups, RefereeServer* pServer, BOOL viaCurlSession)
 {
     return refereeRunSdkRequestWithResponse(serverGroups, NULL, pServer, viaCurlSession);
+}
+
+// Drives both SDK call sites against a server whose certificate must not be accepted, and
+// checks the request was refused for that reason: the call fails with curl's certificate
+// verification error (CURLE_PEER_FAILED_VERIFICATION, never a connection or CA-file error),
+// the SDK sends no HTTP over the connection, and no "TLS negotiated" line is logged. The
+// server's group list is PQC-only, so the key exchange that precedes the certificate check is
+// ML-KEM: a completed post-quantum key exchange must not stand in for a trusted peer.
+static VOID refereeExpectServerCertificateRejected(REFEREE_CERT_SCENARIO certScenario)
+{
+    RefereeServer server;
+    BOOL viaCurlSession;
+    STATUS status;
+    INT32 callSite;
+
+    for (callSite = 0; callSite < 2; callSite++) {
+        viaCurlSession = (callSite == 1);
+        SCOPED_TRACE(viaCurlSession ? "initializeCurlSession (Response.c)" : "blockingCurlCall (CurlCall.c)");
+
+        refereeStartLogCapture();
+        status = refereeRunSdkRequestWithCert(REFEREE_PQC_ONLY_GROUPS, NULL, certScenario, &server, viaCurlSession);
+        refereeStopLogCapture();
+
+        EXPECT_TRUE(STATUS_FAILED(status)) << "request succeeded against a server certificate the SDK must not trust";
+        ASSERT_TRUE(server.acceptedConnection) << server.errorText;
+        EXPECT_FALSE(server.receivedRequest) << "SDK sent its request over a connection whose certificate it should have refused";
+        EXPECT_EQ(0u, gRefereeLoggedGroupCount) << "no accepted connection, so no 'TLS negotiated' line; got " << gRefereeLoggedGroups[0];
+        EXPECT_NE(nullptr, STRSTR(gRefereeClientError, curl_easy_strerror(CURLE_PEER_FAILED_VERIFICATION)))
+            << "expected a certificate verification failure, got: " << gRefereeClientError;
+    }
 }
 
 // Raw AWS-LC client (not the SDK) pinned to the given groups. Used as the negative
@@ -629,6 +723,26 @@ TEST(TlsKeyExchangeRefereeTest, nonFipsBuildAcceptsX25519OnlyServer)
     EXPECT_STREQ(REFEREE_GROUP_X25519, gRefereeLoggedGroups[0]);
 }
 #endif
+
+// Server certificate verification. The tests above trust the referee's certificate, so
+// they would pass with verification off; these three show that the AWS-LC build, on both
+// SDK call sites, refuses a server whose certificate is not trusted, is expired, or names
+// another host. The positive control is every test above: the same code path, the same
+// server, a certificate the SDK is told to trust, and the request goes through.
+TEST(TlsKeyExchangeRefereeTest, sdkRejectsServerCertificateFromUntrustedIssuer)
+{
+    refereeExpectServerCertificateRejected(REFEREE_CERT_UNTRUSTED_ISSUER);
+}
+
+TEST(TlsKeyExchangeRefereeTest, sdkRejectsExpiredServerCertificate)
+{
+    refereeExpectServerCertificateRejected(REFEREE_CERT_EXPIRED);
+}
+
+TEST(TlsKeyExchangeRefereeTest, sdkRejectsServerCertificateIssuedToAnotherHost)
+{
+    refereeExpectServerCertificateRejected(REFEREE_CERT_WRONG_HOST);
+}
 
 // The group list the SDK installs must put the hybrid post-quantum group first: a server
 // that supports both and honors client preference picks ML-KEM. (AWS-LC servers follow
