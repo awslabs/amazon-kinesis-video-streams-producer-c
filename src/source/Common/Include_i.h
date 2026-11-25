@@ -13,8 +13,11 @@ extern "C" {
 ////////////////////////////////////////////////////
 // Project include files
 ////////////////////////////////////////////////////
-#if defined(KVS_USE_OPENSSL)
+#if defined(KVS_USE_OPENSSL) || defined(KVS_USE_AWS_LC)
 
+// AWS-LC exposes the OpenSSL 1.1.1 API surface, so it shares this branch.
+// Only SslInit.c (legacy CRYPTO_set_locking_callback) checks KVS_USE_OPENSSL
+// specifically; AWS-LC is internally thread-safe and does not need it.
 #include <openssl/sha.h>
 #include <openssl/hmac.h>
 #include <openssl/evp.h>

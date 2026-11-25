@@ -3,6 +3,9 @@
  */
 #define LOG_CLASS "CurlApiCallbacks"
 #include "Include_i.h"
+#if defined(KVS_USE_AWS_LC_FIPS)
+#include <openssl/crypto.h> // FIPS_mode()
+#endif
 
 /**
  * Creates CURL based API callbacks provider
@@ -17,6 +20,16 @@ STATUS createCurlApiCallbacks(PCallbacksProvider pCallbacksProvider, PCHAR regio
     KvsControlPlaneEndpointType controlPlaneEndpointType;
 
     CHK(pCallbacksProvider != NULL && ppCurlApiCallbacks != NULL, STATUS_NULL_ARG);
+#if defined(KVS_USE_AWS_LC_FIPS)
+    // Built for the AWS-LC FIPS module. The FIPS and non-FIPS AWS-LC lines install identical
+    // headers and library names, so a stale non-FIPS install in the dependency prefix links
+    // without a build error (the configure guards against the known case, but a prebuilt or
+    // system library can still slip through). Refuse to run rather than ship a binary that
+    // claims FIPS and is not.
+    CHK_ERR(FIPS_mode() == 1, STATUS_CRYPTO_FIPS_MODE_MISMATCH,
+            "Built with USE_AWS_LC_FIPS but the linked AWS-LC is not in FIPS mode (FIPS_mode() == 0). "
+            "Rebuild against the AWS-LC FIPS module: remove the dependency install prefix and reconfigure.");
+#endif
     CHK(certPath == NULL || STRNLEN(certPath, MAX_PATH_LEN + 1) <= MAX_PATH_LEN, STATUS_INVALID_CERT_PATH_LENGTH);
     CHK(customUserAgent == NULL || STRNLEN(customUserAgent, MAX_CUSTOM_USER_AGENT_LEN + 1) <= MAX_CUSTOM_USER_AGENT_LEN,
         STATUS_MAX_CUSTOM_USER_AGENT_LEN_EXCEEDED);

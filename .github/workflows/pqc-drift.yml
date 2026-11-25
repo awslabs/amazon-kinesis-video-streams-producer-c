@@ -1,0 +1,172 @@
+name: PQC key exchange drift check
+
+# Nightly guard for the post-quantum TLS path against the LIVE service.
+#
+# Per-PR CI tolerates either classical or hybrid ML-KEM key exchange so a
+# service-side rollout cannot break unrelated pull requests. This workflow is the
+# strict counterpart: it pins the group the SDK is expected to negotiate with each
+# KVS plane today and fails on ANY change, in either direction:
+#   - classical -> ML-KEM: the service enabled PQC on that plane; update the
+#     expectation (below) and, once both planes are ML-KEM, tighten the per-PR
+#     assertions in ci.yml / samples.yml to make ML-KEM the permanent gate;
+#   - ML-KEM -> classical: a silent fallback (SDK, dependency, or service
+#     regression); investigate before anything else.
+#
+# Expected groups are repository variables (Settings -> Secrets and variables ->
+# Actions -> Variables), with defaults matching the state observed on 2026-10-12:
+#   KVS_EXPECTED_CONTROL_PLANE_GROUP  default X25519MLKEM768  (kinesisvideo.<region>)
+#   KVS_EXPECTED_DATA_PLANE_GROUP     default X25519          (PutMedia data endpoint)
+#
+# On failure an issue labelled "pqc-drift" is opened (or the open one updated).
+
+on:
+  schedule:
+    - cron: '17 9 * * *'   # daily, 09:17 UTC
+  workflow_dispatch:
+    inputs:
+      control_plane_group:
+        description: 'Expected group on the control plane (overrides the repository variable)'
+        required: false
+        default: ''
+      data_plane_group:
+        description: 'Expected group on the PutMedia data plane (overrides the repository variable)'
+        required: false
+        default: ''
+
+jobs:
+  drift-check:
+    runs-on: ubuntu-22.04
+    name: AWS-LC vs live KVS endpoints
+
+    env:
+      AWS_KVS_LOG_LEVEL: 2
+      KVS_STREAM_NAME: demo-stream-producer-c-aws-lc-pqc-drift
+      EXECUTABLE_TIMEOUT_SECS: 300
+      EXPECTED_CP: ${{ inputs.control_plane_group || vars.KVS_EXPECTED_CONTROL_PLANE_GROUP || 'X25519MLKEM768' }}
+      EXPECTED_DP: ${{ inputs.data_plane_group || vars.KVS_EXPECTED_DATA_PLANE_GROUP || 'X25519' }}
+
+    permissions:
+      id-token: write
+      contents: read
+      issues: write
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.x'
+
+      - name: Build repository (USE_AWS_LC)
+        run: |
+          mkdir build && cd build
+          cmake .. -DBUILD_TEST=ON -DUSE_OPENSSL=OFF -DUSE_AWS_LC=ON -DBUILD_STATIC=ON -DPARALLEL_BUILD=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
+          make -j$(nproc)
+
+      - name: Offline referee (the SDK still offers ML-KEM regardless of the service)
+        working-directory: ./build
+        run: |
+          ./tst/producer_test --gtest_filter="TlsBackendTest.*:TlsKeyExchangeRefereeTest.*"
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-duration-seconds: 900
+
+      - name: Streaming sample (creates the stream, exercises control plane and PutMedia)
+        working-directory: ./build
+        run: |
+          set -o pipefail
+          timeout --signal=SIGKILL "$EXECUTABLE_TIMEOUT_SECS" \
+            ./kvsVideoOnlyRealtimeStreamingSample "$KVS_STREAM_NAME" | tee output.log
+          grep -q '"EventType":"PERSISTED"' output.log
+
+      - name: Control plane probe (strict)
+        working-directory: ./build
+        run: |
+          echo "Expected control plane group: $EXPECTED_CP"
+          ./kvsTlsKeyExchangeProbe https://kinesisvideo.${{ secrets.AWS_REGION }}.amazonaws.com/ - "$EXPECTED_CP" | tee probe-control-plane.log
+
+      - name: Data plane probe (strict)
+        working-directory: ./build
+        run: |
+          echo "Expected data plane group: $EXPECTED_DP"
+          data_endpoint=$(aws kinesisvideo get-data-endpoint --stream-name "$KVS_STREAM_NAME" --api-name PUT_MEDIA --query DataEndpoint --output text --no-cli-pager)
+          echo "PutMedia data endpoint: $data_endpoint"
+          # Unauthenticated GET: the HTTP status is irrelevant, only the negotiated group is checked.
+          ./kvsTlsKeyExchangeProbe "$data_endpoint/" - "$EXPECTED_DP" | tee probe-data-plane.log
+
+      - name: Every sample connection must use its plane's expected group (strict)
+        working-directory: ./build
+        run: |
+          # Classify each "TLS negotiated" line by the most recent request host: PutMedia
+          # requests are the data plane, everything else is the control plane.
+          # Assumption: no other request logs its "host ->" line between PutMedia's
+          # "host ->" and its handshake line. PutMedia runs on its own thread, so an
+          # interleaved control-plane request would be tagged as data plane and reported
+          # as DRIFT, a loud false positive rather than a silent miss. The plain streaming
+          # sample makes no control-plane call after its first three, so this does not
+          # occur here; the two strict probes above remain the authoritative per-plane signal.
+          awk -v cp="$EXPECTED_CP" -v dp="$EXPECTED_DP" '
+            /host -> / { phase = ($0 ~ /\/putMedia/) ? "data" : "control" }
+            /TLS negotiated:/ {
+              match($0, /keyExchange=[^ ]+/); g = substr($0, RSTART + 12, RLENGTH - 12)
+              want = (phase == "data") ? dp : cp
+              n[phase]++
+              if (g != want) { bad++; print "DRIFT (" phase " plane): negotiated " g ", expected " want }
+            }
+            END {
+              printf "control-plane TLS lines: %d (expected %s), data-plane TLS lines: %d (expected %s)\n", n["control"], cp, n["data"], dp
+              if (n["control"] < 2 || n["data"] < 1) { print "Too few TLS lines: control plane x2 plus PutMedia expected"; exit 1 }
+              if (bad) exit 1
+              print "No drift"
+            }' output.log
+
+      - name: Open or update the drift issue
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -e
+          # A pipeline's status is its last command's (sed), so defaults are applied on the result, not with ||
+          groups_seen=$(grep -o 'keyExchange=[^ ]*' build/output.log 2>/dev/null | sort | uniq -c | sed 's/^/    /')
+          cp_probe=$(grep -E 'RESULT|negotiated group' build/probe-control-plane.log 2>/dev/null | sed 's/^/    /')
+          dp_probe=$(grep -E 'RESULT|negotiated group' build/probe-data-plane.log 2>/dev/null | sed 's/^/    /')
+          [ -n "$groups_seen" ] || groups_seen="    (no sample output)"
+          [ -n "$cp_probe" ] || cp_probe="    (no probe output)"
+          [ -n "$dp_probe" ] || dp_probe="    (no probe output)"
+          title="PQC drift: KVS key exchange no longer matches expected (control plane $EXPECTED_CP, data plane $EXPECTED_DP)"
+          body=$(cat <<EOF
+          The nightly PQC key exchange drift check failed.
+
+          Expected: control plane \`$EXPECTED_CP\` (KVS_EXPECTED_CONTROL_PLANE_GROUP), data plane \`$EXPECTED_DP\` (KVS_EXPECTED_DATA_PLANE_GROUP).
+
+          Control plane probe:
+          $cp_probe
+
+          Data plane probe:
+          $dp_probe
+
+          Streaming sample, groups negotiated per connection:
+          $groups_seen
+
+          Run: $RUN_URL
+
+          If KVS enabled ML-KEM on a plane, update the matching repository variable; once both planes are X25519MLKEM768, tighten the per-PR assertions in ci.yml and samples.yml. If a group moved back to classical, treat it as a silent fallback and investigate the SDK, its dependencies, and the service.
+          EOF
+          )
+          # '// empty' matters: on an empty list '.[0].number' prints the string "null", which would pass -n
+          existing=$(gh issue list --label pqc-drift --state open --json number --jq '.[0].number // empty' || true)
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+            echo "Updated issue #$existing"
+          else
+            gh label create pqc-drift --description "Nightly PQC key exchange drift check failed" --color D93F0B 2>/dev/null || true
+            gh issue create --title "$title" --label pqc-drift --body "$body"
+          fi
