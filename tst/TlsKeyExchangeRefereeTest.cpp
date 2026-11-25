@@ -84,7 +84,7 @@ static UINT32 gRefereeLoggedGroupCount = 0;
 // The curl failure the SDK reported for the request: blockingCurlCall logs it as
 // "Curl perform failed ... with result <curl_easy_strerror> : <CURLOPT_ERRORBUFFER>";
 // on the session path the test performs the request itself and records the CURLcode text.
-static CHAR gRefereeClientError[512];
+static CHAR gRefereeClientError[1024];
 static logPrintFunc gRefereePreviousLogFn = NULL;
 
 static VOID refereeCaptureLogPrint(UINT32 level, const PCHAR tag, const PCHAR fmt, ...)
