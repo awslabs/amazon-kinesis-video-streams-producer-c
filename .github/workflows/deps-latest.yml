@@ -71,9 +71,11 @@ jobs:
         run: |
           set -e
           # Not releases/latest for AWS-LC: that returns the newest release of EITHER line,
-          # which is the FIPS line right after a FIPS release. Take the newest published vX.Y.Z.
+          # which is the FIPS line right after a FIPS release. Take the highest vX.Y.Z: sort
+          # by version, not publish date, because AWS-LC publishes backport releases on older
+          # major lines (e.g. v4.2.0 shipped after v5.12.0) and a date sort would pick those.
           latest_aws_lc=$(gh api 'repos/aws/aws-lc/releases?per_page=100' \
-            --jq '[.[] | select(.draft == false and .prerelease == false and (.tag_name | startswith("v")))] | sort_by(.published_at) | last | .tag_name')
+            --jq '[.[] | select(.draft == false and .prerelease == false and (.tag_name | startswith("v")))] | sort_by(.tag_name | ltrimstr("v") | split(".") | map(tonumber? // 0)) | last | .tag_name')
           latest_curl=$(gh api repos/curl/curl/releases/latest --jq .tag_name)
           case "$latest_aws_lc" in ''|null) echo "Could not resolve the latest AWS-LC release tag"; exit 1;; esac
           case "$latest_curl" in ''|null) echo "Could not resolve the latest curl release tag"; exit 1;; esac
@@ -92,37 +94,6 @@ jobs:
             echo "## Latest-dependency build"
             echo "* AWS-LC: \`$aws_lc_tag\`"
             echo "* curl: \`$curl_tag\`"
-          } >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Compare the pinned tags with the latest releases
-        id: pins
-        env:
-          LATEST_AWS_LC: ${{ steps.tags.outputs.latest_aws_lc }}
-          LATEST_CURL: ${{ steps.tags.outputs.latest_curl }}
-        run: |
-          set -e
-          # The non-FIPS AWS-LC pin (the FIPS line is pinned to a certified release on purpose)
-          # and the curl pin the AWS-LC backends use (the first CURL_DEFAULT_GIT_TAG after the
-          # USE_AWS_LC branch; the OpenSSL and mbedTLS backends pin older curl releases by design).
-          pinned_aws_lc=$(grep -oE 'set\(AWS_LC_DEFAULT_GIT_TAG v[0-9]+\.[0-9]+\.[0-9]+\)' CMake/Dependencies/libawslc-CMakeLists.txt | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+')
-          pinned_curl=$(awk '/if \(USE_AWS_LC OR USE_AWS_LC_FIPS\)/ {f=1} f && /set\(CURL_DEFAULT_GIT_TAG/ {gsub(/[()]/, ""); print $2; exit}' CMake/Dependencies/libcurl-CMakeLists.txt)
-          case "$pinned_aws_lc" in '') echo "Could not read the AWS-LC pin from libawslc-CMakeLists.txt"; exit 1;; esac
-          case "$pinned_curl" in '') echo "Could not read the curl pin from libcurl-CMakeLists.txt"; exit 1;; esac
-          behind=false
-          [ "$pinned_aws_lc" != "$LATEST_AWS_LC" ] && behind=true
-          [ "$pinned_curl" != "$LATEST_CURL" ] && behind=true
-          echo "pinned: AWS-LC $pinned_aws_lc, curl $pinned_curl; latest: AWS-LC $LATEST_AWS_LC, curl $LATEST_CURL; behind=$behind"
-          {
-            echo "pinned_aws_lc=$pinned_aws_lc"
-            echo "pinned_curl=$pinned_curl"
-            echo "behind=$behind"
-          } >> "$GITHUB_OUTPUT"
-          {
-            echo "## Pinned tags vs latest releases"
-            echo "| Dependency | Pinned | Latest release |"
-            echo "|---|---|---|"
-            echo "| AWS-LC | \`$pinned_aws_lc\` | \`$LATEST_AWS_LC\` |"
-            echo "| curl | \`$pinned_curl\` | \`$LATEST_CURL\` |"
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Build repository (USE_AWS_LC, latest tags)
@@ -167,6 +138,40 @@ jobs:
         working-directory: ./build
         run: |
           ./kvsTlsKeyExchangeProbe https://kinesisvideo.${{ secrets.AWS_REGION }}.amazonaws.com/ - X25519MLKEM768:X25519
+
+      - name: Compare the pinned tags with the latest releases
+        id: pins
+        # After the build so a failure here cannot skip the build or masquerade as a build
+        # failure in the issue below; needs only the resolved tags, not the build result.
+        if: always() && steps.tags.outcome == 'success'
+        env:
+          LATEST_AWS_LC: ${{ steps.tags.outputs.latest_aws_lc }}
+          LATEST_CURL: ${{ steps.tags.outputs.latest_curl }}
+        run: |
+          set -e
+          # The non-FIPS AWS-LC pin (the FIPS line is pinned to a certified release on purpose)
+          # and the curl pin the AWS-LC backends use (the first CURL_DEFAULT_GIT_TAG after the
+          # USE_AWS_LC branch; the OpenSSL and mbedTLS backends pin older curl releases by design).
+          pinned_aws_lc=$(grep -oE 'set\(AWS_LC_DEFAULT_GIT_TAG v[0-9]+\.[0-9]+\.[0-9]+\)' CMake/Dependencies/libawslc-CMakeLists.txt | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+')
+          pinned_curl=$(awk '/if \(USE_AWS_LC OR USE_AWS_LC_FIPS\)/ {f=1} f && /set\(CURL_DEFAULT_GIT_TAG/ {gsub(/[()]/, ""); print $2; exit}' CMake/Dependencies/libcurl-CMakeLists.txt)
+          case "$pinned_aws_lc" in '') echo "Could not read the AWS-LC pin from libawslc-CMakeLists.txt"; exit 1;; esac
+          case "$pinned_curl" in '') echo "Could not read the curl pin from libcurl-CMakeLists.txt"; exit 1;; esac
+          behind=false
+          [ "$pinned_aws_lc" != "$LATEST_AWS_LC" ] && behind=true
+          [ "$pinned_curl" != "$LATEST_CURL" ] && behind=true
+          echo "pinned: AWS-LC $pinned_aws_lc, curl $pinned_curl; latest: AWS-LC $LATEST_AWS_LC, curl $LATEST_CURL; behind=$behind"
+          {
+            echo "pinned_aws_lc=$pinned_aws_lc"
+            echo "pinned_curl=$pinned_curl"
+            echo "behind=$behind"
+          } >> "$GITHUB_OUTPUT"
+          {
+            echo "## Pinned tags vs latest releases"
+            echo "| Dependency | Pinned | Latest release |"
+            echo "|---|---|---|"
+            echo "| AWS-LC | \`$pinned_aws_lc\` | \`$LATEST_AWS_LC\` |"
+            echo "| curl | \`$pinned_curl\` | \`$LATEST_CURL\` |"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Open or update the latest-dependency issue
         if: failure()
@@ -247,7 +252,7 @@ jobs:
 
           The build against the latest releases in this run: build $OUTCOME_BUILD, test suite $OUTCOME_TESTS ($RUN_URL).
 
-          Read the release notes and advisories between the pinned and the latest release. If any fixes a vulnerability that affects the SDK, treat the bump as a security fix and follow the dependency security response in the README (owner and target time). Otherwise bump the pins (\`CMake/Dependencies/libawslc-CMakeLists.txt\`, \`libcurl-CMakeLists.txt\`, and the versions table in README.md) with the next release. This issue closes itself when the pins catch up.
+          Read the release notes and advisories between the pinned and the latest release. If any fixes a vulnerability that affects the SDK, treat the bump as a security fix and follow the dependency security response in the README (owner and priority). Otherwise bump the pins (\`CMake/Dependencies/libawslc-CMakeLists.txt\`, \`libcurl-CMakeLists.txt\`, and the versions table in README.md) with the next release. This issue closes itself when the pins catch up.
           EOF
           )
           if [ -n "$existing" ]; then
